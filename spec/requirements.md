@@ -1,36 +1,51 @@
-# Requirements, round 1
+# Requirements
 
-*Draft of 2026-10-11.* This is the first spec for this toolkit, written as an exercise in the workflow it describes. It is one file so it can be reviewed in one sitting. Once the spec format is settled (Q1), it splits into per-component directories (MODEL-1). Verification items come in a later round.
+*Round 3, 2026-10-11.* This is the spec for this toolkit, written as an exercise in the workflow it describes. It is one file so it can be reviewed in one sitting. Once the toolkit exists, it splits into per-component directories (MODEL-1).
+
+- **What changed in round 3:** [changes/2026-10-11-round-3.md](changes/2026-10-11-round-3.md). Read that, not this whole file.
+- **Vocabulary:** [glossary.md](glossary.md) (proposed; see Q18).
 
 ## How to read this
 
-- ✅ **CONFIRMED**: states something you asked for. The quote under it is my source. Skim it to check I didn't stretch your words.
+- ✅ **CONFIRMED**: states something you asked for. The quote under it is my source. Quotes are your words with typos fixed; "…" marks a cut and [brackets] a substitution.
 - 🟡 **NEEDS REVIEW**: I added it, or I added substance to something you asked for (a number, a mechanism, a scope). *Why* gives my reasoning, and *Refines* names the ask it builds on. These are the places I'm steering, so these are the ones to read.
 
-**63 confirmed · 46 need review · 10 open questions.** Suggested order: the open questions, then the 🟡 items. The ✅ items are skimmable.
+**88 confirmed · 54 need review · 5 open questions.**
 
 ## Open questions
 
-These came up while I was writing the requirements down. Some are conflicts between your own asks that only showed once the asks sat side by side.
+8. **Who may write needs?** (MODEL-12) This was waiting on vocabulary, which [glossary.md](glossary.md) now proposes. A need is an outcome you want, judged by you (validation). A requirement is a checkable statement that agents verify. My lean: only you write needs, and agents propose them to you as questions.
+12. **What gets approved individually?** (MODEL-25) Proposal: each spec item has its own approval. A spec item is any need, requirement, verification item or decision record, plus each component's own definition (its purpose, parent and dependencies). Test links and related-code lists are not approved; the checker polices those. In short, you approve meaning and the checker verifies the links to code.
+16. **Restructure into layers before building?** Systems engineering writes system requirements that trace to the needs. It then allocates those to components, where they become component requirements (flow-down). Flow-down is the compression NEED-1 asks for: you'd read about 15 system requirements and look at components only where you care, instead of reading all 142 component-level items. Restructuring means three things:
+    - (a) writing the system requirements;
+    - (b) tracing every component requirement up to one of them;
+    - (c) moving design choices (hooks, YAML on stdin, plugin packaging, fingerprints…) out of requirements and into decision records.
 
-1. **How do agents edit the spec?** (MODEL-1, CLI-1) You first leaned toward JSON that agents touch only through the CLI. I proposed plain YAML that agents edit directly, with the CLI for queries, checks and to-do lists. This choice decides the file layout and most of the CLI.
-2. **What runs at merge?** (VERIFY-7) I read "changed VIs belonging to changed REQs/components" as three groups: items that changed, items that verify a changed requirement, and items of components whose related code changed. Is the third group in?
-3. **When do auditors run?** (AGENT-4, VERIFY-6) Your code-first flow runs skeptical audits before your review. Your tiering holds token-heavy work until after your LGTM, and audits are token-heavy.
-   - *Before review:* the audits inform what you read, but they spend tokens on changes you might reject.
-   - *After LGTM:* cheaper, but you approve without seeing their findings.
+    My lean: yes, as the next round, before building.
+17. **Add your CUJs as an item type?** Systems engineering calls them operational scenarios and writes them before needs. Ours exist only in chat, with NEED-6 and NEED-7 hinting at them. As items, they would ground the needs, give validation something concrete ("does CUJ 2 actually work?"), and become the first scenarios for agent-behavior evals (Q15). My lean: yes.
+18. **Adopt systems-engineering vocabulary?** See [glossary.md](glossary.md), especially two choices:
+    - Keep "component" (SE says "system element").
+    - Replace "modality" with SE's four verification methods (Test, Analysis, Demonstration, Inspection), keeping unit test, integration test and reasoning check as the techniques under them.
 
-   My lean: before.
-4. **Stop or continue on a contradiction?** (AGENT-17) When a request contradicts an approved requirement, should the agent ask right away or note it and raise it at review? Asking right away gives you earlier steering but interrupts "make X happen". My lean: ask right away only when the requirement is critical.
-5. **How do reasoning checks run?** (REASON-2) Subagents running inside the session may inherit repo instruction files and memory, which breaks the zero-context rule. Calling the model API from the Python CLI controls the context and model version exactly, but it needs an API key and runs outside Claude Code. Which?
-6. **What does accepting a failed reasoning test change?** (AGENT-9) Suppose the behavior you accepted also contradicts the requirement's text. Should the requirement change too, which would then show up as a bright change in the diff? My lean: yes. Otherwise the requirement and its VI end up saying different things.
-7. **What exactly counts as approval?** (CHANGE-6, CHANGE-7)
-   - In spec-first mode, your lgtm on the spec diff is recorded on the branch. Merging then approves the final result, including any deviations.
-   - In code-first mode, merging is the only approval.
+    My lean: keep "component", and adopt the four methods.
 
-   Either way: does a merge approve every agent-proposed requirement in it, or do you want to sign off individually on ones you only skimmed? My lean: the merge approves them, and their origin (MODEL-14) stays on record so you can audit them later.
-8. **Who may write needs?** (MODEL-12) Needs sit at the top of every trace. An agent-invented need could justify agent-invented requirements beneath it. My lean: only you write needs, and agents propose them to you as questions.
-9. **Are long-running tests expensive?** (MODEL-9) Your tiers split on token cost. By that rule an hour-long integration test is cheap, so it would run on every check. Should the expensive tier also cover slow items?
-10. **Which mode applies when a request doesn't say?** (CHANGE-1, CHANGE-2) "Write the specs for X" is spec-first, and "build it real quick" is code-first. "Make X happen" says neither. My lean: code-first, so the common case asks nothing of you.
+### Resolved
+
+| Q | Round | Resolution | Items |
+|---|---|---|---|
+| 1 | 2 | Agents edit the spec through the CLI, and a hook blocks direct edits. | CLI-1, CLI-5 to CLI-8, AGENT-20 |
+| 2 | 3 | Expensive checks never run automatically, and the agent runs every cheap check after each change. | VERIFY-6, AGENT-30; VERIFY-7 and VERIFY-9 removed |
+| 3 | 3 | Auditors run before your review. | AGENT-4 |
+| 4 | 2–3 | Contradictions are always reported. Stopping to ask happens only in spec-first mode, and code-first never stops. | AGENT-17, AGENT-18, AGENT-28 |
+| 5 | 2 | Reasoning checks run in fresh, non-forked subagents that read code but not the spec. | REASON-2, REASON-5 to REASON-7 |
+| 6 | 2 | When an accepted failure contradicts a requirement, the requirement changes and you get the alternatives. | AGENT-19 |
+| 7 | 2 | Approvals are fingerprinted records that the checker can verify. | MODEL-24 to MODEL-26, CHECK-14, CHECK-15 |
+| 9 | 2 | "Expensive" covers time as well as tokens, and full runs happen on request. | MODEL-9, MODEL-23, VERIFY-11 to VERIFY-13, AGENT-22 |
+| 10 | 2 | Code-first is the default mode. | CHANGE-9 |
+| 11 | 3 | Where agents make changes is left to you and the harness. Quick changes come first when you ask. | AGENT-32, AGENT-29 |
+| 13 | 3 | Chat approvals are allowed when unambiguous. | AGENT-21, AGENT-33, AGENT-34 |
+| 14 | 3 | No transcript archive. Decisions live in paraphrased decision records on components. | MODEL-28, AGENT-24, AGENT-35; AGENT-26 removed |
+| 15 | 3 | Shelved. The AGENT requirements are demonstrated in real use until there's an eval harness. | AGENT section note |
 
 ## Components
 
@@ -69,6 +84,10 @@ A reusable systems-engineering toolkit. It provides skills, subagents, a checker
   - *Source:* "How to make this system relatively low overhead, so that the agent I'm interfacing with doesn't have to think about it much"
 - ✅ **NEED-6** The engineer needs to choose, per change, between specifying first and building first.
   - *Source:* "the system should support two CUJs … We want to support both workflows cleanly."
+- ✅ **NEED-7** The engineer needs to develop quickly, running the full verification only occasionally and without supervising it.
+  - *Source:* "I want to be able to develop quickly with agility, and occasionally say 'hey let's run the full suite' and walk away"
+- ✅ **NEED-8** The engineer needs the reasoning behind each decision to stay available to future agents and to the engineer.
+  - *Source:* "any documentation, links to external docs, things that came up in the building, build notes, reasoning for why something is the way it is, should be persisted"
 
 ### Requirements
 
@@ -85,7 +104,7 @@ A reusable systems-engineering toolkit. It provides skills, subagents, a checker
 
 ## MODEL: what a spec contains
 
-A spec holds components, needs, requirements, verification items and implementations, plus the links between them.
+A spec holds components, needs, requirements, verification items, decision records and implementations, plus the links and approvals between them.
 
 - ✅ **MODEL-1** The spec shall store each component as its own directory inside a single, flat components directory.
   - *Source:* "We have a directory called components and inside that we have directories for each component … It's still a flat directory"
@@ -103,10 +122,16 @@ A spec holds components, needs, requirements, verification items and implementat
   - *Source:* "it could be 'implemented in {Implementation name XYZ, C++} or have no implementations'"
 - ✅ **MODEL-8** Each verification item shall link to its tests separately for each implementation.
   - *Source:* "there's an implementation of this for the C++ stack, but if I remade it in rust that could also work"
-- ✅ **MODEL-9** Each verification item shall have a cost tier: cheap (fully automated, no model calls) or expensive (needs model calls or subagents).
-  - *Source:* "Expensive (e.g. not fully automated steps that require extra tokens/subagents spun up) should be a separate tier of tests". See Q9.
+- ✅ **MODEL-9** Each verification item shall have a cost tier: cheap, or expensive when it needs model calls, subagents or a long run time.
+  - *Source:* "Expensive (e.g. not fully automated steps that require extra tokens/subagents spun up) should be a separate tier of tests" · "Expensive is not just a function of tokens, but time."
 - ✅ **MODEL-10** Each component shall list its related code by path or pattern, with no limit on how many components a file relates to.
   - *Source:* "Should we decouple it, such that components can call out related code files" · "I'm not sure about 1 file to 1 component"
+- ✅ **MODEL-24** The spec shall record each approval by the engineer together with a fingerprint of the approved content.
+  - *Source:* "a list of properties stating when the file has been LGTMed by the user, including an 'approved' + some kind of git state of the file? Or like hash?"
+- ✅ **MODEL-27** Each spec item and change record shall be able to link to its context: artifacts, documents, external links and build notes.
+  - *Source:* "in the schema, we should have a way to link to context … any documentation, links to external docs, things that came up in the building, build notes". Links to conversation transcripts were dropped in round 3.
+- ✅ **MODEL-28** Each component shall keep its decision records: a dated history of the decisions about it, each with its reasoning and the alternatives considered.
+  - *Source:* "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time."
 - 🟡 **MODEL-11** Each component except the root shall name exactly one parent component, recorded separately from its dependencies.
   - *Why:* "is part of" (home feed → side panel) and "depends on" (side panel → image cache) are different relations. Requirements flow down the first, and change impact flows along the second. If the two are mixed, neither works.
 - 🟡 **MODEL-12** The spec shall hold needs, meaning goals that can't be verified directly, as a third kind of item, each traced to the requirements that serve it.
@@ -115,7 +140,7 @@ A spec holds components, needs, requirements, verification items and implementat
   - *Why:* the rationale is the first thing an agent reads when you ask why a requirement exists. That's why the NASA and INCOSE handbooks make it mandatory.
 - 🟡 **MODEL-14** Each requirement shall record its origin: stated by the engineer, or proposed by an agent.
   - *Refines:* "we may want to consider adding this functionality to the rendering UI, so I know what to read"
-  - *Why:* makes this document's ✅/🟡 split permanent, so REVIEW-8 can show it.
+  - *Why:* makes this document's ✅/🟡 split permanent. Approval (MODEL-24) tracks what you've seen; origin tracks whose idea it was.
 - 🟡 **MODEL-15** A requirement ID shall never be reused, including after its requirement is deleted.
   - *Why:* "why did AGENT-17 disappear?" only works if AGENT-17 has always meant one thing.
 - 🟡 **MODEL-16** Requirement text shall follow the wording rules: exactly one "shall", one of the EARS (Easy Approach to Requirements Syntax) sentence patterns, and no banned terms (vague words, escape clauses, open-ended endings, test or implementation vocabulary).
@@ -132,6 +157,13 @@ A spec holds components, needs, requirements, verification items and implementat
   - *Why:* lets a C++ original and a Rust port share one repository, each with its own code lists and tests.
 - 🟡 **MODEL-22** Exactly one implementation shall be marked primary.
   - *Why:* gives changes a default target (CHANGE-8).
+- 🟡 **MODEL-23** A run time shall count as long when it exceeds 60 seconds, unless the repository's configuration sets another limit.
+  - *Why:* keeps the cheap tier fast enough to run after every change. 60 seconds is a guess, which is why it's configurable.
+- 🟡 **MODEL-25** Approvals shall apply to individual items (needs, requirements and verification items), not to whole files.
+  - *Refines:* MODEL-24's source (you suggested per file).
+  - *Why:* one reworded requirement shouldn't un-approve the others in its file. See Q12.
+- 🟡 **MODEL-26** Each approval shall store the content it approved.
+  - *Why:* a fingerprint shows *that* something changed. Only the stored content shows *what* changed (REVIEW-11).
 
 ## CHECK: the checker
 
@@ -150,6 +182,8 @@ The checker tells an agent everything still unfinished in its spec work, determi
   - *Source:* "XYZ files were edited but the REQs not updated, can you check the REQs" · "if the code is changed then the agent is notified … and dumps all the specs into context"
 - ✅ **CHECK-6** When a verification item has changed and none of the requirements it verifies has, the checker shall ask whether a requirement change was forgotten.
   - *Source:* "hey, you had to change a verification item but didn't change a req - did you forget?"
+- ✅ **CHECK-14** The checker shall report as unapproved each item that has no approval, or whose content no longer matches its approval's fingerprint.
+  - *Source:* "Then the CLI can derive when the file is not approved (e.g. a subagent went and changed things, so now the hash doesn't match?)"
 - 🟡 **CHECK-7** The checker shall treat a CHECK-5 or CHECK-6 finding as resolved once the change record gives a reason for it.
   - *Refines:* "Then it should file a waiver (maybe?) or just continue"
   - *Why:* "just continue" leaves you nothing to read. A one-line reason costs the agent little, and it's what you'll want to see in review.
@@ -166,6 +200,8 @@ The checker tells an agent everything still unfinished in its spec work, determi
   - *Why:* the checker runs every time an agent tries to finish (AGENT-12), and slow checks get skipped.
 - 🟡 **CHECK-13** Where a repository adopts the toolkit with existing code, the checker shall accept a baseline of pre-existing findings and report only findings outside it.
   - *Why:* an existing codebase starts with hundreds of unlinked tests, and a baseline makes adoption gradual. The baseline should only ever shrink.
+- 🟡 **CHECK-15** When preparing a merge, the checker shall report each unapproved item as a finding.
+  - *Why:* keeps the main branch limited to what you've seen (NEED-1). Approving takes a click on the review page (REVIEW-13) or an explicit message in chat (AGENT-33).
 
 ## VERIFY: the verification runner
 
@@ -181,16 +217,20 @@ The runner executes verification items by modality and tier, and tracks each ite
   - *Source:* as VERIFY-3.
 - ✅ **VERIFY-5** The runner shall derive each verification item's status in each implementation: not implemented, not yet run, passing or failing.
   - *Source:* "the specs should mark in some way what has been implemented yet, and what has not (e.g. don't expect tests to pass, perhaps VIs have been specced but not implemented)"
-- ✅ **VERIFY-6** The runner shall run expensive-tier items only after the engineer has approved the change for merging.
-  - *Source:* "only run when the user already agrees the system LGTM, and it's time to merge things to main"
-- ✅ **VERIFY-7** When preparing a merge, the runner shall run the expensive-tier items the change affects: items that changed, items that verify a changed requirement, and items of components whose related code changed.
-  - *Source:* "run all the test suite (for changed VIs belonging to changed REQs/components, so as to not waste too many tokens)". The three groups are my reading; see Q2.
+- ✅ **VERIFY-6** The runner shall run expensive-tier items only when the engineer explicitly requests them.
+  - *Source:* "I don't want it to spin up the reasoning agents every time automatically (a human should gate that)" · "occasionally say 'hey let's run the full suite'"
 - ✅ **VERIFY-8** When an expensive-tier item fails, the runner shall add the failure to the change's list of decisions for the engineer.
   - *Source:* "If reasoning or integration+reasoning tests fail, the LLM should add it to a list of things to flag to the user."
-- 🟡 **VERIFY-9** When preparing a merge, the runner shall run every cheap-tier item.
-  - *Why:* cheap items cost seconds, not tokens. Running only some of them saves little and risks missing a regression.
-- 🟡 **VERIFY-10** When preparing a merge, the runner shall use a reasoning check to compare each changed verification item's tests against its description.
-  - *Why:* CHECK-9 catches drift mechanically. This catches a test that never matched its description in the first place.
+- ✅ **VERIFY-11** When the engineer requests a full run, the runner shall run every verification item in every tier without needing the engineer present.
+  - *Source:* "occasionally say 'hey let's run the full suite' and walk away"
+- ✅ **VERIFY-12** At the end of a full run, the toolkit shall produce a summary of the product's health.
+  - *Source:* "come back with … an AI summary of the health of the code"
+- 🟡 **VERIFY-13** The health summary shall list each component's verification status, each change the run made with its reason, each unapproved item, and each requirement without verification.
+  - *Why:* this is what you'd want to know on returning: what's broken, what agents changed while you were away, and what's waiting for you.
+- *Removed in round 3:*
+  - VERIFY-7 (merge-time scope of expensive items): expensive items now run only when you ask (VERIFY-6).
+  - VERIFY-9 (run every cheap item at merge): replaced by AGENT-30, which runs them after every change.
+  - VERIFY-10 (automatic reasoning check of tests against descriptions at merge): moved into the pre-review audits as AGENT-31.
 
 ### UNIT: unit-test modality (child of VERIFY)
 
@@ -210,13 +250,19 @@ The runner executes verification items by modality and tier, and tracks each ite
 
 - ✅ **REASON-1** A reasoning-test item shall consist of a prompt asking a model to judge a stated aspect of the product, plus the inputs that judgment needs.
   - *Source:* "'REASONING TEST' which is a prompt that asks an LLM to reason about certain aspects we want to think about, that might be hard to confirm"
-- ✅ **REASON-2** The modality shall run each reasoning check with only its item's prompt and declared inputs in context: no project instructions, memory or conversation history.
-  - *Source:* "Subagents that do reasoning should be spun up with 0 context about the project, and only given what is absolutely necessary to verify … (this should be a req)". See Q5.
+- ✅ **REASON-2** The modality shall run each reasoning check in a fresh subagent that does not inherit the conversation, given only its item's prompt and declared inputs.
+  - *Source:* "Subagents that do reasoning should be spun up with 0 context about the project, and only given what is absolutely necessary to verify … (this should be a req)" · "I imagine there's a 'forking' ability, which preserves user conversation. If that exists, I do not want to use it."
+- ✅ **REASON-5** A reasoning check shall be able to read the product's code, except the spec directory.
+  - *Source:* "For the subagent to verify and reason through things, it will need to read code. However, we should tell it to NOT read in spec/ directory."
 - 🟡 **REASON-3** Each reasoning check shall return a pass or fail verdict with evidence quoted from its inputs.
   - *Why:* a bare verdict can't be audited. Quoted evidence shows you why it failed within seconds.
 - 🟡 **REASON-4** For an item that verifies a critical requirement, the modality shall take the majority verdict of three independent runs.
   - *Refines:* "the goal being to have slightly more deterministic results"
   - *Why:* one sample from a nondeterministic judge tells you little, and three runs is the smallest number that gives a majority. Limiting this to critical requirements keeps the token cost down.
+- 🟡 **REASON-6** A hook in the reasoning-check subagent's definition shall block reads of the spec directory.
+  - *Why:* an instruction can be ignored, but a hook can't be. Claude Code lets a subagent definition carry its own hooks. It's a small hook: refuse reads under the spec directory and drop spec hits from search results. Your round-3 call: retract it if it turns out to be fiddly.
+- 🟡 **REASON-7** The reasoning-check subagent's definition shall exclude the project's instruction files.
+  - *Why:* fresh (non-fork) subagents still load CLAUDE.md and AGENTS.md by default, and those files can carry project context or spec-related instructions. The definition's `omitClaudeMd` setting turns that off.
 
 ## LANG: language adapters
 
@@ -241,17 +287,18 @@ The change record captures what was asked, which mode the change runs in, what c
   - *Source:* "hey build it real quick, then update the spec to match"
 - ✅ **CHANGE-3** Each change record shall keep a list of decisions for the engineer.
   - *Source:* "the LLM should add it to a list of things to flag to the user"
+- ✅ **CHANGE-9** When a request names no mode, the toolkit shall use code-first mode.
+  - *Source:* your answer to Q10: "Agree".
 - 🟡 **CHANGE-4** Each change record shall capture the engineer's request in the engineer's own words.
   - *Why:* lets auditors ask "you asked for X, so why does the spec now also say Y?" without a separate planning step.
 - 🟡 **CHANGE-5** Each change record shall give a reason for each requirement the change added, modified or removed.
   - *Refines:* "I view the spec diff and say 'hey why does this component no longer have a requirement to do x or y' and the agent is able to explain"
   - *Why:* an agent starting from a fresh context months later can only answer "why?" if someone wrote the reason down at the time.
-- 🟡 **CHANGE-6** In spec-first mode, the change record shall store the spec revision the engineer approved.
-  - *Why:* AGENT-11 and REVIEW-11 compare the final spec against this revision to find deviations. See Q7.
-- 🟡 **CHANGE-7** The toolkit shall treat a spec edit as approved once it is merged into the main branch.
-  - *Why:* gives "approved" a precise meaning without extra tooling: your merge is the approval. Auditors check changes against the approved spec.
 - 🟡 **CHANGE-8** Each change record shall name the implementation the change targets, defaulting to the primary implementation.
   - *Why:* CHECK-11 and the to-do list need to know which implementation "done" refers to. For a port, it's the new implementation.
+- *Removed in round 2:*
+  - CHANGE-6 (store the approved spec revision): replaced by MODEL-26.
+  - CHANGE-7 (merging counts as approval): replaced by approval records (MODEL-24).
 
 ## REVIEW: review pages
 
@@ -271,33 +318,47 @@ Web pages for the engineer, showing the spec as a whole and how a change alters 
   - *Source:* "nothing if nothing changed"
 - ✅ **REVIEW-7** The renderer shall show each requirement's status in each implementation.
   - *Source:* "the specs should mark in some way what has been implemented yet, and what has not"
-- 🟡 **REVIEW-8** In a diff, the renderer shall mark each new or changed requirement that an agent proposed.
+- ✅ **REVIEW-13** The review page shall let the engineer approve items or give feedback on them.
+  - *Source:* "click 'approve' (or give feedback)"
+- 🟡 **REVIEW-8** The renderer shall mark each unapproved item.
   - *Refines:* "we may want to consider adding this functionality to the rendering UI, so I know what to read"
+  - *Why:* "unapproved" (CHECK-14) means exactly "what you haven't seen yet". That's what this document's 🟡 tags approximate by hand.
 - 🟡 **REVIEW-9** In a diff, the renderer shall highlight in amber each verification item that changed while the requirements it verifies did not.
   - *Why:* that's where test weakening hides. In a 2025 benchmark, Claude models cheated mostly by editing test files, so this case deserves its own color.
 - 🟡 **REVIEW-10** In a diff, the renderer shall show the recorded reason beside each changed or removed requirement.
   - *Why:* answers most "why?" questions before you need to ask them.
-- 🟡 **REVIEW-11** For a spec-first change, the renderer shall show the differences between the approved spec and the final spec.
-  - *Why:* puts your "I had to change a few things for you to review" on the page, not just in a chat message.
+- 🟡 **REVIEW-11** The renderer shall show each unapproved item's differences from its last approved content.
+  - *Why:* one mechanism covers both the spec-first "I had to change a few things" case and every other change since your last approval.
 - 🟡 **REVIEW-12** In a diff, the renderer shall show the decisions for the engineer above all requirement changes.
   - *Why:* those decisions are the steering points (NEED-2), so they shouldn't be buried at the bottom.
 
 ## CLI: the command-line tool
 
-The single tool through which agents, and the engineer, query, check, verify and render the spec.
+The single tool through which agents, and the engineer, query, edit, check, verify and render the spec.
 
-- ✅ **CLI-1** The toolkit shall provide one command-line tool through which agents query, check, verify and render the spec.
-  - *Source:* "The commandline interface the LLM uses" · "the only way that the LLM interacts with components is through a command line tool". See Q1.
+- ✅ **CLI-1** The toolkit shall provide one command-line tool through which agents query, edit, check, verify and render the spec.
+  - *Source:* "The commandline interface the LLM uses" · "I want the CLI to be the main way agents edit the spec."
 - ✅ **CLI-2** The CLI shall generate, for a named implementation, a to-do list of the requirements and verification items not yet implemented or not passing in it.
   - *Source:* "This ends up forming an automated 'todo' list for the LLM … 'let's implement this project in rust' and the todo list can be regenerated but for an entire different implementation"
-- 🟡 **CLI-3** The CLI shall answer four queries: one component's spec, the components related to given files, the trace from a requirement to its verification items and tests, and a requirement's change history.
-  - *Why:* lets an agent pull exactly the spec it needs into context, instead of all of it. This is your "dumps the specs into context", but targeted.
+- ✅ **CLI-5** Before applying an edit, the CLI shall show the agent the edit's context: affected parent and child requirements, linked verification items and tests, dependent components, and approval status.
+  - *Source:* "if an agent wants to edit the spec, the CLI has a chance to intercept the request and give extra context (for example, dumping the descendant V&V / REQs into context, then asking 'confirm?' or something)"
+- 🟡 **CLI-3** The CLI shall answer four queries: one component's spec, the components related to given files, the trace from a requirement to its verification items and tests, and a requirement's history (its rationale, each change with its reason, and its linked context).
+  - *Why:* lets an agent pull exactly the spec it needs into context, instead of all of it. The history query is how a later agent learns why a requirement is the way it is (AGENT-25).
 - 🟡 **CLI-4** The CLI shall order a to-do list so that each component's items follow those of the components it depends on.
   - *Why:* lets an agent build from the bottom up. A port starts at the leaf components and works upward.
+- 🟡 **CLI-6** When an edit affects approved items or items that others depend on, the CLI shall apply it only after the agent acknowledges each affected item by name.
+  - *Refines:* "then asking 'confirm?'"
+  - *Why:* a model will rubber-stamp a generic "confirm?". Naming each affected item with a one-line note makes the agent actually consider it, and those notes become reasons you can read. Edits that affect nothing apply immediately, so friction only appears where there's something to consider.
+- 🟡 **CLI-7** The CLI shall accept a batch of edits as one YAML document on standard input.
+  - *Why:* multi-line prose passed as shell arguments breaks on quotes, and a heredoc doesn't. One call can also carry a twenty-requirement update.
+- 🟡 **CLI-8** The CLI shall reject a modification or removal that has no reason.
+  - *Why:* enforces CHANGE-5 at write time, while the reason is fresh.
 
 ## AGENT: skills, subagents and hooks
 
 These fit the methodology into an agent's normal coding work.
+
+*Verification of the AGENT requirements is deferred (Q15, round 3). They're demonstrated in real use until there's an eval harness, and the first eval scenarios should come from real failures.*
 
 - ✅ **AGENT-1** In code-first mode, the skill shall let the main agent edit code without first reading the spec.
   - *Source:* "it spends time looking at code, and WHEN IT ADDS VALUE also reading the current REQs and V&V, but otherwise … it probably doesn't need to"
@@ -306,7 +367,7 @@ These fit the methodology into an agent's normal coding work.
 - ✅ **AGENT-3** The main agent shall report a change as done only after the checker reports no findings for it.
   - *Source:* "At the end, it runs the linter and is told 'hey XYZ tests have been added and are not associated with VERs …'"
 - ✅ **AGENT-4** Skeptical auditor subagents shall review each change's spec updates before the engineer reviews the change.
-  - *Source:* "have skeptical subagents run audits too, to ensure everything is up to date. Then I go in, read the specs". See Q3.
+  - *Source:* "have skeptical subagents run audits too, to ensure everything is up to date. Then I go in, read the specs" · Q3: "Before review sounds fine."
 - ✅ **AGENT-5** The toolkit shall critique each new or changed requirement and verification item.
   - *Source:* "How do we write some way to critique whether or not a requirement is well written or whether or not a verification item is well written"
 - ✅ **AGENT-6** The skill shall direct agents to pass the questions that spec work raises to the engineer, rather than resolve them silently.
@@ -316,11 +377,39 @@ These fit the methodology into an agent's normal coding work.
 - ✅ **AGENT-8** When the engineer asks for stronger verification of a requirement, the agent shall add verification items for it.
   - *Source:* "I want more robust test coverage on this important invariant"
 - ✅ **AGENT-9** When the engineer accepts a flagged failure, the agent shall update that verification item's expected result to the accepted behavior.
-  - *Source:* "If the user says lgtm, then the doc expectations must be updated." See Q6.
+  - *Source:* "If the user says lgtm, then the doc expectations must be updated."
 - ✅ **AGENT-10** In spec-first mode, the agent shall implement the approved spec by working through the to-do list for the target implementation.
   - *Source:* "then the implementation is created, the REQs and VIs checked off one by one"
 - ✅ **AGENT-11** When a spec-first change is complete, the agent shall list each difference between the approved spec and the final spec, or state that there are none.
   - *Source:* "'done, and I had to change a few things for you to review' or 'done, and everything was able to be made to spec'"
+- ✅ **AGENT-17** The agent shall report every contradiction between a request and an approved requirement.
+  - *Source:* "always _mention_ 'hey, this breaks X, Y, changes Z'"
+- ✅ **AGENT-18** In spec-first mode, when a contradiction is one the engineer would likely want to decide before more work is done, the agent shall stop and ask before continuing.
+  - *Source:* "but not let that halt execution UNLESS X or Y is deemed by the LLM to likely be something the user would want to have an opinion on / confirmation on" · round 3: "Only in cases where the user is trying to plan a change should we have things that halt the flow and come back and ask the user what to do."
+- ✅ **AGENT-19** When accepting a flagged failure requires changing a requirement, the agent shall change it and add a decision for the engineer listing the alternatives.
+  - *Source:* "I think yes, and with a flag to the user for these cases- like, 'hey, because of X or Y we needed to change the REQ. The alternatives are A B or C'"
+- ✅ **AGENT-21** Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, or an explicit approval in chat.
+  - *Source:* "Yeah I think LGTM in chat is fine, with the caveat that there can be no ambiguity to what I mean" · "e.g. a subagent went and changed things, so now the hash doesn't match"
+- ✅ **AGENT-22** During a full run, agents shall attempt to fix each failure, by changing code, requirements or verification items.
+  - *Source:* "come back with maybe some code changed, some reworded reqs, some updated / new VIs". Their changes stay unapproved until you approve them (CHECK-14).
+- ✅ **AGENT-23** When a decision is made in conversation, the agent shall persist its reasoning and sources as context linked from the affected items.
+  - *Source:* "if I'm designing and debating with an agent, and an Artifact is made with some visualizations, and I say 'yeah that looks cool lets do that'- then the implementation happens, reqs are made / updated, I'd like the agent to persist that"
+- ✅ **AGENT-24** The agent shall write a decision record for each decision made while building, attached to each component the decision affects.
+  - *Source:* "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time."
+- ✅ **AGENT-25** Before modifying or removing an approved requirement, the agent shall read its rationale and linked context.
+  - *Source:* "an implementing agent might say 'hmm, can I change this REQ? Let me read up on why they made it the way they made it...'"
+- ✅ **AGENT-28** In code-first mode, the agent shall finish the requested change without stopping to ask the engineer.
+  - *Source:* "it must remain possible to have a CUJ where the user can state what they want, say 'go for it', and come back to the changes having been made, and read the spec"
+- ✅ **AGENT-29** When the engineer asks for a quick change, the agent shall tell the engineer as soon as the change is usable, before finishing its tests and spec updates.
+  - *Source:* "sometimes I just want an agent to make a damn change quick, so I can run my binary and play with it while other changes get done … Sometimes I want the change done first, then it can spend all day polishing"
+- ✅ **AGENT-30** The agent shall run every cheap-tier item before reporting a change as done.
+  - *Source:* "I fully expect the agent to run all unit tests after changes anyways- its a single command."
+- ✅ **AGENT-32** The skills shall leave the choice of where agents make changes (working tree, branch or worktree) to the engineer and the agent harness.
+  - *Source:* "Let's not encode this in the skill. Agent harnesses are getting better and better, I don't want to be overly prescriptive."
+- ✅ **AGENT-33** A chat message shall count as an approval only when it states unambiguously which items it approves.
+  - *Source:* "agents say 1000 things in one chat, if I say lgtm I might mean 'yeah sure' to some of them, not 'yes, and also approve every req'"
+- ✅ **AGENT-35** A decision record shall present the engineer's reasoning as paraphrase, never as a direct quote.
+  - *Source:* "Don't directly quote, maybe clean it up a bit. Be careful not to imply its a direct quote."
 - 🟡 **AGENT-12** When the main agent tries to finish, a hook shall run the checker and return any findings to the agent.
   - *Why:* keeps AGENT-3 true even when the agent forgets, or doesn't have the skill loaded. A Claude Code Stop hook can block finishing and hand the findings back to the agent.
 - 🟡 **AGENT-13** Each auditor shall be a fresh-context subagent that did not author the change it audits.
@@ -332,5 +421,11 @@ These fit the methodology into an agent's normal coding work.
   - *Why:* the scenario probe from our earlier discussion, applied only where it pays off.
 - 🟡 **AGENT-16** For each critical requirement in a change, an auditor shall try to describe an implementation that passes the requirement's verification items yet violates it.
   - *Why:* if the auditor succeeds, the verification is too weak. This is a cheap, reasoning-based relative of mutation testing.
-- 🟡 **AGENT-17** When a requested change contradicts an approved requirement, the agent shall raise the contradiction with the engineer before the change merges.
-  - *Why:* this is the highest-value steering point. You learn that the request and the spec disagree while choosing between them is still cheap. See Q4.
+- 🟡 **AGENT-20** A hook shall block agents' direct edits to spec files, naming the CLI command to use instead.
+  - *Why:* agents default to editing files. A refusal that names the alternative redirects them reliably, and it keeps every edit going through CLI-5's context step.
+- 🟡 **AGENT-31** An auditor shall compare each changed verification item's tests against its description.
+  - *Why:* this was VERIFY-10. Running it automatically at merge would spin up reasoning agents without your say-so. The pre-review audits are where you accepted automatic reasoning work (Q3).
+- 🟡 **AGENT-34** A hook reading the engineer's own message shall record each chat approval, applying it only to the items as they were last shown to the engineer.
+  - *Why:* the agent never records an approval itself, so it can't act on a misreading. An approval also can't cover anything that changed after you looked.
+- *Removed:*
+  - AGENT-26 (archive transcripts), in round 3: decision records replace it (MODEL-28, AGENT-24).
