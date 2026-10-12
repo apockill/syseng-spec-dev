@@ -1,0 +1,62 @@
+- element: MODEL
+  ids:
+  - MODEL-26
+  note: MODEL-26, in round 4.
+- element: MODEL
+  ids:
+  - MODEL-6
+  note: MODEL-6, in round 5, because it restated SYS-8.
+- element: MODEL
+  ids:
+  - MODEL-19
+  - MODEL-20
+  note: MODEL-19 and MODEL-20 (the criticality flag), in round 5; see DR-20.
+- element: CHECK
+  ids:
+  - CHECK-13
+  note: CHECK-13 (a baseline of grandfathered findings for existing repos), in round 5. ONBOARD replaces it; see DR-21.
+- element: VERIFY
+  ids:
+  - VERIFY-7
+  - VERIFY-9
+  - VERIFY-10
+  note: VERIFY-7, VERIFY-9 and VERIFY-10, in round 3.
+- element: VERIFY
+  ids:
+  - VERIFY-1
+  - VERIFY-6
+  - VERIFY-11
+  note: VERIFY-1, VERIFY-6 and VERIFY-11, in round 5, because they restated SYS-22, SYS-12 and SYS-13.
+- element: REASON
+  ids:
+  - REASON-6
+  - REASON-7
+  note: REASON-6 and REASON-7, in round 4. They're now DR-7.
+- element: LANG
+  ids:
+  - LANG-1
+  note: LANG-1, in round 5, because it restated SYS-22.
+- element: CHANGE
+  ids:
+  - CHANGE-6
+  - CHANGE-7
+  note: CHANGE-6 and CHANGE-7, in round 2.
+- element: REVIEW
+  ids:
+  - REVIEW-8
+  note: REVIEW-8, in round 5, because it restated SYS-14.
+- element: AGENT
+  ids:
+  - AGENT-26
+  note: AGENT-26, in round 3.
+- element: AGENT
+  ids:
+  - AGENT-5
+  - AGENT-6
+  - AGENT-17
+  - AGENT-28
+  note: AGENT-5, AGENT-6, AGENT-17 and AGENT-28, in round 5, because they restated SYS-21, SYS-16 and SYS-18.
+- element: AGENT
+  ids:
+  - AGENT-23
+  note: AGENT-23, merged into AGENT-24 in round 5.

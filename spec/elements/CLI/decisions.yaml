@@ -1,0 +1,11 @@
+- id: DR-19
+  title: Named acknowledgments only for edits with impact
+  decided_by: agent
+  elements:
+  - CLI
+  requirements: CLI-6
+  recorded: round 4 (decided in round 2)
+  context: the engineer wanted the CLI to show context before an edit and ask for confirmation. Models rubber-stamp generic confirmations.
+  decision: an edit that touches approved or depended-upon items needs an acknowledgment of each affected item, by name, with a one-line note. Other edits apply at once.
+  alternatives: a generic confirmation on every edit, or no confirmation.
+  consequences: friction appears only where there's something to weigh, and the notes become reasons the engineer can read.

@@ -1,0 +1,96 @@
+- id: CHECK-1
+  text: In a single run, the checker shall report every violation of the MODEL requirements, along with every finding of the checks below.
+  origin: engineer
+  traces_to: SYS-7
+  source: |-
+    "the linter will be as comprehensive as possible to flag to the AI that its job is not done yet"
+  reworded: by INCOSE's rules, "as comprehensive as possible" is an escape clause, because nothing could ever fail it. This version can fail.
+- id: CHECK-2
+  text: Each finding shall state what is wrong, where it is, and what action resolves it, in terms an agent can act on without the methodology docs in its context.
+  origin: engineer
+  traces_to: SYS-20
+  source: |-
+    "a lot of the time the AI will not have the document for the system engineering documentation in its context … flag to the AI that its job is not done yet. That certain documentation needs to be updated, that certain tests need to be linked"
+- id: CHECK-3
+  text: The checker shall report each test that no verification item links to.
+  origin: engineer
+  traces_to: SYS-7
+  source: |-
+    "every unit test is referenced in some file" · "XYZ tests have been added and are not associated with VERs"
+- id: CHECK-4
+  text: The checker shall report each verification-item link to a test or file that does not exist.
+  origin: engineer
+  traces_to: SYS-7
+  source: |-
+    "XYZ tests are referenced in VERs but don't exist"
+- id: CHECK-5
+  text: When a system element's related code has changed and its requirements have not, the checker shall report that system element together with its current requirements.
+  origin: engineer
+  traces_to: SYS-7
+  source: |-
+    "XYZ files were edited but the REQs not updated, can you check the REQs" · "if the code is changed then the agent is notified … and dumps all the specs into context"
+- id: CHECK-6
+  text: When a verification item has changed and none of the requirements it verifies has, the checker shall ask whether a requirement change was forgotten.
+  origin: engineer
+  traces_to: SYS-7
+  source: |-
+    "hey, you had to change a verification item but didn't change a req - did you forget?"
+- id: CHECK-14
+  text: The checker shall report as unapproved each item that has no approval, or whose content no longer matches its approval's fingerprint.
+  origin: engineer
+  traces_to: SYS-14
+  source: |-
+    "Then the CLI can derive when the file is not approved (e.g. a subagent went and changed things, so now the hash doesn't match?)"
+- id: CHECK-16
+  text: Each wording finding shall name the rule it breaks, link to the rule's explanation, say why the rule exists, and suggest a rewrite.
+  origin: engineer
+  traces_to: SYS-20
+  source: |-
+    "As long as the error messages 'hey you did this wrong. According to {link to INCOSE ruleset} this is bad practice. We recommend {recommendations}.' … Think of rust- fantastic error messages, they guide the user to best practice and explain the 'why'."
+- id: CHECK-7
+  text: The checker shall treat a CHECK-5 or CHECK-6 finding as resolved once the change record gives a reason for it.
+  origin: agent
+  traces_to: SYS-7
+  refines: |-
+    "Then it should file a waiver (maybe?) or just continue"
+  why: |-
+    "just continue" leaves you nothing to read. A one-line reason costs the agent little, and it's what you'll want to see in review.
+- id: CHECK-8
+  text: The checker shall report each changed code file that no system element lists as related.
+  origin: agent
+  traces_to: SYS-7
+  refines: |-
+    "every header is referenced in some file"
+  why: a soft version of your original guarantee. New code can't land outside every system element's view without a finding.
+- id: CHECK-9
+  text: When a linked test's source or a verification item's description changes without the pair being re-confirmed, the checker shall report the pair.
+  origin: agent
+  traces_to: SYS-7
+  why: keeps descriptions and tests from drifting apart silently. Re-confirming means an agent has checked that they still match, and recorded that it did.
+- id: CHECK-10
+  text: The checker shall report a verification item that has no tests in an implementation as a to-do for that implementation, not as a finding.
+  origin: agent
+  traces_to: SYS-9
+  why: in spec-first planning and in a port, unimplemented items are expected. CHECK-11 decides when they must be finished.
+- id: CHECK-11
+  text: When an agent marks a change done, the checker shall report each requirement the change added or modified that neither passes in the change's target implementation nor has a recorded deferral.
+  origin: agent
+  traces_to: SYS-7
+  why: one completion rule covers both modes. A deferral, with its reason, covers features built across several changes, and ports.
+- id: CHECK-12
+  text: The checker shall finish within 5 seconds on a 100,000-line repository on the engineer's development machine.
+  origin: agent
+  traces_to: SYS-7
+  why: the checker runs every time an agent tries to finish, and slow checks get skipped.
+- id: CHECK-15
+  text: When preparing a merge, the checker shall report each unapproved item as a finding.
+  origin: agent
+  traces_to: SYS-14
+  why: keeps the main branch limited to what you've seen. Approving takes a click (REVIEW-13) or an explicit message in chat (AGENT-33).
+- id: CHECK-17
+  text: Within one run, the checker shall explain a rule in full only at its first finding, and refer back to that explanation for later findings of the same rule.
+  origin: agent
+  traces_to: SYS-20
+  refines: |-
+    "Remember not to waste too many tokens though. Like everything, there must be balance."
+  why: a spec with twenty vague words shouldn't produce twenty copies of the same lesson.

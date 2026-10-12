@@ -1,0 +1,6 @@
+id: MODEL
+title: What a spec contains
+parent: SYS
+depends_on: []
+purpose: A spec holds needs, system elements, requirements, verification items, decision records and implementations, plus the links and approvals between them.
+related_code: {}

@@ -1,0 +1,83 @@
+- id: DR-3
+  title: Refuse direct edits to spec files with a pre-tool hook
+  decided_by: agent
+  elements:
+  - AGENT
+  requirements: AGENT-20
+  recorded: round 4 (decided in round 2)
+  status: part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it.
+  context: agents are trained to edit files directly, which would bypass the CLI's context step.
+  decision: a Claude Code PreToolUse hook refuses agents' file edits under the spec directory. Its refusal names the CLI command to use instead.
+  alternatives: an instruction in the skill, which is easy to ignore. Linting afterwards, by which time the edit has already happened.
+  consequences: the engineer can still edit spec files by hand, because hooks only see agents' tool calls.
+- id: DR-4
+  title: Run the checker from a stop hook
+  decided_by: agent
+  elements:
+  - AGENT
+  - CHECK
+  requirements: AGENT-12, CHECK-12
+  recorded: round 4 (decided in round 1)
+  status: part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it.
+  context: the main agent often won't have the methodology in context, and it may forget to run the checker.
+  decision: a Claude Code Stop hook runs the checker when the agent tries to finish, and blocks with the findings. It blocks at most once per turn, so a mid-task question to the engineer still gets through.
+  alternatives: relying on the skill's instructions. A CI-only check, which comes too late.
+  consequences: the checker must be fast (CHECK-12).
+- id: DR-6
+  title: Record chat approvals from the engineer's own message
+  decided_by: agent
+  elements:
+  - AGENT
+  requirements: AGENT-21, AGENT-33, AGENT-34
+  recorded: round 4 (decided in round 3)
+  status: part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it.
+  context: the engineer wants to approve in chat, but only with unambiguous wording.
+  decision: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. The agent never records approvals.
+  alternatives: letting the agent record approvals, which risks a misreading. Approving only on the review page, which is safe but slower.
+  consequences: |-
+    Q23 settled the phrasing: a message that starts with "approve" and names the items, or says to approve everything except some items. When the exceptions are given by description, every item they could refer to stays unapproved (AGENT-43). In harnesses without such a hook, chat approval falls back to the review page or the terminal.
+- id: DR-15
+  title: Code-first never stops to ask; only spec-first may
+  decided_by: engineer
+  elements:
+  - AGENT
+  requirements: SYS-16, SYS-18, AGENT-18
+  recorded: round 4 (decided in round 3)
+  context: the engineer wants to hand off a change, come back to it finished, and read the spec. Stopping to ask belongs to planning.
+  decision: in code-first mode, agents finish the change and report every contradiction and question at the end. In spec-first mode, an agent may stop on a contradiction the engineer would likely want to decide first.
+  alternatives: stopping in either mode whenever the agent judges a contradiction important. That was the engineer's first answer, refined in round 3.
+  consequences: a code-first change may be built on a reading the engineer later rejects. The open decisions make that visible immediately.
+- id: DR-16
+  title: Defer verifying agent-behavior requirements
+  decided_by: engineer
+  elements:
+  - AGENT
+  requirements: the AGENT requirements
+  recorded: round 4 (decided in round 3)
+  context: the AGENT requirements describe judgments, such as when to stop and ask, which unit tests can't check. The engineer wants to start building and iterate.
+  decision: verify them by demonstration, meaning the engineer observes them in real use, until an eval harness exists.
+  alternatives: build scenario evals now.
+  consequences: following current eval guidance, the first eval scenarios should come from real failures seen in use.
+- id: DR-17
+  title: Independence through review, not separate authors
+  decided_by: agent
+  elements:
+  - AGENT
+  requirements: SYS-11, AGENT-13, AGENT-14, AGENT-31
+  recorded: round 4 (decided in round 2)
+  context: in the engineer's experience, requirements and their verification should have different authors. In code-first mode, one agent writes the code, the tests and the spec.
+  decision: checks come from fresh-context auditors that didn't author the change. One auditor examines only the tests and verification items that the change modified or deleted.
+  alternatives: separate authoring agents for requirements and for verification, which was the earlier spec-first design.
+  consequences: this removes the incentive to go easy. It doesn't remove blind spots shared by every instance of one model.
+- id: DR-27
+  title: IDs always come with a title, linked where possible
+  decided_by: engineer
+  elements:
+  - AGENT
+  - REVIEW
+  requirements: SYS-30, AGENT-44, REVIEW-15
+  recorded: round 8
+  context: the engineer can't remember what an ID refers to, and bare IDs send them searching files.
+  decision: every mention of a spec item gives its title alongside its ID, and links to it where the medium allows. The review page shows an item's text when you hover over or click its ID.
+  alternatives: bare IDs, or titles only. Titles alone would lose the stable reference that traceability needs.
+  consequences: messages run slightly longer, and nothing needs to be looked up.

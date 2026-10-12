@@ -1,0 +1,13 @@
+- id: DR-14
+  title: Expensive verification only when the engineer asks
+  decided_by: engineer
+  elements:
+  - VERIFY
+  - AGENT
+  requirements: SYS-12, AGENT-30
+  recorded: round 4 (decided in rounds 2 and 3)
+  context: reasoning checks and long runs cost tokens and time. The engineer wants to move fast and to decide when these run.
+  decision: |-
+    expensive items run only when the engineer asks: for a full run, a single change, or onboarding (ONBOARD-3). Agents always run every cheap item before reporting a change as done.
+  alternatives: running expensive items automatically at merge, which was my first proposal.
+  consequences: regressions that only expensive checks would catch wait for the next requested run.

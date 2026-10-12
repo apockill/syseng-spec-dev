@@ -1,0 +1,8 @@
+id: ONBOARD
+title: Bringing an existing project in
+parent: SYS
+depends_on:
+- CLI
+purpose: |-
+  Onboarding takes a project that already has code and tests and produces its spec: the project's current state, and the reasons behind it.
+related_code: {}

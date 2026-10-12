@@ -1,0 +1,126 @@
+- id: Q1
+  status: resolved
+  round: '2'
+  resolution: Agents edit the spec through the CLI.
+  items: SYS-25, CLI-1, CLI-5 to CLI-8, AGENT-20; DR-2, DR-3
+- id: Q2
+  status: resolved
+  round: '3'
+  resolution: Expensive checks run only on request, and cheap ones after every change.
+  items: SYS-12, AGENT-30
+- id: Q3
+  status: resolved
+  round: '3'
+  resolution: Auditors run before your review.
+  items: AGENT-4
+- id: Q4
+  status: resolved
+  round: 2–3
+  resolution: Contradictions are always reported, and only spec-first mode stops to ask.
+  items: SYS-16, SYS-18, AGENT-18
+- id: Q5
+  status: resolved
+  round: '2'
+  resolution: Reasoning checks run in fresh, non-forked subagents that can't see the spec.
+  items: SYS-11, REASON-2, REASON-5; DR-7
+- id: Q6
+  status: resolved
+  round: '2'
+  resolution: Accepting a failure that contradicts a requirement changes the requirement, with alternatives offered.
+  items: AGENT-19
+- id: Q7
+  status: resolved
+  round: '2'
+  resolution: Approvals are fingerprinted, one per spec item.
+  items: SYS-14, MODEL-24, MODEL-25; DR-5
+- id: Q8
+  status: resolved
+  round: '4'
+  resolution: Agents turn what you say into needs, and you approve them.
+  items: AGENT-36, AGENT-37
+- id: Q9
+  status: resolved
+  round: '2'
+  resolution: Expensive means tokens or time, and full runs happen on request.
+  items: SYS-12, SYS-13, MODEL-9, MODEL-23
+- id: Q10
+  status: resolved
+  round: '2'
+  resolution: Code-first is the default mode.
+  items: CHANGE-9
+- id: Q11
+  status: resolved
+  round: '3'
+  resolution: Where changes happen is up to you and the harness, and quick changes come first.
+  items: SYS-18, AGENT-29, AGENT-32
+- id: Q12
+  status: resolved
+  round: '4'
+  resolution: You approve meaning, and the checker polices links.
+  items: MODEL-25, MODEL-31
+- id: Q13
+  status: resolved
+  round: '3'
+  resolution: Chat approvals are allowed when they're unambiguous.
+  items: AGENT-21, AGENT-33, AGENT-34; DR-6
+- id: Q14
+  status: resolved
+  round: '3'
+  resolution: There's no transcript archive; decisions live in paraphrased records.
+  items: SYS-19, MODEL-28, AGENT-24, AGENT-35; DR-13
+- id: Q15
+  status: resolved
+  round: '3'
+  resolution: Verifying agent behavior is shelved until there's an eval harness.
+  items: DR-16
+- id: Q16
+  status: resolved
+  round: '4'
+  resolution: The spec is layered, and design choices moved to decision records.
+  items: SYS-6 to SYS-27; DR-18
+- id: Q17
+  status: resolved
+  round: '4'
+  resolution: CUJs are context on needs, not an item type.
+  items: MODEL-29; DR-12
+- id: Q18
+  status: resolved
+  round: '4'
+  resolution: SE vocabulary is adopted.
+  items: MODEL-30, glossary; DR-11
+- id: Q19
+  status: resolved
+  round: '5'
+  resolution: System requirements get system-level verification.
+  items: MODEL-32; DR-23
+- id: Q20
+  status: resolved
+  round: '5'
+  resolution: Requirements that restate their parent are removed.
+  items: MODEL-33; DR-22
+- id: Q21
+  status: resolved
+  round: '6'
+  resolution: The CLI is the product, the method is one Agent Skill, and harness glue is optional (Claude Code first).
+  items: SYS-27, CLI-1; DR-1
+- id: Q22
+  status: resolved
+  round: '8'
+  resolution: A harness that can start subagents is required. The skill describes the ideal setup, and the agent arranges it.
+  items: SYS-28, SYS-29, AGENT-42; DR-25, DR-7
+- id: Q23
+  status: resolved
+  round: '8'
+  resolution: Chat approvals start with "approve" and name the items. Exceptions given by description are read conservatively.
+  items: AGENT-33, AGENT-43; DR-6
+- id: Q24
+  status: resolved
+  round: '8'
+  resolution: |-
+    "Part of" is a tree and "uses" is a DAG. Verifying a change covers everything that depends on what it touched.
+  items: MODEL-11, VERIFY-14; DR-8
+- id: Q25
+  status: resolved
+  round: '8'
+  resolution: All wording rules are errors, with error messages that teach and stay short.
+  items: MODEL-16, CHECK-16, CHECK-17; DR-9

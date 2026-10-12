@@ -1,0 +1,7 @@
+id: UNIT
+title: Unit-test technique
+parent: VERIFY
+depends_on:
+- LANG
+purpose: Runs a verification item's linked unit tests in each implementation, through that implementation's language adapter.
+related_code: {}

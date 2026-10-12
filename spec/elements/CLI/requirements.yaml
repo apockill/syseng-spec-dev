@@ -1,0 +1,47 @@
+- id: CLI-1
+  text: The toolkit shall provide one command-line tool through which agents query, edit, check, verify and render the spec.
+  origin: engineer
+  traces_to: SYS-27
+  source: |-
+    "The commandline interface the LLM uses" · "I want the CLI to be the main way agents edit the spec." · "Can't the CLI be the implementation?"
+- id: CLI-2
+  text: The CLI shall generate, for a named implementation, a to-do list of the requirements and verification items not yet implemented or not passing in it.
+  origin: engineer
+  traces_to: SYS-9
+  source: |-
+    "This ends up forming an automated 'todo' list for the LLM … 'let's implement this project in rust' and the todo list can be regenerated but for an entire different implementation"
+- id: CLI-5
+  text: |-
+    Before applying an edit, the CLI shall show the agent the edit's context: affected parent and child requirements, linked verification items and tests, dependent system elements, and approval status.
+  origin: engineer
+  traces_to: SYS-20
+  source: |-
+    "if an agent wants to edit the spec, the CLI has a chance to intercept the request and give extra context (for example, dumping the descendant V&V / REQs into context, then asking 'confirm?' or something)"
+- id: CLI-3
+  text: |-
+    The CLI shall answer four queries: one system element's spec, the system elements related to given files, the trace from a requirement to its verification items and tests, and a requirement's history (its rationale, each change with its reason, and its linked context).
+  origin: agent
+  traces_to: SYS-20
+  why: lets an agent pull exactly the spec it needs into context, instead of all of it.
+- id: CLI-4
+  text: The CLI shall order a to-do list with each system element's items after those of the system elements it depends on.
+  origin: agent
+  traces_to: SYS-9
+  why: lets an agent build from the bottom up. A port starts at the leaves.
+- id: CLI-6
+  text: When an edit affects approved items or items that others depend on, the CLI shall apply it only after the agent acknowledges each affected item by name.
+  origin: agent
+  traces_to: SYS-20
+  refines: |-
+    "then asking 'confirm?'"
+  why: a model will rubber-stamp a generic "confirm?". Naming each affected item makes it actually consider each one. See DR-19.
+- id: CLI-7
+  text: The CLI shall accept multiple edits in a single invocation.
+  origin: agent
+  traces_to: SYS-25
+  why: a twenty-requirement update should be one call, not twenty. The input format is DR-2.
+- id: CLI-8
+  text: The CLI shall reject a modification or removal that has no reason.
+  origin: agent
+  traces_to: SYS-19
+  why: this enforces CHANGE-5 at write time, while the reason is fresh.

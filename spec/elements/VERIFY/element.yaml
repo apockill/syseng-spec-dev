@@ -1,0 +1,8 @@
+id: VERIFY
+title: Runs verification items and tracks their status
+parent: SYS
+depends_on:
+- MODEL
+- LANG
+purpose: The runner executes verification items by technique and tier, and tracks each item's status in each implementation.
+related_code: {}

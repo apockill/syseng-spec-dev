@@ -1,0 +1,20 @@
+spec_version: 1
+implementations:
+- name: python
+  language: python
+  root: .
+  primary: true
+element_order:
+- SYS
+- MODEL
+- CHECK
+- VERIFY
+- UNIT
+- INTEG
+- REASON
+- LANG
+- CHANGE
+- REVIEW
+- CLI
+- ONBOARD
+- AGENT

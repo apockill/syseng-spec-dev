@@ -1,0 +1,62 @@
+- id: CHANGE-1
+  text: The toolkit shall support a spec-first mode, in which the engineer approves the spec changes before implementation begins.
+  origin: engineer
+  traces_to: SYS-17
+  source: |-
+    "the engineer wants to know BEFORE the code is written how the specs will be built … I then examine the diff and agree 'lgtm', then the implementation is created"
+- id: CHANGE-2
+  text: The toolkit shall support a code-first mode, in which the engineer reviews the spec changes after the change is implemented.
+  origin: engineer
+  traces_to: SYS-17
+  source: |-
+    "hey build it real quick, then update the spec to match" · "afterwards, or during implementation (however works best / is most natural for the agent). I don't want to be too prescriptive"
+- id: CHANGE-3
+  text: Each change record shall keep a list of open decisions.
+  origin: engineer
+  traces_to: SYS-16
+  source: |-
+    "the LLM should add it to a list of things to flag to the user"
+- id: CHANGE-9
+  text: When a request names no mode, the toolkit shall use code-first mode.
+  origin: engineer
+  traces_to: SYS-17
+  source: |-
+    Q10: "Agree".
+- id: CHANGE-10
+  text: Each open decision shall offer options, with one marked as recommended.
+  origin: engineer
+  traces_to: SYS-26
+  source: |-
+    "it should always propose options and have a 'Recommended' option, so the user can say 'yeah go for it' to a whole set" · "The alternatives are A B or C"
+- id: CHANGE-12
+  text: The toolkit shall accept the recommended options of a set of open decisions from one statement by the engineer.
+  origin: engineer
+  traces_to: SYS-26
+  source: |-
+    "so the user can say 'yeah go for it' to a whole set"
+  reworded: |-
+    round 9: "The engineer shall be able to accept" became "The toolkit shall accept", because "be able to" describes a capability, not a behavior (INCOSE R10).
+- id: CHANGE-4
+  text: Each change record shall summarize the engineer's request.
+  origin: agent
+  traces_to: SYS-19
+  why: lets auditors ask "you asked for X, so why does the spec now also say Y?". It's a summary rather than a quote, which matches how decision records treat your words (AGENT-35).
+- id: CHANGE-5
+  text: Each change record shall give a reason for each requirement the change added, modified or removed.
+  origin: agent
+  traces_to: SYS-19
+  refines: |-
+    "I view the spec diff and say 'hey why does this component no longer have a requirement to do x or y' and the agent is able to explain"
+  why: an agent starting fresh months later can only answer "why?" if someone wrote the reason down at the time.
+- id: CHANGE-8
+  text: Each change record shall name the implementation the change targets, defaulting to the primary implementation.
+  origin: agent
+  traces_to: SYS-9
+  why: CHECK-11 and the to-do list need to know which implementation "done" refers to.
+- id: CHANGE-11
+  text: Each open decision shall say whether it involves an item the engineer stated, or one with decision records behind it.
+  origin: agent
+  traces_to: SYS-26
+  refines: |-
+    "If a human had hand / there are notes of previous ADRs, then flag that so the user knows not to skim/lgtm too early."
+  why: you asked for this on flagged items. I applied it to every open decision, because the risk of skimming too early is the same.

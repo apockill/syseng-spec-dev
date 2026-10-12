@@ -1,0 +1,39 @@
+- id: SYS-V1
+  verifies:
+  - SYS-2
+  method: test
+  technique: unit test
+  origin: agent
+  description: Running the checker on this repository's own spec reports no errors.
+  tests:
+    python:
+    - tests/test_repo_spec.py::test_repository_spec_passes_its_own_checker
+- id: SYS-V2
+  verifies:
+  - SYS-6
+  method: test
+  technique: unit test
+  origin: agent
+  description: A requirement that traces to nothing is reported, unless it's marked derived with a reason; this repository's spec traces completely.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_untraced_requirement_is_reported
+    - tests/test_check_structure.py::test_derived_requirement_needs_a_reason
+    - tests/test_repo_spec.py::test_repository_spec_passes_its_own_checker
+- id: SYS-V3
+  verifies:
+  - SYS-3
+  method: inspection
+  technique: manual
+  origin: agent
+  description: The toolkit's source and packaging (pyproject.toml, src/) are Python.
+- id: SYS-V4
+  verifies:
+  - SYS-14
+  method: test
+  technique: unit test
+  origin: agent
+  description: Listing the checker's to-dos names every unapproved item.
+  tests:
+    python:
+    - tests/test_repo_spec.py::test_todo_lists_unapproved_items

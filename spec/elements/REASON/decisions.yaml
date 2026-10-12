@@ -1,0 +1,13 @@
+- id: DR-7
+  title: Run reasoning checks in an isolated subagent that can't see the spec
+  decided_by: agent
+  elements:
+  - REASON
+  requirements: REASON-2, REASON-5
+  recorded: round 4 (was REASON-6 and REASON-7)
+  status: |-
+    part of the Claude Code adapter (DR-1). The requirement itself is harness-neutral (DR-25): the skill describes the ideal reasoning-check subagent, and each agent sets one up with what its harness offers. This record covers how to do that in Claude Code. Q22 ruled out an API path.
+  context: the engineer wants reasoning checks to start with no project context and no conversation, and to read the code but not the spec.
+  decision: use a custom, non-fork subagent. Its definition sets `omitClaudeMd`, so CLAUDE.md and AGENTS.md don't load. It has no shell tool. It carries its own hook that refuses reads under the spec directory and drops spec hits from search results.
+  alternatives: a fork, which inherits the conversation and which the engineer ruled out. An instruction alone. A direct model-API call, which Q22 ruled out (DR-25).
+  consequences: if the read-blocking hook proves fiddly, drop it and keep the instruction (the engineer's call).

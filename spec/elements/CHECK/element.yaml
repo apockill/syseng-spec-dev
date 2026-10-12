@@ -1,0 +1,10 @@
+id: CHECK
+title: The checker (the linter)
+parent: SYS
+depends_on:
+- MODEL
+- LANG
+- CHANGE
+- VERIFY
+purpose: The checker tells an agent everything still unfinished in its spec work, deterministically and within seconds.
+related_code: {}

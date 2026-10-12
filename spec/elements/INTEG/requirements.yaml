@@ -1,0 +1,17 @@
+- id: INTEG-1
+  text: An integration-test item shall run its declared commands.
+  origin: engineer
+  traces_to: SYS-10
+  source: |-
+    "'INTEGRATION TEST' which would be a combination of 'run XYZ COMMANDS'"
+- id: INTEG-2
+  text: Where an integration-test item declares a reasoning step, the technique shall judge the commands' output with a reasoning check.
+  origin: engineer
+  traces_to: SYS-10
+  source: |-
+    "and perhaps 'REASON' about them"
+- id: INTEG-3
+  text: An integration-test item shall pass only when each command's exit status and output meet the item's declared expectations.
+  origin: agent
+  traces_to: SYS-10
+  why: without declared expectations, "passed" only means "didn't crash".

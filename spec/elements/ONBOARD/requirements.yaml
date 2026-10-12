@@ -1,0 +1,41 @@
+- id: ONBOARD-1
+  text: When onboarding an existing project, the toolkit shall extract its needs, requirements, verification items and decision records from the project's code, tests, comments and documentation.
+  origin: engineer
+  traces_to: SYS-23
+  source: |-
+    "we simply need to guess/extract/format the spec from the project, clarify certain design decisions (so as to extract NEEDs/REQs/VERs)"
+- id: ONBOARD-2
+  text: Onboarding shall describe the project's current state without proposing changes to it.
+  origin: engineer
+  traces_to: SYS-23
+  source: |-
+    "this is less about 'steering' and more about 'encoding the state of the project correctly, and encoding the WHY the state is the way it is correctly'"
+- id: ONBOARD-3
+  text: Onboarding shall run every check the toolkit offers, expensive checks and auditors included, on the extracted spec.
+  origin: engineer
+  traces_to: SYS-23
+  source: |-
+    "This step … should be extra careful, run all the checks, rechecks, skeptical subagents... the whole kitchen sink, to ensure that everything is captured." Asking for onboarding counts as the request SYS-12 needs.
+- id: ONBOARD-4
+  text: Onboarding shall take the reasons for the current design from code comments and structure wherever they reveal them.
+  origin: engineer
+  traces_to: SYS-23
+  source: |-
+    "Sometimes the WHY can be found through code comments / obvious structure."
+- id: ONBOARD-5
+  text: Onboarding shall ask the engineer only about reasons the project itself doesn't reveal.
+  origin: engineer
+  traces_to: SYS-23
+  source: |-
+    "Sometimes no, and that's when clear use of the users times is in order, asking high signal questions."
+- id: ONBOARD-6
+  text: Onboarding shall end with a spec the engineer can approve after reviewing only its needs.
+  origin: engineer
+  traces_to: SYS-23
+  source: |-
+    "The end goal is a user just looks at the NEEDS, confirms them, states 'approve everything' and moves on."
+- id: ONBOARD-7
+  text: Onboarding shall record each failing test or broken link it finds as an open decision, without fixing it.
+  origin: agent
+  traces_to: SYS-23
+  why: this follows from ONBOARD-2. Fixing things during onboarding would be steering you didn't ask for.

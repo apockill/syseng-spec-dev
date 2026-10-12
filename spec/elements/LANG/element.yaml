@@ -1,0 +1,7 @@
+id: LANG
+title: Language adapters
+parent: SYS
+depends_on: []
+purpose: |-
+  The adapters hold everything specific to a programming language: finding tests, running them, and reading their source.
+related_code: {}

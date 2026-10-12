@@ -1,0 +1,6 @@
+id: REASON
+title: Reasoning-check technique
+parent: VERIFY
+depends_on: []
+purpose: Has an isolated subagent judge a stated aspect of the product from declared inputs and the code, without seeing the spec.
+related_code: {}

@@ -1,0 +1,8 @@
+id: AGENT
+title: The skill, plus per-harness adapters
+parent: SYS
+depends_on:
+- CLI
+purpose: The method ships as one Agent Skill. Optional per-harness adapters enforce parts of it, starting with Claude Code (DR-1).
+related_code: {}
+note: Verification of the AGENT requirements is deferred (DR-16). Until there's an eval harness, they're demonstrated in real use.

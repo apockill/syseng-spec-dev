@@ -1,0 +1,32 @@
+- id: REASON-1
+  text: A reasoning-check item shall consist of a prompt asking a model to judge a stated aspect of the product, plus the inputs that judgment needs.
+  origin: engineer
+  traces_to: SYS-10
+  source: |-
+    "'REASONING TEST' which is a prompt that asks an LLM to reason about certain aspects we want to think about, that might be hard to confirm"
+- id: REASON-2
+  text: The technique shall run each reasoning check in a fresh subagent that does not inherit the conversation, given only its item's prompt and declared inputs.
+  origin: engineer
+  traces_to: SYS-11
+  source: |-
+    "Subagents that do reasoning should be spun up with 0 context about the project, and only given what is absolutely necessary to verify … (this should be a req)" · "I imagine there's a 'forking' ability, which preserves user conversation. If that exists, I do not want to use it." See DR-7.
+- id: REASON-5
+  text: A reasoning check shall have read access to the product's code, excluding the spec directory.
+  origin: engineer
+  traces_to: SYS-11
+  source: |-
+    "For the subagent to verify and reason through things, it will need to read code. However, we should tell it to NOT read in spec/ directory." See DR-7.
+  reworded: |-
+    round 9: "shall be able to read" became "shall have read access to" (INCOSE R10).
+- id: REASON-3
+  text: Each reasoning check shall return a pass or fail verdict with evidence quoted from its inputs.
+  origin: agent
+  traces_to: SYS-10
+  why: a bare verdict can't be audited. Quoted evidence shows why it failed in seconds.
+- id: REASON-4
+  text: For an item that verifies a requirement the toolkit judges important, the technique shall take the majority verdict of three independent runs.
+  origin: agent
+  traces_to: SYS-24
+  refines: |-
+    "the goal being to have slightly more deterministic results"
+  why: one sample from a nondeterministic judge tells you little, and three runs is the smallest number that gives a majority. In round 5 the trigger changed from a critical flag to an importance judgment.

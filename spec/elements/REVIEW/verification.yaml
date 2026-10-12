@@ -1,0 +1,22 @@
+- id: REVIEW-V1
+  verifies:
+  - REVIEW-1
+  - REVIEW-14
+  method: test
+  technique: unit test
+  origin: agent
+  description: The rendered view lists needs, then system requirements, then constraints, then each system element; each system requirement lists what refines it.
+  tests:
+    python:
+    - tests/test_render.py::test_view_reads_top_down
+    - tests/test_render.py::test_system_requirement_lists_what_refines_it
+- id: REVIEW-V2
+  verifies:
+  - REVIEW-3
+  method: test
+  technique: unit test
+  origin: agent
+  description: The rendered requirements view contains no verification items.
+  tests:
+    python:
+    - tests/test_render.py::test_view_hides_verification_items

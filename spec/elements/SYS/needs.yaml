@@ -1,0 +1,81 @@
+- id: NEED-1
+  text: The engineer needs to keep intellectual control of a product of 100,000+ lines of code by reading its requirements, and only occasionally its verification items.
+  origin: engineer
+  source: |-
+    "allow a single engineer to maintain intellectual control over what they are building, even as the product balloons to 100k+ LOC … only showing the highest signal things (REQs). VERs are more for the LLMs … and also for the sole engineer to read occasionally"
+  context: you want to work as a guide, not a line-by-line auditor. One person directs agents across a codebase that would normally need a team, and follows what the system must do and how that's changing, without reading the code in depth.
+- id: NEED-2
+  text: The engineer needs agents to surface the questions that spec work raises, so the engineer gets more chances to steer.
+  origin: engineer
+  source: |-
+    "for the LLM to stop and say 'wait, actually, now that I am forced to think in this way it begs the questions XYZ' those questions can be surfaced to the user, who now has more opportunities to steer"
+  context: writing things down in systems-engineering form makes agents notice gaps. Each question they raise is a chance to change direction early, while it's cheap.
+- id: NEED-3
+  text: The engineer needs to reuse the toolkit across unrelated projects.
+  origin: engineer
+  source: |-
+    "this skill/set of skills must NOT reference [the host project]. I plan on reusing this."
+  context: the toolkit is meant for many projects, so nothing in it may assume a particular one.
+- id: NEED-4
+  text: The engineer needs the V&V documentation to be enough to rebuild the product in another language.
+  origin: engineer
+  source: |-
+    "if I took all the V&V documentation and said 'build this in rust' I'd want that to work"
+  context: you want the design kept separate from the code. Then you can ask agents to rebuild the product in Rust, or on another framework, and get the same product.
+- id: NEED-5
+  text: The engineer needs the process to cost the main agent little attention.
+  origin: engineer
+  source: |-
+    "How to make this system relatively low overhead, so that the agent I'm interfacing with doesn't have to think about it much"
+  context: the main agent should mostly just code. The toolkit and its subagents do the spec bookkeeping.
+- id: NEED-6
+  text: The engineer needs to choose, per change, between specifying first and building first.
+  origin: engineer
+  source: |-
+    "the system should support two CUJs … We want to support both workflows cleanly."
+  context: |-
+    there are two scenarios.
+    - **Planning:** you ask for the spec of a feature, review it and approve it. Agents then implement it from a to-do list and report anything they had to change. The same to-do list can drive a rebuild in a new language.
+    - **Building:** you ask for a change to be built and try the result. The agent updates the spec during or after the work, whichever suits it, and you review the spec changes once the change is done.
+- id: NEED-7
+  text: The engineer needs to develop quickly, running the full verification only occasionally and without supervising it.
+  origin: engineer
+  source: |-
+    "I want to be able to develop quickly with agility, and occasionally say 'hey let's run the full suite' and walk away"
+  context: day to day, you want changes fast, and you often try the binary while agents polish tests and spec in parallel. Occasionally you start a full verification run and walk away. You come back to fixes, reworded requirements, new verification items and a health summary, which you approve or comment on.
+- id: NEED-8
+  text: The engineer needs the reasoning behind each decision to stay available to future agents and to the engineer.
+  origin: engineer
+  source: |-
+    "any documentation, links to external docs, things that came up in the building, build notes, reasoning for why something is the way it is, should be persisted"
+  context: weeks later, an agent about to change a requirement should be able to find out why it is the way it is, and then go ahead or flag the change to you. Reasoning from design discussions, including artifacts you liked, should outlive the conversation.
+- id: NEED-9
+  text: The engineer needs verification that isn't weakened by the agents whose work it checks.
+  origin: engineer
+  source: |-
+    "it's important that the system engineers who make the requirements are not also the same ones that make the verification items because there is a perverse incentive to make it easier"
+  context: in professional practice, requirement writers don't write their own verification, because a single author unconsciously makes it easier to pass. Agents have the same incentive, and coding agents are known to edit tests until they pass.
+- id: NEED-10
+  text: The engineer needs to bring an existing project into the toolkit by reviewing only its needs.
+  origin: engineer
+  source: |-
+    "The end goal is a user just looks at the NEEDS, confirms them, states 'approve everything' and moves on. Future changes get more rigor. Otherwise, reviewing the existing project will take forever."
+  context: when an existing project comes in, the job is to record what it is and why, not to redesign it. Agents should do as much of that thinking as they can by reading the code, comments and structure. They should ask only high-value questions and leave you to confirm the needs and approve the rest in one go. Rigor goes into the changes that follow.
+- id: NEED-11
+  text: The engineer needs each minute spent reviewing to yield as much steering as possible.
+  origin: engineer
+  source: |-
+    "Repetition is wasted cognitive overhead. The goal of this framework is to maximize the steering-to-human-time ratio, and maintain intellectual control over the design without having to look at the code in depth"
+  context: every repeated or low-value item costs you attention. Agents should do the thinking they can, bring you only the decisions that matter most, and make each one quick to settle with a recommended option.
+- id: NEED-12
+  text: The engineer needs to use the toolkit with more than one agent harness.
+  origin: engineer
+  source: |-
+    "I'd like to use this methodology in other agentic use cases possibly … In the future I'll also use this in antigravity, so I don't want to couple too closely to claude code"
+  context: you use Claude Code today and plan to use Antigravity next (still with Claude models), and possibly other agent setups. The method shouldn't be tied to any one of them.
+- id: NEED-13
+  text: The engineer needs the toolkit to improve from the friction agents meet while using it.
+  origin: engineer
+  source: |-
+    "Agents should be encouraged to modify this skill if the UX can be improved, or if the user is trying to use them in a new way … if an agent has to jump through 16 hoops to get something done, the human will never know, and therefore the skill will never be improved."
+  context: agents are the toolkit's heaviest users. When one has to work around the toolkit, you only hear about it if the agent says so, and without that the toolkit never gets better. Agents should also adapt the toolkit when you start using it in a new way.

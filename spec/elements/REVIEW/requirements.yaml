@@ -1,0 +1,79 @@
+- id: REVIEW-1
+  text: The renderer shall render the spec's system elements and requirements as a web page.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    "we'll create tools to render components on a web page"
+- id: REVIEW-2
+  text: The renderer shall render the spec differences between two revisions as a web page.
+  origin: engineer
+  traces_to: SYS-15
+  source: |-
+    "and also render the diffs between changes"
+- id: REVIEW-3
+  text: The renderer shall hide verification items until the engineer asks to see them.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    "only showing the highest signal things (REQs). VERs are … for the sole engineer to read occasionally"
+- id: REVIEW-4
+  text: In a diff, the renderer shall highlight brightly each system element whose requirements changed.
+  origin: engineer
+  traces_to: SYS-15
+  source: |-
+    "bright colors when a component has changed requirements"
+- id: REVIEW-5
+  text: In a diff, the renderer shall highlight mildly each system element whose related code changed while its requirements and verification items did not.
+  origin: engineer
+  traces_to: SYS-15
+  source: |-
+    "mild color when a component's underlying file changed but the req/ver didn't"
+- id: REVIEW-6
+  text: In a diff, the renderer shall leave unchanged system elements unhighlighted.
+  origin: engineer
+  traces_to: SYS-15
+  source: |-
+    "nothing if nothing changed"
+- id: REVIEW-7
+  text: The renderer shall show each requirement's status in each implementation.
+  origin: engineer
+  traces_to: SYS-9
+  source: |-
+    "the specs should mark in some way what has been implemented yet, and what has not"
+- id: REVIEW-13
+  text: The review page shall let the engineer approve items or give feedback on them.
+  origin: engineer
+  traces_to: SYS-14
+  source: |-
+    "click 'approve' (or give feedback)"
+- id: REVIEW-15
+  text: The review page shall show an item's text when the engineer hovers over or clicks its ID.
+  origin: engineer
+  traces_to: SYS-30
+  source: |-
+    "it should say DR-8 and on hover or click or whatever … it should state what it means"
+- id: REVIEW-9
+  text: In a diff, the renderer shall highlight in amber each verification item that changed while the requirements it verifies did not.
+  origin: agent
+  traces_to: SYS-11
+  why: that's where test weakening hides, so it gets its own color.
+- id: REVIEW-10
+  text: In a diff, the renderer shall show the recorded reason beside each changed or removed requirement.
+  origin: agent
+  traces_to: SYS-19
+  why: this answers most "why?" questions before you need to ask them.
+- id: REVIEW-11
+  text: The renderer shall show each unapproved item's differences from its last approved content.
+  origin: agent
+  traces_to: SYS-14
+  why: one mechanism covers both the spec-first "I had to change a few things" case and every other change since your last approval.
+- id: REVIEW-12
+  text: In a diff, the renderer shall show the open decisions above the requirement changes.
+  origin: agent
+  traces_to: SYS-16
+  why: those are the steering points, so they shouldn't be buried at the bottom.
+- id: REVIEW-14
+  text: The renderer shall show the spec top-down, with needs and system requirements first and each system element's requirements on request.
+  origin: agent
+  traces_to: SYS-6
+  why: this is the reading order NEED-1 depends on, and the one this file uses.

@@ -1,0 +1,177 @@
+- id: MODEL-1
+  text: The spec shall store each system element as its own directory inside a single, flat directory of system elements.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    "We have a directory called components and inside that we have directories for each component … It's still a flat directory"
+- id: MODEL-2
+  text: The spec model shall support system elements at every level, from the whole system down to a single unit.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    "these range from extremely high level to extremely small level"
+- id: MODEL-3
+  text: Each system element shall list the system elements it depends on.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    "These components state their dependencies in some way … A component could be depended on by many other components."
+- id: MODEL-4
+  text: The dependency graph of system elements shall contain no cycles.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    "the linter should enforce that there's no loops"
+- id: MODEL-5
+  text: The spec shall hold requirements and verification items as separate kinds of item, with each verification item linked to the requirements it verifies.
+  origin: engineer
+  traces_to: SYS-10
+  source: |-
+    "We have the concept of requirements and verification items."
+- id: MODEL-7
+  text: The spec shall name each implementation of the product, with its language.
+  origin: engineer
+  traces_to: SYS-9
+  source: |-
+    "it could be 'implemented in {Implementation name XYZ, C++} or have no implementations'"
+- id: MODEL-8
+  text: Each verification item shall link to its tests separately for each implementation.
+  origin: engineer
+  traces_to: SYS-9
+  source: |-
+    "there's an implementation of this for the C++ stack, but if I remade it in rust that could also work"
+- id: MODEL-9
+  text: |-
+    Each verification item shall have a cost tier: cheap, or expensive when it needs model calls, subagents or a long run time.
+  origin: engineer
+  traces_to: SYS-12
+  source: |-
+    "Expensive (e.g. not fully automated steps that require extra tokens/subagents spun up) should be a separate tier of tests" · "Expensive is not just a function of tokens, but time."
+- id: MODEL-10
+  text: Each system element shall list its related code by path or pattern, with no limit on how many system elements a file relates to.
+  origin: engineer
+  traces_to: SYS-7
+  source: |-
+    "Should we decouple it, such that components can call out related code files" · "I'm not sure about 1 file to 1 component". See DR-10.
+- id: MODEL-12
+  text: The spec shall hold needs, meaning goals that can't be verified directly, as a third kind of item, each traced to the requirements that serve it.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    Q8: "That sounds good … Of course I will have to approve the needs down the line."
+- id: MODEL-14
+  text: |-
+    Each requirement shall record its origin: stated by the engineer, or proposed by an agent.
+  origin: engineer
+  traces_to: SYS-26
+  source: |-
+    "If a human had hand / there are notes of previous ADRs, then flag that so the user knows not to skim/lgtm too early." · "we may want to consider adding this functionality to the rendering UI, so I know what to read"
+- id: MODEL-24
+  text: The spec shall record each approval by the engineer together with a fingerprint of the approved content.
+  origin: engineer
+  traces_to: SYS-14
+  source: |-
+    "a list of properties stating when the file has been LGTMed by the user, including an 'approved' + some kind of git state of the file? Or like hash?" See DR-5.
+- id: MODEL-25
+  text: |-
+    Approvals shall apply to individual spec items: needs, requirements, verification items, decision records and the definitions of system elements.
+  origin: engineer
+  traces_to: SYS-14
+  source: |-
+    Q12: "Agreed."
+- id: MODEL-27
+  text: |-
+    Each spec item and change record shall support links to its context: artifacts, documents, external links and build notes.
+  origin: engineer
+  traces_to: SYS-19
+  source: |-
+    "in the schema, we should have a way to link to context … any documentation, links to external docs, things that came up in the building, build notes"
+  reworded: |-
+    round 9: "shall be able to link" became "shall support links" (INCOSE R10).
+- id: MODEL-28
+  text: |-
+    Each system element shall keep its decision records: a dated history of the decisions about it, each with its reasoning and the alternatives considered.
+  origin: engineer
+  traces_to: SYS-19
+  source: |-
+    "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time."
+- id: MODEL-29
+  text: |-
+    Each need shall record, in paraphrase, the context it came from: the engineer's reasoning and scenarios of use.
+  origin: engineer
+  traces_to: SYS-19
+  source: |-
+    Q17: "if I state a CUJ or say why or what I'm doing, that should be annotated somewhere for future agents to know about / have context of". See DR-12.
+- id: MODEL-30
+  text: Each verification item shall name its verification method (test, analysis, demonstration or inspection) and its technique.
+  origin: engineer
+  traces_to: SYS-10
+  source: |-
+    Q18: "Yes let's adopt."
+- id: MODEL-31
+  text: Links that the checker verifies, such as test links and related-code lists, shall need no approval.
+  origin: engineer
+  traces_to: SYS-14
+  source: |-
+    Q12: "The things the checker can automate, no need to approve."
+- id: MODEL-32
+  text: Each system requirement shall be verified at the system level, in addition to the verification of the requirements that refine it.
+  origin: engineer
+  traces_to: SYS-10
+  source: |-
+    Q19 (should system requirements get their own verification items?): "Yes, this makes sense."
+- id: MODEL-33
+  text: No requirement shall restate the requirement it refines.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    Q20: "Repetition is wasted cognitive overhead."
+- id: MODEL-11
+  text: Each system element except the system itself shall name exactly one parent, recorded separately from its dependencies.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    Q24 (one parent per element, reuse through dependencies): "I think we're talking about the same thing? As long as both 'RENDER' and 'PHYSICS' can depend on it". See DR-8.
+- id: MODEL-16
+  text: |-
+    Requirement text shall follow the wording rules: exactly one "shall", one of the EARS (Easy Approach to Requirements Syntax) sentence patterns, and no banned terms (vague words, escape clauses, open-ended endings, test or implementation vocabulary).
+  origin: engineer
+  traces_to: SYS-21
+  source: |-
+    Q25 (how strict the wording rules should be): "I like strictness (B). It's a free way to get the LLM on rails." See DR-9.
+- id: MODEL-13
+  text: Each requirement shall carry a rationale.
+  origin: agent
+  traces_to: SYS-19
+  why: the rationale is the first thing an agent reads when you ask why a requirement exists. That's why the NASA and INCOSE handbooks make it mandatory.
+- id: MODEL-15
+  text: A requirement ID shall never be reused, including after its requirement is deleted.
+  origin: agent
+  traces_to: SYS-19
+  why: |-
+    "why did AGENT-17 disappear?" only works if AGENT-17 has always meant one thing.
+- id: MODEL-17
+  text: Requirement and need text shall contain no language-specific names, such as function, class or file names.
+  origin: agent
+  traces_to: SYS-8
+  why: a requirement that names a C++ class can't guide a Rust rebuild. Those names belong in test links and related-code lists.
+- id: MODEL-18
+  text: Each requirement shall have at least one verification item, or a recorded reason for having none.
+  origin: agent
+  traces_to: SYS-10
+  why: a requirement that nothing checks is only a wish. The recorded reason lets you accept a gap on purpose.
+- id: MODEL-21
+  text: Each implementation shall declare a root directory, under which its related-code paths and test links resolve.
+  origin: agent
+  traces_to: SYS-9
+  why: lets a C++ original and a Rust port share one repository.
+- id: MODEL-22
+  text: Exactly one implementation shall be marked primary.
+  origin: agent
+  traces_to: SYS-9
+  why: gives changes a default target (CHANGE-8).
+- id: MODEL-23
+  text: A run time shall count as long when it exceeds 60 seconds, unless the repository's configuration sets another limit.
+  origin: agent
+  traces_to: SYS-12
+  why: keeps the cheap tier fast enough to run after every change. 60 seconds is a guess, which is why it's configurable.

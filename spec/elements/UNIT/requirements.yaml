@@ -1,0 +1,6 @@
+- id: UNIT-1
+  text: The unit-test technique shall run a verification item's linked tests through the language adapter of each implementation that has them.
+  origin: engineer
+  traces_to: SYS-10
+  source: |-
+    "one modality might be 'software unit test', and can be written in [supported languages]"

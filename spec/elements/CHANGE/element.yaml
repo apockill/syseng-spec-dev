@@ -1,0 +1,7 @@
+id: CHANGE
+title: Change records and modes
+parent: SYS
+depends_on:
+- MODEL
+purpose: A change record captures what was asked, which mode the change runs in, what changed in the spec and why, and the open decisions waiting for the engineer.
+related_code: {}

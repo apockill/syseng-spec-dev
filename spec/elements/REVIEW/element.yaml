@@ -1,0 +1,9 @@
+id: REVIEW
+title: Review pages
+parent: SYS
+depends_on:
+- MODEL
+- CHANGE
+- VERIFY
+purpose: Web pages that show the engineer the spec as a whole, and how a change alters it.
+related_code: {}

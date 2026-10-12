@@ -1,0 +1,224 @@
+- id: AGENT-1
+  text: In code-first mode, the skill shall let the main agent edit code without first reading the spec.
+  origin: engineer
+  traces_to: SYS-17
+  source: |-
+    "it spends time looking at code, and WHEN IT ADDS VALUE also reading the current REQs and V&V, but otherwise … it probably doesn't need to"
+- id: AGENT-2
+  text: The skill shall direct the main agent to update the requirements and verification items a change affects, as part of that change.
+  origin: engineer
+  traces_to: SYS-7
+  source: |-
+    "It makes all the changes and tries its best to update V&V along the way."
+- id: AGENT-3
+  text: The main agent shall report a change as done only after the checker reports no findings for it.
+  origin: engineer
+  traces_to: SYS-7
+  source: |-
+    "At the end, it runs the linter and is told 'hey XYZ tests have been added and are not associated with VERs …'"
+- id: AGENT-4
+  text: Skeptical auditor subagents shall review each change's spec updates before the engineer reviews the change.
+  origin: engineer
+  traces_to: SYS-11
+  source: |-
+    "have skeptical subagents run audits too, to ensure everything is up to date. Then I go in, read the specs" · Q3: "Before review sounds fine."
+- id: AGENT-7
+  text: When the engineer asks why a requirement changed or disappeared, the agent shall answer with the reason recorded for that change.
+  origin: engineer
+  traces_to: SYS-19
+  source: |-
+    "say 'hey why does this component no longer have a requirement to do x or y' and the agent is able to explain"
+- id: AGENT-8
+  text: When the engineer asks for stronger verification of a requirement, the agent shall add verification items for it.
+  origin: engineer
+  traces_to: SYS-24
+  source: |-
+    "I want more robust test coverage on this important invariant"
+- id: AGENT-9
+  text: When the engineer accepts a flagged failure, the agent shall update that verification item's expected result to the accepted behavior.
+  origin: engineer
+  traces_to: SYS-10
+  source: |-
+    "If the user says lgtm, then the doc expectations must be updated."
+- id: AGENT-10
+  text: In spec-first mode, the agent shall implement the approved spec by working through the to-do list for the target implementation.
+  origin: engineer
+  traces_to: SYS-17
+  source: |-
+    "then the implementation is created, the REQs and VIs checked off one by one"
+- id: AGENT-11
+  text: When a spec-first change is complete, the agent shall list each difference between the approved spec and the final spec, or state that there are none.
+  origin: engineer
+  traces_to: SYS-17
+  source: |-
+    "'done, and I had to change a few things for you to review' or 'done, and everything was able to be made to spec'"
+- id: AGENT-18
+  text: In spec-first mode, when a contradiction is one the engineer would likely want to decide before more work is done, the agent shall stop and ask before continuing.
+  origin: engineer
+  traces_to: SYS-16
+  source: |-
+    "Only in cases where the user is trying to plan a change should we have things that halt the flow and come back and ask the user what to do." See DR-15.
+- id: AGENT-19
+  text: When accepting a flagged failure requires changing a requirement, the agent shall change it and add an open decision listing the alternatives.
+  origin: engineer
+  traces_to: SYS-16
+  source: |-
+    "I think yes, and with a flag to the user for these cases- like, 'hey, because of X or Y we needed to change the REQ. The alternatives are A B or C'"
+- id: AGENT-21
+  text: |-
+    Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, or an explicit approval in chat.
+  origin: engineer
+  traces_to: SYS-14
+  source: |-
+    "Yeah I think LGTM in chat is fine, with the caveat that there can be no ambiguity to what I mean"
+- id: AGENT-22
+  text: During a full run, agents shall attempt to fix each failure, by changing code, requirements or verification items.
+  origin: engineer
+  traces_to: SYS-13
+  source: |-
+    "come back with maybe some code changed, some reworded reqs, some updated / new VIs". Their changes stay unapproved until you approve them.
+- id: AGENT-24
+  text: The agent shall write a decision record for each decision made while building, attached to each system element the decision affects and linked to its sources.
+  origin: engineer
+  traces_to: SYS-19
+  source: |-
+    "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time." · "if I'm designing and debating with an agent, and an Artifact is made with some visualizations, and I say 'yeah that looks cool lets do that' … I'd like the agent to persist that"
+- id: AGENT-25
+  text: Before modifying or removing an approved requirement, the agent shall read its rationale and linked context.
+  origin: engineer
+  traces_to: SYS-19
+  source: |-
+    "an implementing agent might say 'hmm, can I change this REQ? Let me read up on why they made it the way they made it...'"
+- id: AGENT-29
+  text: When the engineer asks for a quick change, the agent shall tell the engineer as soon as the change is usable, before finishing its tests and spec updates.
+  origin: engineer
+  traces_to: SYS-18
+  source: |-
+    "sometimes I just want an agent to make a damn change quick, so I can run my binary and play with it while other changes get done"
+- id: AGENT-30
+  text: The agent shall run every cheap-tier item before reporting a change as done.
+  origin: engineer
+  traces_to: SYS-7
+  source: |-
+    "I fully expect the agent to run all unit tests after changes anyways- its a single command."
+- id: AGENT-32
+  text: The skills shall leave the choice of where agents make changes (working tree, branch or worktree) to the engineer and the agent harness.
+  origin: engineer
+  traces_to: SYS-29
+  source: |-
+    "Let's not encode this in the skill. Agent harnesses are getting better and better, I don't want to be overly prescriptive."
+- id: AGENT-33
+  text: A chat message shall count as an approval only when it states unambiguously which items it approves.
+  origin: engineer
+  traces_to: SYS-14
+  source: |-
+    "agents say 1000 things in one chat, if I say lgtm I might mean 'yeah sure' to some of them, not 'yes, and also approve every req'"
+- id: AGENT-35
+  text: A decision record shall present the engineer's reasoning as paraphrase, never as a direct quote.
+  origin: engineer
+  traces_to: SYS-19
+  source: |-
+    "Don't directly quote, maybe clean it up a bit. Be careful not to imply its a direct quote."
+- id: AGENT-36
+  text: The agent shall turn the engineer's conversational statements of intent into needs, requirements and verification items.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    Q8: "as long as it can be easily done conversationally- the idea being I state what I want and some reasoning why, and the agent converts that to needs/reqs/vis/etc."
+- id: AGENT-37
+  text: The agent shall base each need only on what the engineer has stated.
+  origin: engineer
+  traces_to: SYS-6
+  source: |-
+    Q8: "That sounds good" (my lean was that agents may draft needs only from your words) · "Of course I will have to approve the needs down the line."
+- id: AGENT-40
+  text: Whenever the toolkit acts on an importance judgment, it shall state the judgment's reasons.
+  origin: engineer
+  traces_to: SYS-26
+  source: |-
+    on a ranked list in which "each item says why it ranks where it does": "This was really helpful."
+- id: AGENT-41
+  text: The skill shall direct agents to use their harness's own features, such as question menus, wherever those let the engineer answer or review in fewer steps.
+  origin: engineer
+  traces_to: SYS-29
+  source: |-
+    "try to use the harness you're running in to make the UX good for the user. If asking questions, consider using the harness to ask the question in a menu, whatever. Use the tools available to achieve the goal."
+  reworded: |-
+    round 9: "easier" became "in fewer steps", because "easier" is vague (INCOSE R7).
+- id: AGENT-42
+  text: The skill's instructions shall work in every agent harness that can start subagents.
+  origin: engineer
+  traces_to: SYS-27
+  source: |-
+    "The language of the skill can be generic enough to work for antigravity / claude code / maybe codex (?) or other things in the future."
+  reworded: |-
+    round 9: "any" became "every" (INCOSE R32).
+- id: AGENT-44
+  text: Whenever an agent mentions a spec item to the engineer, it shall give the item's title with its ID, linked to the item where the medium allows.
+  origin: engineer
+  traces_to: SYS-30
+  source: |-
+    "If you must use IDs, then they should link to a LOC or the spec … Or just use the title, or say DR-8 (some description) etc."
+- id: AGENT-45
+  text: The skill shall invite agents to change the skill whenever they find friction in it or a new way the engineer uses it.
+  origin: engineer
+  traces_to: SYS-31
+  source: |-
+    "Agents should be encouraged to modify this skill if the UX can be improved, or if the user is trying to use them in a new way. So keep the option open in the wording."
+- id: AGENT-46
+  text: When an agent works around friction in the toolkit, the agent shall report the workaround to the engineer with a proposed improvement.
+  origin: engineer
+  traces_to: SYS-31
+  source: |-
+    "Agents need to be comfortable bringing those issues up too."
+- id: AGENT-12
+  text: When the main agent tries to finish, the toolkit shall run the checker and return each finding to the agent.
+  origin: agent
+  traces_to: SYS-7
+  why: keeps AGENT-3 true even when the agent forgets or doesn't have the skill loaded. In Claude Code this is DR-4. In a harness without that hook, it's an instruction.
+  reworded: |-
+    round 9: "any findings" became "each finding" (INCOSE R32).
+- id: AGENT-13
+  text: Each auditor shall be a fresh-context subagent that did not author the change it audits.
+  origin: agent
+  traces_to: SYS-11
+  refines: |-
+    "it's important that the system engineers who make the requirements are not also the same ones that make the verification items"
+  why: see DR-17. In code-first mode one agent writes the code, tests and spec, so independence has to come from review.
+- id: AGENT-14
+  text: One auditor shall examine only the pre-existing tests and verification items that the change modified or deleted.
+  origin: agent
+  traces_to: SYS-11
+  why: new tests mostly add coverage. Edited and deleted tests are where weakening happens.
+- id: AGENT-15
+  text: An auditor shall probe each new or changed requirement it judges important for ambiguity, by comparing how isolated agents read it.
+  origin: agent
+  traces_to: SYS-21
+  why: this is the scenario probe from our earlier discussion, used only where it pays off. In round 5 the trigger changed from a critical flag to an importance judgment.
+- id: AGENT-16
+  text: For each requirement in a change that it judges important, an auditor shall try to describe an implementation that passes the requirement's verification items yet violates it.
+  origin: agent
+  traces_to: SYS-24
+  why: if it succeeds, the verification is too weak. This is a cheap, reasoning-based cousin of mutation testing.
+- id: AGENT-20
+  text: The toolkit shall refuse agents' direct edits to spec files, naming the CLI command to use instead.
+  origin: agent
+  traces_to: SYS-25
+  why: agents default to editing files, and a refusal that names the alternative redirects them reliably. In Claude Code this is DR-3.
+- id: AGENT-31
+  text: An auditor shall compare each changed verification item's tests against its description.
+  origin: agent
+  traces_to: SYS-11
+  why: this catches a test that never matched its description. It runs with the pre-review audits you accepted in Q3.
+- id: AGENT-34
+  text: A chat approval shall apply only to the items as they were last shown to the engineer.
+  origin: agent
+  traces_to: SYS-14
+  why: an approval can't cover anything that changed after you looked. In Claude Code it's recorded by DR-6.
+- id: AGENT-43
+  text: When an approval names its exceptions by description instead of by ID, the toolkit shall leave unapproved every item the description could refer to.
+  origin: agent
+  traces_to: SYS-14
+  refines: |-
+    "I'll more likely just say 'approve everything except {description}, lets workshop that- {feedback}'"
+  why: a described exception has to be interpreted. Resolving every doubt toward "not approved" means a misreading can only hold an item back. It can never approve something you meant to exclude.

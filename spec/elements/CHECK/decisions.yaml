@@ -1,0 +1,27 @@
+- id: DR-30
+  title: Wording rules were calibrated against this spec before they shipped
+  decided_by: agent
+  elements:
+  - CHECK
+  - MODEL
+  requirements: MODEL-16, CHECK-16
+  recorded: round 9 (slice 1)
+  context: The engineer chose strict wording rules (errors, not warnings), so a noisy rule would block agents on false alarms and teach them to fight the checker. The checker's first run on this spec reported 29 errors, and 18 of them were false.
+  decision: |-
+    - EARS is read loosely: condition clauses at the front are optional (When, While, If, Where, In, During, At and similar), and the subject may contain commas.
+    - The check for conditions placed after "shall" was dropped. Only 1 of its 10 hits was real, because phrases like "decisions made while building" aren't conditions. Auditors judge condition placement instead.
+    - Three exemptions cover the remaining false hits: "how many", capitalized words inside a proper name, and "both … and".
+    - The other 11 findings were real, and those requirements were reworded.
+  alternatives: Keeping every rule as first written and rewording around the false hits, which bends good requirements to fit bad rules. Turning the noisy rules into warnings, which the engineer had ruled out.
+  consequences: Every remaining rule fires only on real problems in this spec. Each exemption has a regression test, so a later change to the rules can't silently bring the noise back.
+- id: DR-31
+  title: Missing verification and missing approvals are to-dos, not errors
+  decided_by: agent
+  elements:
+  - CHECK
+  requirements: CHECK-10, CHECK-14, CHECK-15, MODEL-18
+  recorded: round 9 (slice 1)
+  context: 169 requirements have no verification item yet, and most items aren't approved. If those were errors, the checker would fail on every run, and agents would learn to ignore it.
+  decision: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. In merge mode (`spec check --merge`, CHECK-15), unapproved items become errors. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches.
+  alternatives: Failing on every missing item from day one.
+  consequences: The checker stays green while to-dos remain, so the summary line is what keeps them visible.

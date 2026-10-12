@@ -1,0 +1,150 @@
+- id: DR-2
+  title: Store the spec as YAML, and take edits as a YAML batch on standard input
+  decided_by: agent
+  elements:
+  - MODEL
+  - CLI
+  requirements: MODEL-1, CLI-1, CLI-7
+  recorded: round 4 (decided in round 2; approved in round 5)
+  context: the engineer chose the CLI as the agents' way to edit the spec, so that it can add context before an edit lands. The format was left to me.
+  decision: spec files are YAML. To make several edits, an agent writes them as one small YAML document and pipes it into a single CLI command, usually as a heredoc. That avoids passing each field as a command-line argument.
+  alternatives: JSON edited only through the CLI, which was the engineer's first idea but produces noisy diffs. Markdown with embedded metadata, which is fragile to parse.
+  consequences: raw git diffs stay readable, prose never fights shell quoting, and a large update is one call.
+- id: DR-5
+  title: Approval records store a fingerprint and the approved content
+  decided_by: agent
+  elements:
+  - MODEL
+  requirements: MODEL-24, MODEL-25, REVIEW-11
+  recorded: round 4 (the fingerprint idea is the engineer's, from round 2; storing the content was MODEL-26)
+  context: the engineer proposed recording approvals with a hash or git state, so the toolkit can tell when approved content has changed.
+  decision: each approval stores the item's fingerprint and the approved text itself.
+  alternatives: a fingerprint alone, which shows *that* something changed but not *what*. A git revision, which fails for approvals given before a commit.
+  consequences: the review page can always show what changed since approval. [approvals.md](approvals.md) already follows this format by hand.
+- id: DR-8
+  title: A decomposition tree plus a separate dependency graph
+  decided_by: agent
+  elements:
+  - MODEL
+  requirements: MODEL-3, MODEL-4, MODEL-11
+  recorded: round 4 (decided in round 1)
+  context: the engineer's first sketch had one "depends on" relation that covered both "is part of" and "uses".
+  decision: |-
+    "part of" is a tree, so each system element has one parent. "Uses" is a separate graph that must have no cycles.
+  alternatives: one combined graph, which mixes requirement flow-down with change impact. Several parents per element.
+  consequences: |-
+    requirements flow down the tree, and change impact follows the dependency graph. A shared element, such as a general utility, has one parent: usually the lowest element whose parts all use it, or the system itself. Every element that relies on it lists it as a dependency. Q24 confirmed this and added one rule: verifying a change also covers every element that depends on what it touched (VERIFY-14).
+- id: DR-9
+  title: Wording rules from INCOSE plus EARS patterns
+  decided_by: agent
+  elements:
+  - MODEL
+  requirements: MODEL-16
+  recorded: round 4 (decided in round 1)
+  context: the engineer asked for hard, checkable rules for writing requirements.
+  decision: |-
+    use the mechanically checkable subset of INCOSE's Guide to Writing Requirements: one "shall"; no vague terms, escape clauses or open-ended endings; no test or implementation vocabulary. Add the EARS sentence patterns.
+  alternatives: a free-form style judged only by a model, which can't be verified. INCOSE's full set of roughly 40 rules, many of which need judgment.
+  consequences: |-
+    the checker can enforce wording. Q25 made every rule an error.
+    - Each finding names its rule, says why the rule exists, and suggests a rewrite (CHECK-16).
+    - Findings link to the skill's own rules page, which cites INCOSE's rule numbers, because the INCOSE guide isn't freely available.
+    - To save tokens, a rule is explained in full only once per run (CHECK-17).
+    - The aim is the Rust compiler's style: errors that teach a fresh agent this repo's expectations. Quality that needs judgment is left to the auditors (SYS-21).
+- id: DR-10
+  title: Related code is a loose link, not file ownership
+  decided_by: engineer
+  elements:
+  - MODEL
+  - CHECK
+  requirements: MODEL-10, CHECK-5, CHECK-8
+  recorded: round 4 (decided in round 2)
+  context: I first proposed that each file belong to exactly one system element. The engineer worried that this would make refactoring costly and tie the spec to one language's file layout.
+  decision: each system element lists related code by path or pattern, and a file may relate to any number of elements. Tests are the firm link.
+  alternatives: exactly-one ownership. Deriving the mapping from per-test coverage, which may come later as an upgrade.
+  consequences: some code may relate to no system element. CHECK-8 flags such code when it changes.
+- id: DR-12
+  title: Scenarios of use are context on needs, not an item type
+  decided_by: engineer
+  elements:
+  - MODEL
+  requirements: MODEL-29
+  recorded: round 4
+  context: I proposed a separate item type for the engineer's CUJs. The engineer preferred annotating needs with them, so that future agents know why a need exists.
+  decision: |-
+    each need records its context in paraphrase: the reasoning and the scenarios behind it.
+  alternatives: a scenario item type with its own IDs and approvals.
+  consequences: this matches SE practice, which keeps operational scenarios in a narrative concept-of-operations document rather than as baselined line items.
+- id: DR-13
+  title: No transcript archive; decision records carry the reasoning
+  decided_by: engineer
+  elements:
+  - MODEL
+  - AGENT
+  requirements: SYS-19, MODEL-28, AGENT-24, AGENT-35
+  recorded: round 4 (decided in round 3)
+  context: the engineer first suggested linking conversation transcripts. Claude Code deletes those after 30 days by default, they live on one machine, and they can contain secrets.
+  decision: keep no transcript links and no archive. Each decision becomes a dated, paraphrased decision record on the system elements it affects.
+  alternatives: archive transcripts outside the repository, or raise the retention period.
+  consequences: reasoning has to be captured when the decision is made. This file does that for rounds 1–5.
+- id: DR-20
+  title: Importance is judged from history, not stored as a flag
+  decided_by: engineer
+  elements:
+  - MODEL
+  - AGENT
+  - REASON
+  requirements: SYS-24, SYS-26, MODEL-14, REASON-4, AGENT-15, AGENT-16, AGENT-40
+  recorded: round 5
+  context: I proposed a "critical" flag on requirements, which would trigger extra verification. The engineer worried that such a flag inflates over time until it means nothing. The engineer preferred that agents judge importance from each item's recorded history, for deciding both how much to verify and what to ask about first.
+  decision: |-
+    there is no criticality flag. Agents judge importance each time from an item's history: whether the engineer stated it, its decision records, how often it changed, and what depends on it. They state their reasons whenever they act on a judgment (AGENT-40).
+  alternatives: a stored critical flag (MODEL-19 and MODEL-20, now removed).
+  consequences: judgments can differ between runs. Stated reasons make that visible and correctable.
+- id: DR-23
+  title: System requirements are verified at the system level
+  decided_by: engineer
+  elements:
+  - MODEL
+  - VERIFY
+  requirements: MODEL-32
+  recorded: round 5
+  context: SE verifies each level at its own level (the V-model). Passing element-level tests doesn't prove the system works end to end.
+  decision: each system requirement gets its own verification, such as an end-to-end run or a demonstration, in addition to its children's verification.
+  alternatives: treat a system requirement as verified when all its children pass.
+  consequences: the VI round will write system-level checks, for example running a code-first change end to end and confirming that it never stopped to ask.
+- id: DR-28
+  title: The spec lives in YAML files per system element, and the Markdown views are generated
+  decided_by: agent
+  elements:
+  - MODEL
+  - REVIEW
+  requirements: MODEL-1, MODEL-25, MODEL-28, REVIEW-14
+  recorded: round 9 (slice 1)
+  context: DR-2 chose YAML, and slice 1 had to choose the files. The engineer reads Markdown, and diffs should stay small and local to what changed.
+  decision: |-
+    Each system element is a directory under spec/elements/. It holds element.yaml, plus requirements.yaml, verification.yaml and decisions.yaml as needed.
+    - Needs live with the system element.
+    - A decision record sits with the first element it names.
+    - Approvals, retired IDs, questions and project settings are single files at the top of spec/.
+    - requirements.md and decisions.md are generated by `spec render`, and the checker reports them when they're stale.
+  alternatives: One big YAML file, which becomes a merge-conflict hotspot. One file per item, which means hundreds of tiny files. Hand-written Markdown as the source, which can't be parsed reliably and drifts.
+  consequences: A change to one element touches one directory, and readers keep the same Markdown view. Hand edits to a view are overwritten, and the checker flags them first.
+- id: DR-29
+  title: Fingerprints cover an item's meaning, and migration carried approvals over
+  decided_by: agent
+  elements:
+  - MODEL
+  requirements: MODEL-24, MODEL-25, MODEL-31
+  recorded: round 9 (slice 1)
+  context: Approvals were fingerprints of Markdown text. Moving to YAML would have broken every one of them, even though no meaning changed.
+  decision: |-
+    A fingerprint is a hash of an item's meaning fields, which vary by kind:
+    - requirement: its text;
+    - need: its text and context;
+    - decision record: its title, status, context, decision, alternatives and consequences;
+    - verification item: its description, method, technique and the requirements it verifies;
+    - system element: its title, purpose, parent and dependencies.
+    Before migrating, every old fingerprint was checked against the Markdown, and all 69 matched. The approvals were then re-fingerprinted, with each old value kept as `migrated_from`.
+  alternatives: Asking the engineer to re-approve 69 unchanged items. Fingerprinting the raw YAML, which would let a formatting change un-approve an item.
+  consequences: Re-formatting or re-linking an item never un-approves it, and rewording it always does. One old fingerprint, NEED-12's, had also covered the heading of the next section, because of a parsing bug in my interim scripts. Its new fingerprint covers just the need and its context.

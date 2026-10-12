@@ -1,0 +1,121 @@
+- id: MODEL-V1
+  verifies:
+  - MODEL-1
+  method: test
+  technique: unit test
+  origin: agent
+  description: Given a system element directory nested inside another element's directory, the checker reports it.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_nested_element_directory_is_reported
+- id: MODEL-V2
+  verifies:
+  - MODEL-2
+  - MODEL-11
+  method: test
+  technique: unit test
+  origin: agent
+  description: Given an element whose parent doesn't exist, or parents that loop back on themselves, the checker reports a broken tree.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_broken_tree_is_reported
+    - tests/test_check_structure.py::test_parent_loop_is_reported
+- id: MODEL-V3
+  verifies:
+  - MODEL-3
+  - MODEL-4
+  method: test
+  technique: unit test
+  origin: agent
+  description: Given a dependency on an unknown element, or a dependency cycle, the checker reports it and names every element in the cycle.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_unknown_dependency_is_reported
+    - tests/test_check_structure.py::test_dependency_cycle_is_reported
+- id: MODEL-V4
+  verifies:
+  - MODEL-12
+  method: test
+  technique: unit test
+  origin: agent
+  description: Given a need that no requirement serves, the checker reports the need.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_unserved_need_is_reported
+- id: MODEL-V5
+  verifies:
+  - MODEL-13
+  method: test
+  technique: unit test
+  origin: agent
+  description: Given a requirement with neither a rationale nor a source, the checker reports it.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_requirement_without_rationale_is_reported
+- id: MODEL-V6
+  verifies:
+  - MODEL-14
+  method: test
+  technique: unit test
+  origin: agent
+  description: Given an item whose origin is neither the engineer nor an agent, the checker reports it.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_missing_origin_is_reported
+- id: MODEL-V7
+  verifies:
+  - MODEL-15
+  method: test
+  technique: unit test
+  origin: agent
+  description: Given an item that reuses a retired ID, or two items sharing one ID, the checker reports each.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_retired_id_reuse_is_reported
+    - tests/test_check_structure.py::test_duplicate_id_is_reported
+- id: MODEL-V8
+  verifies:
+  - MODEL-16
+  method: test
+  technique: unit test
+  origin: agent
+  description: Each wording rule fires on a sentence that breaks it, and none fires on well-formed requirements, including the calibrated exemptions (a quoted 'shall', 'how many', proper names, 'both … and').
+  tests:
+    python:
+    - tests/test_wording.py::test_good_requirements_pass
+    - tests/test_wording.py::test_each_rule_fires
+    - tests/test_wording.py::test_quoted_shall_is_a_mention_not_an_obligation
+    - tests/test_wording.py::test_capitalized_vague_word_at_sentence_start_still_counts
+- id: MODEL-V9
+  verifies:
+  - MODEL-17
+  method: test
+  technique: unit test
+  origin: agent
+  description: Requirement text containing a code span, a file name, a snake_case or camelCase identifier, or call syntax is reported.
+  tests:
+    python:
+    - tests/test_wording.py::test_each_rule_fires
+- id: MODEL-V10
+  verifies:
+  - MODEL-24
+  - MODEL-25
+  - MODEL-31
+  method: test
+  technique: unit test
+  origin: agent
+  description: An approval records the item's fingerprint. Rewording the item makes it unapproved; re-pointing its test links does not.
+  tests:
+    python:
+    - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
+    - tests/test_approvals.py::test_approve_command_records_fingerprint_and_words
+- id: MODEL-V11
+  verifies:
+  - MODEL-30
+  method: test
+  technique: unit test
+  origin: agent
+  description: A verification item whose method isn't test, analysis, demonstration or inspection, or whose technique is unknown, is reported.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_invalid_verification_item_is_reported

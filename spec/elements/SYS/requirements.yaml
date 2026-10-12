@@ -1,0 +1,258 @@
+- id: SYS-6
+  text: The spec shall trace each requirement to the need or requirement it serves, or mark it as derived.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-1
+  - NEED-8
+  - NEED-11
+  source: |-
+    Q16: "Yep, please do this as the next round."
+- id: SYS-7
+  text: The toolkit shall prevent an agent from reporting a change as done until every spec update the change requires is done.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-1
+  - NEED-5
+  source: |-
+    "the linter will be as comprehensive as possible to flag to the AI that its job is not done yet"
+  reworded: |-
+    round 9: "while any spec update … remains undone" became "until every spec update … is done" (INCOSE R32).
+- id: SYS-8
+  text: The spec shall describe the product's requirements and verification independently of programming language.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-4
+  source: NEED-4 · "if there are tests they should describe the test and link to the 'implementations'"
+  reworded: |-
+    round 9: "of any programming language" became "of programming language" (INCOSE R32).
+- id: SYS-9
+  text: The toolkit shall track, for each implementation, which requirements it satisfies.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-4
+  - NEED-6
+  source: |-
+    "the specs should mark in some way what has been implemented yet, and what has not … the todo list can be regenerated but for an entire different implementation"
+- id: SYS-10
+  text: The toolkit shall verify each requirement by test, analysis, demonstration or inspection.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-1
+  source: |-
+    "We have the concept of requirements and verification items." · Q18: "Yes let's adopt."
+- id: SYS-11
+  text: The toolkit shall keep each check of an agent's work independent of that agent.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-9
+  source: NEED-9.
+- id: SYS-12
+  text: The toolkit shall run expensive verification only when the engineer requests it.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-7
+  source: |-
+    "I don't want it to spin up the reasoning agents every time automatically (a human should gate that)"
+  allocation_note: VERIFY. Its restatement there, VERIFY-6, was removed under MODEL-33.
+- id: SYS-13
+  text: When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-7
+  source: |-
+    "occasionally say 'hey let's run the full suite' and walk away"
+- id: SYS-14
+  text: The toolkit shall show the engineer which spec items the engineer has not yet approved.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-1
+  source: |-
+    "Then the CLI can derive when the file is not approved (e.g. a subagent went and changed things, so now the hash doesn't match?)"
+- id: SYS-15
+  text: The toolkit shall present each change to the engineer as the differences it makes to the spec.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-1
+  source: |-
+    "we'll create tools to render components on a web page and also render the diffs between changes"
+- id: SYS-16
+  text: The toolkit shall bring to the engineer each question and contradiction that arises during a change.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-2
+  source: NEED-2 · "always _mention_ 'hey, this breaks X, Y, changes Z'"
+- id: SYS-17
+  text: The toolkit shall support both reviewing a change's spec before the change is implemented and reviewing it after.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-6
+  source: |-
+    "the system should support two CUJs … We want to support both workflows cleanly." · "afterwards, or during implementation (however works best / is most natural for the agent) … From the user perspective, they will look at it afterwards."
+- id: SYS-18
+  text: In code-first mode, the toolkit shall let a change complete without the engineer's involvement.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-7
+  source: |-
+    "it must remain possible to have a CUJ where the user can state what they want, say 'go for it', and come back to the changes having been made, and read the spec"
+- id: SYS-19
+  text: The toolkit shall keep the reasoning behind each decision about a system element with that element.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-8
+  source: |-
+    "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time."
+- id: SYS-20
+  text: The toolkit shall give an agent the spec context its current work needs, without the agent reading the methodology.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-5
+  source: |-
+    "a lot of the time the AI will not have the document for the system engineering documentation in its context" · "the CLI has a chance to intercept the request and give extra context"
+- id: SYS-21
+  text: The toolkit shall find requirements and verification items that are ambiguous, unverifiable or too weak to catch a wrong implementation.
+  origin: agent
+  kind: system
+  serves:
+  - NEED-1
+  - NEED-9
+  refines: |-
+    "How do we write some way to critique whether or not a requirement is well written or whether or not a verification item is well written"
+  why: this spells out what "well written" means, so that a critique can fail. Your round-5 additions on how flags are presented are CHANGE-10 to CHANGE-12.
+- id: SYS-22
+  text: Adding a programming language or a verification technique shall require no change to the toolkit's existing code.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-3
+  - NEED-4
+  source: |-
+    "adding rust later is a matter of 'extending' rather than 'refactoring' the cli tool" · "make it extensible"
+  allocation_note: VERIFY, for new techniques. Its restatements, VERIFY-1 and LANG-1, were removed under MODEL-33.
+- id: SYS-23
+  text: The toolkit shall be adoptable by a repository that already contains code and tests.
+  origin: agent
+  kind: system
+  serves:
+  - NEED-3
+  - NEED-10
+  why: reuse mostly means existing projects. How adoption works is now ONBOARD.
+- id: SYS-24
+  text: The toolkit shall scale each requirement's automated verification to its importance, judged from the requirement's recorded history.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-9
+  source: |-
+    "Criticality should be based on the ADRs and history encoded in the item, the agent can decide criticality … Or were you referring to 'verification' in the sense of 'agentic automated verification'? In which case I think my advice also applies." See DR-20.
+- id: SYS-25
+  text: The toolkit shall route agents' edits to the spec through its command-line tool.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-2
+  - NEED-5
+  source: |-
+    "I want the CLI to be the main way agents edit the spec. This is because, if an agent wants to edit the spec, the CLI has a chance to intercept the request and give extra context"
+- id: SYS-26
+  text: The toolkit shall order the questions and flags it brings to the engineer by how much each answer could change the spec or the other answers, most consequential first.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-2
+  - NEED-11
+  source: |-
+    "whenever asking questions or flagging things to the user, to use their time wisely by always ordering things by 'most likely to impact other answers'" · "clearly these 3 are most useful, I'll use the users time wisely and ask about those first"
+- id: SYS-27
+  text: Each check, verification, query and edit the toolkit offers shall work without depending on a particular agent harness.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-12
+  source: |-
+    "I'd like to use this methodology in other agentic use cases possibly. Can't the CLI be the implementation? … I don't want to couple too closely to claude code". How: DR-1.
+  reworded: |-
+    round 9: "without any particular agent harness" became "without depending on a particular agent harness" (INCOSE R32).
+- id: SYS-29
+  text: The toolkit shall state the outcomes it needs from agents, leaving the means to each agent and its harness.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-5
+  - NEED-12
+  source: |-
+    "How it does it is up to the agent. We are here to tell it the needs, and how to ideally configure the subagents." · "I don't want to be overly prescriptive."
+- id: SYS-30
+  text: The toolkit shall present each spec item to the engineer in a form the engineer can read without looking anything up.
+  origin: engineer
+  kind: system
+  serves:
+  - NEED-11
+  source: |-
+    "IDs are really hard to remember … Otherwise, I'm left Ctrl+f'ing to figure out what the heck you're asking."
+- id: SYS-31
+  kind: system
+  text: The toolkit shall invite agents to improve the toolkit wherever they meet friction or a new way of working.
+  origin: engineer
+  serves:
+  - NEED-13
+  source: |-
+    "So keep the option open in the wording. Otherwise, if an agent has to jump through 16 hoops to get something done, the human will never know, and therefore the skill will never be improved."
+- id: SYS-1
+  text: The toolkit's skills, subagent definitions, code and documentation shall contain no references to a specific host project.
+  origin: engineer
+  kind: constraint
+  serves:
+  - NEED-3
+  source: NEED-3.
+- id: SYS-2
+  text: This repository shall pass the toolkit's checker against its own spec.
+  origin: engineer
+  kind: constraint
+  serves:
+  - NEED-3
+  source: |-
+    "that repo should dogfood this methodology. We should be writing this tooling with our own system engineering tooling, and linting it"
+- id: SYS-3
+  text: The toolkit shall be implemented in Python.
+  origin: engineer
+  kind: constraint
+  source: |-
+    "likely the CLI would be written in python". This is your constraint, so it traces to no need.
+- id: SYS-4
+  text: The toolkit shall read every project-specific setting from the host repository.
+  origin: agent
+  kind: constraint
+  serves:
+  - NEED-3
+  why: this is the counterpart to SYS-1. Project specifics need a home outside the toolkit.
+- id: SYS-5
+  text: The toolkit shall set up a host repository for use in one step.
+  origin: agent
+  kind: constraint
+  serves:
+  - NEED-3
+  - NEED-5
+  why: |-
+    reworded in round 5 to your meaning: setting up the spec and everything else a project needs when it joins. Bringing an existing project's content in is ONBOARD.
+- id: SYS-28
+  text: The toolkit shall assume it runs in an agent harness that can start subagents.
+  origin: engineer
+  kind: constraint
+  source: |-
+    Q22: "Requirement is 'there must be SOME harness involved' and that harness has to support subagents." This is your constraint, so it traces to no need.

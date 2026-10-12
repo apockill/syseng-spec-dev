@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Runs the toolkit's CLI from this checkout.
+exec python3 -m syseng "$@"

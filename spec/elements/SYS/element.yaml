@@ -1,0 +1,8 @@
+id: SYS
+title: |-
+  The toolkit: the system as a whole
+parent: null
+depends_on: []
+purpose: |-
+  A reusable systems-engineering toolkit: a command-line tool, one portable skill and optional adapters for agent harnesses. It lets one engineer direct AI agents on a large codebase by reading requirements instead of code.
+related_code: {}

@@ -1,0 +1,11 @@
+- id: DR-21
+  title: Onboarding records the current state with maximum agent effort
+  decided_by: engineer
+  elements:
+  - ONBOARD
+  requirements: SYS-23, ONBOARD-1 to ONBOARD-7
+  recorded: round 5
+  context: I had proposed adopting the toolkit gradually, grandfathering existing gaps in a baseline (CHECK-13). The engineer wants the opposite. Bringing a project in should capture everything at once, as carefully as possible, so that the engineer only confirms the needs and approves the rest. Reviewing an existing project line by line would take forever.
+  decision: onboarding extracts the full spec and the reasons behind it, runs every check (including expensive ones and auditors), and asks only questions the project can't answer. It records the current state without proposing changes. Rigor goes into later changes instead.
+  alternatives: gradual adoption with a shrinking baseline of grandfathered findings.
+  consequences: onboarding is expensive in tokens and time, but it happens once per project.

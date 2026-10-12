@@ -1,0 +1,10 @@
+id: CLI
+title: The command-line tool
+parent: SYS
+depends_on:
+- MODEL
+- CHECK
+- VERIFY
+- REVIEW
+purpose: The single tool through which agents, and the engineer, query, edit, check, verify and render the spec.
+related_code: {}

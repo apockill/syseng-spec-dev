@@ -1,0 +1,23 @@
+- id: DR-24
+  title: Open decisions come with options and a recommendation
+  decided_by: engineer
+  elements:
+  - CHANGE
+  requirements: CHANGE-10, CHANGE-11, CHANGE-12
+  recorded: round 5
+  context: the engineer wants to settle agent-raised issues quickly, often accepting a whole set at once. When something the engineer wrote, or something with recorded history, is involved, the engineer wants a warning not to skim it.
+  decision: every open decision offers options, with one marked as recommended, and a set can be accepted in one statement. Each one also says whether it involves an engineer-stated item or one with decision records behind it. That last part is my extension (CHANGE-11) from flagged items to all open decisions.
+  alternatives: free-form questions.
+  consequences: most decisions take seconds. The ones that touch your own words stand out.
+- id: DR-26
+  title: Order questions by how much their answers would change
+  decided_by: engineer
+  elements:
+  - CHANGE
+  - AGENT
+  requirements: SYS-26, AGENT-40
+  recorded: round 8
+  context: a ranked list worked well for the engineer. It sorted the questions by how much each answer would change, said why each ranked where it did, gave a recommended option, and offered a one-line way to accept everything. The engineer wants the skill to do this whenever it asks questions or flags things.
+  decision: order questions and flags by how likely each answer is to change the spec or the other answers, most consequential first. Each one carries its reasons and a recommended option, and a set can be accepted in one line.
+  alternatives: ordering by system element or by ID.
+  consequences: the engineer can stop after the top few. The rest can usually be accepted as a block.

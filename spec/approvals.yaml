@@ -1,0 +1,624 @@
+- id: DR-1
+  fingerprint: 0b72ae3a99ed
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    The CLI is the product, the method is one portable skill, and harness glue is optional: the Python CLI holds all the logic. The method ships as one Agent Skill in the open SKILL.md format, which Claude Code, Antigravity and most other harnesses read. A harness can also get thin glue that calls the CLI; the setup command writes that glue into the repository. There is no plugin.
+  migrated_from: 1c3566d6d5b0
+- id: DR-2
+  fingerprint: 5dc4e3b79986
+  approved_on: '2026-10-11'
+  via: chat (round 5)
+  words: SGTM.
+  text: |-
+    Store the spec as YAML, and take edits as a YAML batch on standard input: spec files are YAML. To make several edits, an agent writes them as one small YAML document and pipes it into a single CLI command, usually as a heredoc. That avoids passing each field as a command-line argument.
+  migrated_from: 656ec1f2e9dd
+- id: DR-3
+  fingerprint: 8080e42e27e9
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Refuse direct edits to spec files with a pre-tool hook: a Claude Code PreToolUse hook refuses agents' file edits under the spec directory. Its refusal names the CLI command to use instead.
+  migrated_from: 122b902a0707
+- id: DR-4
+  fingerprint: 56ea6a8485b5
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Run the checker from a stop hook: a Claude Code Stop hook runs the checker when the agent tries to finish, and blocks with the findings. It blocks at most once per turn, so a mid-task question to the engineer still gets through.
+  migrated_from: a714eed29f4b
+- id: DR-5
+  fingerprint: 6dc3ea774c82
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Approval records store a fingerprint and the approved content: each approval stores the item's fingerprint and the approved text itself.
+  migrated_from: df888faa4827
+- id: DR-6
+  fingerprint: 46ae340c7a65
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Record chat approvals from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. The agent never records approvals.
+  migrated_from: 320e75aa3368
+- id: DR-7
+  fingerprint: 0a155d6d4c67
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Run reasoning checks in an isolated subagent that can't see the spec: use a custom, non-fork subagent. Its definition sets `omitClaudeMd`, so CLAUDE.md and AGENTS.md don't load. It has no shell tool. It carries its own hook that refuses reads under the spec directory and drops spec hits from search results.
+  migrated_from: 1602b8e7daa4
+- id: DR-8
+  fingerprint: a5f0a5050a81
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    A decomposition tree plus a separate dependency graph: "part of" is a tree, so each system element has one parent. "Uses" is a separate graph that must have no cycles.
+  migrated_from: 01e339b8f646
+- id: DR-9
+  fingerprint: 327ecce4e67a
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Wording rules from INCOSE plus EARS patterns: use the mechanically checkable subset of INCOSE's Guide to Writing Requirements: one "shall"; no vague terms, escape clauses or open-ended endings; no test or implementation vocabulary. Add the EARS sentence patterns.
+  migrated_from: de09a707460a
+- id: DR-10
+  fingerprint: ad10adf7bf72
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Related code is a loose link, not file ownership: each system element lists related code by path or pattern, and a file may relate to any number of elements. Tests are the firm link.
+  migrated_from: cda3d4e72496
+- id: DR-11
+  fingerprint: 188c87530a54
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Adopt systems-engineering vocabulary: "system element" replaces "component". Verification items name one of the four standard methods (test, analysis, demonstration, inspection) and a technique (unit test, integration test, reasoning check). The full vocabulary is in [glossary.md](glossary.md).
+  migrated_from: f8a1f4f7f3dd
+- id: DR-12
+  fingerprint: 495b40506ad0
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Scenarios of use are context on needs, not an item type: each need records its context in paraphrase: the reasoning and the scenarios behind it.
+  migrated_from: 4ac13ccfd11d
+- id: DR-13
+  fingerprint: 991262901a9b
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    No transcript archive; decision records carry the reasoning: keep no transcript links and no archive. Each decision becomes a dated, paraphrased decision record on the system elements it affects.
+  migrated_from: 4f8179787a6d
+- id: DR-14
+  fingerprint: 2f9c3f82b590
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Expensive verification only when the engineer asks: expensive items run only when the engineer asks: for a full run, a single change, or onboarding (ONBOARD-3). Agents always run every cheap item before reporting a change as done.
+  migrated_from: 1e140faf2554
+- id: DR-15
+  fingerprint: dd98d7e03706
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Code-first never stops to ask; only spec-first may: in code-first mode, agents finish the change and report every contradiction and question at the end. In spec-first mode, an agent may stop on a contradiction the engineer would likely want to decide first.
+  migrated_from: f4dc487d8dc4
+- id: DR-16
+  fingerprint: 1baa5c09024e
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Defer verifying agent-behavior requirements: verify them by demonstration, meaning the engineer observes them in real use, until an eval harness exists.
+  migrated_from: d2e358ba60c2
+- id: DR-17
+  fingerprint: 8d619bccc60e
+  approved_on: '2026-10-11'
+  via: chat (round 7)
+  words: LGTM
+  text: |-
+    Independence through review, not separate authors: checks come from fresh-context auditors that didn't author the change. One auditor examines only the tests and verification items that the change modified or deleted.
+  migrated_from: 5112b51aa963
+- id: DR-18
+  fingerprint: f16f8574d8fe
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Restructure the spec into layers: needs come first, then system requirements that serve them, then element requirements, each tracing to exactly one system requirement. Design choices moved into this file.
+  migrated_from: b6c534fd14b1
+- id: DR-19
+  fingerprint: 289652d39732
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Named acknowledgments only for edits with impact: an edit that touches approved or depended-upon items needs an acknowledgment of each affected item, by name, with a one-line note. Other edits apply at once.
+  migrated_from: bd6d06b2cb78
+- id: DR-20
+  fingerprint: 9762ee4a7ccb
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Importance is judged from history, not stored as a flag: there is no criticality flag. Agents judge importance each time from an item's history: whether the engineer stated it, its decision records, how often it changed, and what depends on it. They state their reasons whenever they act on a judgment (AGENT-40).
+  migrated_from: b8fa17c18edb
+- id: DR-21
+  fingerprint: 1d5e00dfb3d1
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Onboarding records the current state with maximum agent effort: onboarding extracts the full spec and the reasons behind it, runs every check (including expensive ones and auditors), and asks only questions the project can't answer. It records the current state without proposing changes. Rigor goes into later changes instead.
+  migrated_from: a61c2ae99672
+- id: DR-22
+  fingerprint: 9d51045c58e6
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    No restatement; system requirements can be allocated directly: remove requirements that only restate their parent. A system requirement can be allocated to a system element without an element-level copy. Round 5 removed eleven restatements.
+  migrated_from: 683382bbfae9
+- id: DR-23
+  fingerprint: a905f02e55d8
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    System requirements are verified at the system level: each system requirement gets its own verification, such as an end-to-end run or a demonstration, in addition to its children's verification.
+  migrated_from: e782a5d176aa
+- id: DR-24
+  fingerprint: ab705e6d05ee
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Open decisions come with options and a recommendation: every open decision offers options, with one marked as recommended, and a set can be accepted in one statement. Each one also says whether it involves an engineer-stated item or one with decision records behind it. That last part is my extension (CHANGE-11) from flagged items to all open decisions.
+  migrated_from: 8e9dde481cfe
+- id: DR-25
+  fingerprint: b197e796eb5f
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    A harness that can start subagents is required, and the skill states outcomes, not means: the toolkit assumes an agent harness that can start subagents, and there's no model-API path. The skill's language stays generic enough for Claude Code, Antigravity, Codex and future harnesses. It states outcomes and ideal setups, and leaves the means to the agent.
+  migrated_from: 79f37716ced5
+- id: DR-26
+  fingerprint: e2c3c6b0195b
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    Order questions by how much their answers would change: order questions and flags by how likely each answer is to change the spec or the other answers, most consequential first. Each one carries its reasons and a recommended option, and a set can be accepted in one line.
+  migrated_from: 35f401b312b0
+- id: DR-27
+  fingerprint: 223a35e862fa
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: |-
+    IDs always come with a title, linked where possible: every mention of a spec item gives its title alongside its ID, and links to it where the medium allows. The review page shows an item's text when you hover over or click its ID.
+  migrated_from: c12c0af1c3ff
+- id: DR-28
+  fingerprint: b247d6825348
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: |-
+    The spec lives in YAML files per system element, and the Markdown views are generated: Each system element is a directory under spec/elements/. It holds element.yaml, plus requirements.yaml, verification.yaml and decisions.yaml as needed. - Needs live with the system element. - A decision record sits with the first element it names. - Approvals, retired IDs, questions and project settings are single files at the top of spec/. - requirements.md and decisions.md are generated by `spec render`, and the checker reports them when they're stale.
+- id: DR-29
+  fingerprint: 0ad3211b3da6
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: |-
+    Fingerprints cover an item's meaning, and migration carried approvals over: A fingerprint is a hash of an item's meaning fields, which vary by kind: - requirement: its text; - need: its text and context; - decision record: its title, status, context, decision, alternatives and consequences; - verification item: its description, method, technique and the requirements it verifies; - system element: its title, purpose, parent and dependencies. Before migrating, every old fingerprint was checked against the Markdown, and all 69 matched. The approvals were then re-fingerprinted, with each old value kept as `migrated_from`.
+- id: DR-30
+  fingerprint: b2101ae530ef
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: |-
+    Wording rules were calibrated against this spec before they shipped: - EARS is read loosely: condition clauses at the front are optional (When, While, If, Where, In, During, At and similar), and the subject may contain commas. - The check for conditions placed after "shall" was dropped. Only 1 of its 10 hits was real, because phrases like "decisions made while building" aren't conditions. Auditors judge condition placement instead. - Three exemptions cover the remaining false hits: "how many", capitalized words inside a proper name, and "both … and". - The other 11 findings were real, and those requirements were reworded.
+- id: DR-31
+  fingerprint: 4816ed10f4d5
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: |-
+    Missing verification and missing approvals are to-dos, not errors: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. In merge mode (`spec check --merge`, CHECK-15), unapproved items become errors. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches.
+- id: DR-32
+  fingerprint: 1df7b1e7bcb8
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: |-
+    A Nix flake for development, and standard packaging for everyone else: flake.nix provides Python with PyYAML and pytest, and `bin/spec` runs the CLI from the checkout. pyproject.toml keeps the toolkit installable with pip anywhere else. Until flake.nix is tracked by git, the dev shell starts with `nix develop path:.`.
+- id: NEED-1
+  fingerprint: f4d032821275
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs to keep intellectual control of a product of 100,000+ lines of code by reading its requirements, and only occasionally its verification items.
+  migrated_from: ae99c89eba84
+- id: NEED-2
+  fingerprint: e6075d038a36
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs agents to surface the questions that spec work raises, so the engineer gets more chances to steer.
+  migrated_from: 26cdcde64ef3
+- id: NEED-3
+  fingerprint: 4b59906ae6a0
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs to reuse the toolkit across unrelated projects.
+  migrated_from: faf3a3e85925
+- id: NEED-4
+  fingerprint: 4f923c2ad874
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs the V&V documentation to be enough to rebuild the product in another language.
+  migrated_from: 5db11719abb6
+- id: NEED-5
+  fingerprint: a2be556c6d6f
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs the process to cost the main agent little attention.
+  migrated_from: 6fb6c195747d
+- id: NEED-6
+  fingerprint: 1cf82c4ca4fd
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs to choose, per change, between specifying first and building first.
+  migrated_from: 5a5f5569a7ae
+- id: NEED-7
+  fingerprint: 920f7c60fc92
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs to develop quickly, running the full verification only occasionally and without supervising it.
+  migrated_from: 4ceb9199d68f
+- id: NEED-8
+  fingerprint: 682676a9ce0e
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs the reasoning behind each decision to stay available to future agents and to the engineer.
+  migrated_from: a2f99cfcbb7a
+- id: NEED-9
+  fingerprint: bd89e0ab426b
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs verification that isn't weakened by the agents whose work it checks.
+  migrated_from: 3db712f74d63
+- id: NEED-10
+  fingerprint: df5feea8324b
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs to bring an existing project into the toolkit by reviewing only its needs.
+  migrated_from: 1d6bec7b7c53
+- id: NEED-11
+  fingerprint: d02a05ffd7be
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs each minute spent reviewing to yield as much steering as possible.
+  migrated_from: 078a44361c0c
+- id: NEED-12
+  fingerprint: f5eef14e177a
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The engineer needs to use the toolkit with more than one agent harness.
+  migrated_from: 6f88882e60eb
+- id: NEED-13
+  fingerprint: 069e0df7af2d
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: The engineer needs the toolkit to improve from the friction agents meet while using it.
+- id: SYS-1
+  fingerprint: d9c7fec31355
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit's skills, subagent definitions, code and documentation shall contain no references to a specific host project.
+  migrated_from: b0181ec0906f
+- id: SYS-2
+  fingerprint: fb2184e16954
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: This repository shall pass the toolkit's checker against its own spec.
+  migrated_from: 349cf23360af
+- id: SYS-3
+  fingerprint: 6ed42849e461
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall be implemented in Python.
+  migrated_from: 582d505f8475
+- id: SYS-4
+  fingerprint: feff1bd8072e
+  approved_on: '2026-10-11'
+  via: chat (round 5)
+  words: SGTM.
+  text: The toolkit shall read every project-specific setting from the host repository.
+  migrated_from: e5596f1f8221
+- id: SYS-5
+  fingerprint: 59043e2721cb
+  approved_on: '2026-10-11'
+  via: chat (round 5)
+  words: Clarify what 'installs' means. If it means 'sets up the spec/ file and other things upon 'initiating a project into this system', SGTM.
+  text: The toolkit shall set up a host repository for use in one step.
+  migrated_from: 1e779de31649
+- id: SYS-6
+  fingerprint: dd3ce1d1acac
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The spec shall trace each requirement to the need or requirement it serves, or mark it as derived.
+  migrated_from: ce8a90ff6b69
+- id: SYS-7
+  fingerprint: 17860781fc49
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: The toolkit shall prevent an agent from reporting a change as done until every spec update the change requires is done.
+- id: SYS-8
+  fingerprint: 445f824cedfd
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: The spec shall describe the product's requirements and verification independently of programming language.
+- id: SYS-9
+  fingerprint: c24ca1f45203
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall track, for each implementation, which requirements it satisfies.
+  migrated_from: 5083c59f3792
+- id: SYS-10
+  fingerprint: a5f7c233ac82
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall verify each requirement by test, analysis, demonstration or inspection.
+  migrated_from: d576bc344481
+- id: SYS-11
+  fingerprint: efdc259e82cc
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall keep each check of an agent's work independent of that agent.
+  migrated_from: fad3f1944fe3
+- id: SYS-12
+  fingerprint: 5673a6ea4d7f
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall run expensive verification only when the engineer requests it.
+  migrated_from: 7fd9ad8a3c55
+- id: SYS-13
+  fingerprint: 9afaf723ca4d
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
+  migrated_from: ff42db86caa1
+- id: SYS-14
+  fingerprint: 548591ff0ebb
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall show the engineer which spec items the engineer has not yet approved.
+  migrated_from: dcc83a998b0a
+- id: SYS-15
+  fingerprint: 7b83674fa98a
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall present each change to the engineer as the differences it makes to the spec.
+  migrated_from: 7e91c3813a70
+- id: SYS-16
+  fingerprint: 75bc29a921bd
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall bring to the engineer each question and contradiction that arises during a change.
+  migrated_from: 6b67232a8952
+- id: SYS-17
+  fingerprint: c713cac8b48f
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall support both reviewing a change's spec before the change is implemented and reviewing it after.
+  migrated_from: f02fb83073a0
+- id: SYS-18
+  fingerprint: 7fffec004b8c
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: In code-first mode, the toolkit shall let a change complete without the engineer's involvement.
+  migrated_from: 6d2b8a082b1c
+- id: SYS-19
+  fingerprint: 363b477083f6
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall keep the reasoning behind each decision about a system element with that element.
+  migrated_from: f03aa0771f56
+- id: SYS-20
+  fingerprint: f7f14a8c11e8
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall give an agent the spec context its current work needs, without the agent reading the methodology.
+  migrated_from: 6ff74f8c208e
+- id: SYS-21
+  fingerprint: 9d2cd96b901c
+  approved_on: '2026-10-11'
+  via: chat (round 5)
+  words: SGTM (additions captured as CHANGE-10 to CHANGE-12)
+  text: The toolkit shall find requirements and verification items that are ambiguous, unverifiable or too weak to catch a wrong implementation.
+  migrated_from: bf0edf0a29ee
+- id: SYS-22
+  fingerprint: b32be7ae0003
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: Adding a programming language or a verification technique shall require no change to the toolkit's existing code.
+  migrated_from: 969fede9f114
+- id: SYS-23
+  fingerprint: bfd3952e2e80
+  approved_on: '2026-10-11'
+  via: chat (round 5)
+  words: SGTM
+  text: The toolkit shall be adoptable by a repository that already contains code and tests.
+  migrated_from: ef3a70ef0281
+- id: SYS-24
+  fingerprint: add63a2734e6
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall scale each requirement's automated verification to its importance, judged from the requirement's recorded history.
+  migrated_from: efd971c9b015
+- id: SYS-25
+  fingerprint: 523daeb0d3f9
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall route agents' edits to the spec through its command-line tool.
+  migrated_from: 925c81e3e1e8
+- id: SYS-26
+  fingerprint: ca125d10b8a4
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall order the questions and flags it brings to the engineer by how much each answer could change the spec or the other answers, most consequential first.
+  migrated_from: d1850418a1d3
+- id: SYS-27
+  fingerprint: db32ee730d0b
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: Each check, verification, query and edit the toolkit offers shall work without depending on a particular agent harness.
+- id: SYS-28
+  fingerprint: b3e5548c67e2
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall assume it runs in an agent harness that can start subagents.
+  migrated_from: 93d2dc155340
+- id: SYS-29
+  fingerprint: 41cf543caa1f
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall state the outcomes it needs from agents, leaving the means to each agent and its harness.
+  migrated_from: c1aa914d68c0
+- id: SYS-30
+  fingerprint: c149cd86e35d
+  approved_on: '2026-10-11'
+  via: chat (round 8)
+  words: |-
+    Approve all (menu choice: needs, system requirements, constraints and decision records as last shown)
+  text: The toolkit shall present each spec item to the engineer in a form the engineer can read without looking anything up.
+  migrated_from: 0fbaa2e556e8
+- id: SYS-31
+  fingerprint: 55df46d1b028
+  approved_on: '2026-10-11'
+  via: chat (menu, round 9)
+  words: |-
+    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  text: The toolkit shall invite agents to improve the toolkit wherever they meet friction or a new way of working.

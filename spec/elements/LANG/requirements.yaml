@@ -1,0 +1,17 @@
+- id: LANG-2
+  text: The toolkit shall include adapters for C++ and Python.
+  origin: engineer
+  traces_to: SYS-22
+  source: |-
+    "The commandline interface the LLM uses would support C++ to start with" · "one language we should support as a P0 should also be python"
+- id: LANG-3
+  text: |-
+    Each adapter shall provide three operations: list a repository's tests, run a chosen set of tests, and return a named test's source.
+  origin: agent
+  traces_to: SYS-22
+  why: these are the minimum that CHECK-3, CHECK-9 and UNIT-1 need. Coverage collection can come later.
+- id: LANG-4
+  text: The first-release adapters shall support GoogleTest for C++ and pytest for Python.
+  origin: agent
+  traces_to: SYS-22
+  why: each is the most common framework in its language.

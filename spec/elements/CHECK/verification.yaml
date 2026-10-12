@@ -1,0 +1,44 @@
+- id: CHECK-V1
+  verifies:
+  - CHECK-1
+  method: test
+  technique: unit test
+  origin: agent
+  description: A spec with several different problems, including an unreadable file, yields a finding for every problem in one run.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_one_run_reports_every_problem
+    - tests/test_check_structure.py::test_malformed_file_is_reported_without_crashing
+- id: CHECK-V2
+  verifies:
+  - CHECK-2
+  - CHECK-16
+  method: test
+  technique: unit test
+  origin: agent
+  description: A wording error names its rule, the item, the file and line, marks the offending words, and says why the rule exists, how to fix it, and where the rule is explained.
+  tests:
+    python:
+    - tests/test_messages.py::test_error_explains_rule
+- id: CHECK-V3
+  verifies:
+  - CHECK-17
+  method: test
+  technique: unit test
+  origin: agent
+  description: When one rule fires twice in a run, only its first finding carries the full explanation.
+  tests:
+    python:
+    - tests/test_messages.py::test_rule_explained_once_per_run
+- id: CHECK-V4
+  verifies:
+  - CHECK-14
+  - CHECK-15
+  method: test
+  technique: unit test
+  origin: agent
+  description: Unapproved items are to-dos in a normal check and errors when preparing a merge; an approval for an unknown item is an error.
+  tests:
+    python:
+    - tests/test_approvals.py::test_unapproved_items_block_only_merges
+    - tests/test_approvals.py::test_approval_of_unknown_item_is_reported

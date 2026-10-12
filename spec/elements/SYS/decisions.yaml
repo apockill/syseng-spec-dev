@@ -1,0 +1,72 @@
+- id: DR-1
+  title: The CLI is the product, the method is one portable skill, and harness glue is optional
+  decided_by: engineer
+  elements:
+  - SYS
+  - CLI
+  - AGENT
+  requirements: SYS-5, SYS-27, CLI-1
+  recorded: round 6 (Q21). A Claude Code plugin was first proposed in round 1.
+  context: I first proposed packaging the toolkit as a Claude Code plugin. The engineer wants to use the method in other agent setups as well (Antigravity next, still with Claude models), so it shouldn't be tied to one harness.
+  decision: the Python CLI holds all the logic. The method ships as one Agent Skill in the open SKILL.md format, which Claude Code, Antigravity and most other harnesses read. A harness can also get thin glue that calls the CLI; the setup command writes that glue into the repository. There is no plugin.
+  alternatives: a Claude Code plugin as the product (the first proposal). The CLI and the skill only, with no glue anywhere, which leaves the merge-time check as the only hard gate.
+  consequences: Claude Code is the first harness with glue (DR-3, DR-4, DR-6, DR-7). In a harness without glue, those enforcements become instructions, and the merge-time check (CHECK-15) is the backstop.
+- id: DR-11
+  title: Adopt systems-engineering vocabulary
+  decided_by: engineer
+  elements:
+  - SYS
+  requirements: the whole spec, MODEL-30
+  recorded: round 4
+  context: the engineer had coined "component" and "item" and wanted the vocabulary to follow best practice.
+  decision: |-
+    "system element" replaces "component". Verification items name one of the four standard methods (test, analysis, demonstration, inspection) and a technique (unit test, integration test, reasoning check). The full vocabulary is in [glossary.md](glossary.md).
+  alternatives: keep "component", which is familiar to software engineers but isn't the standard term.
+  consequences: agents that know SE terms can apply them directly.
+- id: DR-18
+  title: Restructure the spec into layers
+  decided_by: engineer
+  elements:
+  - SYS
+  requirements: SYS-6 to SYS-27
+  recorded: round 4
+  context: by round 3 the spec held 142 requirements at the element level, and almost none of them traced to a need. That was too much to read, and it diverged from SE's flow-down.
+  decision: needs come first, then system requirements that serve them, then element requirements, each tracing to exactly one system requirement. Design choices moved into this file.
+  alternatives: a flat list grouped by system element.
+  consequences: the layer to read is now needs, system requirements and constraints. Q20 then removed restatements (DR-22).
+- id: DR-22
+  title: No restatement; system requirements can be allocated directly
+  decided_by: engineer
+  elements:
+  - SYS
+  - MODEL
+  requirements: MODEL-33
+  recorded: round 5
+  context: after layering, several element requirements just repeated their parent. The engineer counts every repeated line as wasted attention (NEED-11).
+  decision: remove requirements that only restate their parent. A system requirement can be allocated to a system element without an element-level copy. Round 5 removed eleven restatements.
+  alternatives: keep the copies, so that each system element "owns" its requirements.
+  consequences: less to read. Allocation is shown on the system requirement itself.
+- id: DR-25
+  title: A harness that can start subagents is required, and the skill states outcomes, not means
+  decided_by: engineer
+  elements:
+  - SYS
+  - AGENT
+  - REASON
+  requirements: SYS-28, SYS-29, AGENT-41, AGENT-42, REASON-2
+  recorded: round 8 (Q22)
+  context: Q22 asked whether reasoning checks need a path that runs outside any agent harness. The engineer decided that a harness is always involved and must be able to start subagents. The skill's job is to say what's needed and how a subagent should ideally be set up. How to do it is up to each agent and its harness. More broadly, agents should use whatever their harness offers, such as question menus, to make the experience good.
+  decision: the toolkit assumes an agent harness that can start subagents, and there's no model-API path. The skill's language stays generic enough for Claude Code, Antigravity, Codex and future harnesses. It states outcomes and ideal setups, and leaves the means to the agent.
+  alternatives: an API path added later (my recommendation in Q22), or an API path only.
+  consequences: reasoning checks can't run in plain CI without an agent. Instructions specific to one harness live only in that harness's adapter (DR-1).
+- id: DR-32
+  title: A Nix flake for development, and standard packaging for everyone else
+  decided_by: agent
+  elements:
+  - SYS
+  requirements: SYS-3
+  recorded: round 9 (slice 1)
+  context: The engineer's machine runs NixOS, where generic Linux binaries such as uv's installer don't run. The engineer's other project already uses a flake.
+  decision: flake.nix provides Python with PyYAML and pytest, and `bin/spec` runs the CLI from the checkout. pyproject.toml keeps the toolkit installable with pip anywhere else. Until flake.nix is tracked by git, the dev shell starts with `nix develop path:.`.
+  alternatives: A pip virtual environment, which works here but isn't the engineer's convention.
+  consequences: Commands run as `nix develop path:. -c spec check`. Once the files are committed, plain `nix develop` works.
