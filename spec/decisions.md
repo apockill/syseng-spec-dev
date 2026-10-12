@@ -1,12 +1,12 @@
 # Decision records
 
-*Round 7, 2026-10-11.* These are the decisions made while designing the toolkit. Each record is attached to the system elements it affects (MODEL-28). Reasoning is paraphrased, not quoted (AGENT-35). The design conversation behind rounds 1–5 won't be kept (DR-13), so these records are its reasoning.
+*Round 8, 2026-10-11.* These are the decisions made while designing the toolkit. Each record is attached to the system elements it affects (MODEL-28). Reasoning is paraphrased, not quoted (AGENT-35). The design conversation behind rounds 1–5 won't be kept (DR-13), so these records are its reasoning.
 
 - ✅ marks a decision you made.
 - 🟡 marks a decision I made, which needs your review.
 - 🔒 marks a decision you've approved.
 
-### DR-1 ✅ The CLI is the product, the method is one portable skill, and harness glue is optional
+### DR-1 ✅ 🔒 The CLI is the product, the method is one portable skill, and harness glue is optional
 *System elements:* SYS, CLI, AGENT · *Requirements:* SYS-5, SYS-27, CLI-1 · *Recorded:* round 6 (Q21). A Claude Code plugin was first proposed in round 1.
 - **Context:** I first proposed packaging the toolkit as a Claude Code plugin. The engineer wants to use the method in other agent setups as well (Antigravity next, still with Claude models), so it shouldn't be tied to one harness.
 - **Decision:** the Python CLI holds all the logic. The method ships as one Agent Skill in the open SKILL.md format, which Claude Code, Antigravity and most other harnesses read. A harness can also get thin glue that calls the CLI; the setup command writes that glue into the repository. There is no plugin.
@@ -20,7 +20,7 @@
 - **Alternatives:** JSON edited only through the CLI, which was the engineer's first idea but produces noisy diffs. Markdown with embedded metadata, which is fragile to parse.
 - **Consequences:** raw git diffs stay readable, prose never fights shell quoting, and a large update is one call.
 
-### DR-3 🟡 Refuse direct edits to spec files with a pre-tool hook
+### DR-3 🟡 🔒 Refuse direct edits to spec files with a pre-tool hook
 *System elements:* AGENT · *Requirements:* AGENT-20 · *Recorded:* round 4 (decided in round 2)
 - **Status:** part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it.
 - **Context:** agents are trained to edit files directly, which would bypass the CLI's context step.
@@ -28,7 +28,7 @@
 - **Alternatives:** an instruction in the skill, which is easy to ignore. Linting afterwards, by which time the edit has already happened.
 - **Consequences:** the engineer can still edit spec files by hand, because hooks only see agents' tool calls.
 
-### DR-4 🟡 Run the checker from a stop hook
+### DR-4 🟡 🔒 Run the checker from a stop hook
 *System elements:* AGENT, CHECK · *Requirements:* AGENT-12, CHECK-12 · *Recorded:* round 4 (decided in round 1)
 - **Status:** part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it.
 - **Context:** the main agent often won't have the methodology in context, and it may forget to run the checker.
@@ -36,86 +36,90 @@
 - **Alternatives:** relying on the skill's instructions. A CI-only check, which comes too late.
 - **Consequences:** the checker must be fast (CHECK-12).
 
-### DR-5 🟡 Approval records store a fingerprint and the approved content
+### DR-5 🟡 🔒 Approval records store a fingerprint and the approved content
 *System elements:* MODEL · *Requirements:* MODEL-24, MODEL-25, REVIEW-11 · *Recorded:* round 4 (the fingerprint idea is the engineer's, from round 2; storing the content was MODEL-26)
 - **Context:** the engineer proposed recording approvals with a hash or git state, so the toolkit can tell when approved content has changed.
 - **Decision:** each approval stores the item's fingerprint and the approved text itself.
 - **Alternatives:** a fingerprint alone, which shows *that* something changed but not *what*. A git revision, which fails for approvals given before a commit.
 - **Consequences:** the review page can always show what changed since approval. [approvals.md](approvals.md) already follows this format by hand.
 
-### DR-6 🟡 Record chat approvals from the engineer's own message
+### DR-6 🟡 🔒 Record chat approvals from the engineer's own message
 *System elements:* AGENT · *Requirements:* AGENT-21, AGENT-33, AGENT-34 · *Recorded:* round 4 (decided in round 3)
 - **Status:** part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it.
 - **Context:** the engineer wants to approve in chat, but only with unambiguous wording.
 - **Decision:** a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. The agent never records approvals.
 - **Alternatives:** letting the agent record approvals, which risks a misreading. Approving only on the review page, which is safe but slower.
-- **Consequences:** this needs a defined approval phrasing, which is Q23. In harnesses without such a hook, chat approval falls back to the review page or the terminal.
+- **Consequences:** Q23 settled the phrasing: a message that starts with "approve" and names the items, or says to approve everything except some items. When the exceptions are given by description, every item they could refer to stays unapproved (AGENT-43). In harnesses without such a hook, chat approval falls back to the review page or the terminal.
 
-### DR-7 🟡 Run reasoning checks in an isolated subagent that can't see the spec
+### DR-7 🟡 🔒 Run reasoning checks in an isolated subagent that can't see the spec
 *System elements:* REASON · *Requirements:* REASON-2, REASON-5 · *Recorded:* round 4 (was REASON-6 and REASON-7)
-- **Status:** part of the Claude Code adapter (DR-1). A later option is for the CLI to run reasoning checks itself through a model API, with a file reader that can't reach the spec. That would make the isolation independent of any harness. Whether to add that path is Q22.
+- **Status:** part of the Claude Code adapter (DR-1). The requirement itself is harness-neutral (DR-25): the skill describes the ideal reasoning-check subagent, and each agent sets one up with what its harness offers. This record covers how to do that in Claude Code. Q22 ruled out an API path.
 - **Context:** the engineer wants reasoning checks to start with no project context and no conversation, and to read the code but not the spec.
 - **Decision:** use a custom, non-fork subagent. Its definition sets `omitClaudeMd`, so CLAUDE.md and AGENTS.md don't load. It has no shell tool. It carries its own hook that refuses reads under the spec directory and drops spec hits from search results.
-- **Alternatives:** a fork, which inherits the conversation and which the engineer ruled out. An instruction alone. A direct model-API call, described under Status.
+- **Alternatives:** a fork, which inherits the conversation and which the engineer ruled out. An instruction alone. A direct model-API call, which Q22 ruled out (DR-25).
 - **Consequences:** if the read-blocking hook proves fiddly, drop it and keep the instruction (the engineer's call).
 
-### DR-8 🟡 A decomposition tree plus a separate dependency graph
+### DR-8 🟡 🔒 A decomposition tree plus a separate dependency graph
 *System elements:* MODEL · *Requirements:* MODEL-3, MODEL-4, MODEL-11 · *Recorded:* round 4 (decided in round 1)
 - **Context:** the engineer's first sketch had one "depends on" relation that covered both "is part of" and "uses".
 - **Decision:** "part of" is a tree, so each system element has one parent. "Uses" is a separate graph that must have no cycles.
 - **Alternatives:** one combined graph, which mixes requirement flow-down with change impact. Several parents per element.
-- **Consequences:** requirements flow down the tree, and change impact follows the dependency graph. A shared element, such as a general utility, has one parent: usually the lowest element whose parts all use it, or the system itself. Every element that relies on it lists it as a dependency. See Q24.
+- **Consequences:** requirements flow down the tree, and change impact follows the dependency graph. A shared element, such as a general utility, has one parent: usually the lowest element whose parts all use it, or the system itself. Every element that relies on it lists it as a dependency. Q24 confirmed this and added one rule: verifying a change also covers every element that depends on what it touched (VERIFY-14).
 
-### DR-9 🟡 Wording rules from INCOSE plus EARS patterns
+### DR-9 🟡 🔒 Wording rules from INCOSE plus EARS patterns
 *System elements:* MODEL · *Requirements:* MODEL-16 · *Recorded:* round 4 (decided in round 1)
 - **Context:** the engineer asked for hard, checkable rules for writing requirements.
 - **Decision:** use the mechanically checkable subset of INCOSE's Guide to Writing Requirements: one "shall"; no vague terms, escape clauses or open-ended endings; no test or implementation vocabulary. Add the EARS sentence patterns.
 - **Alternatives:** a free-form style judged only by a model, which can't be verified. INCOSE's full set of roughly 40 rules, many of which need judgment.
-- **Consequences:** the checker can enforce wording. How strictly is Q25. Quality that needs judgment is left to the auditors (SYS-21).
+- **Consequences:** the checker can enforce wording. Q25 made every rule an error.
+  - Each finding names its rule, says why the rule exists, and suggests a rewrite (CHECK-16).
+  - Findings link to the skill's own rules page, which cites INCOSE's rule numbers, because the INCOSE guide isn't freely available.
+  - To save tokens, a rule is explained in full only once per run (CHECK-17).
+  - The aim is the Rust compiler's style: errors that teach a fresh agent this repo's expectations. Quality that needs judgment is left to the auditors (SYS-21).
 
-### DR-10 ✅ Related code is a loose link, not file ownership
+### DR-10 ✅ 🔒 Related code is a loose link, not file ownership
 *System elements:* MODEL, CHECK · *Requirements:* MODEL-10, CHECK-5, CHECK-8 · *Recorded:* round 4 (decided in round 2)
 - **Context:** I first proposed that each file belong to exactly one system element. The engineer worried that this would make refactoring costly and tie the spec to one language's file layout.
 - **Decision:** each system element lists related code by path or pattern, and a file may relate to any number of elements. Tests are the firm link.
 - **Alternatives:** exactly-one ownership. Deriving the mapping from per-test coverage, which may come later as an upgrade.
 - **Consequences:** some code may relate to no system element. CHECK-8 flags such code when it changes.
 
-### DR-11 ✅ Adopt systems-engineering vocabulary
+### DR-11 ✅ 🔒 Adopt systems-engineering vocabulary
 *System elements:* SYS · *Requirements:* the whole spec, MODEL-30 · *Recorded:* round 4
 - **Context:** the engineer had coined "component" and "item" and wanted the vocabulary to follow best practice.
 - **Decision:** "system element" replaces "component". Verification items name one of the four standard methods (test, analysis, demonstration, inspection) and a technique (unit test, integration test, reasoning check). The full vocabulary is in [glossary.md](glossary.md).
 - **Alternatives:** keep "component", which is familiar to software engineers but isn't the standard term.
 - **Consequences:** agents that know SE terms can apply them directly.
 
-### DR-12 ✅ Scenarios of use are context on needs, not an item type
+### DR-12 ✅ 🔒 Scenarios of use are context on needs, not an item type
 *System elements:* MODEL · *Requirements:* MODEL-29 · *Recorded:* round 4
 - **Context:** I proposed a separate item type for the engineer's CUJs. The engineer preferred annotating needs with them, so that future agents know why a need exists.
 - **Decision:** each need records its context in paraphrase: the reasoning and the scenarios behind it.
 - **Alternatives:** a scenario item type with its own IDs and approvals.
 - **Consequences:** this matches SE practice, which keeps operational scenarios in a narrative concept-of-operations document rather than as baselined line items.
 
-### DR-13 ✅ No transcript archive; decision records carry the reasoning
+### DR-13 ✅ 🔒 No transcript archive; decision records carry the reasoning
 *System elements:* MODEL, AGENT · *Requirements:* SYS-19, MODEL-28, AGENT-24, AGENT-35 · *Recorded:* round 4 (decided in round 3)
 - **Context:** the engineer first suggested linking conversation transcripts. Claude Code deletes those after 30 days by default, they live on one machine, and they can contain secrets.
 - **Decision:** keep no transcript links and no archive. Each decision becomes a dated, paraphrased decision record on the system elements it affects.
 - **Alternatives:** archive transcripts outside the repository, or raise the retention period.
 - **Consequences:** reasoning has to be captured when the decision is made. This file does that for rounds 1–5.
 
-### DR-14 ✅ Expensive verification only when the engineer asks
+### DR-14 ✅ 🔒 Expensive verification only when the engineer asks
 *System elements:* VERIFY, AGENT · *Requirements:* SYS-12, AGENT-30 · *Recorded:* round 4 (decided in rounds 2 and 3)
 - **Context:** reasoning checks and long runs cost tokens and time. The engineer wants to move fast and to decide when these run.
 - **Decision:** expensive items run only when the engineer asks: for a full run, a single change, or onboarding (ONBOARD-3). Agents always run every cheap item before reporting a change as done.
 - **Alternatives:** running expensive items automatically at merge, which was my first proposal.
 - **Consequences:** regressions that only expensive checks would catch wait for the next requested run.
 
-### DR-15 ✅ Code-first never stops to ask; only spec-first may
+### DR-15 ✅ 🔒 Code-first never stops to ask; only spec-first may
 *System elements:* AGENT · *Requirements:* SYS-16, SYS-18, AGENT-18 · *Recorded:* round 4 (decided in round 3)
 - **Context:** the engineer wants to hand off a change, come back to it finished, and read the spec. Stopping to ask belongs to planning.
 - **Decision:** in code-first mode, agents finish the change and report every contradiction and question at the end. In spec-first mode, an agent may stop on a contradiction the engineer would likely want to decide first.
 - **Alternatives:** stopping in either mode whenever the agent judges a contradiction important. That was the engineer's first answer, refined in round 3.
 - **Consequences:** a code-first change may be built on a reading the engineer later rejects. The open decisions make that visible immediately.
 
-### DR-16 ✅ Defer verifying agent-behavior requirements
+### DR-16 ✅ 🔒 Defer verifying agent-behavior requirements
 *System elements:* AGENT · *Requirements:* the AGENT requirements · *Recorded:* round 4 (decided in round 3)
 - **Context:** the AGENT requirements describe judgments, such as when to stop and ask, which unit tests can't check. The engineer wants to start building and iterate.
 - **Decision:** verify them by demonstration, meaning the engineer observes them in real use, until an eval harness exists.
@@ -129,51 +133,72 @@
 - **Alternatives:** separate authoring agents for requirements and for verification, which was the earlier spec-first design.
 - **Consequences:** this removes the incentive to go easy. It doesn't remove blind spots shared by every instance of one model.
 
-### DR-18 ✅ Restructure the spec into layers
+### DR-18 ✅ 🔒 Restructure the spec into layers
 *System elements:* SYS · *Requirements:* SYS-6 to SYS-27 · *Recorded:* round 4
 - **Context:** by round 3 the spec held 142 requirements at the element level, and almost none of them traced to a need. That was too much to read, and it diverged from SE's flow-down.
 - **Decision:** needs come first, then system requirements that serve them, then element requirements, each tracing to exactly one system requirement. Design choices moved into this file.
 - **Alternatives:** a flat list grouped by system element.
 - **Consequences:** the layer to read is now needs, system requirements and constraints. Q20 then removed restatements (DR-22).
 
-### DR-19 🟡 Named acknowledgments only for edits with impact
+### DR-19 🟡 🔒 Named acknowledgments only for edits with impact
 *System elements:* CLI · *Requirements:* CLI-6 · *Recorded:* round 4 (decided in round 2)
 - **Context:** the engineer wanted the CLI to show context before an edit and ask for confirmation. Models rubber-stamp generic confirmations.
 - **Decision:** an edit that touches approved or depended-upon items needs an acknowledgment of each affected item, by name, with a one-line note. Other edits apply at once.
 - **Alternatives:** a generic confirmation on every edit, or no confirmation.
 - **Consequences:** friction appears only where there's something to weigh, and the notes become reasons the engineer can read.
 
-### DR-20 ✅ Importance is judged from history, not stored as a flag
+### DR-20 ✅ 🔒 Importance is judged from history, not stored as a flag
 *System elements:* MODEL, AGENT, REASON · *Requirements:* SYS-24, SYS-26, MODEL-14, REASON-4, AGENT-15, AGENT-16, AGENT-40 · *Recorded:* round 5
 - **Context:** I proposed a "critical" flag on requirements, which would trigger extra verification. The engineer worried that such a flag inflates over time until it means nothing. The engineer preferred that agents judge importance from each item's recorded history, for deciding both how much to verify and what to ask about first.
 - **Decision:** there is no criticality flag. Agents judge importance each time from an item's history: whether the engineer stated it, its decision records, how often it changed, and what depends on it. They state their reasons whenever they act on a judgment (AGENT-40).
 - **Alternatives:** a stored critical flag (MODEL-19 and MODEL-20, now removed).
 - **Consequences:** judgments can differ between runs. Stated reasons make that visible and correctable.
 
-### DR-21 ✅ Onboarding records the current state with maximum agent effort
+### DR-21 ✅ 🔒 Onboarding records the current state with maximum agent effort
 *System elements:* ONBOARD · *Requirements:* SYS-23, ONBOARD-1 to ONBOARD-7 · *Recorded:* round 5
 - **Context:** I had proposed adopting the toolkit gradually, grandfathering existing gaps in a baseline (CHECK-13). The engineer wants the opposite. Bringing a project in should capture everything at once, as carefully as possible, so that the engineer only confirms the needs and approves the rest. Reviewing an existing project line by line would take forever.
 - **Decision:** onboarding extracts the full spec and the reasons behind it, runs every check (including expensive ones and auditors), and asks only questions the project can't answer. It records the current state without proposing changes. Rigor goes into later changes instead.
 - **Alternatives:** gradual adoption with a shrinking baseline of grandfathered findings.
 - **Consequences:** onboarding is expensive in tokens and time, but it happens once per project.
 
-### DR-22 ✅ No restatement; system requirements can be allocated directly
+### DR-22 ✅ 🔒 No restatement; system requirements can be allocated directly
 *System elements:* SYS, MODEL · *Requirements:* MODEL-33 · *Recorded:* round 5
 - **Context:** after layering, several element requirements just repeated their parent. The engineer counts every repeated line as wasted attention (NEED-11).
 - **Decision:** remove requirements that only restate their parent. A system requirement can be allocated to a system element without an element-level copy. Round 5 removed eleven restatements.
 - **Alternatives:** keep the copies, so that each system element "owns" its requirements.
 - **Consequences:** less to read. Allocation is shown on the system requirement itself.
 
-### DR-23 ✅ System requirements are verified at the system level
+### DR-23 ✅ 🔒 System requirements are verified at the system level
 *System elements:* MODEL, VERIFY · *Requirements:* MODEL-32 · *Recorded:* round 5
 - **Context:** SE verifies each level at its own level (the V-model). Passing element-level tests doesn't prove the system works end to end.
 - **Decision:** each system requirement gets its own verification, such as an end-to-end run or a demonstration, in addition to its children's verification.
 - **Alternatives:** treat a system requirement as verified when all its children pass.
 - **Consequences:** the VI round will write system-level checks, for example running a code-first change end to end and confirming that it never stopped to ask.
 
-### DR-24 ✅ Open decisions come with options and a recommendation
+### DR-24 ✅ 🔒 Open decisions come with options and a recommendation
 *System elements:* CHANGE · *Requirements:* CHANGE-10, CHANGE-11, CHANGE-12 · *Recorded:* round 5
 - **Context:** the engineer wants to settle agent-raised issues quickly, often accepting a whole set at once. When something the engineer wrote, or something with recorded history, is involved, the engineer wants a warning not to skim it.
 - **Decision:** every open decision offers options, with one marked as recommended, and a set can be accepted in one statement. Each one also says whether it involves an engineer-stated item or one with decision records behind it. That last part is my extension (CHANGE-11) from flagged items to all open decisions.
 - **Alternatives:** free-form questions.
 - **Consequences:** most decisions take seconds. The ones that touch your own words stand out.
+
+### DR-25 ✅ 🔒 A harness that can start subagents is required, and the skill states outcomes, not means
+*System elements:* SYS, AGENT, REASON · *Requirements:* SYS-28, SYS-29, AGENT-41, AGENT-42, REASON-2 · *Recorded:* round 8 (Q22)
+- **Context:** Q22 asked whether reasoning checks need a path that runs outside any agent harness. The engineer decided that a harness is always involved and must be able to start subagents. The skill's job is to say what's needed and how a subagent should ideally be set up. How to do it is up to each agent and its harness. More broadly, agents should use whatever their harness offers, such as question menus, to make the experience good.
+- **Decision:** the toolkit assumes an agent harness that can start subagents, and there's no model-API path. The skill's language stays generic enough for Claude Code, Antigravity, Codex and future harnesses. It states outcomes and ideal setups, and leaves the means to the agent.
+- **Alternatives:** an API path added later (my recommendation in Q22), or an API path only.
+- **Consequences:** reasoning checks can't run in plain CI without an agent. Instructions specific to one harness live only in that harness's adapter (DR-1).
+
+### DR-26 ✅ 🔒 Order questions by how much their answers would change
+*System elements:* CHANGE, AGENT · *Requirements:* SYS-26, AGENT-40 · *Recorded:* round 8
+- **Context:** a ranked list worked well for the engineer. It sorted the questions by how much each answer would change, said why each ranked where it did, gave a recommended option, and offered a one-line way to accept everything. The engineer wants the skill to do this whenever it asks questions or flags things.
+- **Decision:** order questions and flags by how likely each answer is to change the spec or the other answers, most consequential first. Each one carries its reasons and a recommended option, and a set can be accepted in one line.
+- **Alternatives:** ordering by system element or by ID.
+- **Consequences:** the engineer can stop after the top few. The rest can usually be accepted as a block.
+
+### DR-27 ✅ 🔒 IDs always come with a title, linked where possible
+*System elements:* AGENT, REVIEW · *Requirements:* SYS-30, AGENT-44, REVIEW-15 · *Recorded:* round 8
+- **Context:** the engineer can't remember what an ID refers to, and bare IDs send them searching files.
+- **Decision:** every mention of a spec item gives its title alongside its ID, and links to it where the medium allows. The review page shows an item's text when you hover over or click its ID.
+- **Alternatives:** bare IDs, or titles only. Titles alone would lose the stable reference that traceability needs.
+- **Consequences:** messages run slightly longer, and nothing needs to be looked up.

@@ -1,8 +1,8 @@
 # Requirements
 
-*Round 7, 2026-10-11.* The spec for this toolkit, written as an exercise in the workflow it describes. It's one file so you can review it in one sitting. Once the toolkit exists, it splits into one directory per system element (MODEL-1).
+*Round 8, 2026-10-11.* The spec for this toolkit, written as an exercise in the workflow it describes. It's one file so you can review it in one sitting. Once the toolkit exists, it splits into one directory per system element (MODEL-1).
 
-- **What changed in round 7:** [changes/2026-10-11-round-7.md](changes/2026-10-11-round-7.md)
+- **What changed in round 8:** [changes/2026-10-11-round-8.md](changes/2026-10-11-round-8.md)
 - **Why things are the way they are:** [decisions.md](decisions.md), the decision records
 - **What you've approved:** [approvals.md](approvals.md)
 - **Vocabulary:** [glossary.md](glossary.md)
@@ -16,27 +16,11 @@ Read top-down. The **needs** say what you want, and the **system requirements** 
 - 🔒 **APPROVED**: you approved this exact text. The record is in [approvals.md](approvals.md).
 - **↑** marks what an item traces to: a requirement's parent, or the needs a system requirement serves.
 
-**12 needs · 22 system requirements · 5 constraints · 131 system-element requirements** (120 confirmed, 50 need review, 4 approved). The layer to read is the first three: 39 items.
+**12 needs · 24 system requirements · 6 constraints · 139 system-element requirements** (132 confirmed, 49 need review, 42 approved). The layer to read is the first three: 42 items.
 
 ## Open questions
 
-These are ordered by how much your answer would change (SYS-26). Each has a recommended option (CHANGE-10).
-
-22. **Can reasoning checks run without a harness?** (DR-7, SYS-27) Right now they run as Claude Code subagents, which works inside Claude Code. A full run started from a plain terminal, or a CI job, would have nothing to run them with.
-    - **A. (recommended)** Keep the harness subagent as the first way to run them, and add a model-API path later for runs outside any harness. The API path needs an API key.
-    - **B.** Use the API path only. This gives the strongest isolation, because the CLI controls exactly what the model sees, but every check is billed to an API key.
-    - **C.** Use harness subagents only, so reasoning checks only ever run inside a harness.
-23. **How do you want to approve in chat?** (DR-6, AGENT-33) Quoting an item and replying "LGTM" is natural. But a hook can't safely tell which item a quote refers to, and the agent isn't allowed to interpret approvals for you.
-    - **A. (recommended)** Send a message that starts with "approve" and lists IDs, for example "approve DR-17, SYS-6" or "approve all listed except NEED-4". It's unambiguous, still conversational, and easy for a hook to parse.
-    - **B.** Use a slash command such as `/approve …`. Also unambiguous, but more ceremony.
-    - **C.** Keep replying "LGTM" to quotes in chat, and record the approvals later on the review page.
-24. **Shared system elements** (DR-8, your question). "Part of" stays a tree: each system element has exactly one parent, and that parent's requirements flow down to it. Reuse lives in the "uses" graph, which is a DAG. A general utility gets one parent, usually the lowest element whose parts all use it, or the system itself. Every element that relies on the utility lists it as a dependency.
-    - **A. (recommended)** A tree for "part of", plus a DAG for "uses", as described above.
-    - **B.** Let "part of" be a DAG as well, so an element can have several parents. Flow-down then becomes ambiguous (which parent's requirements does a shared utility serve?), and reading top-down shows the element twice.
-25. **How strict should the wording rules be?** (DR-9, MODEL-16)
-    - **A. (recommended)** Treat "exactly one shall" and the banned terms as errors, and a mismatch with the EARS sentence patterns as a warning. Many valid requirements, several in this spec among them, fit EARS only loosely.
-    - **B.** Treat all three as errors.
-    - **C.** Treat everything as a warning.
+None right now.
 
 ### Resolved
 
@@ -63,6 +47,10 @@ These are ordered by how much your answer would change (SYS-26). Each has a reco
 | 19 | 5 | System requirements get system-level verification. | MODEL-32; DR-23 |
 | 20 | 5 | Requirements that restate their parent are removed. | MODEL-33; DR-22 |
 | 21 | 6 | The CLI is the product, the method is one Agent Skill, and harness glue is optional (Claude Code first). | SYS-27, CLI-1; DR-1 |
+| 22 | 8 | A harness that can start subagents is required. The skill describes the ideal setup, and the agent arranges it. | SYS-28, SYS-29, AGENT-42; DR-25, DR-7 |
+| 23 | 8 | Chat approvals start with "approve" and name the items. Exceptions given by description are read conservatively. | AGENT-33, AGENT-43; DR-6 |
+| 24 | 8 | "Part of" is a tree and "uses" is a DAG. Verifying a change covers everything that depends on what it touched. | MODEL-11, VERIFY-14; DR-8 |
+| 25 | 8 | All wording rules are errors, with error messages that teach and stay short. | MODEL-16, CHECK-16, CHECK-17; DR-9 |
 
 ---
 
@@ -70,42 +58,42 @@ These are ordered by how much your answer would change (SYS-26). Each has a reco
 
 What you want, in your terms. You validate these; nothing verifies them.
 
-- ✅ **NEED-1** The engineer needs to keep intellectual control of a product of 100,000+ lines of code by reading its requirements, and only occasionally its verification items.
+- ✅ 🔒 **NEED-1** The engineer needs to keep intellectual control of a product of 100,000+ lines of code by reading its requirements, and only occasionally its verification items.
   - *Source:* "allow a single engineer to maintain intellectual control over what they are building, even as the product balloons to 100k+ LOC … only showing the highest signal things (REQs). VERs are more for the LLMs … and also for the sole engineer to read occasionally"
   - *Context (paraphrased):* you want to work as a guide, not a line-by-line auditor. One person directs agents across a codebase that would normally need a team, and follows what the system must do and how that's changing, without reading the code in depth.
-- ✅ **NEED-2** The engineer needs agents to surface the questions that spec work raises, so the engineer gets more chances to steer.
+- ✅ 🔒 **NEED-2** The engineer needs agents to surface the questions that spec work raises, so the engineer gets more chances to steer.
   - *Source:* "for the LLM to stop and say 'wait, actually, now that I am forced to think in this way it begs the questions XYZ' those questions can be surfaced to the user, who now has more opportunities to steer"
   - *Context (paraphrased):* writing things down in systems-engineering form makes agents notice gaps. Each question they raise is a chance to change direction early, while it's cheap.
-- ✅ **NEED-3** The engineer needs to reuse the toolkit across unrelated projects.
+- ✅ 🔒 **NEED-3** The engineer needs to reuse the toolkit across unrelated projects.
   - *Source:* "this skill/set of skills must NOT reference [the host project]. I plan on reusing this."
   - *Context (paraphrased):* the toolkit is meant for many projects, so nothing in it may assume a particular one.
-- ✅ **NEED-4** The engineer needs the V&V documentation to be enough to rebuild the product in another language.
+- ✅ 🔒 **NEED-4** The engineer needs the V&V documentation to be enough to rebuild the product in another language.
   - *Source:* "if I took all the V&V documentation and said 'build this in rust' I'd want that to work"
   - *Context (paraphrased):* you want the design kept separate from the code. Then you can ask agents to rebuild the product in Rust, or on another framework, and get the same product.
-- ✅ **NEED-5** The engineer needs the process to cost the main agent little attention.
+- ✅ 🔒 **NEED-5** The engineer needs the process to cost the main agent little attention.
   - *Source:* "How to make this system relatively low overhead, so that the agent I'm interfacing with doesn't have to think about it much"
   - *Context (paraphrased):* the main agent should mostly just code. The toolkit and its subagents do the spec bookkeeping.
-- ✅ **NEED-6** The engineer needs to choose, per change, between specifying first and building first.
+- ✅ 🔒 **NEED-6** The engineer needs to choose, per change, between specifying first and building first.
   - *Source:* "the system should support two CUJs … We want to support both workflows cleanly."
   - *Context (paraphrased):* there are two scenarios.
     - **Planning:** you ask for the spec of a feature, review it and approve it. Agents then implement it from a to-do list and report anything they had to change. The same to-do list can drive a rebuild in a new language.
     - **Building:** you ask for a change to be built and try the result. The agent updates the spec during or after the work, whichever suits it, and you review the spec changes once the change is done.
-- ✅ **NEED-7** The engineer needs to develop quickly, running the full verification only occasionally and without supervising it.
+- ✅ 🔒 **NEED-7** The engineer needs to develop quickly, running the full verification only occasionally and without supervising it.
   - *Source:* "I want to be able to develop quickly with agility, and occasionally say 'hey let's run the full suite' and walk away"
   - *Context (paraphrased):* day to day, you want changes fast, and you often try the binary while agents polish tests and spec in parallel. Occasionally you start a full verification run and walk away. You come back to fixes, reworded requirements, new verification items and a health summary, which you approve or comment on.
-- ✅ **NEED-8** The engineer needs the reasoning behind each decision to stay available to future agents and to the engineer.
+- ✅ 🔒 **NEED-8** The engineer needs the reasoning behind each decision to stay available to future agents and to the engineer.
   - *Source:* "any documentation, links to external docs, things that came up in the building, build notes, reasoning for why something is the way it is, should be persisted"
   - *Context (paraphrased):* weeks later, an agent about to change a requirement should be able to find out why it is the way it is, and then go ahead or flag the change to you. Reasoning from design discussions, including artifacts you liked, should outlive the conversation.
-- ✅ **NEED-9** The engineer needs verification that isn't weakened by the agents whose work it checks.
+- ✅ 🔒 **NEED-9** The engineer needs verification that isn't weakened by the agents whose work it checks.
   - *Source:* "it's important that the system engineers who make the requirements are not also the same ones that make the verification items because there is a perverse incentive to make it easier"
   - *Context (paraphrased):* in professional practice, requirement writers don't write their own verification, because a single author unconsciously makes it easier to pass. Agents have the same incentive, and coding agents are known to edit tests until they pass.
-- ✅ **NEED-10** The engineer needs to bring an existing project into the toolkit by reviewing only its needs.
+- ✅ 🔒 **NEED-10** The engineer needs to bring an existing project into the toolkit by reviewing only its needs.
   - *Source:* "The end goal is a user just looks at the NEEDS, confirms them, states 'approve everything' and moves on. Future changes get more rigor. Otherwise, reviewing the existing project will take forever."
   - *Context (paraphrased):* when an existing project comes in, the job is to record what it is and why, not to redesign it. Agents should do as much of that thinking as they can by reading the code, comments and structure. They should ask only high-value questions and leave you to confirm the needs and approve the rest in one go. Rigor goes into the changes that follow.
-- ✅ **NEED-11** The engineer needs each minute spent reviewing to yield as much steering as possible.
+- ✅ 🔒 **NEED-11** The engineer needs each minute spent reviewing to yield as much steering as possible.
   - *Source:* "Repetition is wasted cognitive overhead. The goal of this framework is to maximize the steering-to-human-time ratio, and maintain intellectual control over the design without having to look at the code in depth"
   - *Context (paraphrased):* every repeated or low-value item costs you attention. Agents should do the thinking they can, bring you only the decisions that matter most, and make each one quick to settle with a recommended option.
-- ✅ **NEED-12** The engineer needs to use the toolkit with more than one agent harness.
+- ✅ 🔒 **NEED-12** The engineer needs to use the toolkit with more than one agent harness.
   - *Source:* "I'd like to use this methodology in other agentic use cases possibly … In the future I'll also use this in antigravity, so I don't want to couple too closely to claude code"
   - *Context (paraphrased):* you use Claude Code today and plan to use Antigravity next (still with Claude models), and possibly other agent setups. The method shouldn't be tied to any one of them.
 
@@ -113,85 +101,91 @@ What you want, in your terms. You validate these; nothing verifies them.
 
 What the toolkit as a whole shall do. Each one serves the needs marked ↑ and is refined by the system-element requirements listed under it.
 
-- ✅ **SYS-6** ↑NEED-1, NEED-8, NEED-11 · The spec shall trace each requirement to the need or requirement it serves, or mark it as derived.
+- ✅ 🔒 **SYS-6** ↑NEED-1, NEED-8, NEED-11 · The spec shall trace each requirement to the need or requirement it serves, or mark it as derived.
   - *Source:* Q16: "Yep, please do this as the next round."
   - *Refined by:* MODEL-1, MODEL-2, MODEL-3, MODEL-4, MODEL-11, MODEL-12, MODEL-33, REVIEW-1, REVIEW-3, REVIEW-14, AGENT-36, AGENT-37
-- ✅ **SYS-7** ↑NEED-1, NEED-5 · The toolkit shall prevent an agent from reporting a change as done while any spec update the change requires remains undone.
+- ✅ 🔒 **SYS-7** ↑NEED-1, NEED-5 · The toolkit shall prevent an agent from reporting a change as done while any spec update the change requires remains undone.
   - *Source:* "the linter will be as comprehensive as possible to flag to the AI that its job is not done yet"
   - *Refined by:* MODEL-10, CHECK-1, CHECK-3, CHECK-4, CHECK-5, CHECK-6, CHECK-7, CHECK-8, CHECK-9, CHECK-11, CHECK-12, AGENT-2, AGENT-3, AGENT-12, AGENT-30
-- ✅ **SYS-8** ↑NEED-4 · The spec shall describe the product's requirements and verification independently of any programming language.
+- ✅ 🔒 **SYS-8** ↑NEED-4 · The spec shall describe the product's requirements and verification independently of any programming language.
   - *Source:* NEED-4 · "if there are tests they should describe the test and link to the 'implementations'"
   - *Refined by:* MODEL-17
-- ✅ **SYS-9** ↑NEED-4, NEED-6 · The toolkit shall track, for each implementation, which requirements it satisfies.
+- ✅ 🔒 **SYS-9** ↑NEED-4, NEED-6 · The toolkit shall track, for each implementation, which requirements it satisfies.
   - *Source:* "the specs should mark in some way what has been implemented yet, and what has not … the todo list can be regenerated but for an entire different implementation"
   - *Refined by:* MODEL-7, MODEL-8, MODEL-21, MODEL-22, CHECK-10, VERIFY-5, CHANGE-8, REVIEW-7, CLI-2, CLI-4
-- ✅ **SYS-10** ↑NEED-1 · The toolkit shall verify each requirement by test, analysis, demonstration or inspection.
+- ✅ 🔒 **SYS-10** ↑NEED-1 · The toolkit shall verify each requirement by test, analysis, demonstration or inspection.
   - *Source:* "We have the concept of requirements and verification items." · Q18: "Yes let's adopt."
-  - *Refined by:* MODEL-5, MODEL-18, MODEL-30, MODEL-32, VERIFY-2, VERIFY-3, VERIFY-4, UNIT-1, INTEG-1, INTEG-2, INTEG-3, REASON-1, REASON-3, AGENT-9
-- ✅ **SYS-11** ↑NEED-9 · The toolkit shall keep each check of an agent's work independent of that agent.
+  - *Refined by:* MODEL-5, MODEL-18, MODEL-30, MODEL-32, VERIFY-2, VERIFY-3, VERIFY-4, VERIFY-14, UNIT-1, INTEG-1, INTEG-2, INTEG-3, REASON-1, REASON-3, AGENT-9
+- ✅ 🔒 **SYS-11** ↑NEED-9 · The toolkit shall keep each check of an agent's work independent of that agent.
   - *Source:* NEED-9.
   - *Refined by:* REASON-2, REASON-5, REVIEW-9, AGENT-4, AGENT-13, AGENT-14, AGENT-31
-- ✅ **SYS-12** ↑NEED-7 · The toolkit shall run expensive verification only when the engineer requests it.
+- ✅ 🔒 **SYS-12** ↑NEED-7 · The toolkit shall run expensive verification only when the engineer requests it.
   - *Source:* "I don't want it to spin up the reasoning agents every time automatically (a human should gate that)"
   - *Also allocated to:* VERIFY. Its restatement there, VERIFY-6, was removed under MODEL-33.
   - *Refined by:* MODEL-9, MODEL-23
-- ✅ **SYS-13** ↑NEED-7 · When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
+- ✅ 🔒 **SYS-13** ↑NEED-7 · When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
   - *Source:* "occasionally say 'hey let's run the full suite' and walk away"
   - *Refined by:* VERIFY-12, VERIFY-13, AGENT-22
-- ✅ **SYS-14** ↑NEED-1 · The toolkit shall show the engineer which spec items the engineer has not yet approved.
+- ✅ 🔒 **SYS-14** ↑NEED-1 · The toolkit shall show the engineer which spec items the engineer has not yet approved.
   - *Source:* "Then the CLI can derive when the file is not approved (e.g. a subagent went and changed things, so now the hash doesn't match?)"
-  - *Refined by:* MODEL-24, MODEL-25, MODEL-31, CHECK-14, CHECK-15, REVIEW-11, REVIEW-13, AGENT-21, AGENT-33, AGENT-34
-- ✅ **SYS-15** ↑NEED-1 · The toolkit shall present each change to the engineer as the differences it makes to the spec.
+  - *Refined by:* MODEL-24, MODEL-25, MODEL-31, CHECK-14, CHECK-15, REVIEW-11, REVIEW-13, AGENT-21, AGENT-33, AGENT-34, AGENT-43
+- ✅ 🔒 **SYS-15** ↑NEED-1 · The toolkit shall present each change to the engineer as the differences it makes to the spec.
   - *Source:* "we'll create tools to render components on a web page and also render the diffs between changes"
   - *Refined by:* REVIEW-2, REVIEW-4, REVIEW-5, REVIEW-6
-- ✅ **SYS-16** ↑NEED-2 · The toolkit shall bring to the engineer each question and contradiction that arises during a change.
+- ✅ 🔒 **SYS-16** ↑NEED-2 · The toolkit shall bring to the engineer each question and contradiction that arises during a change.
   - *Source:* NEED-2 · "always _mention_ 'hey, this breaks X, Y, changes Z'"
   - *Refined by:* VERIFY-8, CHANGE-3, REVIEW-12, AGENT-18, AGENT-19
-- ✅ **SYS-17** ↑NEED-6 · The toolkit shall support both reviewing a change's spec before the change is implemented and reviewing it after.
+- ✅ 🔒 **SYS-17** ↑NEED-6 · The toolkit shall support both reviewing a change's spec before the change is implemented and reviewing it after.
   - *Source:* "the system should support two CUJs … We want to support both workflows cleanly." · "afterwards, or during implementation (however works best / is most natural for the agent) … From the user perspective, they will look at it afterwards."
   - *Refined by:* CHANGE-1, CHANGE-2, CHANGE-9, AGENT-1, AGENT-10, AGENT-11
-- ✅ **SYS-18** ↑NEED-7 · In code-first mode, the toolkit shall let a change complete without the engineer's involvement.
+- ✅ 🔒 **SYS-18** ↑NEED-7 · In code-first mode, the toolkit shall let a change complete without the engineer's involvement.
   - *Source:* "it must remain possible to have a CUJ where the user can state what they want, say 'go for it', and come back to the changes having been made, and read the spec"
-  - *Refined by:* AGENT-29, AGENT-32
-- ✅ **SYS-19** ↑NEED-8 · The toolkit shall keep the reasoning behind each decision about a system element with that element.
+  - *Refined by:* AGENT-29
+- ✅ 🔒 **SYS-19** ↑NEED-8 · The toolkit shall keep the reasoning behind each decision about a system element with that element.
   - *Source:* "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time."
   - *Refined by:* MODEL-13, MODEL-15, MODEL-27, MODEL-28, MODEL-29, CHANGE-4, CHANGE-5, REVIEW-10, CLI-8, AGENT-7, AGENT-24, AGENT-25, AGENT-35
-- ✅ **SYS-20** ↑NEED-5 · The toolkit shall give an agent the spec context its current work needs, without the agent reading the methodology.
+- ✅ 🔒 **SYS-20** ↑NEED-5 · The toolkit shall give an agent the spec context its current work needs, without the agent reading the methodology.
   - *Source:* "a lot of the time the AI will not have the document for the system engineering documentation in its context" · "the CLI has a chance to intercept the request and give extra context"
-  - *Refined by:* CHECK-2, CLI-3, CLI-5, CLI-6
+  - *Refined by:* CHECK-2, CHECK-16, CHECK-17, CLI-3, CLI-5, CLI-6
 - 🟡 🔒 **SYS-21** ↑NEED-1, NEED-9 · The toolkit shall find requirements and verification items that are ambiguous, unverifiable or too weak to catch a wrong implementation.
   - *Refines:* "How do we write some way to critique whether or not a requirement is well written or whether or not a verification item is well written"
   - *Why:* this spells out what "well written" means, so that a critique can fail. Your round-5 additions on how flags are presented are CHANGE-10 to CHANGE-12.
   - *Refined by:* MODEL-16, AGENT-15
-- ✅ **SYS-22** ↑NEED-3, NEED-4 · Adding a programming language or a verification technique shall require no change to the toolkit's existing code.
+- ✅ 🔒 **SYS-22** ↑NEED-3, NEED-4 · Adding a programming language or a verification technique shall require no change to the toolkit's existing code.
   - *Source:* "adding rust later is a matter of 'extending' rather than 'refactoring' the cli tool" · "make it extensible"
   - *Also allocated to:* VERIFY, for new techniques. Its restatements, VERIFY-1 and LANG-1, were removed under MODEL-33.
   - *Refined by:* LANG-2, LANG-3, LANG-4
 - 🟡 🔒 **SYS-23** ↑NEED-3, NEED-10 · The toolkit shall be adoptable by a repository that already contains code and tests.
   - *Why:* reuse mostly means existing projects. How adoption works is now ONBOARD.
   - *Refined by:* ONBOARD-1, ONBOARD-2, ONBOARD-3, ONBOARD-4, ONBOARD-5, ONBOARD-6, ONBOARD-7
-- ✅ **SYS-24** ↑NEED-9 · The toolkit shall scale each requirement's automated verification to its importance, judged from the requirement's recorded history.
+- ✅ 🔒 **SYS-24** ↑NEED-9 · The toolkit shall scale each requirement's automated verification to its importance, judged from the requirement's recorded history.
   - *Source:* "Criticality should be based on the ADRs and history encoded in the item, the agent can decide criticality … Or were you referring to 'verification' in the sense of 'agentic automated verification'? In which case I think my advice also applies." See DR-20.
   - *Refined by:* REASON-4, AGENT-8, AGENT-16
-- ✅ **SYS-25** ↑NEED-2, NEED-5 · The toolkit shall route agents' edits to the spec through its command-line tool.
+- ✅ 🔒 **SYS-25** ↑NEED-2, NEED-5 · The toolkit shall route agents' edits to the spec through its command-line tool.
   - *Source:* "I want the CLI to be the main way agents edit the spec. This is because, if an agent wants to edit the spec, the CLI has a chance to intercept the request and give extra context"
   - *Refined by:* CLI-7, AGENT-20
-- ✅ **SYS-26** ↑NEED-2, NEED-11 · The toolkit shall present the open decisions to the engineer in order of importance, judged from the recorded history of the items involved.
-  - *Source:* "an agent can say 'well, I had to change 10 things to get from point A to point B. Of these, using the context and history encoded in the items, clearly these 3 are most useful, I'll use the users time wisely and ask about those first.'"
+- ✅ 🔒 **SYS-26** ↑NEED-2, NEED-11 · The toolkit shall order the questions and flags it brings to the engineer by how much each answer could change the spec or the other answers, most consequential first.
+  - *Source:* "whenever asking questions or flagging things to the user, to use their time wisely by always ordering things by 'most likely to impact other answers'" · "clearly these 3 are most useful, I'll use the users time wisely and ask about those first"
   - *Refined by:* MODEL-14, CHANGE-10, CHANGE-11, CHANGE-12, AGENT-40
-- ✅ **SYS-27** ↑NEED-12 · Each check, verification, query and edit the toolkit offers shall work without any particular agent harness.
+- ✅ 🔒 **SYS-27** ↑NEED-12 · Each check, verification, query and edit the toolkit offers shall work without any particular agent harness.
   - *Source:* "I'd like to use this methodology in other agentic use cases possibly. Can't the CLI be the implementation? … I don't want to couple too closely to claude code". How: DR-1.
-  - *Refined by:* CLI-1
+  - *Refined by:* CLI-1, AGENT-42
 
+- ✅ 🔒 **SYS-29** ↑NEED-5, NEED-12 · The toolkit shall state the outcomes it needs from agents, leaving the means to each agent and its harness.
+  - *Source:* "How it does it is up to the agent. We are here to tell it the needs, and how to ideally configure the subagents." · "I don't want to be overly prescriptive."
+  - *Refined by:* AGENT-32, AGENT-41
+- ✅ 🔒 **SYS-30** ↑NEED-11 · The toolkit shall present each spec item to the engineer in a form the engineer can read without looking anything up.
+  - *Source:* "IDs are really hard to remember … Otherwise, I'm left Ctrl+f'ing to figure out what the heck you're asking."
+  - *Refined by:* REVIEW-15, AGENT-44
 ## Constraints
 
 These are limits you've put on the solution. They're verified directly and aren't refined further.
 
-- ✅ **SYS-1** ↑NEED-3 · The toolkit's skills, subagent definitions, code and documentation shall contain no references to a specific host project.
+- ✅ 🔒 **SYS-1** ↑NEED-3 · The toolkit's skills, subagent definitions, code and documentation shall contain no references to a specific host project.
   - *Source:* NEED-3.
-- ✅ **SYS-2** ↑NEED-3 · This repository shall pass the toolkit's checker against its own spec.
+- ✅ 🔒 **SYS-2** ↑NEED-3 · This repository shall pass the toolkit's checker against its own spec.
   - *Source:* "that repo should dogfood this methodology. We should be writing this tooling with our own system engineering tooling, and linting it"
-- ✅ **SYS-3** · The toolkit shall be implemented in Python.
+- ✅ 🔒 **SYS-3** · The toolkit shall be implemented in Python.
   - *Source:* "likely the CLI would be written in python". This is your constraint, so it traces to no need.
 - 🟡 🔒 **SYS-4** ↑NEED-3 · The toolkit shall read every project-specific setting from the host repository.
   - *Why:* this is the counterpart to SYS-1. Project specifics need a home outside the toolkit.
@@ -200,6 +194,8 @@ These are limits you've put on the solution. They're verified directly and aren'
 
 ---
 
+- ✅ 🔒 **SYS-28** · The toolkit shall assume it runs in an agent harness that can start subagents.
+  - *Source:* Q22: "Requirement is 'there must be SOME harness involved' and that harness has to support subagents." This is your constraint, so it traces to no need.
 ## System elements
 
 | ID | System element | Parent | Depends on |
@@ -262,14 +258,14 @@ A spec holds needs, system elements, requirements, verification items, decision 
   - *Source:* Q19 (should system requirements get their own verification items?): "Yes, this makes sense."
 - ✅ **MODEL-33** ↑SYS-6 · No requirement shall restate the requirement it refines.
   - *Source:* Q20: "Repetition is wasted cognitive overhead."
-- 🟡 **MODEL-11** ↑SYS-6 · Each system element except the system itself shall name exactly one parent, recorded separately from its dependencies.
-  - *Why:* "is part of" and "depends on" are different relations. Requirements flow down the first, and change impact flows along the second. See DR-8.
+- ✅ **MODEL-11** ↑SYS-6 · Each system element except the system itself shall name exactly one parent, recorded separately from its dependencies.
+  - *Source:* Q24 (one parent per element, reuse through dependencies): "I think we're talking about the same thing? As long as both 'RENDER' and 'PHYSICS' can depend on it". See DR-8.
+- ✅ **MODEL-16** ↑SYS-21 · Requirement text shall follow the wording rules: exactly one "shall", one of the EARS (Easy Approach to Requirements Syntax) sentence patterns, and no banned terms (vague words, escape clauses, open-ended endings, test or implementation vocabulary).
+  - *Source:* Q25 (how strict the wording rules should be): "I like strictness (B). It's a free way to get the LLM on rails." See DR-9.
 - 🟡 **MODEL-13** ↑SYS-19 · Each requirement shall carry a rationale.
   - *Why:* the rationale is the first thing an agent reads when you ask why a requirement exists. That's why the NASA and INCOSE handbooks make it mandatory.
 - 🟡 **MODEL-15** ↑SYS-19 · A requirement ID shall never be reused, including after its requirement is deleted.
   - *Why:* "why did AGENT-17 disappear?" only works if AGENT-17 has always meant one thing.
-- 🟡 **MODEL-16** ↑SYS-21 · Requirement text shall follow the wording rules: exactly one "shall", one of the EARS (Easy Approach to Requirements Syntax) sentence patterns, and no banned terms (vague words, escape clauses, open-ended endings, test or implementation vocabulary).
-  - *Why:* short, unambiguous requirements are what make NEED-1 cheap. Banning test vocabulary is how a requirement avoids stating its own test. See DR-9.
 - 🟡 **MODEL-17** ↑SYS-8 · Requirement and need text shall contain no language-specific names, such as function, class or file names.
   - *Why:* a requirement that names a C++ class can't guide a Rust rebuild. Those names belong in test links and related-code lists.
 - 🟡 **MODEL-18** ↑SYS-10 · Each requirement shall have at least one verification item, or a recorded reason for having none.
@@ -304,6 +300,8 @@ The checker tells an agent everything still unfinished in its spec work, determi
   - *Source:* "hey, you had to change a verification item but didn't change a req - did you forget?"
 - ✅ **CHECK-14** ↑SYS-14 · The checker shall report as unapproved each item that has no approval, or whose content no longer matches its approval's fingerprint.
   - *Source:* "Then the CLI can derive when the file is not approved (e.g. a subagent went and changed things, so now the hash doesn't match?)"
+- ✅ **CHECK-16** ↑SYS-20 · Each wording finding shall name the rule it breaks, link to the rule's explanation, say why the rule exists, and suggest a rewrite.
+  - *Source:* "As long as the error messages 'hey you did this wrong. According to {link to INCOSE ruleset} this is bad practice. We recommend {recommendations}.' … Think of rust- fantastic error messages, they guide the user to best practice and explain the 'why'."
 - 🟡 **CHECK-7** ↑SYS-7 · The checker shall treat a CHECK-5 or CHECK-6 finding as resolved once the change record gives a reason for it.
   - *Refines:* "Then it should file a waiver (maybe?) or just continue"
   - *Why:* "just continue" leaves you nothing to read. A one-line reason costs the agent little, and it's what you'll want to see in review.
@@ -320,6 +318,9 @@ The checker tells an agent everything still unfinished in its spec work, determi
   - *Why:* the checker runs every time an agent tries to finish, and slow checks get skipped.
 - 🟡 **CHECK-15** ↑SYS-14 · When preparing a merge, the checker shall report each unapproved item as a finding.
   - *Why:* keeps the main branch limited to what you've seen. Approving takes a click (REVIEW-13) or an explicit message in chat (AGENT-33).
+- 🟡 **CHECK-17** ↑SYS-20 · Within one run, the checker shall explain a rule in full only at its first finding, and refer back to that explanation for later findings of the same rule.
+  - *Refines:* "Remember not to waste too many tokens though. Like everything, there must be balance."
+  - *Why:* a spec with twenty vague words shouldn't produce twenty copies of the same lesson.
 - *Removed:*
   - CHECK-13 (a baseline of grandfathered findings for existing repos), in round 5. ONBOARD replaces it; see DR-21.
 
@@ -339,6 +340,8 @@ The runner executes verification items by technique and tier, and tracks each it
   - *Source:* "If reasoning or integration+reasoning tests fail, the LLM should add it to a list of things to flag to the user."
 - ✅ **VERIFY-12** ↑SYS-13 · At the end of a full run, the toolkit shall produce a summary of the product's health.
   - *Source:* "come back with … an AI summary of the health of the code"
+- ✅ **VERIFY-14** ↑SYS-10 · When the engineer requests verification of a change, the runner shall include the verification items of every system element that depends, directly or indirectly, on an element the change touched.
+  - *Source:* Q24: "if the general utility changes, and I ask for a comprehensive verification, it triggers VI's on RENDER and PHYSICS"
 - 🟡 **VERIFY-13** ↑SYS-13 · The health summary shall list each system element's verification status, each change the run made with its reason, each unapproved item, and each requirement without verification.
   - *Why:* what you'd want to know on returning: what's broken, what agents changed while you were away, and what's waiting for you.
 - *Removed:*
@@ -437,6 +440,8 @@ Web pages that show the engineer the spec as a whole, and how a change alters it
   - *Source:* "the specs should mark in some way what has been implemented yet, and what has not"
 - ✅ **REVIEW-13** ↑SYS-14 · The review page shall let the engineer approve items or give feedback on them.
   - *Source:* "click 'approve' (or give feedback)"
+- ✅ **REVIEW-15** ↑SYS-30 · The review page shall show an item's text when the engineer hovers over or clicks its ID.
+  - *Source:* "it should say DR-8 and on hover or click or whatever … it should state what it means"
 - 🟡 **REVIEW-9** ↑SYS-11 · In a diff, the renderer shall highlight in amber each verification item that changed while the requirements it verifies did not.
   - *Why:* that's where test weakening hides, so it gets its own color.
 - 🟡 **REVIEW-10** ↑SYS-19 · In a diff, the renderer shall show the recorded reason beside each changed or removed requirement.
@@ -531,7 +536,7 @@ The method ships as one Agent Skill. Optional per-harness adapters enforce parts
   - *Source:* "sometimes I just want an agent to make a damn change quick, so I can run my binary and play with it while other changes get done"
 - ✅ **AGENT-30** ↑SYS-7 · The agent shall run every cheap-tier item before reporting a change as done.
   - *Source:* "I fully expect the agent to run all unit tests after changes anyways- its a single command."
-- ✅ **AGENT-32** ↑SYS-18 · The skills shall leave the choice of where agents make changes (working tree, branch or worktree) to the engineer and the agent harness.
+- ✅ **AGENT-32** ↑SYS-29 · The skills shall leave the choice of where agents make changes (working tree, branch or worktree) to the engineer and the agent harness.
   - *Source:* "Let's not encode this in the skill. Agent harnesses are getting better and better, I don't want to be overly prescriptive."
 - ✅ **AGENT-33** ↑SYS-14 · A chat message shall count as an approval only when it states unambiguously which items it approves.
   - *Source:* "agents say 1000 things in one chat, if I say lgtm I might mean 'yeah sure' to some of them, not 'yes, and also approve every req'"
@@ -541,6 +546,14 @@ The method ships as one Agent Skill. Optional per-harness adapters enforce parts
   - *Source:* Q8: "as long as it can be easily done conversationally- the idea being I state what I want and some reasoning why, and the agent converts that to needs/reqs/vis/etc."
 - ✅ **AGENT-37** ↑SYS-6 · The agent shall base each need only on what the engineer has stated.
   - *Source:* Q8: "That sounds good" (my lean was that agents may draft needs only from your words) · "Of course I will have to approve the needs down the line."
+- ✅ **AGENT-40** ↑SYS-26 · Whenever the toolkit acts on an importance judgment, it shall state the judgment's reasons.
+  - *Source:* on a ranked list in which "each item says why it ranks where it does": "This was really helpful."
+- ✅ **AGENT-41** ↑SYS-29 · The skill shall direct agents to use their harness's own features, such as question menus, wherever those make the engineer's interaction easier.
+  - *Source:* "try to use the harness you're running in to make the UX good for the user. If asking questions, consider using the harness to ask the question in a menu, whatever. Use the tools available to achieve the goal."
+- ✅ **AGENT-42** ↑SYS-27 · The skill's instructions shall work in any agent harness that can start subagents.
+  - *Source:* "The language of the skill can be generic enough to work for antigravity / claude code / maybe codex (?) or other things in the future."
+- ✅ **AGENT-44** ↑SYS-30 · Whenever an agent mentions a spec item to the engineer, it shall give the item's title with its ID, linked to the item where the medium allows.
+  - *Source:* "If you must use IDs, then they should link to a LOC or the spec … Or just use the title, or say DR-8 (some description) etc."
 - 🟡 **AGENT-12** ↑SYS-7 · When the main agent tries to finish, the toolkit shall run the checker and return any findings to the agent.
   - *Why:* keeps AGENT-3 true even when the agent forgets or doesn't have the skill loaded. In Claude Code this is DR-4. In a harness without that hook, it's an instruction.
 - 🟡 **AGENT-13** ↑SYS-11 · Each auditor shall be a fresh-context subagent that did not author the change it audits.
@@ -558,8 +571,9 @@ The method ships as one Agent Skill. Optional per-harness adapters enforce parts
   - *Why:* this catches a test that never matched its description. It runs with the pre-review audits you accepted in Q3.
 - 🟡 **AGENT-34** ↑SYS-14 · A chat approval shall apply only to the items as they were last shown to the engineer.
   - *Why:* an approval can't cover anything that changed after you looked. In Claude Code it's recorded by DR-6.
-- 🟡 **AGENT-40** ↑SYS-26 · Whenever the toolkit acts on an importance judgment, it shall state the judgment's reasons.
-  - *Why:* a judgment made fresh each time can differ between runs. Stated reasons let you see and correct it. That's the price of not storing a flag (DR-20).
+- 🟡 **AGENT-43** ↑SYS-14 · When an approval names its exceptions by description instead of by ID, the toolkit shall leave unapproved every item the description could refer to.
+  - *Refines:* "I'll more likely just say 'approve everything except {description}, lets workshop that- {feedback}'"
+  - *Why:* a described exception has to be interpreted. Resolving every doubt toward "not approved" means a misreading can only hold an item back. It can never approve something you meant to exclude.
 - *Removed:*
   - AGENT-26, in round 3.
   - AGENT-5, AGENT-6, AGENT-17 and AGENT-28, in round 5, because they restated SYS-21, SYS-16 and SYS-18.
