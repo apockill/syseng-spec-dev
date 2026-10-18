@@ -60,3 +60,27 @@
   refines: |-
     "If a human had hand / there are notes of previous ADRs, then flag that so the user knows not to skim/lgtm too early."
   why: you asked for this on flagged items. I applied it to every open decision, because the risk of skimming too early is the same.
+- id: CHANGE-13
+  text: An item shall count as approved, written or decided by the engineer when it has an approval record, when its origin is the engineer or it quotes the engineer, or when it is a decision record the engineer made.
+  traces_to: SYS-37
+  origin: agent
+  why: |-
+    the engineer, approving SYS-37: "'approved, wrote or decided.' is kind of vague. Maybe child reqs specify this further." This pins it down.
+- id: CHANGE-14
+  text: Each change record shall list each alteration the change made to an item the engineer approved, wrote or decided, with the line that keeps it, until the engineer keeps it or it is rolled back.
+  traces_to: SYS-37
+  origin: agent
+  why: the change record is where the engineer reviews a change, so the alterations to answer belong at its top, right after open decisions.
+- id: CHANGE-15
+  text: Each change record shall list the items proposed for the engineer's explicit approval, in the order proposed, each with its reason, followed by one line that approves those still waiting.
+  traces_to: SYS-38
+  origin: agent
+  why: a proposal made mid-change survives the conversation, and the engineer can approve every waiting item at once.
+- id: CHANGE-16
+  text: Each change-log entry shall record the date and time of the edit.
+  traces_to: SYS-39
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 22:12
+    words: Timestamps and history of changes is important, so the agent can see some decisions are old, some are newer, and will know what is more likely 'ok to change' and what is likely 'fresh, and representative of the latest direction'
+    context: Approving SYS-39, which shows agents an item's approval and history before they change it.

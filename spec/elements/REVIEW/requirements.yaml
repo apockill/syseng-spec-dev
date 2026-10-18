@@ -77,3 +77,13 @@
   origin: agent
   traces_to: SYS-6
   why: this is the reading order NEED-1 depends on, and the one this file uses.
+- id: REVIEW-16
+  text: The requirements view shall mark each item that is approved, changed since approval or delegated, naming for each delegated item the approved item above it.
+  traces_to: SYS-34
+  origin: agent
+  why: SYS-34 asks every view to show the state. Naming the approved item tells the reader which approval covers it.
+- id: REVIEW-17
+  text: The requirements view shall show each quote with the date and time it was said and the summary of what was being discussed.
+  traces_to: SYS-35
+  origin: agent
+  why: SYS-35 keeps the date and the context so readers can see them.

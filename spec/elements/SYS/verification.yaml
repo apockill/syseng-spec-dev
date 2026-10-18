@@ -55,3 +55,13 @@
   technique: manual
   origin: agent
   description: On a machine with Python but without Nix tooling, install the toolkit with pip into a new virtual environment, run setup in a scratch repository, then run the repository's launcher to check the spec. Each step succeeds, and the checker reports no errors.
+- id: SYS-V7
+  verifies:
+  - SYS-40
+  method: inspection
+  technique: unit test
+  origin: agent
+  description: No kind of spec item has a field for importance, priority, score or criticality.
+  tests:
+    python:
+    - tests/test_review.py::test_no_importance_score_is_stored

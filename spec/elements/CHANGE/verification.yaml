@@ -64,3 +64,28 @@
     python:
     - tests/test_decisions.py::test_resolve_takes_the_recommended_options_for_a_set
     - tests/test_decisions.py::test_resolve_a_specific_option
+- id: CHANGE-V7
+  verifies:
+  - CHANGE-13
+  - CHANGE-14
+  - CHECK-21
+  method: test
+  technique: integration test
+  origin: agent
+  description: Rewording a requirement in the engineer's words needs an acknowledgment first. Once applied, the change record lists it with the line that keeps it, and it's a to-do, until the engineer approves it as reworded, after which it's listed as kept. Rewording it back to its earlier text answers it as rolled back.
+  tests:
+    python:
+    - tests/test_review.py::test_altering_the_engineers_words_is_raised_until_kept
+    - tests/test_review.py::test_rolling_back_an_alteration_answers_it
+- id: CHANGE-V8
+  verifies:
+  - CHANGE-15
+  - CLI-14
+  method: test
+  technique: integration test
+  origin: agent
+  description: A proposal with a reason is listed in the change record with one line approving what's still waiting, and is marked approved once the engineer approves it. A proposal without a reason is refused.
+  tests:
+    python:
+    - tests/test_review.py::test_proposals_are_listed_with_reasons_until_approved
+    - tests/test_review.py::test_a_proposal_needs_a_reason

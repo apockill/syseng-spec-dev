@@ -22,7 +22,9 @@ Run the toolkit as `{{SPEC}}` from the repository root. `{{SPEC}} <command> --he
 5. **Before the engineer reviews,** have fresh-context auditors check your spec updates. See references/auditing.md.
 6. **Report:**
    - what changed, with a link to the change record;
+   - each alteration to an item the engineer approved, wrote or decided, with the line that keeps it, such as `CHECK-3 LGTM`. The change record lists them, and you roll back the ones they don't keep;
    - the open decisions, most consequential first;
+   - the items you propose for their explicit approval;
    - any friction you hit.
 
 Code-first never stops to ask. Finish the change and record your questions as open decisions. Spec-first does stop, when a contradiction is one the engineer would want to decide before more work happens.
@@ -57,7 +59,9 @@ YAML
 - **If it rejects the batch,** fix what the errors say. Nothing was written.
 - **Use a distinctive heredoc delimiter,** such as `YAML`, so a batch can't collide with your own script's.
 - **Needs come only from the engineer's words.** Turn what they say, and why they say it, into needs, requirements and verification items. See references/writing-requirements.md.
-- **Before you modify or remove an approved requirement,** read its rationale, decisions and history with `{{SPEC}} show <ID>`.
+- **Before you change an item, weigh what `{{SPEC}} edit` and `{{SPEC}} show <ID>` say about it:** who approved it, when and how; whether it carries the engineer's words or decision; how recently and how often it changed; how much discussion is behind it. Delegated and older items are yours to reshape while the item above them still holds. Recent approvals and the engineer's own words are their current direction: change those only when the work needs it, and expect to be asked about each one.
+- **Put the engineer's words where they belong.** Quote their reasoning, not just their "yes", on each requirement it directly expresses, with when they said it and a context line that says only what was being discussed. Place each requirement under the system element it constrains, however high up the engineer's request began. See references/writing-requirements.md.
+- **Connect what they say to what's there.** When the engineer asks for something the spec already accounts for, name the items that cover it, with their titles, and add the engineer's words to them.
 
 ## Talking to the engineer
 
@@ -67,12 +71,13 @@ YAML
   - Offer a one-line way to accept everything.
   - Use your harness's question menu if it has one.
 - **Record open decisions in the change** with `{{SPEC}} decide` (question, importance, involves, options), so they survive the conversation.
-- **Approvals belong to the engineer.**
-  - Record an approval only when the engineer has explicitly approved items that were named to them, and quote their words: `{{SPEC}} approve <IDs> --words "<their words>" --via <chat|menu>`. Choosing an approval option in a menu counts when the question named the items; quote the question and the choice.
+- **Approvals belong to the engineer, and each one records how it was given.**
+  - Record an approval only when the engineer has explicitly approved items that were named to them, or restated what an item already says, and quote their words: `{{SPEC}} approve <IDs> --words "<their words>" --via <chat|menu|restated>`. Add `--note` for anything else about how it was given, such as a pasted reply they confirmed as theirs. A menu choice counts when the question named the items; quote the question and the choice. When you record a restatement, tell the engineer which items you counted.
   - A bare "lgtm" isn't an approval, and you never approve your own work.
   - When an approval names its exceptions by description ("everything except the wording ones"), leave out every item the description could refer to, and confirm the exact list with the engineer before recording it.
   - When you ask the engineer to approve items, give them the exact line that records it, such as `approve CLI-9, DR-41` or `CLI-9 LGTM`. The same phrasing every time lets the engineer learn it.
   - A harness adapter may record typed approvals itself. When it tells you it has, don't record them again.
+- **Don't ask for approval of everything.** Everything under an approved item is delegated, and yours to decide. Propose for explicit approval the items that record a choice between alternatives, and the items others depend on: `{{SPEC}} propose <IDs> --why "…"`, most consequential first.
 - **When asked "why is X like this?",** answer from `{{SPEC}} show X`: its rationale, decision records and history.
 
 {{HARNESS_NOTES}}

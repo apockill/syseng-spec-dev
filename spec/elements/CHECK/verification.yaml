@@ -37,8 +37,32 @@
   method: test
   technique: unit test
   origin: agent
-  description: Unapproved items are to-dos in a normal check and errors when preparing a merge; an approval for an unknown item is an error.
+  description: An item reworded after its approval is reported as changed since approval; re-linking its tests isn't a change. The merge check passes while items are unreviewed, and says whether any alteration awaits the engineer's answer. An approval for an unknown item is an error.
   tests:
     python:
-    - tests/test_approvals.py::test_unapproved_items_block_only_merges
+    - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
+    - tests/test_approvals.py::test_merge_check_never_fails_because_of_approvals
     - tests/test_approvals.py::test_approval_of_unknown_item_is_reported
+- id: CHECK-V5
+  verifies:
+  - CHECK-18
+  - CHECK-19
+  method: test
+  technique: unit test
+  origin: agent
+  description: After the engineer approves a system requirement, its element requirement is delegated one level under it and that requirement's verification item two levels under it, and neither is a to-do. A need with nothing approved above it is unreviewed and a to-do. An item reworded after its own approval is changed, not delegated, and is a to-do.
+  tests:
+    python:
+    - tests/test_review.py::test_items_under_an_approved_item_are_delegated
+    - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
+- id: CHECK-V6
+  verifies:
+  - CHECK-20
+  - MODEL-36
+  method: test
+  technique: unit test
+  origin: agent
+  description: A quote without the summary of what was being discussed is reported.
+  tests:
+    python:
+    - tests/test_review.py::test_quotes_need_words_a_date_and_context

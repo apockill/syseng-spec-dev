@@ -1,14 +1,14 @@
 """The checker: finds everything still unfinished in the spec, in one run (CHECK-1).
 
 Findings are errors (the spec is wrong) or to-dos (work not done yet, such as a
-requirement with no verification item, CHECK-10). Only errors fail the check, except in
-merge mode, where unapproved items become errors too (CHECK-15).
+requirement with no verification item, CHECK-10). Only errors fail the check, in every
+mode: whether a branch lands is the engineer's call (CHECK-15, DR-31).
 """
 
 from dataclasses import dataclass
 from pathlib import Path
 
-from syseng import fingerprint, render
+from syseng import render, review
 from syseng.model import Spec
 from syseng.rules import METHODS, RULES, TECHNIQUES, check_wording
 
@@ -33,14 +33,14 @@ def _f(code, message, item=None, where=None, excerpt=None, span=None) -> Finding
     return Finding(code, message, item, file, line, excerpt, span)
 
 
-def check(spec: Spec, merge: bool = False) -> list[Finding]:
+def check(spec: Spec) -> list[Finding]:
     out: list[Finding] = []
     out += _structure(spec)
     out += _traces(spec)
     out += _attributes(spec)
     out += _wording(spec)
     out += _verification(spec)
-    out += _approvals(spec, merge)
+    out += _approvals(spec)
     out += _rendered(spec)
     return out
 
@@ -178,14 +178,31 @@ def _attributes(spec: Spec) -> list[Finding]:
         if not item.data.get("text") and item.kind != "vi":
             out.append(_f("S007", f"{item.id} has no `text`", item.id, item))
     for item in spec.requirements():
-        if not (item.data.get("why") or item.data.get("source")):
+        if not (item.data.get("why") or item.data.get("source") or item.data.get("quotes")):
             out.append(_f("A001", f"{item.id} has neither `why` nor `source`", item.id, item))
+    for item in spec.items.values():
+        out += _quote_findings(item)
     for item in spec.of_kind("decision"):
         if item.data.get("decided_by") not in ("engineer", "agent"):
             out.append(_f("S007", f"{item.id} needs `decided_by: engineer` or `agent`", item.id, item))
         for f in ("title", "context", "decision"):
             if not item.data.get(f):
                 out.append(_f("S007", f"{item.id} has no `{f}`", item.id, item))
+    return out
+
+
+def _quote_findings(item) -> list[Finding]:
+    """Each quote keeps the engineer's exact words, when they said them, and what was being discussed (CHECK-20)."""
+    quotes = item.data.get("quotes")
+    if quotes is None:
+        return []
+    if not isinstance(quotes, list):
+        return [_f("S007", f"{item.id}'s `quotes` must be a list", item.id, item)]
+    out = []
+    for n, q in enumerate(quotes, 1):
+        missing = [k for k in ("words", "said", "context") if not (isinstance(q, dict) and q.get(k))]
+        if missing:
+            out.append(_f("S007", f"quote {n} on {item.id} has no `{'`, `'.join(missing)}`", item.id, item))
     return out
 
 
@@ -221,32 +238,34 @@ def _verification(spec: Spec) -> list[Finding]:
 
 
 # ---------------------------------------------------------------- approvals
-def _approvals(spec: Spec, merge: bool) -> list[Finding]:
+def _approvals(spec: Spec) -> list[Finding]:
     out = []
     for a in spec.approvals:
         aid = a.get("id")
         if aid not in spec.items and aid not in spec.elements:
             out.append(Finding("A005", f"approval for {aid}, which doesn't exist", aid, spec.root / "approvals.yaml"))
-    code = "A004" if merge else "A003"
-    for status in approval_status(spec):
-        if status["state"] != "approved":
-            note = "changed since approval" if status["state"] == "changed" else "never approved"
-            out.append(Finding(code, f"{status['id']} is unapproved ({note})", status["id"],
+    for status in approval_status(spec):  # delegated items aren't to-dos (CHECK-19)
+        if status["state"] == review.CHANGED:
+            out.append(Finding("A003", f"{status['id']} changed since the engineer approved it", status["id"],
                                status["file"], status["line"]))
+        elif status["state"] == review.UNREVIEWED:
+            out.append(Finding("A003", f"{status['id']} is unreviewed: nothing above it is approved", status["id"],
+                               status["file"], status["line"]))
+    for cid, alt in review.unanswered(spec):
+        out.append(Finding("A004", f"{alt['id']} was altered in {cid} ({', '.join(alt['reasons'])}) and awaits "
+                                   f"the engineer's answer", alt["id"]))
     return out
 
 
 def approval_status(spec: Spec) -> list[dict]:
-    """One entry per approvable item: approved, changed since approval, or never approved."""
+    """One entry per approvable item, with its review state (CHECK-18)."""
     rows = []
-    approvable = [(i.id, i.kind, i.data, i.file, i.line) for i in spec.items.values()]
-    approvable += [(e.id, "element", e.data, e.file, 1) for e in spec.elements.values()]
-    for iid, kind, data, file, line in approvable:
-        current = fingerprint.of(kind, data)
-        a = spec.approval_for(iid)
-        state = "never" if not a else ("approved" if a.get("fingerprint") == current else "changed")
-        rows.append({"id": iid, "kind": kind, "state": state, "file": file, "line": line,
-                     "fingerprint": current})
+    approvable = [(i.id, i.kind, i.file, i.line) for i in spec.items.values()]
+    approvable += [(e.id, "element", e.file, 1) for e in spec.elements.values()]
+    for iid, kind, file, line in approvable:
+        s = review.state_of(spec, iid)
+        rows.append({"id": iid, "kind": kind, "state": s.state, "under": s.under, "file": file, "line": line,
+                     "fingerprint": review.current_fingerprint(spec, iid)})
     return rows
 
 
@@ -293,15 +312,21 @@ def format_findings(findings: list[Finding], root: Path) -> str:
     return "\n".join(lines)
 
 
+def _n(count: int, noun: str) -> str:
+    return f"{count} {noun}{'' if count == 1 else 's'}"
+
+
 def summarize(findings: list[Finding]) -> str:
     errors = [f for f in findings if f.severity == "error"]
     todos = [f for f in findings if f.severity == "todo"]
     unverified = sum(1 for f in todos if f.code == "T004")
-    unapproved = sum(1 for f in todos if f.code == "A003")
+    unreviewed = sum(1 for f in todos if f.code == "A003")
     unserved = sum(1 for f in todos if f.code == "T002")
+    unanswered = sum(1 for f in todos if f.code == "A004")
     parts = [f"{len(errors)} error{'s' if len(errors) != 1 else ''}"]
     if todos:
-        served = f"{unserved} needs nothing serves yet, " if unserved else ""
-        parts.append(f"{len(todos)} to-dos ({served}{unverified} requirements without verification items, "
-                     f"{unapproved} unapproved items; list them with `spec check --todo`)")
+        served = f"{_n(unserved, 'need')} nothing serves yet, " if unserved else ""
+        answers = f"{_n(unanswered, 'alteration')} awaiting the engineer's answer, " if unanswered else ""
+        parts.append(f"{_n(len(todos), 'to-do')} ({answers}{served}{_n(unverified, 'requirement')} without "
+                     f"verification items, {_n(unreviewed, 'unreviewed item')}; list them with `spec check --todo`)")
     return "spec check: " + ", ".join(parts)

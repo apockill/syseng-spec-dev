@@ -11,12 +11,14 @@
 
 Read top-down. The **needs** say what you want, and the **system requirements** say what the toolkit as a whole shall do; together they're the layer to read. Drill into a system element only where you care.
 
-- ✅ **CONFIRMED**: from your words. The line under it is my source. Quotes keep your words with typos fixed; "…" marks a cut and [brackets] a substitution.
+- ✅ **CONFIRMED**: from your words. *Your words* lines quote you exactly, with when you said them and what we were discussing. Older items quote you under *Source*, with typos fixed; "…" marks a cut and [brackets] a substitution.
 - 🟡 **NEEDS REVIEW**: I added it, or I added substance to something you asked for (a number, a mechanism, a scope). *Why* gives my reasoning; *Refines* names the ask it builds on.
 - 🔒 **APPROVED**: you approved this exact text (see [approvals.yaml](approvals.yaml)).
+- 🔓 **CHANGED**: you approved an earlier version, and it has changed since.
+- ⤷ **DELEGATED**: not approved itself, but under the item named, which you approved. An agent may change it while that item still holds.
 - **↑** marks what an item traces to: a requirement's parent, or the needs a system requirement serves.
 
-**21 needs · 33 system requirements · 8 constraints · 147 system-element requirements** (158 confirmed, 51 need review, 52 approved). The layer to read is the first three: 62 items.
+**21 needs · 33 system requirements · 8 constraints · 170 system-element requirements** (167 confirmed, 65 need review; 62 approved, 0 changed since approval, 170 delegated, 0 unreviewed). The layer to read is the first three: 62 items.
 
 ## Open questions
 
@@ -120,7 +122,7 @@ What you want, in your terms. You validate these; nothing verifies them.
 - ✅ 🔒 **NEED-20** The engineer needs the requirement tree to follow the system's structure, not the order or framing of their requests.
   - *Source:* "However, If I said "make a 3d game that does xyz (high level statement) and make sure the players feet are purple" that might call out two very different parts of the requirement tree (purple feet being much closer to the 'character model' portion of components). So, the goal here is: 'spread out the quotes where applicable, but build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree". Like, the "players feet must be purple" shouldn't be close to the top of the tree. It would be like, 'game world' -> 'game characters' -> 'player' -> 'player model' -> 'textures' -> 'req: purple feet, approved by human, quotes'." (2026-10-17)
   - *Context (paraphrased):* Clarifying NEED-16: which requirements carry the engineer's words, and where in the tree those requirements belong.
-- ✅ **NEED-21** The engineer needs agents to point out which existing items already account for what the engineer asks for.
+- ✅ 🔒 **NEED-21** The engineer needs agents to point out which existing items already account for what the engineer asks for.
   - *Source:* "This was helpful: surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework. It's helpful because it can help us weave the graph tighter through conversation, help find conenctions, etc." (2026-10-17)
   - *Context (paraphrased):* Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.
 
@@ -209,23 +211,32 @@ What the toolkit as a whole shall do. Each one serves the needs marked ↑ and i
 - ✅ 🔒 **SYS-31** ↑NEED-13 · The toolkit shall invite agents to improve the toolkit wherever they meet friction or a new way of working.
   - *Source:* "So keep the option open in the wording. Otherwise, if an agent has to jump through 16 hoops to get something done, the human will never know, and therefore the skill will never be improved."
   - *Refined by:* AGENT-45, AGENT-46
-- ✅ **SYS-33** ↑NEED-14 · The toolkit shall record with each approval the approver, the channel, the number of items approved together, the engineer's words, and the decisions the engineer resolved about the item beforehand.
+- ✅ 🔒 **SYS-33** ↑NEED-14 · The toolkit shall record with each approval the approver, the channel, the number of items approved together, the engineer's words, and the decisions the engineer resolved about the item beforehand.
   - *Source:* "What matters is that in the future we can see WHO approved it and HOW." · "Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful." (2026-10-17)
-- ✅ **SYS-34** ↑NEED-15 · Each view of an item shall show whether the engineer approved the item explicitly or the item is delegated under an item the engineer approved.
+  - *Refined by:* MODEL-34, CLI-11, CLI-12
+- ✅ 🔒 **SYS-34** ↑NEED-15 · Each view of an item shall show whether the engineer approved the item explicitly or the item is delegated under an item the engineer approved.
   - *Source:* "As long as its clear what items got explicit approval, and which got approval by proxy, sure." · "Let's use delegated then. It'll imply the LLM chose it, and could be changed in the future, but at least we know where the req fits in the graph." (2026-10-17)
-- ✅ **SYS-35** ↑NEED-16 · The toolkit shall keep each statement of the engineer word for word on the requirements that directly express it, with the date and time of the statement and a summary of what was being discussed.
+  - *Refined by:* CHECK-18, CHECK-19, REVIEW-16
+- ✅ 🔒 **SYS-35** ↑NEED-16 · The toolkit shall keep each statement of the engineer word for word on the requirements that directly express it, with the date and time of the statement and a summary of what was being discussed.
   - *Source:* "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things." · "Just to be clear, the goal is not 'every requirement must have a quote'." (2026-10-17)
-- ✅ **SYS-36** ↑NEED-20 · The toolkit shall place each requirement under the system element whose behavior the requirement constrains, whatever the order or framing of the request the requirement came from.
+  - *Refined by:* MODEL-36, CHECK-20, REVIEW-17, AGENT-53, AGENT-54
+- ✅ 🔒 **SYS-36** ↑NEED-20 · The toolkit shall place each requirement under the system element whose behavior the requirement constrains, whatever the order or framing of the request the requirement came from.
   - *Source:* "build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree" (2026-10-17)
-- ✅ **SYS-37** ↑NEED-17 · Once a change is built and tested, the toolkit shall ask the engineer whether to keep each alteration the change made to an item the engineer approved, wrote or decided.
+  - *Refined by:* AGENT-55
+- ✅ 🔒 **SYS-37** ↑NEED-17 · Once a change is built and tested, the toolkit shall ask the engineer whether to keep each alteration the change made to an item the engineer approved, wrote or decided.
   - *Source:* "It means: build and test the change, then say "hey, because of how I did this, XYZ had to change" and ask for permission to change them." (2026-10-17)
-- ✅ **SYS-38** ↑NEED-18 · The toolkit shall present the items agents propose for the engineer's explicit approval, each with the reason it deserves the engineer's attention, most consequential first.
+  - *Refined by:* CHECK-21, CHANGE-13, CHANGE-14, AGENT-52
+- ✅ 🔒 **SYS-38** ↑NEED-18 · The toolkit shall present the items agents propose for the engineer's explicit approval, each with the reason it deserves the engineer's attention, most consequential first.
   - *Source:* "it should be easy to have LLM propose different nodes in the graph for approval as it works- and take that feedback and 'lock' the requirement in so that in the future its less likely to be changed in sweeping changes (without it being brought up)." (2026-10-17)
-- ✅ **SYS-39** ↑NEED-19 · Before an agent changes an item, the toolkit shall show the agent whether the engineer approved, wrote or decided the item, and the discussion behind it.
+  - *Refined by:* CHANGE-15, CLI-14, AGENT-51
+- ✅ 🔒 **SYS-39** ↑NEED-19 · Before an agent changes an item, the toolkit shall show the agent whether the engineer approved, wrote or decided the item, and the discussion behind it.
+  - *Your words, 2026-10-17 22:12:* "Timestamps and history of changes is important, so the agent can see some decisions are old, some are newer, and will know what is more likely 'ok to change' and what is likely 'fresh, and representative of the latest direction'"
+    *(Approving SYS-39.)*
   - *Source:* "It should feel more comfortable changing things that were less reviewed by humans, and more likely to call out / chat with a human about design over more pivitol historical decisions." (2026-10-17)
-- ✅ **SYS-41** ↑NEED-21 · When the engineer asks for something that existing items already account for, the toolkit shall name those items to the engineer.
+  - *Refined by:* MODEL-35, CHANGE-16, CLI-13
+- ✅ 🔒 **SYS-41** ↑NEED-21 · When the engineer asks for something that existing items already account for, the toolkit shall name those items to the engineer.
   - *Source:* "surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework." (2026-10-17)
-  - *Refined by:* AGENT-50
+  - *Refined by:* AGENT-50, AGENT-56
 
 ## Constraints
 
@@ -245,7 +256,9 @@ Limits you've put on the solution. They're verified directly and aren't refined 
   - *Source:* Q22: "Requirement is 'there must be SOME harness involved' and that harness has to support subagents." This is your constraint, so it traces to no need.
 - ✅ 🔒 **SYS-32** · The toolkit shall install and run on machines without Nix.
   - *Source:* "Let's not overindex too much on nix. Most users of this might not use nix, after all." (round 11, replying to a friction report)
-- ✅ **SYS-40** ↑NEED-19 · The spec shall store no measure of an item's importance.
+- ✅ 🔒 **SYS-40** ↑NEED-19 · The spec shall store no measure of an item's importance.
+  - *Your words, 2026-10-17 22:12:* "I'm open to this. If you think there's a way to quantify importance, sure. I think whats better reflective of what I'm trying to say is 'metrics that can represent importance are surfaced to the llm in interfaces where it would be useful (last edit, # of discussion, approval types, # of context links, etc...) but not "IMPORTANT" or "NOT IMPORTANT" classification or scoring."
+    *(Approving SYS-40.)*
   - *Source:* "I don't want a 'value of decision' marker, but I want all of these to be useful for reasoning over as the LLM does large refactors." (2026-10-17)
 
 ---
@@ -272,65 +285,72 @@ Limits you've put on the solution. They're verified directly and aren't refined 
 
 A spec holds needs, system elements, requirements, verification items, decision records and implementations, plus the links and approvals between them.
 
-- ✅ **MODEL-1** ↑SYS-6 · The spec shall store each system element as its own directory inside a single, flat directory of system elements.
+- ✅ ⤷SYS-6 **MODEL-1** ↑SYS-6 · The spec shall store each system element as its own directory inside a single, flat directory of system elements.
   - *Source:* "We have a directory called components and inside that we have directories for each component … It's still a flat directory"
-- ✅ **MODEL-2** ↑SYS-6 · The spec model shall support system elements at every level, from the whole system down to a single unit.
+- ✅ ⤷SYS-6 **MODEL-2** ↑SYS-6 · The spec model shall support system elements at every level, from the whole system down to a single unit.
   - *Source:* "these range from extremely high level to extremely small level"
-- ✅ **MODEL-3** ↑SYS-6 · Each system element shall list the system elements it depends on.
+- ✅ ⤷SYS-6 **MODEL-3** ↑SYS-6 · Each system element shall list the system elements it depends on.
   - *Source:* "These components state their dependencies in some way … A component could be depended on by many other components."
-- ✅ **MODEL-4** ↑SYS-6 · The dependency graph of system elements shall contain no cycles.
+- ✅ ⤷SYS-6 **MODEL-4** ↑SYS-6 · The dependency graph of system elements shall contain no cycles.
   - *Source:* "the linter should enforce that there's no loops"
-- ✅ **MODEL-5** ↑SYS-10 · The spec shall hold requirements and verification items as separate kinds of item, with each verification item linked to the requirements it verifies.
+- ✅ ⤷SYS-10 **MODEL-5** ↑SYS-10 · The spec shall hold requirements and verification items as separate kinds of item, with each verification item linked to the requirements it verifies.
   - *Source:* "We have the concept of requirements and verification items."
-- ✅ **MODEL-7** ↑SYS-9 · The spec shall name each implementation of the product, with its language.
+- ✅ ⤷SYS-9 **MODEL-7** ↑SYS-9 · The spec shall name each implementation of the product, with its language.
   - *Source:* "it could be 'implemented in {Implementation name XYZ, C++} or have no implementations'"
-- ✅ **MODEL-8** ↑SYS-9 · Each verification item shall link to its tests separately for each implementation.
+- ✅ ⤷SYS-9 **MODEL-8** ↑SYS-9 · Each verification item shall link to its tests separately for each implementation.
   - *Source:* "there's an implementation of this for the C++ stack, but if I remade it in rust that could also work"
-- ✅ **MODEL-9** ↑SYS-12 · Each verification item shall have a cost tier: cheap, or expensive when it needs model calls, subagents or a long run time.
+- ✅ ⤷SYS-12 **MODEL-9** ↑SYS-12 · Each verification item shall have a cost tier: cheap, or expensive when it needs model calls, subagents or a long run time.
   - *Source:* "Expensive (e.g. not fully automated steps that require extra tokens/subagents spun up) should be a separate tier of tests" · "Expensive is not just a function of tokens, but time."
-- ✅ **MODEL-10** ↑SYS-7 · Each system element shall list its related code by path or pattern, with no limit on how many system elements a file relates to.
+- ✅ ⤷SYS-7 **MODEL-10** ↑SYS-7 · Each system element shall list its related code by path or pattern, with no limit on how many system elements a file relates to.
   - *Source:* "Should we decouple it, such that components can call out related code files" · "I'm not sure about 1 file to 1 component". See DR-10.
-- ✅ **MODEL-12** ↑SYS-6 · The spec shall hold needs, meaning goals that can't be verified directly, as a third kind of item, each traced to the requirements that serve it.
+- ✅ ⤷SYS-6 **MODEL-12** ↑SYS-6 · The spec shall hold needs, meaning goals that can't be verified directly, as a third kind of item, each traced to the requirements that serve it.
   - *Source:* Q8: "That sounds good … Of course I will have to approve the needs down the line."
-- ✅ **MODEL-14** ↑SYS-26 · Each requirement shall record its origin: stated by the engineer, or proposed by an agent.
+- ✅ ⤷SYS-26 **MODEL-14** ↑SYS-26 · Each requirement shall record its origin: stated by the engineer, or proposed by an agent.
   - *Source:* "If a human had hand / there are notes of previous ADRs, then flag that so the user knows not to skim/lgtm too early." · "we may want to consider adding this functionality to the rendering UI, so I know what to read"
-- ✅ **MODEL-24** ↑SYS-14 · The spec shall record each approval by the engineer together with a fingerprint of the approved content.
+- ✅ ⤷SYS-14 **MODEL-24** ↑SYS-14 · The spec shall record each approval by the engineer together with a fingerprint of the approved content.
   - *Source:* "a list of properties stating when the file has been LGTMed by the user, including an 'approved' + some kind of git state of the file? Or like hash?" See DR-5.
-- ✅ **MODEL-25** ↑SYS-14 · Approvals shall apply to individual spec items: needs, requirements, verification items, decision records and the definitions of system elements.
+- ✅ ⤷SYS-14 **MODEL-25** ↑SYS-14 · Approvals shall apply to individual spec items: needs, requirements, verification items, decision records and the definitions of system elements.
   - *Source:* Q12: "Agreed."
-- ✅ **MODEL-27** ↑SYS-19 · Each spec item and change record shall support links to its context: artifacts, documents, external links and build notes.
+- ✅ ⤷SYS-19 **MODEL-27** ↑SYS-19 · Each spec item and change record shall support links to its context: artifacts, documents, external links and build notes.
   - *Source:* "in the schema, we should have a way to link to context … any documentation, links to external docs, things that came up in the building, build notes"
   - *Reworded:* round 9: "shall be able to link" became "shall support links" (INCOSE R10).
-- ✅ **MODEL-28** ↑SYS-19 · Each system element shall keep its decision records: a dated history of the decisions about it, each with its reasoning and the alternatives considered.
+- ✅ ⤷SYS-19 **MODEL-28** ↑SYS-19 · Each system element shall keep its decision records: a dated history of the decisions about it, each with its reasoning and the alternatives considered.
   - *Source:* "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time."
-- ✅ **MODEL-29** ↑SYS-19 · Each need shall record, in paraphrase, the context it came from: the engineer's reasoning and scenarios of use.
+- ✅ ⤷SYS-19 **MODEL-29** ↑SYS-19 · Each need shall record, in paraphrase, the context it came from: the engineer's reasoning and scenarios of use.
   - *Source:* Q17: "if I state a CUJ or say why or what I'm doing, that should be annotated somewhere for future agents to know about / have context of". See DR-12.
-- ✅ **MODEL-30** ↑SYS-10 · Each verification item shall name its verification method (test, analysis, demonstration or inspection) and its technique.
+- ✅ ⤷SYS-10 **MODEL-30** ↑SYS-10 · Each verification item shall name its verification method (test, analysis, demonstration or inspection) and its technique.
   - *Source:* Q18: "Yes let's adopt."
-- ✅ **MODEL-31** ↑SYS-14 · Links that the checker verifies, such as test links and related-code lists, shall need no approval.
+- ✅ ⤷SYS-14 **MODEL-31** ↑SYS-14 · Links that the checker verifies, such as test links and related-code lists, shall need no approval.
   - *Source:* Q12: "The things the checker can automate, no need to approve."
-- ✅ **MODEL-32** ↑SYS-10 · Each system requirement shall be verified at the system level, in addition to the verification of the requirements that refine it.
+- ✅ ⤷SYS-10 **MODEL-32** ↑SYS-10 · Each system requirement shall be verified at the system level, in addition to the verification of the requirements that refine it.
   - *Source:* Q19 (should system requirements get their own verification items?): "Yes, this makes sense."
-- ✅ **MODEL-33** ↑SYS-6 · No requirement shall restate the requirement it refines.
+- ✅ ⤷SYS-6 **MODEL-33** ↑SYS-6 · No requirement shall restate the requirement it refines.
   - *Source:* Q20: "Repetition is wasted cognitive overhead."
-- ✅ **MODEL-11** ↑SYS-6 · Each system element except the system itself shall name exactly one parent, recorded separately from its dependencies.
+- ✅ ⤷SYS-6 **MODEL-11** ↑SYS-6 · Each system element except the system itself shall name exactly one parent, recorded separately from its dependencies.
   - *Source:* Q24 (one parent per element, reuse through dependencies): "I think we're talking about the same thing? As long as both 'RENDER' and 'PHYSICS' can depend on it". See DR-8.
-- ✅ **MODEL-16** ↑SYS-21 · Requirement text shall follow the wording rules: exactly one "shall", one of the EARS (Easy Approach to Requirements Syntax) sentence patterns, and no banned terms (vague words, escape clauses, open-ended endings, test or implementation vocabulary).
+- ✅ ⤷SYS-21 **MODEL-16** ↑SYS-21 · Requirement text shall follow the wording rules: exactly one "shall", one of the EARS (Easy Approach to Requirements Syntax) sentence patterns, and no banned terms (vague words, escape clauses, open-ended endings, test or implementation vocabulary).
   - *Source:* Q25 (how strict the wording rules should be): "I like strictness (B). It's a free way to get the LLM on rails." See DR-9.
-- 🟡 **MODEL-13** ↑SYS-19 · Each requirement shall carry a rationale.
+- ✅ ⤷SYS-35 **MODEL-36** ↑SYS-35 · A quote shall hold the engineer's exact words, the date and time the engineer said them, and a summary of what was being discussed.
+  - *Your words, 2026-10-17 20:31:* "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things."
+    *(Discussing where the engineer's words should be kept on the requirements.)*
+- 🟡 ⤷SYS-19 **MODEL-13** ↑SYS-19 · Each requirement shall carry a rationale.
   - *Why:* the rationale is the first thing an agent reads when you ask why a requirement exists. That's why the NASA and INCOSE handbooks make it mandatory.
-- 🟡 **MODEL-15** ↑SYS-19 · A requirement ID shall never be reused, including after its requirement is deleted.
+- 🟡 ⤷SYS-19 **MODEL-15** ↑SYS-19 · A requirement ID shall never be reused, including after its requirement is deleted.
   - *Why:* "why did AGENT-17 disappear?" only works if AGENT-17 has always meant one thing.
-- 🟡 **MODEL-17** ↑SYS-8 · Requirement and need text shall contain no language-specific names, such as function, class or file names.
+- 🟡 ⤷SYS-8 **MODEL-17** ↑SYS-8 · Requirement and need text shall contain no language-specific names, such as function, class or file names.
   - *Why:* a requirement that names a C++ class can't guide a Rust rebuild. Those names belong in test links and related-code lists.
-- 🟡 **MODEL-18** ↑SYS-10 · Each requirement shall have at least one verification item, or a recorded reason for having none.
+- 🟡 ⤷SYS-10 **MODEL-18** ↑SYS-10 · Each requirement shall have at least one verification item, or a recorded reason for having none.
   - *Why:* a requirement that nothing checks is only a wish. The recorded reason lets you accept a gap on purpose.
-- 🟡 **MODEL-21** ↑SYS-9 · Each implementation shall declare a root directory, under which its related-code paths and test links resolve.
+- 🟡 ⤷SYS-9 **MODEL-21** ↑SYS-9 · Each implementation shall declare a root directory, under which its related-code paths and test links resolve.
   - *Why:* lets a C++ original and a Rust port share one repository.
-- 🟡 **MODEL-22** ↑SYS-9 · Exactly one implementation shall be marked primary.
+- 🟡 ⤷SYS-9 **MODEL-22** ↑SYS-9 · Exactly one implementation shall be marked primary.
   - *Why:* gives changes a default target (CHANGE-8).
-- 🟡 **MODEL-23** ↑SYS-12 · A run time shall count as long when it exceeds 60 seconds, unless the repository's configuration sets another limit.
+- 🟡 ⤷SYS-12 **MODEL-23** ↑SYS-12 · A run time shall count as long when it exceeds 60 seconds, unless the repository's configuration sets another limit.
   - *Why:* keeps the cheap tier fast enough to run after every change. 60 seconds is a guess, which is why it's configurable.
+- 🟡 ⤷SYS-33 **MODEL-34** ↑SYS-33 · Each approval record shall hold the approver, the channel, the date and time, the number of items approved in the same action, the engineer's words, and the fingerprint of the content approved.
+  - *Why:* SYS-33 lists what an approval must show. The channel is the review page, the terminal, chat, a harness menu or a restatement (AGENT-50).
+- 🟡 ⤷SYS-39 **MODEL-35** ↑SYS-39 · The spec shall keep every approval of an item, oldest first.
+  - *Why:* an item approved several times, or approved again after a change, carries more signal than a single approval, and the dates show how fresh each approval is.
 - *Removed:*
   - MODEL-26, in round 4.
   - MODEL-6, in round 5, because it restated SYS-8.
@@ -340,42 +360,50 @@ A spec holds needs, system elements, requirements, verification items, decision 
 
 The checker tells an agent everything still unfinished in its spec work, deterministically and within seconds.
 
-- ✅ **CHECK-1** ↑SYS-7 · In a single run, the checker shall report every violation of the MODEL requirements, along with every finding of the checks below.
+- ✅ ⤷SYS-7 **CHECK-1** ↑SYS-7 · In a single run, the checker shall report every violation of the MODEL requirements, along with every finding of the checks below.
   - *Source:* "the linter will be as comprehensive as possible to flag to the AI that its job is not done yet"
   - *Reworded:* by INCOSE's rules, "as comprehensive as possible" is an escape clause, because nothing could ever fail it. This version can fail.
-- ✅ **CHECK-2** ↑SYS-20 · Each finding shall state what is wrong, where it is, and what action resolves it, in terms an agent can act on without the methodology docs in its context.
+- ✅ ⤷SYS-20 **CHECK-2** ↑SYS-20 · Each finding shall state what is wrong, where it is, and what action resolves it, in terms an agent can act on without the methodology docs in its context.
   - *Source:* "a lot of the time the AI will not have the document for the system engineering documentation in its context … flag to the AI that its job is not done yet. That certain documentation needs to be updated, that certain tests need to be linked"
-- ✅ **CHECK-3** ↑SYS-7 · The checker shall report each test that no verification item links to.
+- ✅ ⤷SYS-7 **CHECK-3** ↑SYS-7 · The checker shall report each test that no verification item links to.
   - *Source:* "every unit test is referenced in some file" · "XYZ tests have been added and are not associated with VERs"
-- ✅ **CHECK-4** ↑SYS-7 · The checker shall report each verification-item link to a test or file that does not exist.
+- ✅ ⤷SYS-7 **CHECK-4** ↑SYS-7 · The checker shall report each verification-item link to a test or file that does not exist.
   - *Source:* "XYZ tests are referenced in VERs but don't exist"
-- ✅ **CHECK-5** ↑SYS-7 · When a system element's related code has changed and its requirements have not, the checker shall report that system element together with its current requirements.
+- ✅ ⤷SYS-7 **CHECK-5** ↑SYS-7 · When a system element's related code has changed and its requirements have not, the checker shall report that system element together with its current requirements.
   - *Source:* "XYZ files were edited but the REQs not updated, can you check the REQs" · "if the code is changed then the agent is notified … and dumps all the specs into context"
-- ✅ **CHECK-6** ↑SYS-7 · When a verification item has changed and none of the requirements it verifies has, the checker shall ask whether a requirement change was forgotten.
+- ✅ ⤷SYS-7 **CHECK-6** ↑SYS-7 · When a verification item has changed and none of the requirements it verifies has, the checker shall ask whether a requirement change was forgotten.
   - *Source:* "hey, you had to change a verification item but didn't change a req - did you forget?"
-- ✅ **CHECK-14** ↑SYS-14 · The checker shall report as unapproved each item that has no approval, or whose content no longer matches its approval's fingerprint.
+- ✅ ⤷SYS-14 **CHECK-14** ↑SYS-14 · The checker shall report each item whose content no longer matches the fingerprint of its latest approval.
   - *Source:* "Then the CLI can derive when the file is not approved (e.g. a subagent went and changed things, so now the hash doesn't match?)"
-- ✅ **CHECK-16** ↑SYS-20 · Each wording finding shall name the rule it breaks, link to the rule's explanation, say why the rule exists, and suggest a rewrite.
+- ✅ ⤷SYS-20 **CHECK-16** ↑SYS-20 · Each wording finding shall name the rule it breaks, link to the rule's explanation, say why the rule exists, and suggest a rewrite.
   - *Source:* "As long as the error messages 'hey you did this wrong. According to {link to INCOSE ruleset} this is bad practice. We recommend {recommendations}.' … Think of rust- fantastic error messages, they guide the user to best practice and explain the 'why'."
-- 🟡 **CHECK-7** ↑SYS-7 · The checker shall treat a CHECK-5 or CHECK-6 finding as resolved once the change record gives a reason for it.
+- 🟡 ⤷SYS-7 **CHECK-7** ↑SYS-7 · The checker shall treat a CHECK-5 or CHECK-6 finding as resolved once the change record gives a reason for it.
   - *Refines:* "Then it should file a waiver (maybe?) or just continue"
   - *Why:* "just continue" leaves you nothing to read. A one-line reason costs the agent little, and it's what you'll want to see in review.
-- 🟡 **CHECK-8** ↑SYS-7 · The checker shall report each changed code file that no system element lists as related.
+- 🟡 ⤷SYS-7 **CHECK-8** ↑SYS-7 · The checker shall report each changed code file that no system element lists as related.
   - *Refines:* "every header is referenced in some file"
   - *Why:* a soft version of your original guarantee. New code can't land outside every system element's view without a finding.
-- 🟡 **CHECK-9** ↑SYS-7 · When a linked test's source or a verification item's description changes without the pair being re-confirmed, the checker shall report the pair.
+- 🟡 ⤷SYS-7 **CHECK-9** ↑SYS-7 · When a linked test's source or a verification item's description changes without the pair being re-confirmed, the checker shall report the pair.
   - *Why:* keeps descriptions and tests from drifting apart silently. Re-confirming means an agent has checked that they still match, and recorded that it did.
-- 🟡 **CHECK-10** ↑SYS-9 · The checker shall report a verification item that has no tests in an implementation as a to-do for that implementation, not as a finding.
+- 🟡 ⤷SYS-9 **CHECK-10** ↑SYS-9 · The checker shall report a verification item that has no tests in an implementation as a to-do for that implementation, not as a finding.
   - *Why:* in spec-first planning and in a port, unimplemented items are expected. CHECK-11 decides when they must be finished.
-- 🟡 **CHECK-11** ↑SYS-7 · When an agent marks a change done, the checker shall report each requirement the change added or modified that neither passes in the change's target implementation nor has a recorded deferral.
+- 🟡 ⤷SYS-7 **CHECK-11** ↑SYS-7 · When an agent marks a change done, the checker shall report each requirement the change added or modified that neither passes in the change's target implementation nor has a recorded deferral.
   - *Why:* one completion rule covers both modes. A deferral, with its reason, covers features built across several changes, and ports.
-- 🟡 **CHECK-12** ↑SYS-7 · The checker shall finish within 5 seconds on a 100,000-line repository on the engineer's development machine.
+- 🟡 ⤷SYS-7 **CHECK-12** ↑SYS-7 · The checker shall finish within 5 seconds on a 100,000-line repository on the engineer's development machine.
   - *Why:* the checker runs every time an agent tries to finish, and slow checks get skipped.
-- 🟡 **CHECK-15** ↑SYS-14 · When preparing a merge, the checker shall list, without failing the check, each alteration to an item the engineer approved, wrote or decided that the engineer has not yet kept or rolled back.
+- 🟡 ⤷SYS-14 **CHECK-15** ↑SYS-14 · When preparing a merge, the checker shall list, without failing the check, each alteration to an item the engineer approved, wrote or decided that the engineer has not yet kept or rolled back.
   - *Why:* whether a branch lands is the engineer's call (round 12, D1), so the check shows what they'd want to see first instead of blocking. Approvals that are missing don't matter here; alterations nobody has answered for do (SYS-37).
-- 🟡 **CHECK-17** ↑SYS-20 · Within one run, the checker shall explain a rule in full only at its first finding, and refer back to that explanation for later findings of the same rule.
+- 🟡 ⤷SYS-20 **CHECK-17** ↑SYS-20 · Within one run, the checker shall explain a rule in full only at its first finding, and refer back to that explanation for later findings of the same rule.
   - *Refines:* "Remember not to waste too many tokens though. Like everything, there must be balance."
   - *Why:* a spec with twenty vague words shouldn't produce twenty copies of the same lesson.
+- 🟡 ⤷SYS-34 **CHECK-18** ↑SYS-34 · The checker shall classify each item as approved, changed since approval, delegated under its nearest approved ancestor, or unreviewed, from the approvals and the trace graph each time it runs.
+  - *Why:* the classification is computed and never stored (SYS-40). DR-47 says which items count as an item's ancestors.
+- 🟡 ⤷SYS-34 **CHECK-19** ↑SYS-34 · The checker shall report as a to-do each item that is unreviewed or changed since approval.
+  - *Why:* delegated items are the agent's to decide (DR-44), so they aren't the engineer's to-dos. This turned 228 to-dos in this repository into 20.
+- 🟡 ⤷SYS-35 **CHECK-20** ↑SYS-35 · The checker shall report each quote that lacks the engineer's words, the date and time they were said, or a summary of what was being discussed.
+  - *Why:* a quote without its date or its context loses what makes it signal (MODEL-36).
+- 🟡 ⤷SYS-37 **CHECK-21** ↑SYS-37 · The checker shall report as a to-do each alteration to an item the engineer approved, wrote or decided that the engineer has not kept or had rolled back.
+  - *Why:* an alteration nobody has answered is exactly what the engineer wants surfaced (NEED-17). The merge check lists these too (CHECK-15).
 - *Removed:*
   - CHECK-13 (a baseline of grandfathered findings for existing repos), in round 5. ONBOARD replaces it; see DR-21.
 
@@ -383,21 +411,21 @@ The checker tells an agent everything still unfinished in its spec work, determi
 
 The runner executes verification items by technique and tier, and tracks each item's status in each implementation.
 
-- ✅ **VERIFY-2** ↑SYS-10 · The runner shall support three techniques in its first release: unit test, integration test and reasoning check.
+- ✅ ⤷SYS-10 **VERIFY-2** ↑SYS-10 · The runner shall support three techniques in its first release: unit test, integration test and reasoning check.
   - *Source:* "'software unit test'" · "'REASONING TEST'" · "'INTEGRATION TEST'"
-- ✅ **VERIFY-3** ↑SYS-10 · The runner shall run independent verification items in parallel.
+- ✅ ⤷SYS-10 **VERIFY-3** ↑SYS-10 · The runner shall run independent verification items in parallel.
   - *Source:* "the skill has a tool for running these in parallel and reporting back"
-- ✅ **VERIFY-4** ↑SYS-10 · After each run, the runner shall report each verification item's result.
+- ✅ ⤷SYS-10 **VERIFY-4** ↑SYS-10 · After each run, the runner shall report each verification item's result.
   - *Source:* as VERIFY-3.
-- ✅ **VERIFY-5** ↑SYS-9 · The runner shall derive each verification item's status in each implementation: not implemented, not yet run, passing or failing.
+- ✅ ⤷SYS-9 **VERIFY-5** ↑SYS-9 · The runner shall derive each verification item's status in each implementation: not implemented, not yet run, passing or failing.
   - *Source:* "the specs should mark in some way what has been implemented yet, and what has not (e.g. don't expect tests to pass, perhaps VIs have been specced but not implemented)"
-- ✅ **VERIFY-8** ↑SYS-16 · When an expensive-tier item fails, the runner shall add the failure to the change's open decisions.
+- ✅ ⤷SYS-16 **VERIFY-8** ↑SYS-16 · When an expensive-tier item fails, the runner shall add the failure to the change's open decisions.
   - *Source:* "If reasoning or integration+reasoning tests fail, the LLM should add it to a list of things to flag to the user."
-- ✅ **VERIFY-12** ↑SYS-13 · At the end of a full run, the toolkit shall produce a summary of the product's health.
+- ✅ ⤷SYS-13 **VERIFY-12** ↑SYS-13 · At the end of a full run, the toolkit shall produce a summary of the product's health.
   - *Source:* "come back with … an AI summary of the health of the code"
-- ✅ **VERIFY-14** ↑SYS-10 · When the engineer requests verification of a change, the runner shall include the verification items of every system element that depends, directly or indirectly, on an element the change touched.
+- ✅ ⤷SYS-10 **VERIFY-14** ↑SYS-10 · When the engineer requests verification of a change, the runner shall include the verification items of every system element that depends, directly or indirectly, on an element the change touched.
   - *Source:* Q24: "if the general utility changes, and I ask for a comprehensive verification, it triggers VI's on RENDER and PHYSICS"
-- 🟡 **VERIFY-13** ↑SYS-13 · The health summary shall list each system element's verification status, each change the run made with its reason, each unapproved item, and each requirement without verification.
+- 🟡 ⤷SYS-13 **VERIFY-13** ↑SYS-13 · The health summary shall list each system element's verification status, each change the run made with its reason, each unapproved item, and each requirement without verification.
   - *Why:* what you'd want to know on returning: what's broken, what agents changed while you were away, and what's waiting for you.
 - *Removed:*
   - VERIFY-7, VERIFY-9 and VERIFY-10, in round 3.
@@ -407,34 +435,34 @@ The runner executes verification items by technique and tier, and tracks each it
 
 Runs a verification item's linked unit tests in each implementation, through that implementation's language adapter.
 
-- ✅ **UNIT-1** ↑SYS-10 · The unit-test technique shall run a verification item's linked tests through the language adapter of each implementation that has them.
+- ✅ ⤷SYS-10 **UNIT-1** ↑SYS-10 · The unit-test technique shall run a verification item's linked tests through the language adapter of each implementation that has them.
   - *Source:* "one modality might be 'software unit test', and can be written in [supported languages]"
 
 ### INTEG: Integration-test technique (child of VERIFY)
 
 Runs a verification item's declared commands, checks their results, and can have a reasoning check judge the output.
 
-- ✅ **INTEG-1** ↑SYS-10 · An integration-test item shall run its declared commands.
+- ✅ ⤷SYS-10 **INTEG-1** ↑SYS-10 · An integration-test item shall run its declared commands.
   - *Source:* "'INTEGRATION TEST' which would be a combination of 'run XYZ COMMANDS'"
-- ✅ **INTEG-2** ↑SYS-10 · Where an integration-test item declares a reasoning step, the technique shall judge the commands' output with a reasoning check.
+- ✅ ⤷SYS-10 **INTEG-2** ↑SYS-10 · Where an integration-test item declares a reasoning step, the technique shall judge the commands' output with a reasoning check.
   - *Source:* "and perhaps 'REASON' about them"
-- 🟡 **INTEG-3** ↑SYS-10 · An integration-test item shall pass only when each command's exit status and output meet the item's declared expectations.
+- 🟡 ⤷SYS-10 **INTEG-3** ↑SYS-10 · An integration-test item shall pass only when each command's exit status and output meet the item's declared expectations.
   - *Why:* without declared expectations, "passed" only means "didn't crash".
 
 ### REASON: Reasoning-check technique (child of VERIFY)
 
 Has an isolated subagent judge a stated aspect of the product from declared inputs and the code, without seeing the spec.
 
-- ✅ **REASON-1** ↑SYS-10 · A reasoning-check item shall consist of a prompt asking a model to judge a stated aspect of the product, plus the inputs that judgment needs.
+- ✅ ⤷SYS-10 **REASON-1** ↑SYS-10 · A reasoning-check item shall consist of a prompt asking a model to judge a stated aspect of the product, plus the inputs that judgment needs.
   - *Source:* "'REASONING TEST' which is a prompt that asks an LLM to reason about certain aspects we want to think about, that might be hard to confirm"
-- ✅ **REASON-2** ↑SYS-11 · The technique shall run each reasoning check in a fresh subagent that does not inherit the conversation, given only its item's prompt and declared inputs.
+- ✅ ⤷SYS-11 **REASON-2** ↑SYS-11 · The technique shall run each reasoning check in a fresh subagent that does not inherit the conversation, given only its item's prompt and declared inputs.
   - *Source:* "Subagents that do reasoning should be spun up with 0 context about the project, and only given what is absolutely necessary to verify … (this should be a req)" · "I imagine there's a 'forking' ability, which preserves user conversation. If that exists, I do not want to use it." See DR-7.
-- ✅ **REASON-5** ↑SYS-11 · A reasoning check shall have read access to the product's code, excluding the spec directory.
+- ✅ ⤷SYS-11 **REASON-5** ↑SYS-11 · A reasoning check shall have read access to the product's code, excluding the spec directory.
   - *Source:* "For the subagent to verify and reason through things, it will need to read code. However, we should tell it to NOT read in spec/ directory." See DR-7.
   - *Reworded:* round 9: "shall be able to read" became "shall have read access to" (INCOSE R10).
-- 🟡 **REASON-3** ↑SYS-10 · Each reasoning check shall return a pass or fail verdict with evidence quoted from its inputs.
+- 🟡 ⤷SYS-10 **REASON-3** ↑SYS-10 · Each reasoning check shall return a pass or fail verdict with evidence quoted from its inputs.
   - *Why:* a bare verdict can't be audited. Quoted evidence shows why it failed in seconds.
-- 🟡 **REASON-4** ↑SYS-24 · For an item that verifies a requirement the toolkit judges important, the technique shall take the majority verdict of three independent runs.
+- 🟡 ⤷SYS-24 **REASON-4** ↑SYS-24 · For an item that verifies a requirement the toolkit judges important, the technique shall take the majority verdict of three independent runs.
   - *Refines:* "the goal being to have slightly more deterministic results"
   - *Why:* one sample from a nondeterministic judge tells you little, and three runs is the smallest number that gives a majority. In round 5 the trigger changed from a critical flag to an importance judgment.
 - *Removed:*
@@ -444,11 +472,11 @@ Has an isolated subagent judge a stated aspect of the product from declared inpu
 
 The adapters hold everything specific to a programming language: finding tests, running them, and reading their source.
 
-- ✅ **LANG-2** ↑SYS-22 · The toolkit shall include adapters for C++ and Python.
+- ✅ ⤷SYS-22 **LANG-2** ↑SYS-22 · The toolkit shall include adapters for C++ and Python.
   - *Source:* "The commandline interface the LLM uses would support C++ to start with" · "one language we should support as a P0 should also be python"
-- 🟡 **LANG-3** ↑SYS-22 · Each adapter shall provide three operations: list a repository's tests, run a chosen set of tests, and return a named test's source.
+- 🟡 ⤷SYS-22 **LANG-3** ↑SYS-22 · Each adapter shall provide three operations: list a repository's tests, run a chosen set of tests, and return a named test's source.
   - *Why:* these are the minimum that CHECK-3, CHECK-9 and UNIT-1 need. Coverage collection can come later.
-- 🟡 **LANG-4** ↑SYS-22 · The first-release adapters shall support GoogleTest for C++ and pytest for Python.
+- 🟡 ⤷SYS-22 **LANG-4** ↑SYS-22 · The first-release adapters shall support GoogleTest for C++ and pytest for Python.
   - *Why:* each is the most common framework in its language.
 - *Removed:*
   - LANG-1, in round 5, because it restated SYS-22.
@@ -457,29 +485,38 @@ The adapters hold everything specific to a programming language: finding tests, 
 
 A change record captures what was asked, which mode the change runs in, what changed in the spec and why, and the open decisions waiting for the engineer.
 
-- ✅ **CHANGE-1** ↑SYS-17 · The toolkit shall support a spec-first mode, in which the engineer approves the spec changes before implementation begins.
+- ✅ ⤷SYS-17 **CHANGE-1** ↑SYS-17 · The toolkit shall support a spec-first mode, in which the engineer approves the spec changes before implementation begins.
   - *Source:* "the engineer wants to know BEFORE the code is written how the specs will be built … I then examine the diff and agree 'lgtm', then the implementation is created"
-- ✅ **CHANGE-2** ↑SYS-17 · The toolkit shall support a code-first mode, in which the engineer reviews the spec changes after the change is implemented.
+- ✅ ⤷SYS-17 **CHANGE-2** ↑SYS-17 · The toolkit shall support a code-first mode, in which the engineer reviews the spec changes after the change is implemented.
   - *Source:* "hey build it real quick, then update the spec to match" · "afterwards, or during implementation (however works best / is most natural for the agent). I don't want to be too prescriptive"
-- ✅ **CHANGE-3** ↑SYS-16 · Each change record shall keep a list of open decisions.
+- ✅ ⤷SYS-16 **CHANGE-3** ↑SYS-16 · Each change record shall keep a list of open decisions.
   - *Source:* "the LLM should add it to a list of things to flag to the user"
-- ✅ **CHANGE-9** ↑SYS-17 · When a request names no mode, the toolkit shall use code-first mode.
+- ✅ ⤷SYS-17 **CHANGE-9** ↑SYS-17 · When a request names no mode, the toolkit shall use code-first mode.
   - *Source:* Q10: "Agree".
-- ✅ **CHANGE-10** ↑SYS-26 · Each open decision shall offer options, with one marked as recommended.
+- ✅ ⤷SYS-26 **CHANGE-10** ↑SYS-26 · Each open decision shall offer options, with one marked as recommended.
   - *Source:* "it should always propose options and have a 'Recommended' option, so the user can say 'yeah go for it' to a whole set" · "The alternatives are A B or C"
-- ✅ **CHANGE-12** ↑SYS-26 · The toolkit shall accept the recommended options of a set of open decisions from one statement by the engineer.
+- ✅ ⤷SYS-26 **CHANGE-12** ↑SYS-26 · The toolkit shall accept the recommended options of a set of open decisions from one statement by the engineer.
   - *Source:* "so the user can say 'yeah go for it' to a whole set"
   - *Reworded:* round 9: "The engineer shall be able to accept" became "The toolkit shall accept", because "be able to" describes a capability, not a behavior (INCOSE R10).
-- 🟡 **CHANGE-4** ↑SYS-19 · Each change record shall summarize the engineer's request.
+- ✅ ⤷SYS-39 **CHANGE-16** ↑SYS-39 · Each change-log entry shall record the date and time of the edit.
+  - *Your words, 2026-10-17 22:12:* "Timestamps and history of changes is important, so the agent can see some decisions are old, some are newer, and will know what is more likely 'ok to change' and what is likely 'fresh, and representative of the latest direction'"
+    *(Approving SYS-39, which shows agents an item's approval and history before they change it.)*
+- 🟡 ⤷SYS-19 **CHANGE-4** ↑SYS-19 · Each change record shall summarize the engineer's request.
   - *Why:* lets auditors ask "you asked for X, so why does the spec now also say Y?". It's a summary rather than a quote, which matches how decision records treat your words (AGENT-35).
-- 🟡 **CHANGE-5** ↑SYS-19 · Each change record shall give a reason for each requirement the change added, modified or removed.
+- 🟡 ⤷SYS-19 **CHANGE-5** ↑SYS-19 · Each change record shall give a reason for each requirement the change added, modified or removed.
   - *Refines:* "I view the spec diff and say 'hey why does this component no longer have a requirement to do x or y' and the agent is able to explain"
   - *Why:* an agent starting fresh months later can only answer "why?" if someone wrote the reason down at the time.
-- 🟡 **CHANGE-8** ↑SYS-9 · Each change record shall name the implementation the change targets, defaulting to the primary implementation.
+- 🟡 ⤷SYS-9 **CHANGE-8** ↑SYS-9 · Each change record shall name the implementation the change targets, defaulting to the primary implementation.
   - *Why:* CHECK-11 and the to-do list need to know which implementation "done" refers to.
-- 🟡 **CHANGE-11** ↑SYS-26 · Each open decision shall say whether it involves an item the engineer stated, or one with decision records behind it.
+- 🟡 ⤷SYS-26 **CHANGE-11** ↑SYS-26 · Each open decision shall say whether it involves an item the engineer stated, or one with decision records behind it.
   - *Refines:* "If a human had hand / there are notes of previous ADRs, then flag that so the user knows not to skim/lgtm too early."
   - *Why:* you asked for this on flagged items. I applied it to every open decision, because the risk of skimming too early is the same.
+- 🟡 ⤷SYS-37 **CHANGE-13** ↑SYS-37 · An item shall count as approved, written or decided by the engineer when it has an approval record, when its origin is the engineer or it quotes the engineer, or when it is a decision record the engineer made.
+  - *Why:* the engineer, approving SYS-37: "'approved, wrote or decided.' is kind of vague. Maybe child reqs specify this further." This pins it down.
+- 🟡 ⤷SYS-37 **CHANGE-14** ↑SYS-37 · Each change record shall list each alteration the change made to an item the engineer approved, wrote or decided, with the line that keeps it, until the engineer keeps it or it is rolled back.
+  - *Why:* the change record is where the engineer reviews a change, so the alterations to answer belong at its top, right after open decisions.
+- 🟡 ⤷SYS-38 **CHANGE-15** ↑SYS-38 · Each change record shall list the items proposed for the engineer's explicit approval, in the order proposed, each with its reason, followed by one line that approves those still waiting.
+  - *Why:* a proposal made mid-change survives the conversation, and the engineer can approve every waiting item at once.
 - *Removed:*
   - CHANGE-6 and CHANGE-7, in round 2.
 
@@ -487,34 +524,38 @@ A change record captures what was asked, which mode the change runs in, what cha
 
 Web pages that show the engineer the spec as a whole, and how a change alters it.
 
-- ✅ **REVIEW-1** ↑SYS-6 · The renderer shall render the spec's system elements and requirements as a web page.
+- ✅ ⤷SYS-6 **REVIEW-1** ↑SYS-6 · The renderer shall render the spec's system elements and requirements as a web page.
   - *Source:* "we'll create tools to render components on a web page"
-- ✅ **REVIEW-2** ↑SYS-15 · The renderer shall render the spec differences between two revisions as a web page.
+- ✅ ⤷SYS-15 **REVIEW-2** ↑SYS-15 · The renderer shall render the spec differences between two revisions as a web page.
   - *Source:* "and also render the diffs between changes"
-- ✅ **REVIEW-3** ↑SYS-6 · The renderer shall hide verification items until the engineer asks to see them.
+- ✅ ⤷SYS-6 **REVIEW-3** ↑SYS-6 · The renderer shall hide verification items until the engineer asks to see them.
   - *Source:* "only showing the highest signal things (REQs). VERs are … for the sole engineer to read occasionally"
-- ✅ **REVIEW-4** ↑SYS-15 · In a diff, the renderer shall highlight brightly each system element whose requirements changed.
+- ✅ ⤷SYS-15 **REVIEW-4** ↑SYS-15 · In a diff, the renderer shall highlight brightly each system element whose requirements changed.
   - *Source:* "bright colors when a component has changed requirements"
-- ✅ **REVIEW-5** ↑SYS-15 · In a diff, the renderer shall highlight mildly each system element whose related code changed while its requirements and verification items did not.
+- ✅ ⤷SYS-15 **REVIEW-5** ↑SYS-15 · In a diff, the renderer shall highlight mildly each system element whose related code changed while its requirements and verification items did not.
   - *Source:* "mild color when a component's underlying file changed but the req/ver didn't"
-- ✅ **REVIEW-6** ↑SYS-15 · In a diff, the renderer shall leave unchanged system elements unhighlighted.
+- ✅ ⤷SYS-15 **REVIEW-6** ↑SYS-15 · In a diff, the renderer shall leave unchanged system elements unhighlighted.
   - *Source:* "nothing if nothing changed"
-- ✅ **REVIEW-7** ↑SYS-9 · The renderer shall show each requirement's status in each implementation.
+- ✅ ⤷SYS-9 **REVIEW-7** ↑SYS-9 · The renderer shall show each requirement's status in each implementation.
   - *Source:* "the specs should mark in some way what has been implemented yet, and what has not"
-- ✅ **REVIEW-13** ↑SYS-14 · The review page shall let the engineer approve items or give feedback on them.
+- ✅ ⤷SYS-14 **REVIEW-13** ↑SYS-14 · The review page shall let the engineer approve items or give feedback on them.
   - *Source:* "click 'approve' (or give feedback)"
-- ✅ **REVIEW-15** ↑SYS-30 · The review page shall show an item's text when the engineer hovers over or clicks its ID.
+- ✅ ⤷SYS-30 **REVIEW-15** ↑SYS-30 · The review page shall show an item's text when the engineer hovers over or clicks its ID.
   - *Source:* "it should say DR-8 and on hover or click or whatever … it should state what it means"
-- 🟡 **REVIEW-9** ↑SYS-11 · In a diff, the renderer shall highlight in amber each verification item that changed while the requirements it verifies did not.
+- 🟡 ⤷SYS-11 **REVIEW-9** ↑SYS-11 · In a diff, the renderer shall highlight in amber each verification item that changed while the requirements it verifies did not.
   - *Why:* that's where test weakening hides, so it gets its own color.
-- 🟡 **REVIEW-10** ↑SYS-19 · In a diff, the renderer shall show the recorded reason beside each changed or removed requirement.
+- 🟡 ⤷SYS-19 **REVIEW-10** ↑SYS-19 · In a diff, the renderer shall show the recorded reason beside each changed or removed requirement.
   - *Why:* this answers most "why?" questions before you need to ask them.
-- 🟡 **REVIEW-11** ↑SYS-14 · The renderer shall show each unapproved item's differences from its last approved content.
+- 🟡 ⤷SYS-14 **REVIEW-11** ↑SYS-14 · The renderer shall show each unapproved item's differences from its last approved content.
   - *Why:* one mechanism covers both the spec-first "I had to change a few things" case and every other change since your last approval.
-- 🟡 **REVIEW-12** ↑SYS-16 · In a diff, the renderer shall show the open decisions above the requirement changes.
+- 🟡 ⤷SYS-16 **REVIEW-12** ↑SYS-16 · In a diff, the renderer shall show the open decisions above the requirement changes.
   - *Why:* those are the steering points, so they shouldn't be buried at the bottom.
-- 🟡 **REVIEW-14** ↑SYS-6 · The renderer shall show the spec top-down, with needs and system requirements first and each system element's requirements on request.
+- 🟡 ⤷SYS-6 **REVIEW-14** ↑SYS-6 · The renderer shall show the spec top-down, with needs and system requirements first and each system element's requirements on request.
   - *Why:* this is the reading order NEED-1 depends on, and the one this file uses.
+- 🟡 ⤷SYS-34 **REVIEW-16** ↑SYS-34 · The requirements view shall mark each item that is approved, changed since approval or delegated, naming for each delegated item the approved item above it.
+  - *Why:* SYS-34 asks every view to show the state. Naming the approved item tells the reader which approval covers it.
+- 🟡 ⤷SYS-35 **REVIEW-17** ↑SYS-35 · The requirements view shall show each quote with the date and time it was said and the summary of what was being discussed.
+  - *Why:* SYS-35 keeps the date and the context so readers can see them.
 - *Removed:*
   - REVIEW-8, in round 5, because it restated SYS-14.
 
@@ -522,45 +563,55 @@ Web pages that show the engineer the spec as a whole, and how a change alters it
 
 The single tool through which agents, and the engineer, query, edit, check, verify and render the spec.
 
-- ✅ **CLI-1** ↑SYS-27 · The toolkit shall provide one command-line tool through which agents query, edit, check, verify and render the spec.
+- ✅ ⤷SYS-27 **CLI-1** ↑SYS-27 · The toolkit shall provide one command-line tool through which agents query, edit, check, verify and render the spec.
   - *Source:* "The commandline interface the LLM uses" · "I want the CLI to be the main way agents edit the spec." · "Can't the CLI be the implementation?"
-- ✅ **CLI-2** ↑SYS-9 · The CLI shall generate, for a named implementation, a to-do list of the requirements and verification items not yet implemented or not passing in it.
+- ✅ ⤷SYS-9 **CLI-2** ↑SYS-9 · The CLI shall generate, for a named implementation, a to-do list of the requirements and verification items not yet implemented or not passing in it.
   - *Source:* "This ends up forming an automated 'todo' list for the LLM … 'let's implement this project in rust' and the todo list can be regenerated but for an entire different implementation"
-- ✅ **CLI-5** ↑SYS-20 · Before applying an edit, the CLI shall show the agent the edit's context: affected parent and child requirements, linked verification items and tests, dependent system elements, and approval status.
+- ✅ ⤷SYS-20 **CLI-5** ↑SYS-20 · Before applying an edit, the CLI shall show the agent the edit's context: affected parent and child requirements, linked verification items and tests, dependent system elements, and approval status.
   - *Source:* "if an agent wants to edit the spec, the CLI has a chance to intercept the request and give extra context (for example, dumping the descendant V&V / REQs into context, then asking 'confirm?' or something)"
-- 🟡 **CLI-3** ↑SYS-20 · The CLI shall answer four queries: one system element's spec, the system elements related to given files, the trace from a requirement to its verification items and tests, and a requirement's history (its rationale, each change with its reason, and its linked context).
+- ✅ ⤷SYS-33 **CLI-12** ↑SYS-33 · When recording an approval, the CLI shall record each resolved decision that involved the item.
+  - *Your words, 2026-10-17 20:01:* "Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful."
+    *(Discussing which kinds of approval carry more signal.)*
+- ✅ ⤷SYS-39 **CLI-13** ↑SYS-39 · Before applying an edit, and when showing an item, the CLI shall show the item's review state, its approvals with their channels, whether it carries the engineer's words or decision, its last edit and number of edits, the discussions that involved it, and how many items link to it.
+  - *Your words, 2026-10-17 22:12:* "I think whats better reflective of what I'm trying to say is 'metrics that can represent importance are surfaced to the llm in interfaces where it would be useful (last edit, # of discussion, approval types, # of context links, etc...) but not "IMPORTANT" or "NOT IMPORTANT" classification or scoring."
+    *(Approving SYS-40, which rules out a stored importance score.)*
+- 🟡 ⤷SYS-20 **CLI-3** ↑SYS-20 · The CLI shall answer four queries: one system element's spec, the system elements related to given files, the trace from a requirement to its verification items and tests, and a requirement's history (its rationale, each change with its reason, and its linked context).
   - *Why:* lets an agent pull exactly the spec it needs into context, instead of all of it.
-- 🟡 **CLI-4** ↑SYS-9 · The CLI shall order a to-do list with each system element's items after those of the system elements it depends on.
+- 🟡 ⤷SYS-9 **CLI-4** ↑SYS-9 · The CLI shall order a to-do list with each system element's items after those of the system elements it depends on.
   - *Why:* lets an agent build from the bottom up. A port starts at the leaves.
-- 🟡 **CLI-6** ↑SYS-20 · When an edit affects approved items or items that others depend on, the CLI shall apply it only after the agent acknowledges each affected item by name.
+- 🟡 ⤷SYS-20 **CLI-6** ↑SYS-20 · When an edit affects approved items or items that others depend on, the CLI shall apply it only after the agent acknowledges each affected item by name.
   - *Refines:* "then asking 'confirm?'"
   - *Why:* a model will rubber-stamp a generic "confirm?". Naming each affected item makes it actually consider each one. See DR-19.
-- 🟡 **CLI-7** ↑SYS-25 · The CLI shall accept multiple edits in a single invocation.
+- 🟡 ⤷SYS-25 **CLI-7** ↑SYS-25 · The CLI shall accept multiple edits in a single invocation.
   - *Why:* a twenty-requirement update should be one call, not twenty. The input format is DR-2.
-- 🟡 **CLI-8** ↑SYS-19 · The CLI shall reject a modification or removal that has no reason.
+- 🟡 ⤷SYS-19 **CLI-8** ↑SYS-19 · The CLI shall reject a modification or removal that has no reason.
   - *Why:* this enforces CHANGE-5 at write time, while the reason is fresh.
-- 🟡 **CLI-9** ↑SYS-5 · The CLI shall set up a repository in one command, writing the spec skeleton where none exists, the launcher, the skill, and the hooks and subagents for each harness the engineer names.
+- 🟡 ⤷SYS-5 **CLI-9** ↑SYS-5 · The CLI shall set up a repository in one command, writing the spec skeleton where none exists, the launcher, the skill, and the hooks and subagents for each harness the engineer names.
   - *Why:* SYS-5 asks for one-step setup. The launcher gives agents one command that works on every machine (DR-39). The skill and the harness glue are what make an agent follow the method (DR-38, DR-40).
-- 🟡 **CLI-10** ↑SYS-5 · When setup runs again, the CLI shall refresh the files it wrote and leave every other file and setting unchanged.
+- 🟡 ⤷SYS-5 **CLI-10** ↑SYS-5 · When setup runs again, the CLI shall refresh the files it wrote and leave every other file and setting unchanged.
   - *Why:* running setup again is how a repository picks up a newer skill or hook, and it must never overwrite the engineer's own settings, such as their other Claude Code hooks.
+- 🟡 ⤷SYS-33 **CLI-11** ↑SYS-33 · When no approver is named, the CLI shall record as approver the user name configured for the repository's version control.
+  - *Why:* who approved is part of SYS-33, and the version-control user name is one the engineer has already set.
+- 🟡 ⤷SYS-38 **CLI-14** ↑SYS-38 · The CLI shall record in the open change an agent's proposal that the engineer approve items, with the agent's reason.
+  - *Why:* SYS-38 needs the proposals kept somewhere the engineer reviews, and the change record is that place.
 
 ## ONBOARD: Bringing an existing project in
 
 Onboarding takes a project that already has code and tests and produces its spec: the project's current state, and the reasons behind it.
 
-- ✅ **ONBOARD-1** ↑SYS-23 · When onboarding an existing project, the toolkit shall extract its needs, requirements, verification items and decision records from the project's code, tests, comments and documentation.
+- ✅ ⤷SYS-23 **ONBOARD-1** ↑SYS-23 · When onboarding an existing project, the toolkit shall extract its needs, requirements, verification items and decision records from the project's code, tests, comments and documentation.
   - *Source:* "we simply need to guess/extract/format the spec from the project, clarify certain design decisions (so as to extract NEEDs/REQs/VERs)"
-- ✅ **ONBOARD-2** ↑SYS-23 · Onboarding shall describe the project's current state without proposing changes to it.
+- ✅ ⤷SYS-23 **ONBOARD-2** ↑SYS-23 · Onboarding shall describe the project's current state without proposing changes to it.
   - *Source:* "this is less about 'steering' and more about 'encoding the state of the project correctly, and encoding the WHY the state is the way it is correctly'"
-- ✅ **ONBOARD-3** ↑SYS-23 · Onboarding shall run every check the toolkit offers, expensive checks and auditors included, on the extracted spec.
+- ✅ ⤷SYS-23 **ONBOARD-3** ↑SYS-23 · Onboarding shall run every check the toolkit offers, expensive checks and auditors included, on the extracted spec.
   - *Source:* "This step … should be extra careful, run all the checks, rechecks, skeptical subagents... the whole kitchen sink, to ensure that everything is captured." Asking for onboarding counts as the request SYS-12 needs.
-- ✅ **ONBOARD-4** ↑SYS-23 · Onboarding shall take the reasons for the current design from code comments and structure wherever they reveal them.
+- ✅ ⤷SYS-23 **ONBOARD-4** ↑SYS-23 · Onboarding shall take the reasons for the current design from code comments and structure wherever they reveal them.
   - *Source:* "Sometimes the WHY can be found through code comments / obvious structure."
-- ✅ **ONBOARD-5** ↑SYS-23 · Onboarding shall ask the engineer only about reasons the project itself doesn't reveal.
+- ✅ ⤷SYS-23 **ONBOARD-5** ↑SYS-23 · Onboarding shall ask the engineer only about reasons the project itself doesn't reveal.
   - *Source:* "Sometimes no, and that's when clear use of the users times is in order, asking high signal questions."
-- ✅ **ONBOARD-6** ↑SYS-23 · Onboarding shall end with a spec the engineer can approve after reviewing only its needs.
+- ✅ ⤷SYS-23 **ONBOARD-6** ↑SYS-23 · Onboarding shall end with a spec the engineer can approve after reviewing only its needs.
   - *Source:* "The end goal is a user just looks at the NEEDS, confirms them, states 'approve everything' and moves on."
-- 🟡 **ONBOARD-7** ↑SYS-23 · Onboarding shall record each failing test or broken link it finds as an open decision, without fixing it.
+- 🟡 ⤷SYS-23 **ONBOARD-7** ↑SYS-23 · Onboarding shall record each failing test or broken link it finds as an open decision, without fixing it.
   - *Why:* this follows from ONBOARD-2. Fixing things during onboarding would be steering you didn't ask for.
 
 ## AGENT: The skill, plus per-harness adapters
@@ -569,93 +620,110 @@ The method ships as one Agent Skill. Optional per-harness adapters enforce parts
 
 *Verification of the AGENT requirements is deferred (DR-16). Until there's an eval harness, they're demonstrated in real use.*
 
-- ✅ **AGENT-1** ↑SYS-17 · In code-first mode, the skill shall let the main agent edit code without first reading the spec.
+- ✅ ⤷SYS-17 **AGENT-1** ↑SYS-17 · In code-first mode, the skill shall let the main agent edit code without first reading the spec.
   - *Source:* "it spends time looking at code, and WHEN IT ADDS VALUE also reading the current REQs and V&V, but otherwise … it probably doesn't need to"
-- ✅ **AGENT-2** ↑SYS-7 · The skill shall direct the main agent to update the requirements and verification items a change affects, as part of that change.
+- ✅ ⤷SYS-7 **AGENT-2** ↑SYS-7 · The skill shall direct the main agent to update the requirements and verification items a change affects, as part of that change.
   - *Source:* "It makes all the changes and tries its best to update V&V along the way."
-- ✅ **AGENT-3** ↑SYS-7 · The main agent shall report a change as done only after the checker reports no findings for it.
+- ✅ ⤷SYS-7 **AGENT-3** ↑SYS-7 · The main agent shall report a change as done only after the checker reports no findings for it.
   - *Source:* "At the end, it runs the linter and is told 'hey XYZ tests have been added and are not associated with VERs …'"
-- ✅ **AGENT-4** ↑SYS-11 · Skeptical auditor subagents shall review each change's spec updates before the engineer reviews the change.
+- ✅ ⤷SYS-11 **AGENT-4** ↑SYS-11 · Skeptical auditor subagents shall review each change's spec updates before the engineer reviews the change.
   - *Source:* "have skeptical subagents run audits too, to ensure everything is up to date. Then I go in, read the specs" · Q3: "Before review sounds fine."
-- ✅ **AGENT-7** ↑SYS-19 · When the engineer asks why a requirement changed or disappeared, the agent shall answer with the reason recorded for that change.
+- ✅ ⤷SYS-19 **AGENT-7** ↑SYS-19 · When the engineer asks why a requirement changed or disappeared, the agent shall answer with the reason recorded for that change.
   - *Source:* "say 'hey why does this component no longer have a requirement to do x or y' and the agent is able to explain"
-- ✅ **AGENT-8** ↑SYS-24 · When the engineer asks for stronger verification of a requirement, the agent shall add verification items for it.
+- ✅ ⤷SYS-24 **AGENT-8** ↑SYS-24 · When the engineer asks for stronger verification of a requirement, the agent shall add verification items for it.
   - *Source:* "I want more robust test coverage on this important invariant"
-- ✅ **AGENT-9** ↑SYS-10 · When the engineer accepts a flagged failure, the agent shall update that verification item's expected result to the accepted behavior.
+- ✅ ⤷SYS-10 **AGENT-9** ↑SYS-10 · When the engineer accepts a flagged failure, the agent shall update that verification item's expected result to the accepted behavior.
   - *Source:* "If the user says lgtm, then the doc expectations must be updated."
-- ✅ **AGENT-10** ↑SYS-17 · In spec-first mode, the agent shall implement the approved spec by working through the to-do list for the target implementation.
+- ✅ ⤷SYS-17 **AGENT-10** ↑SYS-17 · In spec-first mode, the agent shall implement the approved spec by working through the to-do list for the target implementation.
   - *Source:* "then the implementation is created, the REQs and VIs checked off one by one"
-- ✅ **AGENT-11** ↑SYS-17 · When a spec-first change is complete, the agent shall list each difference between the approved spec and the final spec, or state that there are none.
+- ✅ ⤷SYS-17 **AGENT-11** ↑SYS-17 · When a spec-first change is complete, the agent shall list each difference between the approved spec and the final spec, or state that there are none.
   - *Source:* "'done, and I had to change a few things for you to review' or 'done, and everything was able to be made to spec'"
-- ✅ **AGENT-18** ↑SYS-16 · In spec-first mode, when a contradiction is one the engineer would likely want to decide before more work is done, the agent shall stop and ask before continuing.
+- ✅ ⤷SYS-16 **AGENT-18** ↑SYS-16 · In spec-first mode, when a contradiction is one the engineer would likely want to decide before more work is done, the agent shall stop and ask before continuing.
   - *Source:* "Only in cases where the user is trying to plan a change should we have things that halt the flow and come back and ask the user what to do." See DR-15.
-- ✅ **AGENT-19** ↑SYS-16 · When accepting a flagged failure requires changing a requirement, the agent shall change it and add an open decision listing the alternatives.
+- ✅ ⤷SYS-16 **AGENT-19** ↑SYS-16 · When accepting a flagged failure requires changing a requirement, the agent shall change it and add an open decision listing the alternatives.
   - *Source:* "I think yes, and with a flag to the user for these cases- like, 'hey, because of X or Y we needed to change the REQ. The alternatives are A B or C'"
-- ✅ **AGENT-21** ↑SYS-14 · Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, an explicit approval in chat, or a restatement in chat of what an item already says.
+- ✅ ⤷SYS-14 **AGENT-21** ↑SYS-14 · Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, an explicit approval in chat, or a restatement in chat of what an item already says.
   - *Source:* "Yeah I think LGTM in chat is fine, with the caveat that there can be no ambiguity to what I mean"
-- ✅ **AGENT-22** ↑SYS-13 · During a full run, agents shall attempt to fix each failure, by changing code, requirements or verification items.
+- ✅ ⤷SYS-13 **AGENT-22** ↑SYS-13 · During a full run, agents shall attempt to fix each failure, by changing code, requirements or verification items.
   - *Source:* "come back with maybe some code changed, some reworded reqs, some updated / new VIs". Their changes stay unapproved until you approve them.
-- ✅ **AGENT-24** ↑SYS-19 · The agent shall write a decision record for each decision made while building, attached to each system element the decision affects and linked to its sources.
+- ✅ ⤷SYS-19 **AGENT-24** ↑SYS-19 · The agent shall write a decision record for each decision made while building, attached to each system element the decision affects and linked to its sources.
   - *Source:* "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time." · "if I'm designing and debating with an agent, and an Artifact is made with some visualizations, and I say 'yeah that looks cool lets do that' … I'd like the agent to persist that"
-- ✅ **AGENT-25** ↑SYS-19 · Before modifying or removing an approved requirement, the agent shall read its rationale and linked context.
+- ✅ ⤷SYS-19 **AGENT-25** ↑SYS-19 · Before modifying or removing an approved requirement, the agent shall read its rationale and linked context.
   - *Source:* "an implementing agent might say 'hmm, can I change this REQ? Let me read up on why they made it the way they made it...'"
-- ✅ **AGENT-29** ↑SYS-18 · When the engineer asks for a quick change, the agent shall tell the engineer as soon as the change is usable, before finishing its tests and spec updates.
+- ✅ ⤷SYS-18 **AGENT-29** ↑SYS-18 · When the engineer asks for a quick change, the agent shall tell the engineer as soon as the change is usable, before finishing its tests and spec updates.
   - *Source:* "sometimes I just want an agent to make a damn change quick, so I can run my binary and play with it while other changes get done"
-- ✅ **AGENT-30** ↑SYS-7 · The agent shall run every cheap-tier item before reporting a change as done.
+- ✅ ⤷SYS-7 **AGENT-30** ↑SYS-7 · The agent shall run every cheap-tier item before reporting a change as done.
   - *Source:* "I fully expect the agent to run all unit tests after changes anyways- its a single command."
-- ✅ **AGENT-32** ↑SYS-29 · The skills shall leave the choice of where agents make changes (working tree, branch or worktree) to the engineer and the agent harness.
+- ✅ ⤷SYS-29 **AGENT-32** ↑SYS-29 · The skills shall leave the choice of where agents make changes (working tree, branch or worktree) to the engineer and the agent harness.
   - *Source:* "Let's not encode this in the skill. Agent harnesses are getting better and better, I don't want to be overly prescriptive."
-- ✅ **AGENT-33** ↑SYS-14 · A chat message shall count as an explicit approval only when it states unambiguously which items it approves.
+- ✅ ⤷SYS-14 **AGENT-33** ↑SYS-14 · A chat message shall count as an explicit approval only when it states unambiguously which items it approves.
   - *Source:* "agents say 1000 things in one chat, if I say lgtm I might mean 'yeah sure' to some of them, not 'yes, and also approve every req'"
-- ✅ **AGENT-35** ↑SYS-19 · A decision record shall present the engineer's reasoning as paraphrase, never as a direct quote.
+- ✅ ⤷SYS-19 **AGENT-35** ↑SYS-19 · A decision record shall present the engineer's reasoning as paraphrase, never as a direct quote.
   - *Source:* "Don't directly quote, maybe clean it up a bit. Be careful not to imply its a direct quote."
-- ✅ **AGENT-36** ↑SYS-6 · The agent shall turn the engineer's conversational statements of intent into needs, requirements and verification items.
+- ✅ ⤷SYS-6 **AGENT-36** ↑SYS-6 · The agent shall turn the engineer's conversational statements of intent into needs, requirements and verification items.
   - *Source:* Q8: "as long as it can be easily done conversationally- the idea being I state what I want and some reasoning why, and the agent converts that to needs/reqs/vis/etc."
-- ✅ **AGENT-37** ↑SYS-6 · The agent shall base each need only on what the engineer has stated.
+- ✅ ⤷SYS-6 **AGENT-37** ↑SYS-6 · The agent shall base each need only on what the engineer has stated.
   - *Source:* Q8: "That sounds good" (my lean was that agents may draft needs only from your words) · "Of course I will have to approve the needs down the line."
-- ✅ **AGENT-40** ↑SYS-26 · Whenever the toolkit acts on an importance judgment, it shall state the judgment's reasons.
+- ✅ ⤷SYS-26 **AGENT-40** ↑SYS-26 · Whenever the toolkit acts on an importance judgment, it shall state the judgment's reasons.
   - *Source:* on a ranked list in which "each item says why it ranks where it does": "This was really helpful."
-- ✅ **AGENT-41** ↑SYS-29 · The skill shall direct agents to use their harness's own features, such as question menus, wherever those let the engineer answer or review in fewer steps.
+- ✅ ⤷SYS-29 **AGENT-41** ↑SYS-29 · The skill shall direct agents to use their harness's own features, such as question menus, wherever those let the engineer answer or review in fewer steps.
   - *Source:* "try to use the harness you're running in to make the UX good for the user. If asking questions, consider using the harness to ask the question in a menu, whatever. Use the tools available to achieve the goal."
   - *Reworded:* round 9: "easier" became "in fewer steps", because "easier" is vague (INCOSE R7).
-- ✅ **AGENT-42** ↑SYS-27 · The skill's instructions shall work in every agent harness that can start subagents.
+- ✅ ⤷SYS-27 **AGENT-42** ↑SYS-27 · The skill's instructions shall work in every agent harness that can start subagents.
   - *Source:* "The language of the skill can be generic enough to work for antigravity / claude code / maybe codex (?) or other things in the future."
   - *Reworded:* round 9: "any" became "every" (INCOSE R32).
-- ✅ **AGENT-44** ↑SYS-30 · Whenever an agent mentions a spec item to the engineer, it shall give the item's title with its ID, linked to the item where the medium allows.
+- ✅ ⤷SYS-30 **AGENT-44** ↑SYS-30 · Whenever an agent mentions a spec item to the engineer, it shall give the item's title with its ID, linked to the item where the medium allows.
   - *Source:* "If you must use IDs, then they should link to a LOC or the spec … Or just use the title, or say DR-8 (some description) etc."
-- ✅ **AGENT-45** ↑SYS-31 · The skill shall invite agents to change the skill whenever they find friction in it or a new way the engineer uses it.
+- ✅ ⤷SYS-31 **AGENT-45** ↑SYS-31 · The skill shall invite agents to change the skill whenever they find friction in it or a new way the engineer uses it.
   - *Source:* "Agents should be encouraged to modify this skill if the UX can be improved, or if the user is trying to use them in a new way. So keep the option open in the wording."
-- ✅ **AGENT-46** ↑SYS-31 · When an agent works around friction in the toolkit, the agent shall report the workaround to the engineer with a proposed improvement.
+- ✅ ⤷SYS-31 **AGENT-46** ↑SYS-31 · When an agent works around friction in the toolkit, the agent shall report the workaround to the engineer with a proposed improvement.
   - *Source:* "Agents need to be comfortable bringing those issues up too."
-- ✅ **AGENT-47** ↑SYS-27 · Each step of the method shall be achievable in a harness that runs none of the toolkit's hooks.
+- ✅ ⤷SYS-27 **AGENT-47** ↑SYS-27 · Each step of the method shall be achievable in a harness that runs none of the toolkit's hooks.
   - *Source:* "the framework must still work without the hooks, the hooks are convenience and guardrails to improve experience, but should not be core. I'm using hermes agent for some coding, and other times it defers to claude code. When hermes uses the system it should still work, but obviously the claude code one will be less likely to make mistakes due to the harnesses, etc." (2026-10-17, deciding to keep the Claude Code hooks)
-- ✅ **AGENT-48** ↑SYS-14 · When an agent asks the engineer to approve items, the agent shall give the exact line that records the approval of those items.
+- ✅ ⤷SYS-14 **AGENT-48** ↑SYS-14 · When an agent asks the engineer to approve items, the agent shall give the exact line that records the approval of those items.
   - *Source:* "Those sessions are okay, as long as the agent knows about them and can tell me things like "please state Approve" and "LGTM" for the specific items. That way I know what to do and can be trained into it." (2026-10-17; "those sessions" are the Claude Code session hooks)
-- ✅ **AGENT-49** ↑SYS-29 · In a harness where the toolkit's hooks run, the installed skill shall tell the agent what each hook does.
+- ✅ ⤷SYS-29 **AGENT-49** ↑SYS-29 · In a harness where the toolkit's hooks run, the installed skill shall tell the agent what each hook does.
   - *Source:* "Those sessions are okay, as long as the agent knows about them" (2026-10-17; "those sessions" are the Claude Code session hooks)
-- ✅ **AGENT-50** ↑SYS-41 · When the engineer restates what an existing item already says, the agent shall record the restatement as the engineer's approval of that item, marked as given by restatement.
+- ✅ ⤷SYS-41 **AGENT-50** ↑SYS-41 · When the engineer restates what an existing item already says, the agent shall record the restatement as the engineer's approval of that item, marked as given by restatement.
   - *Source:* "Since I mentioend "I would like XYZ" and you said "ah that's accounted for in ABC", thats a case where I think "ABC" could be coutned as 'approved' for future notice." (2026-10-17)
-- 🟡 **AGENT-12** ↑SYS-7 · When the main agent tries to finish, the toolkit shall run the checker and return each finding to the agent.
+- ✅ ⤷SYS-38 **AGENT-51** ↑SYS-38 · The agent shall propose for explicit approval each item that records a choice between alternatives, and each item that other items depend on.
+  - *Your words, 2026-10-17 20:01:* "Then the idea here being that LLMs can fish for approval on key requirements, but humans don't _have_ to read all the requiremnets for everything (for example, business logic around 'when this button is clicked, X shall occur' is less interesting than two or three layers up the tree 'the X interface shall enable user to do Y'."
+    *(Discussing whether approval could pass down the requirement tree.)*
+- ✅ ⤷SYS-35 **AGENT-53** ↑SYS-35 · The agent shall quote the engineer's reasoning wherever the engineer gave it, not only the engineer's assent.
+  - *Your words, 2026-10-17 20:31:* "The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things. But for example, in the above paragraph I gave a lot of reasoning. That could go somewhere, and the context summary would provide more info."
+    *(Discussing where the engineer's words should be kept on the requirements.)*
+- ✅ ⤷SYS-35 **AGENT-54** ↑SYS-35 · A quote's summary shall say only what was being discussed.
+  - *Your words, 2026-10-17 20:31:* "The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things."
+    *(Discussing where the engineer's words should be kept on the requirements.)*
+- ✅ ⤷SYS-36 **AGENT-55** ↑SYS-36 · The agent shall place each requirement the engineer states in detail under the system element it constrains, however high in the tree the engineer's request began.
+  - *Your words, 2026-10-17 21:26:* "Like, the "players feet must be purple" shouldn't be close to the top of the tree. It would be like, 'game world' -> 'game characters' -> 'player' -> 'player model' -> 'textures' -> 'req: purple feet, approved by human, quotes'."
+    *(Clarifying which requirements carry the engineer's words, and where in the tree they belong.)*
+- ✅ ⤷SYS-41 **AGENT-56** ↑SYS-41 · When the engineer asks for something that existing items already account for, the agent shall add the engineer's words to those items.
+  - *Your words, 2026-10-17 21:58:* "This was helpful: surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework. It's helpful because it can help us weave the graph tighter through conversation, help find conenctions, etc."
+    *(Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.)*
+- 🟡 ⤷SYS-7 **AGENT-12** ↑SYS-7 · When the main agent tries to finish, the toolkit shall run the checker and return each finding to the agent.
   - *Why:* keeps AGENT-3 true even when the agent forgets or doesn't have the skill loaded. In Claude Code this is DR-4. In a harness without that hook, it's an instruction.
   - *Reworded:* round 9: "any findings" became "each finding" (INCOSE R32).
-- 🟡 **AGENT-13** ↑SYS-11 · Each auditor shall be a fresh-context subagent that did not author the change it audits.
+- 🟡 ⤷SYS-11 **AGENT-13** ↑SYS-11 · Each auditor shall be a fresh-context subagent that did not author the change it audits.
   - *Refines:* "it's important that the system engineers who make the requirements are not also the same ones that make the verification items"
   - *Why:* see DR-17. In code-first mode one agent writes the code, tests and spec, so independence has to come from review.
-- 🟡 **AGENT-14** ↑SYS-11 · One auditor shall examine only the pre-existing tests and verification items that the change modified or deleted.
+- 🟡 ⤷SYS-11 **AGENT-14** ↑SYS-11 · One auditor shall examine only the pre-existing tests and verification items that the change modified or deleted.
   - *Why:* new tests mostly add coverage. Edited and deleted tests are where weakening happens.
-- 🟡 **AGENT-15** ↑SYS-21 · An auditor shall probe each new or changed requirement it judges important for ambiguity, by comparing how isolated agents read it.
+- 🟡 ⤷SYS-21 **AGENT-15** ↑SYS-21 · An auditor shall probe each new or changed requirement it judges important for ambiguity, by comparing how isolated agents read it.
   - *Why:* this is the scenario probe from our earlier discussion, used only where it pays off. In round 5 the trigger changed from a critical flag to an importance judgment.
-- 🟡 **AGENT-16** ↑SYS-24 · For each requirement in a change that it judges important, an auditor shall try to describe an implementation that passes the requirement's verification items yet violates it.
+- 🟡 ⤷SYS-24 **AGENT-16** ↑SYS-24 · For each requirement in a change that it judges important, an auditor shall try to describe an implementation that passes the requirement's verification items yet violates it.
   - *Why:* if it succeeds, the verification is too weak. This is a cheap, reasoning-based cousin of mutation testing.
-- 🟡 **AGENT-20** ↑SYS-25 · The toolkit shall refuse agents' direct edits to spec files, naming the CLI command to use instead.
+- 🟡 ⤷SYS-25 **AGENT-20** ↑SYS-25 · The toolkit shall refuse agents' direct edits to spec files, naming the CLI command to use instead.
   - *Why:* agents default to editing files, and a refusal that names the alternative redirects them reliably. In Claude Code this is DR-3.
-- 🟡 **AGENT-31** ↑SYS-11 · An auditor shall compare each changed verification item's tests against its description.
+- 🟡 ⤷SYS-11 **AGENT-31** ↑SYS-11 · An auditor shall compare each changed verification item's tests against its description.
   - *Why:* this catches a test that never matched its description. It runs with the pre-review audits you accepted in Q3.
-- 🟡 **AGENT-34** ↑SYS-14 · A chat approval shall apply only to the items as they were last shown to the engineer.
+- 🟡 ⤷SYS-14 **AGENT-34** ↑SYS-14 · A chat approval shall apply only to the items as they were last shown to the engineer.
   - *Why:* an approval can't cover anything that changed after you looked. In Claude Code it's recorded by DR-6.
-- 🟡 **AGENT-43** ↑SYS-14 · When an approval names its exceptions by description instead of by ID, the toolkit shall leave unapproved every item the description could refer to.
+- 🟡 ⤷SYS-14 **AGENT-43** ↑SYS-14 · When an approval names its exceptions by description instead of by ID, the toolkit shall leave unapproved every item the description could refer to.
   - *Refines:* "I'll more likely just say 'approve everything except {description}, lets workshop that- {feedback}'"
   - *Why:* a described exception has to be interpreted. Resolving every doubt toward "not approved" means a misreading can only hold an item back. It can never approve something you meant to exclude.
+- 🟡 ⤷SYS-37 **AGENT-52** ↑SYS-37 · Once a change is built and tested, the agent shall ask the engineer whether to keep each alteration the change record lists, giving the line that keeps it.
+  - *Why:* the change record lists the alterations (CHANGE-14), and the agent's report is where the engineer answers them.
 - *Removed:*
   - AGENT-26, in round 3.
   - AGENT-5, AGENT-6, AGENT-17 and AGENT-28, in round 5, because they restated SYS-21, SYS-16 and SYS-18.

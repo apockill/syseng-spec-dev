@@ -3,7 +3,8 @@
   spec check [--merge] [--todo] [--json]   report everything unfinished (CHECK-1)
   spec render                               regenerate the Markdown views
   spec show ID                              one item: trace, children, verification, history
-  spec approve ID... --words TEXT           record the engineer's approval (AGENT-21)
+  spec approve ID... --words TEXT [--via]   record the engineer's approval, with who and how (SYS-33)
+  spec propose ID... --why TEXT             propose items for the engineer's explicit approval (SYS-38)
   spec change start|close|show              open and close the change record edits are logged in
   spec edit [--dry-run] < edits.yaml        change the spec (CLI-5 to CLI-8)
   spec decide < decision.yaml               add an open decision with options (CHANGE-10)
@@ -16,12 +17,14 @@ Run from anywhere inside a repository that has spec/toolkit.yaml, or pass --spec
 
 import argparse
 import datetime
+import getpass
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
-from syseng import changes, edit, fingerprint, init, model, render, yamlio
+from syseng import changes, edit, fingerprint, init, model, render, review, yamlio
 from syseng import check as checker
 
 
@@ -34,7 +37,7 @@ def _load(args) -> model.Spec:
 
 def cmd_check(args) -> int:
     spec = _load(args)
-    findings = checker.check(spec, merge=args.merge)
+    findings = checker.check(spec)
     if args.json:
         print(json.dumps([{"code": f.code, "severity": f.severity, "item": f.item, "message": f.message,
                            "file": str(f.file) if f.file else None, "line": f.line} for f in findings], indent=2))
@@ -45,6 +48,14 @@ def cmd_check(args) -> int:
         if args.todo:
             for f in (f for f in findings if f.severity == "todo"):
                 print(f"todo[{f.code}] {f.message}")
+            print()
+        if args.merge:  # CHECK-15: shows what the engineer may want to answer first; never fails because of it
+            pending = review.unanswered(spec)
+            print("Before this branch lands, these alterations await the engineer's answer:" if pending
+                  else "No alteration awaits the engineer's answer.")
+            for cid, alt in pending:
+                print(f"  {changes._label(spec, alt['id'])}: {' and '.join(alt['reasons'])}; altered in {cid}. "
+                      f"Keep it: `{alt['id']} LGTM`")
             print()
         print(checker.summarize(findings))
     return 1 if any(f.severity == "error" for f in findings) else 0
@@ -73,13 +84,19 @@ def cmd_show(args) -> int:
         print(f"{iid} was retired: {retired[0].get('note')}" if retired else f"{iid}: no such item")
         return 1
     d = item.data
-    status = {s["id"]: s["state"] for s in checker.approval_status(spec)}[iid]
     print(f"{iid} [{item.kind}, in {item.element}, origin {d.get('origin') or d.get('decided_by')}, "
-          f"approval: {status}]")
+          f"approval: {review.state_of(spec, iid).state}]")
     print(f"  {d.get('text') or d.get('title') or d.get('description', '')}")
+    print(f"  attention: {review.describe(spec, iid)}")
+    for a in review.history(spec, iid):
+        print(f"  approved {a.get('approved_at') or a.get('approved_on')} by {a.get('by', 'the engineer')} via "
+              f"{a.get('via')}: {' '.join(str(a.get('words', '')).split())}")
     for key in ("source", "why", "refines", "context", "decision"):
         if d.get(key):
             print(f"  {key}: {' '.join(str(d[key]).split())}")
+    for q in d.get("quotes") or []:
+        print(f"  your words, {q.get('said')}: {' '.join(str(q.get('words', '')).split())} "
+              f"[{' '.join(str(q.get('context', '')).split())}]")
     chain, cur = [], item
     while cur is not None and cur.kind == "requirement" and cur.data.get("traces_to"):
         cur = spec.items.get(cur.data["traces_to"])
@@ -132,23 +149,44 @@ def _expand(ids: list[str]) -> list[str]:
     return out
 
 
+def _approver(repo: Path) -> str:
+    """CLI-11: the version-control user name, else the login name."""
+    try:
+        name = subprocess.run(["git", "config", "user.name"], cwd=repo, capture_output=True, text=True,
+                              timeout=10).stdout.strip()
+    except (OSError, subprocess.TimeoutExpired):
+        name = ""
+    return name or getpass.getuser()
+
+
+def _settled(spec: model.Spec, iid: str) -> list[str]:
+    """CLI-12: the resolved decisions that involved an item, so its approval shows what was discussed first."""
+    return [f"{c.id} {d.get('id')}" for c in changes.all_changes(spec) for d in c.data.get("decisions") or []
+            if d.get("status") == "resolved" and iid in (d.get("involves") or [])]
+
+
 def cmd_approve(args) -> int:
     spec = _load(args)
-    ids = _expand(args.ids)
+    ids = list(dict.fromkeys(_expand(args.ids)))
     missing = [i for i in ids if i not in spec.items and i not in spec.elements]
     if missing:
         print(f"spec approve: unknown IDs: {', '.join(missing)}; nothing recorded")
         return 1
-    today = datetime.date.today().isoformat()
-    by_id = {a.get("id"): a for a in spec.approvals}
+    now = datetime.datetime.now().astimezone().isoformat(timespec="minutes")
+    by = args.by or _approver(spec.root.parent)
+    records = list(spec.approvals)  # every approval is kept, oldest first (MODEL-35)
     for iid in ids:
-        if iid in spec.elements:
-            kind, data = "element", spec.elements[iid].data
-        else:
-            kind, data = spec.items[iid].kind, spec.items[iid].data
-        by_id[iid] = {"id": iid, "fingerprint": fingerprint.of(kind, data), "approved_on": today,
-                      "via": args.via, "words": args.words, "text": fingerprint.summary(kind, data)}
-    yamlio.write(spec.root / "approvals.yaml", sorted(by_id.values(), key=lambda a: render._id_key(a["id"])))
+        kind, data = review.kind_and_data(spec, iid)
+        record = {"id": iid, "fingerprint": fingerprint.of(kind, data), "approved_at": now, "by": by,
+                  "via": args.via, "batch": len(ids), "words": args.words}
+        if args.note:
+            record["note"] = args.note
+        if _settled(spec, iid):
+            record["after"] = _settled(spec, iid)
+        record["text"] = fingerprint.summary(kind, data)
+        records.append(record)
+    records.sort(key=lambda a: (render._id_key(a["id"]), str(a.get("approved_at") or a.get("approved_on") or "")))
+    yamlio.write(spec.root / "approvals.yaml", records)
     print(f"approved {len(ids)} item{'s' if len(ids) != 1 else ''}:")
     for iid in ids:
         print(f"  {changes._label(spec, iid) if iid in spec.items else f'{iid} ({spec.elements[iid].title})'}")
@@ -255,6 +293,27 @@ def cmd_resolve(args) -> int:
     return 0
 
 
+def cmd_propose(args) -> int:
+    spec = _load(args)
+    c = changes.current(spec)
+    if c is None:
+        print("spec propose: no change is open")
+        return 1
+    ids = list(dict.fromkeys(_expand(args.ids)))
+    missing = [i for i in ids if i not in spec.items and i not in spec.elements]
+    if missing:
+        print(f"spec propose: unknown IDs: {', '.join(missing)}; nothing recorded")
+        return 1
+    try:
+        changes.add_proposal(c, ids, args.why)
+    except changes.ChangeError as e:
+        print(f"spec propose: {e}")
+        return 1
+    render.write_views(model.load(spec.root))
+    print(f"proposed for the engineer's explicit approval in {c.id}: {', '.join(ids)}")
+    return 0
+
+
 def cmd_friction(args) -> int:
     spec = _load(args)
     c = changes.current(spec)
@@ -313,7 +372,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--spec", help="spec directory (default: find spec/ from here upward)")
     sub = parser.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("check", help="report everything unfinished in the spec")
-    p.add_argument("--merge", action="store_true", help="treat unapproved items as errors (preparing a merge)")
+    p.add_argument("--merge", action="store_true",
+                   help="also list the alterations awaiting the engineer's answer (preparing a merge); never fails "
+                        "because of them")
     p.add_argument("--todo", action="store_true", help="also list to-dos")
     p.add_argument("--json", action="store_true", help="machine-readable output")
     p.set_defaults(fn=cmd_check)
@@ -325,8 +386,15 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("approve", help="record the engineer's approval of items")
     p.add_argument("ids", nargs="+", help="IDs, or ranges like NEED-1..NEED-12")
     p.add_argument("--words", required=True, help="the engineer's words, as evidence")
-    p.add_argument("--via", default="terminal", help="where the approval was given (terminal, chat, page)")
+    p.add_argument("--via", default="terminal", choices=["terminal", "chat", "menu", "page", "restated"],
+                   help="how the engineer gave it; `restated` when they restated what the item says (AGENT-50)")
+    p.add_argument("--by", help="who approved (default: the repository's version-control user name)")
+    p.add_argument("--note", help="anything else about how it was given, such as a pasted reply they confirmed")
     p.set_defaults(fn=cmd_approve)
+    p = sub.add_parser("propose", help="propose items for the engineer's explicit approval, saying why")
+    p.add_argument("ids", nargs="+", help="IDs, or ranges like CHECK-3..CHECK-5")
+    p.add_argument("--why", required=True, help="why these deserve the engineer's attention")
+    p.set_defaults(fn=cmd_propose)
     p = sub.add_parser("change", help="open, close or show the change record edits are logged in")
     p.add_argument("action", choices=["start", "close", "show"])
     p.add_argument("request", nargs="?", help="start: what the engineer asked for, summarized")

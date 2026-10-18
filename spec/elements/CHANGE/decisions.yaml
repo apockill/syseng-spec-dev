@@ -47,3 +47,16 @@
   decision: Each log entry records the fields that changed, before and after, test links included. Meaning-only comparison is kept for deciding when acknowledgments are needed.
   alternatives: Logging meaning only, which hides test changes from auditors.
   consequences: One entry from round 10 (MODEL-V7's new test links) was logged before this fix, so it carries a reason but no field diff.
+- id: DR-48
+  title: Alterations to the engineer's items are flagged when logged, and answered by approval or rollback
+  decided_by: agent
+  elements:
+  - CHANGE
+  - CLI
+  - CHECK
+  requirements: CHANGE-13, CHANGE-14, CHECK-21
+  recorded: round 12
+  context: SYS-37 asks that each alteration to what the engineer approved, wrote or decided be raised after the work is built and tested, and the engineer described rolling back what they care about.
+  decision: When an edit changes the meaning of such an item, the change log records why it counts (approved, their words, their decision) and the item's fingerprints before and after. Before applying it, the CLI asks the agent to acknowledge it. The alteration stays listed in the change record, and as a to-do, until the engineer approves the item as it now is (kept), or it's back to its earlier content (rolled back). A removed item is listed but can't be kept by approval.
+  alternatives: Comparing against git history, which the toolkit doesn't read and which can't tell why an item counts. An explicit "answered" flag, which an agent could set without the engineer.
+  consequences: Alterations logged before round 12 carry no flag, so the mechanism starts with this round. Keeping an alteration is one line from the engineer, such as `CHECK-14 LGTM`.

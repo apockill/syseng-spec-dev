@@ -7,7 +7,7 @@ requirements, then each system element.
 
 from pathlib import Path
 
-from syseng import changes, fingerprint
+from syseng import changes, review
 from syseng.model import Item, Spec
 
 MARK = {"engineer": "✅", "agent": "🟡"}
@@ -35,14 +35,23 @@ def write_views(spec: Spec) -> list[Path]:
 
 
 # ---------------------------------------------------------------- helpers
-def _approved(spec: Spec, item_id: str, kind: str, data: dict) -> bool:
-    a = spec.approval_for(item_id)
-    return bool(a) and a.get("fingerprint") == fingerprint.of(kind, data)
-
-
 def _marks(spec: Spec, item: Item) -> str:
+    """Whose words an item is, and its review state (REVIEW-16)."""
     mark = MARK.get(item.data.get("origin") or item.data.get("decided_by"), "❔")
-    return mark + (" 🔒" if _approved(spec, item.id, item.kind, item.data) else "")
+    s = review.state_of(spec, item.id)
+    state = {review.APPROVED: " 🔒", review.CHANGED: " 🔓", review.DELEGATED: f" ⤷{s.under}"}.get(s.state, "")
+    return mark + state
+
+
+def _quote_lines(item: Item) -> list[str]:
+    """The engineer's exact words, with when they said them and what was being discussed (REVIEW-17)."""
+    out = []
+    for q in item.data.get("quotes") or []:
+        if isinstance(q, dict):
+            out += _indent_block(f"\"{q.get('words', '')}\"", f"  - *Your words, {q.get('said', '')}:* ", "    ")
+            if q.get("context"):
+                out.append(f"    *({q['context']})*")
+    return out
 
 
 def _indent_block(text: str, first_prefix: str, rest_indent: str) -> list[str]:
@@ -79,7 +88,7 @@ def _item_lines(spec: Spec, item: Item, children: dict[str, list[str]]) -> list[
             ups = ["derived"]
         arrow = f" ↑{', '.join(ups)}" if ups else ""
         head = f"- {_marks(spec, item)} **{item.id}**{arrow} · {d.get('text', '')}"
-    lines = [head]
+    lines = [head] + _quote_lines(item)
     for key, label in SUBFIELDS:
         if d.get(key):
             lines += _indent_block(d[key], f"  - *{label}:* ", "    ")
@@ -95,12 +104,13 @@ def _counts(spec: Spec) -> str:
     element_reqs = spec.of_kind("requirement")
     all_items = needs + system + constraints + element_reqs
     confirmed = sum(1 for i in all_items if i.data.get("origin") == "engineer")
-    approved = sum(1 for i in all_items if _approved(spec, i.id, i.kind, i.data))
+    states = [review.state_of(spec, i.id).state for i in all_items]
     top = len(needs) + len(system) + len(constraints)
     return (f"**{len(needs)} needs · {len(system)} system requirements · {len(constraints)} constraints · "
             f"{len(element_reqs)} system-element requirements** ({confirmed} confirmed, "
-            f"{len(all_items) - confirmed} need review, {approved} approved). "
-            f"The layer to read is the first three: {top} items.")
+            f"{len(all_items) - confirmed} need review; {states.count(review.APPROVED)} approved, "
+            f"{states.count(review.CHANGED)} changed since approval, {states.count(review.DELEGATED)} delegated, "
+            f"{states.count(review.UNREVIEWED)} unreviewed). The layer to read is the first three: {top} items.")
 
 
 def _latest_change(spec: Spec) -> str | None:
@@ -118,9 +128,11 @@ def _change_key(name: str):
 # ---------------------------------------------------------------- requirements view
 INTRO = """Read top-down. The **needs** say what you want, and the **system requirements** say what the toolkit as a whole shall do; together they're the layer to read. Drill into a system element only where you care.
 
-- ✅ **CONFIRMED**: from your words. The line under it is my source. Quotes keep your words with typos fixed; "…" marks a cut and [brackets] a substitution.
+- ✅ **CONFIRMED**: from your words. *Your words* lines quote you exactly, with when you said them and what we were discussing. Older items quote you under *Source*, with typos fixed; "…" marks a cut and [brackets] a substitution.
 - 🟡 **NEEDS REVIEW**: I added it, or I added substance to something you asked for (a number, a mechanism, a scope). *Why* gives my reasoning; *Refines* names the ask it builds on.
 - 🔒 **APPROVED**: you approved this exact text (see [approvals.yaml](approvals.yaml)).
+- 🔓 **CHANGED**: you approved an earlier version, and it has changed since.
+- ⤷ **DELEGATED**: not approved itself, but under the item named, which you approved. An agent may change it while that item still holds.
 - **↑** marks what an item traces to: a requirement's parent, or the needs a system requirement serves."""
 
 
@@ -200,7 +212,7 @@ These are the decisions made while designing and building the toolkit, each atta
 
 - ✅ marks a decision you made.
 - 🟡 marks a decision an agent made, which needs your review.
-- 🔒 marks a decision you've approved."""
+- 🔒 marks a decision you've approved, 🔓 one that changed since you approved it, and ⤷ one delegated under an item you approved."""
 
 DECISION_FIELDS = [("status", "Status"), ("context", "Context"), ("decision", "Decision"),
                    ("alternatives", "Alternatives"), ("consequences", "Consequences")]

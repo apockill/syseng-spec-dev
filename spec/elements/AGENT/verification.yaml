@@ -109,3 +109,19 @@
   tests:
     python:
     - tests/test_skill.py::test_skill_tells_agents_to_give_the_exact_approval_line
+- id: AGENT-V10
+  verifies:
+  - AGENT-50
+  - AGENT-51
+  - AGENT-52
+  - AGENT-53
+  - AGENT-54
+  - AGENT-55
+  - AGENT-56
+  method: inspection
+  technique: unit test
+  origin: agent
+  description: The skill tells agents to propose items for approval, most consequential first; to ask about each alteration with the line that keeps it; to quote the engineer's reasoning with a context line that only frames it; to place requirements by the system element they constrain; to add the engineer's words to the items that already cover a request; and to record restatements as approvals.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_teaches_the_approval_model

@@ -37,3 +37,15 @@
   decision: The rules page is part of the skill. A finding links to the toolkit's own copy inside the toolkit's repository, else to the copy `spec init` installed, else to the page inside the installed package.
   alternatives: A web address, which needs hosting and can disagree with the installed version.
   consequences: In every repository the toolkit has set up, links are relative paths an editor can open.
+- id: DR-47
+  title: An item's ancestors, for delegation, are what it traces to
+  decided_by: agent
+  elements:
+  - CHECK
+  requirements: CHECK-18, CHECK-19
+  recorded: round 12
+  context: Delegation needs a definition of "above" that covers every kind of item (DR-44).
+  decision: |-
+    An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest approved ancestor. An item that changed since its own approval isn't delegated: its change awaits the engineer. Nothing about the result is stored.
+  alternatives: Delegating only through the requirement tree, which would leave every verification item, decision record and element unreviewed.
+  consequences: Approving a need delegates everything beneath it, including system requirements. The agent's proposals (SYS-38) are how key items still reach the engineer.

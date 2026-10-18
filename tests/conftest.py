@@ -51,11 +51,11 @@ class SpecBuilder:
     def load(self) -> model.Spec:
         return model.load(self.root)
 
-    def findings(self, merge: bool = False) -> list[check.Finding]:
-        return check.check(self.load(), merge=merge)
+    def findings(self) -> list[check.Finding]:
+        return check.check(self.load())
 
-    def codes(self, merge: bool = False, severity: str = "error") -> list[str]:
-        return [f.code for f in self.findings(merge) if f.severity == severity]
+    def codes(self, severity: str = "error") -> list[str]:
+        return [f.code for f in self.findings() if f.severity == severity]
 
 
 @pytest.fixture

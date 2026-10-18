@@ -121,3 +121,16 @@
   tests:
     python:
     - tests/test_check_structure.py::test_invalid_verification_item_is_reported
+- id: MODEL-V12
+  verifies:
+  - MODEL-34
+  - MODEL-35
+  - CLI-11
+  method: test
+  technique: unit test
+  origin: agent
+  description: Approving two items together, then one of them again by restatement, keeps both approvals of it, oldest first, each with the approver, the channel, the date and time, the number of items approved together, the engineer's words and any note. Showing the item lists every approval. With no approver named, the version-control user name is recorded.
+  tests:
+    python:
+    - tests/test_review.py::test_every_approval_is_kept_with_who_and_how
+    - tests/test_review.py::test_the_approver_defaults_to_the_version_control_user

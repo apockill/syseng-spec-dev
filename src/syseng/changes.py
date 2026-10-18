@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from syseng import yamlio
+from syseng import review, yamlio
 from syseng.model import Spec
 
 MODES = ("code-first", "spec-first")
@@ -140,12 +140,22 @@ def log_friction(change: Change, workaround: str, proposal: str) -> None:
     change.save()
 
 
+def add_proposal(change: Change, ids: list[str], why: str) -> None:
+    """SYS-38: an agent proposes items for the engineer's explicit approval, saying why they deserve it."""
+    if not (why or "").strip():
+        raise ChangeError("say why these items deserve the engineer's attention (AGENT-40)")
+    change.data.setdefault("proposals", []).append(
+        {"ids": ids, "why": why, "proposed": datetime.datetime.now().astimezone().isoformat(timespec="minutes")})
+    change.save()
+
+
 # ---------------------------------------------------------------- view
 def _label(spec: Spec, item_id: str) -> str:
     """An ID with a short title, so nobody has to look it up (AGENT-44)."""
     item = spec.items.get(item_id)
     if item is None:
-        return item_id
+        element = spec.elements.get(item_id)
+        return f"{item_id} ({element.title}, a system element)" if element and element.title else item_id
     text = str(item.data.get("title") or item.data.get("text") or item.data.get("description") or "")
     words = text.split()
     short = " ".join(words[:9]) + ("…" if len(words) > 9 else "")
@@ -194,6 +204,7 @@ def view(spec: Spec, change: Change) -> str:
     if open_ds:
         out += ["", f"To accept every recommendation: `spec resolve {' '.join(x['id'] for x in open_ds)} "
                     f"--words \"<your words>\"`.", ""]
+    out += _alterations_section(spec, change) + _proposals_section(spec, change)
     resolved = [x for x in decisions if x.get("status") == "resolved"]
     if resolved:
         out += ["## Resolved decisions", ""]
@@ -234,10 +245,58 @@ def _is_block(value) -> bool:
     return isinstance(value, str) and "\n" in value.strip()
 
 
+def _alterations_section(spec: Spec, change: Change) -> list[str]:
+    """CHANGE-14: what this change altered among the items the engineer approved, wrote or decided."""
+    alts = review.alterations(spec, change)
+    if not alts:
+        return []
+    out = ["## Alterations awaiting your answer", ""]
+    pending = [a for a in alts if not a["answered"] and not a["removed"]]
+    if pending:
+        out += ["This change altered items you approved, wrote or decided. Keep each one with the line shown, "
+                "or ask for it to be rolled back.", ""]
+    else:
+        out += ["None left.", ""]
+    for a in pending:
+        out.append(f"- **{_label(spec, a['id'])}**, because {' and '.join(a['reasons'])}. Keep it: "
+                   f"`{a['id']} LGTM`")
+        out += [f"  - {e.get('reason', '')}" for e in a["entries"]]
+    removed = [a["id"] for a in alts if a["removed"]]
+    if removed:
+        out.append(f"- *Removed:* {', '.join(removed)}. Say if any should come back.")
+    answered = [f"{a['id']} ({'rolled back' if a['rolled_back'] else 'kept'})" for a in alts if a["answered"]]
+    if answered:
+        out.append(f"- *Answered:* {', '.join(answered)}")
+    return out + [""]
+
+
+def _proposals_section(spec: Spec, change: Change) -> list[str]:
+    """CHANGE-15: items an agent proposed for the engineer's explicit approval, in the order proposed."""
+    proposals = change.data.get("proposals") or []
+    if not proposals:
+        return []
+    out, pending = ["## Proposed for your explicit approval", ""], []
+    for p in proposals:
+        ids = [i for i in p.get("ids") or [] if review.kind_and_data(spec, i)]
+        waiting = [i for i in ids if review.state_of(spec, i).state != review.APPROVED]
+        pending += [i for i in waiting if i not in pending]
+        done = "" if waiting else " *(approved)*"
+        out.append(f"- {', '.join(_label(spec, i) for i in ids)}: {p.get('why', '')}{done}")
+    if pending:
+        out += ["", f"To approve the ones still waiting: `approve {', '.join(pending)}`"]
+    return out + [""]
+
+
 def _one_line(value) -> str:
     if isinstance(value, list):
-        return ", ".join(str(v) for v in value)
+        return ", ".join(_quote_line(v) if isinstance(v, dict) else str(v) for v in value)
     return " ".join(str(value).split())
+
+
+def _quote_line(q: dict) -> str:
+    """A quote on one line: the engineer's words, then when and about what (MODEL-36)."""
+    words = " ".join(str(q.get("words", "")).split())
+    return f"\"{words}\" ({q.get('said', '')}; {' '.join(str(q.get('context', '')).split())})"
 
 
 def write_views(spec: Spec) -> list[Path]:

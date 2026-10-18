@@ -36,7 +36,7 @@
   source: |-
     "hey, you had to change a verification item but didn't change a req - did you forget?"
 - id: CHECK-14
-  text: The checker shall report as unapproved each item that has no approval, or whose content no longer matches its approval's fingerprint.
+  text: The checker shall report each item whose content no longer matches the fingerprint of its latest approval.
   origin: engineer
   traces_to: SYS-14
   source: |-
@@ -94,3 +94,23 @@
   refines: |-
     "Remember not to waste too many tokens though. Like everything, there must be balance."
   why: a spec with twenty vague words shouldn't produce twenty copies of the same lesson.
+- id: CHECK-18
+  text: The checker shall classify each item as approved, changed since approval, delegated under its nearest approved ancestor, or unreviewed, from the approvals and the trace graph each time it runs.
+  traces_to: SYS-34
+  origin: agent
+  why: the classification is computed and never stored (SYS-40). DR-47 says which items count as an item's ancestors.
+- id: CHECK-19
+  text: The checker shall report as a to-do each item that is unreviewed or changed since approval.
+  traces_to: SYS-34
+  origin: agent
+  why: delegated items are the agent's to decide (DR-44), so they aren't the engineer's to-dos. This turned 228 to-dos in this repository into 20.
+- id: CHECK-20
+  text: The checker shall report each quote that lacks the engineer's words, the date and time they were said, or a summary of what was being discussed.
+  traces_to: SYS-35
+  origin: agent
+  why: a quote without its date or its context loses what makes it signal (MODEL-36).
+- id: CHECK-21
+  text: The checker shall report as a to-do each alteration to an item the engineer approved, wrote or decided that the engineer has not kept or had rolled back.
+  traces_to: SYS-37
+  origin: agent
+  why: an alteration nobody has answered is exactly what the engineer wants surfaced (NEED-17). The merge check lists these too (CHECK-15).

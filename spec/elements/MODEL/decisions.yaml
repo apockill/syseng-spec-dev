@@ -148,3 +148,28 @@
     Before migrating, every old fingerprint was checked against the Markdown, and all 69 matched. The approvals were then re-fingerprinted, with each old value kept as `migrated_from`.
   alternatives: Asking the engineer to re-approve 69 unchanged items. Fingerprinting the raw YAML, which would let a formatting change un-approve an item.
   consequences: Re-formatting or re-linking an item never un-approves it, and rewording it always does. One old fingerprint, NEED-12's, had also covered the heading of the next section, because of a parsing bug in my interim scripts. Its new fingerprint covers just the need and its context.
+- id: DR-45
+  title: Approvals are kept as a history, each with who and how
+  decided_by: agent
+  elements:
+  - MODEL
+  - CLI
+  requirements: MODEL-34, MODEL-35, CLI-11, CLI-12
+  recorded: round 12
+  context: The approvals file held one record per item, so approving again overwrote the earlier record and its words. SYS-33 asks what an approval says about who and how, and SYS-39 asks for history.
+  decision: Every approval is appended, never replaced, and each records the approver, the channel (terminal, chat, menu, page or restated), the date and time, how many items were approved together, the engineer's words, an optional note, and the resolved decisions that involved the item. An item's current approval is any record whose fingerprint matches its content, the latest one first.
+  alternatives: One record per item with a list of past approvals inside it, which makes the file harder to read in a diff. A separate history file, which splits what one approval means across two places.
+  consequences: The approvals file grows with every approval. Records from before round 12 lack the new fields, and the toolkit treats the missing fields as unknown.
+- id: DR-46
+  title: The engineer's words go in a quotes list beside the older source field
+  decided_by: agent
+  elements:
+  - MODEL
+  - CHECK
+  - REVIEW
+  requirements: MODEL-36, CHECK-20, REVIEW-17
+  recorded: round 12
+  context: SYS-35 asks for the engineer's exact words with the date and time and the context. Existing items keep their words in a free-text `source` field, often with typos fixed and without dates.
+  decision: Items take a `quotes` list, each with `said`, `words` and `context`, and the checker requires all three. Existing `source` fields stay as they are. They aren't migrated, because their dates and contexts were never recorded and filling them in would mean inventing them.
+  alternatives: Migrating every `source` field with guessed dates, which would put invented metadata next to the engineer's words.
+  consequences: Two places hold the engineer's words until older items are revisited. The requirements view shows both, and its legend explains the difference.

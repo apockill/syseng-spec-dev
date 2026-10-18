@@ -2,7 +2,7 @@ request: |-
   Approvals carry their signal: who approved each item and how, what is delegated under an approval, the engineer's words kept on the requirements they inform, and changes to locked items raised with the engineer
 mode: spec-first
 target: python
-status: open
+status: closed
 opened: '2026-10-17'
 entries:
 - op: modify
@@ -329,6 +329,551 @@ entries:
     AGENT-V4: still verifies the hook's ID-only approvals. Restatement approvals are recorded by the agent, and no verification item covers them yet.
     DR-6: unchanged. The hook records lines that approve by ID, and the agent records the rest, now including restatements.
     DR-41: unchanged. The hook never interprets restatements; the agent does (AGENT-50).
+- op: add
+  id: MODEL-34
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-33 for the build.
+  after:
+    text: Each approval record shall hold the approver, the channel, the date and time, the number of items approved in the same action, the engineer's words, and the fingerprint of the content approved.
+    traces_to: SYS-33
+    origin: agent
+    why: SYS-33 lists what an approval must show. The channel is the review page, the terminal, chat, a harness menu or a restatement (AGENT-50).
+- op: add
+  id: MODEL-35
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-39 for the build.
+  after:
+    text: The spec shall keep every approval of an item, oldest first.
+    traces_to: SYS-39
+    origin: agent
+    why: an item approved several times, or approved again after a change, carries more signal than a single approval, and the dates show how fresh each approval is.
+- op: add
+  id: MODEL-36
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-35 for the build.
+  after:
+    text: A quote shall hold the engineer's exact words, the date and time the engineer said them, and a summary of what was being discussed.
+    traces_to: SYS-35
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 20:31
+      words: I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things.
+      context: Discussing where the engineer's words should be kept on the requirements.
+- op: add
+  id: CHECK-18
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-34 for the build.
+  after:
+    text: The checker shall classify each item as approved, changed since approval, delegated under its nearest approved ancestor, or unreviewed, from the approvals and the trace graph each time it runs.
+    traces_to: SYS-34
+    origin: agent
+    why: the classification is computed and never stored (SYS-40). DR-47 says which items count as an item's ancestors.
+- op: add
+  id: CHECK-19
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-34 for the build.
+  after:
+    text: The checker shall report as a to-do each item that is unreviewed or changed since approval.
+    traces_to: SYS-34
+    origin: agent
+    why: delegated items are the agent's to decide (DR-44), so they aren't the engineer's to-dos. This turned 228 to-dos in this repository into 20.
+- op: add
+  id: CHECK-20
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-35 for the build.
+  after:
+    text: The checker shall report each quote that lacks the engineer's words, the date and time they were said, or a summary of what was being discussed.
+    traces_to: SYS-35
+    origin: agent
+    why: a quote without its date or its context loses what makes it signal (MODEL-36).
+- op: add
+  id: CHECK-21
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-37 for the build.
+  after:
+    text: The checker shall report as a to-do each alteration to an item the engineer approved, wrote or decided that the engineer has not kept or had rolled back.
+    traces_to: SYS-37
+    origin: agent
+    why: an alteration nobody has answered is exactly what the engineer wants surfaced (NEED-17). The merge check lists these too (CHECK-15).
+- op: add
+  id: CHANGE-13
+  at: 2026-10-17T22:25-07:00
+  reason: answers the engineer's comment on SYS-37.
+  after:
+    text: An item shall count as approved, written or decided by the engineer when it has an approval record, when its origin is the engineer or it quotes the engineer, or when it is a decision record the engineer made.
+    traces_to: SYS-37
+    origin: agent
+    why: |-
+      the engineer, approving SYS-37: "'approved, wrote or decided.' is kind of vague. Maybe child reqs specify this further." This pins it down.
+- op: add
+  id: CHANGE-14
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-37 for the build.
+  after:
+    text: Each change record shall list each alteration the change made to an item the engineer approved, wrote or decided, with the line that keeps it, until the engineer keeps it or it is rolled back.
+    traces_to: SYS-37
+    origin: agent
+    why: the change record is where the engineer reviews a change, so the alterations to answer belong at its top, right after open decisions.
+- op: add
+  id: CHANGE-15
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-38 for the build.
+  after:
+    text: Each change record shall list the items proposed for the engineer's explicit approval, in the order proposed, each with its reason, followed by one line that approves those still waiting.
+    traces_to: SYS-38
+    origin: agent
+    why: a proposal made mid-change survives the conversation, and the engineer can approve every waiting item at once.
+- op: add
+  id: CHANGE-16
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-39 for the build.
+  after:
+    text: Each change-log entry shall record the date and time of the edit.
+    traces_to: SYS-39
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 22:12
+      words: Timestamps and history of changes is important, so the agent can see some decisions are old, some are newer, and will know what is more likely 'ok to change' and what is likely 'fresh, and representative of the latest direction'
+      context: Approving SYS-39, which shows agents an item's approval and history before they change it.
+- op: add
+  id: CLI-11
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-33 for the build.
+  after:
+    text: When no approver is named, the CLI shall record as approver the user name configured for the repository's version control.
+    traces_to: SYS-33
+    origin: agent
+    why: who approved is part of SYS-33, and the version-control user name is one the engineer has already set.
+- op: add
+  id: CLI-12
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-33 for the build.
+  after:
+    text: When recording an approval, the CLI shall record each resolved decision that involved the item.
+    traces_to: SYS-33
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 18:30
+      words: Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful.
+      context: Discussing which kinds of approval carry more signal.
+- op: add
+  id: CLI-13
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-39 for the build.
+  after:
+    text: Before applying an edit, and when showing an item, the CLI shall show the item's review state, its approvals with their channels, whether it carries the engineer's words or decision, its last edit and number of edits, the discussions that involved it, and how many items link to it.
+    traces_to: SYS-39
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 22:12
+      words: |-
+        I think whats better reflective of what I'm trying to say is 'metrics that can represent importance are surfaced to the llm in interfaces where it would be useful (last edit, # of discussion, approval types, # of context links, etc...) but not "IMPORTANT" or "NOT IMPORTANT" classification or scoring.
+      context: Approving SYS-40, which rules out a stored importance score.
+- op: add
+  id: CLI-14
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-38 for the build.
+  after:
+    text: The CLI shall record in the open change an agent's proposal that the engineer approve items, with the agent's reason.
+    traces_to: SYS-38
+    origin: agent
+    why: SYS-38 needs the proposals kept somewhere the engineer reviews, and the change record is that place.
+- op: add
+  id: REVIEW-16
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-34 for the build.
+  after:
+    text: The requirements view shall mark each item that is approved, changed since approval or delegated, naming for each delegated item the approved item above it.
+    traces_to: SYS-34
+    origin: agent
+    why: SYS-34 asks every view to show the state. Naming the approved item tells the reader which approval covers it.
+- op: add
+  id: REVIEW-17
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-35 for the build.
+  after:
+    text: The requirements view shall show each quote with the date and time it was said and the summary of what was being discussed.
+    traces_to: SYS-35
+    origin: agent
+    why: SYS-35 keeps the date and the context so readers can see them.
+- op: add
+  id: AGENT-51
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-38 for the build.
+  after:
+    text: The agent shall propose for explicit approval each item that records a choice between alternatives, and each item that other items depend on.
+    traces_to: SYS-38
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 20:01
+      words: Then the idea here being that LLMs can fish for approval on key requirements, but humans don't _have_ to read all the requiremnets for everything (for example, business logic around 'when this button is clicked, X shall occur' is less interesting than two or three layers up the tree 'the X interface shall enable user to do Y'.
+      context: Discussing whether approval could pass down the requirement tree.
+- op: add
+  id: AGENT-52
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-37 for the build.
+  after:
+    text: Once a change is built and tested, the agent shall ask the engineer whether to keep each alteration the change record lists, giving the line that keeps it.
+    traces_to: SYS-37
+    origin: agent
+    why: the change record lists the alterations (CHANGE-14), and the agent's report is where the engineer answers them.
+- op: add
+  id: AGENT-53
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-35 for the build.
+  after:
+    text: The agent shall quote the engineer's reasoning wherever the engineer gave it, not only the engineer's assent.
+    traces_to: SYS-35
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 20:31
+      words: The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things. But for example, in the above paragraph I gave a lot of reasoning. That could go somewhere, and the context summary would provide more info.
+      context: Discussing where the engineer's words should be kept on the requirements.
+- op: add
+  id: AGENT-54
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-35 for the build.
+  after:
+    text: A quote's summary shall say only what was being discussed.
+    traces_to: SYS-35
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 20:31
+      words: The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things.
+      context: Discussing where the engineer's words should be kept on the requirements.
+- op: add
+  id: AGENT-55
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-36 for the build.
+  after:
+    text: The agent shall place each requirement the engineer states in detail under the system element it constrains, however high in the tree the engineer's request began.
+    traces_to: SYS-36
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 21:26
+      words: |-
+        Like, the "players feet must be purple" shouldn't be close to the top of the tree. It would be like, 'game world' -> 'game characters' -> 'player' -> 'player model' -> 'textures' -> 'req: purple feet, approved by human, quotes'.
+      context: Clarifying which requirements carry the engineer's words, and where in the tree they belong.
+- op: add
+  id: AGENT-56
+  at: 2026-10-17T22:25-07:00
+  reason: refines SYS-41 for the build.
+  after:
+    text: When the engineer asks for something that existing items already account for, the agent shall add the engineer's words to those items.
+    traces_to: SYS-41
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 21:58
+      words: |-
+        This was helpful: surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework. It's helpful because it can help us weave the graph tighter through conversation, help find conenctions, etc.
+      context: Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.
+- op: modify
+  id: SYS-39
+  at: 2026-10-17T22:25-07:00
+  reason: the engineer's comment when approving SYS-39.
+  after:
+    quotes:
+    - said: 2026-10-17 22:12
+      words: Timestamps and history of changes is important, so the agent can see some decisions are old, some are newer, and will know what is more likely 'ok to change' and what is likely 'fresh, and representative of the latest direction'
+      context: Approving SYS-39.
+- op: modify
+  id: SYS-40
+  at: 2026-10-17T22:25-07:00
+  reason: the engineer's comment when approving SYS-40.
+  after:
+    quotes:
+    - said: 2026-10-17 22:12
+      words: |-
+        I'm open to this. If you think there's a way to quantify importance, sure. I think whats better reflective of what I'm trying to say is 'metrics that can represent importance are surfaced to the llm in interfaces where it would be useful (last edit, # of discussion, approval types, # of context links, etc...) but not "IMPORTANT" or "NOT IMPORTANT" classification or scoring.
+      context: Approving SYS-40.
+- op: modify
+  id: CHECK-14
+  at: 2026-10-17T22:25-07:00
+  reason: CHECK-14 reported every item without an approval. Under delegation (DR-44), an item under an approved item isn't a to-do (CHECK-19), so CHECK-14 keeps only the change detection the engineer asked for.
+  raised:
+  - it carries your words
+  fingerprint_before: 37c7249492f5
+  fingerprint_after: edd78f0eb7a1
+  before:
+    text: The checker shall report as unapproved each item that has no approval, or whose content no longer matches its approval's fingerprint.
+  after:
+    text: The checker shall report each item whose content no longer matches the fingerprint of its latest approval.
+  acks:
+    CHECK-14: narrowed to the change detection your words asked for. Items without an approval are now reported only when nothing above them is approved (CHECK-19).
+    CHECK-V4: its description and tests change in this round, with the merge check (CHECK-15) and the narrowed reporting.
+    DR-31: unchanged. Unreviewed items and changed approvals are still to-dos, not errors.
+- op: modify
+  id: CLI-12
+  at: 2026-10-17T22:25-07:00
+  reason: the quote's time was a guess (18:30); this is the time from the session transcript.
+  before:
+    quotes:
+    - said: 2026-10-17 18:30
+      words: Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful.
+      context: Discussing which kinds of approval carry more signal.
+  after:
+    quotes:
+    - said: 2026-10-17 20:01
+      words: Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful.
+      context: Discussing which kinds of approval carry more signal.
+- op: modify
+  id: CHECK-V4
+  at: 2026-10-17T22:27-07:00
+  reason: CHECK-14 and CHECK-15 changed in round 12 (delegation, and D1 on merging).
+  before:
+    description: Unapproved items are to-dos in a normal check and errors when preparing a merge; an approval for an unknown item is an error.
+    tests:
+      python:
+      - tests/test_approvals.py::test_unapproved_items_block_only_merges
+      - tests/test_approvals.py::test_approval_of_unknown_item_is_reported
+  after:
+    description: An item reworded after its approval is reported as changed since approval; re-linking its tests isn't a change. The merge check passes while items are unreviewed, and says whether any alteration awaits the engineer's answer. An approval for an unknown item is an error.
+    tests:
+      python:
+      - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
+      - tests/test_approvals.py::test_merge_check_never_fails_because_of_approvals
+      - tests/test_approvals.py::test_approval_of_unknown_item_is_reported
+- op: add
+  id: MODEL-V12
+  at: 2026-10-17T22:27-07:00
+  reason: verifies the approval records.
+  after:
+    verifies:
+    - MODEL-34
+    - MODEL-35
+    - CLI-11
+    method: test
+    technique: unit test
+    origin: agent
+    description: Approving two items together, then one of them again by restatement, keeps both approvals of it, oldest first, each with the approver, the channel, the date and time, the number of items approved together, the engineer's words and any note. Showing the item lists every approval. With no approver named, the version-control user name is recorded.
+    tests:
+      python:
+      - tests/test_review.py::test_every_approval_is_kept_with_who_and_how
+      - tests/test_review.py::test_the_approver_defaults_to_the_version_control_user
+- op: add
+  id: CLI-V7
+  at: 2026-10-17T22:27-07:00
+  reason: verifies the settled decisions on approvals.
+  after:
+    verifies:
+    - CLI-12
+    method: test
+    technique: unit test
+    origin: agent
+    description: Approving an item that a resolved decision involved records that decision with the approval.
+    tests:
+      python:
+      - tests/test_review.py::test_an_approval_lists_the_decisions_settled_before_it
+- op: add
+  id: CHECK-V5
+  at: 2026-10-17T22:27-07:00
+  reason: verifies the review states.
+  after:
+    verifies:
+    - CHECK-18
+    - CHECK-19
+    method: test
+    technique: unit test
+    origin: agent
+    description: After the engineer approves a system requirement, its element requirement is delegated one level under it and that requirement's verification item two levels under it, and neither is a to-do. A need with nothing approved above it is unreviewed and a to-do. An item reworded after its own approval is changed, not delegated, and is a to-do.
+    tests:
+      python:
+      - tests/test_review.py::test_items_under_an_approved_item_are_delegated
+      - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
+- op: add
+  id: CHECK-V6
+  at: 2026-10-17T22:27-07:00
+  reason: verifies the quote check.
+  after:
+    verifies:
+    - CHECK-20
+    - MODEL-36
+    method: test
+    technique: unit test
+    origin: agent
+    description: A quote without the summary of what was being discussed is reported.
+    tests:
+      python:
+      - tests/test_review.py::test_quotes_need_words_a_date_and_context
+- op: add
+  id: REVIEW-V5
+  at: 2026-10-17T22:27-07:00
+  reason: verifies the views.
+  after:
+    verifies:
+    - REVIEW-16
+    - REVIEW-17
+    method: test
+    technique: unit test
+    origin: agent
+    description: The requirements view marks an approved item, an item changed since approval, and a delegated item with the item it sits under. It shows a quote with its date and time and its context.
+    tests:
+      python:
+      - tests/test_review.py::test_views_mark_approved_changed_and_delegated_items
+      - tests/test_review.py::test_quotes_are_shown_with_when_and_what_was_discussed
+- op: add
+  id: CHANGE-V7
+  at: 2026-10-17T22:27-07:00
+  reason: verifies alterations awaiting the engineer's answer.
+  after:
+    verifies:
+    - CHANGE-13
+    - CHANGE-14
+    - CHECK-21
+    method: test
+    technique: integration test
+    origin: agent
+    description: Rewording a requirement in the engineer's words needs an acknowledgment first. Once applied, the change record lists it with the line that keeps it, and it's a to-do, until the engineer approves it as reworded, after which it's listed as kept. Rewording it back to its earlier text answers it as rolled back.
+    tests:
+      python:
+      - tests/test_review.py::test_altering_the_engineers_words_is_raised_until_kept
+      - tests/test_review.py::test_rolling_back_an_alteration_answers_it
+- op: add
+  id: CHANGE-V8
+  at: 2026-10-17T22:27-07:00
+  reason: verifies proposals.
+  after:
+    verifies:
+    - CHANGE-15
+    - CLI-14
+    method: test
+    technique: integration test
+    origin: agent
+    description: A proposal with a reason is listed in the change record with one line approving what's still waiting, and is marked approved once the engineer approves it. A proposal without a reason is refused.
+    tests:
+      python:
+      - tests/test_review.py::test_proposals_are_listed_with_reasons_until_approved
+      - tests/test_review.py::test_a_proposal_needs_a_reason
+- op: add
+  id: CLI-V8
+  at: 2026-10-17T22:27-07:00
+  reason: verifies what agents see before a change.
+  after:
+    verifies:
+    - CLI-13
+    - CHANGE-16
+    method: test
+    technique: unit test
+    origin: agent
+    description: An edit's context shows the edited item's review state, such as the approved item it's delegated under. Each logged edit records its date and time.
+    tests:
+      python:
+      - tests/test_review.py::test_an_edit_shows_what_the_agent_should_weigh
+      - tests/test_review.py::test_each_logged_edit_records_when_it_happened
+- op: add
+  id: SYS-V7
+  at: 2026-10-17T22:27-07:00
+  reason: verifies the no-score constraint.
+  after:
+    verifies:
+    - SYS-40
+    method: inspection
+    technique: unit test
+    origin: agent
+    description: No kind of spec item has a field for importance, priority, score or criticality.
+    tests:
+      python:
+      - tests/test_review.py::test_no_importance_score_is_stored
+- op: add
+  id: AGENT-V10
+  at: 2026-10-17T22:27-07:00
+  reason: verifies the skill's guidance.
+  after:
+    verifies:
+    - AGENT-50
+    - AGENT-51
+    - AGENT-52
+    - AGENT-53
+    - AGENT-54
+    - AGENT-55
+    - AGENT-56
+    method: inspection
+    technique: unit test
+    origin: agent
+    description: The skill tells agents to propose items for approval, most consequential first; to ask about each alteration with the line that keeps it; to quote the engineer's reasoning with a context line that only frames it; to place requirements by the system element they constrain; to add the engineer's words to the items that already cover a request; and to record restatements as approvals.
+    tests:
+      python:
+      - tests/test_skill.py::test_skill_teaches_the_approval_model
+- op: add
+  id: DR-45
+  at: 2026-10-17T22:27-07:00
+  reason: design decision of round 12's build.
+  after:
+    title: Approvals are kept as a history, each with who and how
+    decided_by: agent
+    elements:
+    - MODEL
+    - CLI
+    requirements: MODEL-34, MODEL-35, CLI-11, CLI-12
+    recorded: round 12
+    context: The approvals file held one record per item, so approving again overwrote the earlier record and its words. SYS-33 asks what an approval says about who and how, and SYS-39 asks for history.
+    decision: Every approval is appended, never replaced, and each records the approver, the channel (terminal, chat, menu, page or restated), the date and time, how many items were approved together, the engineer's words, an optional note, and the resolved decisions that involved the item. An item's current approval is any record whose fingerprint matches its content, the latest one first.
+    alternatives: One record per item with a list of past approvals inside it, which makes the file harder to read in a diff. A separate history file, which splits what one approval means across two places.
+    consequences: The approvals file grows with every approval. Records from before round 12 lack the new fields, and the toolkit treats the missing fields as unknown.
+- op: add
+  id: DR-46
+  at: 2026-10-17T22:27-07:00
+  reason: design decision of round 12's build.
+  after:
+    title: The engineer's words go in a quotes list beside the older source field
+    decided_by: agent
+    elements:
+    - MODEL
+    - CHECK
+    - REVIEW
+    requirements: MODEL-36, CHECK-20, REVIEW-17
+    recorded: round 12
+    context: SYS-35 asks for the engineer's exact words with the date and time and the context. Existing items keep their words in a free-text `source` field, often with typos fixed and without dates.
+    decision: Items take a `quotes` list, each with `said`, `words` and `context`, and the checker requires all three. Existing `source` fields stay as they are. They aren't migrated, because their dates and contexts were never recorded and filling them in would mean inventing them.
+    alternatives: Migrating every `source` field with guessed dates, which would put invented metadata next to the engineer's words.
+    consequences: Two places hold the engineer's words until older items are revisited. The requirements view shows both, and its legend explains the difference.
+- op: add
+  id: DR-47
+  at: 2026-10-17T22:27-07:00
+  reason: design decision of round 12's build.
+  after:
+    title: An item's ancestors, for delegation, are what it traces to
+    decided_by: agent
+    elements:
+    - CHECK
+    requirements: CHECK-18, CHECK-19
+    recorded: round 12
+    context: Delegation needs a definition of "above" that covers every kind of item (DR-44).
+    decision: |-
+      An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest approved ancestor. An item that changed since its own approval isn't delegated: its change awaits the engineer. Nothing about the result is stored.
+    alternatives: Delegating only through the requirement tree, which would leave every verification item, decision record and element unreviewed.
+    consequences: Approving a need delegates everything beneath it, including system requirements. The agent's proposals (SYS-38) are how key items still reach the engineer.
+- op: add
+  id: DR-48
+  at: 2026-10-17T22:27-07:00
+  reason: design decision of round 12's build.
+  after:
+    title: Alterations to the engineer's items are flagged when logged, and answered by approval or rollback
+    decided_by: agent
+    elements:
+    - CHANGE
+    - CLI
+    - CHECK
+    requirements: CHANGE-13, CHANGE-14, CHECK-21
+    recorded: round 12
+    context: SYS-37 asks that each alteration to what the engineer approved, wrote or decided be raised after the work is built and tested, and the engineer described rolling back what they care about.
+    decision: When an edit changes the meaning of such an item, the change log records why it counts (approved, their words, their decision) and the item's fingerprints before and after. Before applying it, the CLI asks the agent to acknowledge it. The alteration stays listed in the change record, and as a to-do, until the engineer approves the item as it now is (kept), or it's back to its earlier content (rolled back). A removed item is listed but can't be kept by approval.
+    alternatives: Comparing against git history, which the toolkit doesn't read and which can't tell why an item counts. An explicit "answered" flag, which an agent could set without the engineer.
+    consequences: Alterations logged before round 12 carry no flag, so the mechanism starts with this round. Keeping an alteration is one line from the engineer, such as `CHECK-14 LGTM`.
+- op: modify
+  id: DR-44
+  at: 2026-10-17T22:27-07:00
+  reason: the approach is built; the status said it wasn't yet.
+  raised:
+  - you approved it
+  fingerprint_before: 412d2ff133b9
+  fingerprint_after: 1cdaa2bb7b02
+  before:
+    status: proposed in round 12; not built yet.
+  after:
+    status: built in round 12.
+  acks:
+    DR-44: only its status changed, from proposed to built.
 decisions:
 - id: D1
   question: Should anything about approvals stop a branch from landing on master?
@@ -351,3 +896,29 @@ decisions:
   words: Yeah I think its up to the user to decide.
   resolved: '2026-10-17'
 friction: []
+proposals:
+- ids:
+  - CHANGE-13
+  why: |-
+    you asked for it when approving SYS-37: it pins down what counts as approved, written or decided, which decides what gets raised with you
+  proposed: 2026-10-17T22:28-07:00
+- ids:
+  - DR-47
+  why: |-
+    it decides what delegation covers: approving a need delegates everything beneath it, system requirements included, so proposals are how key items still reach you
+  proposed: 2026-10-17T22:28-07:00
+- ids:
+  - SYS
+  why: |-
+    the root system element: approving it delegates the other 12 element definitions, the last unreviewed items apart from decision records
+  proposed: 2026-10-17T22:28-07:00
+- ids:
+  - DR-46
+  why: your older quotes stay in Source without dates or context; only new ones are exact and dated, because back-filling would mean inventing metadata
+  proposed: 2026-10-17T22:28-07:00
+- ids:
+  - DR-45
+  - DR-48
+  why: the mechanics behind approval history and raised alterations; lower stakes, but each was a choice between alternatives
+  proposed: 2026-10-17T22:28-07:00
+closed: '2026-10-17'

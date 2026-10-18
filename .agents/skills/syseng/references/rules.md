@@ -75,12 +75,12 @@ The rationale is what an agent reads first when someone asks why a requirement e
 `origin` says whose idea an item is: `engineer` (from their words) or `agent` (a proposal). The review page uses it to show the engineer what to read (MODEL-14).
 
 <a id="a003"></a>
-### A003: unapproved item (to-do)
-The engineer hasn't approved this item's current content, or it changed after approval (CHECK-14). Approvals are recorded by `.syseng/spec approve`, only from the engineer's own words (AGENT-21).
+### A003: unreviewed item (to-do)
+Nothing covers this item: neither it nor anything above it in the trace graph is approved, or it changed after the engineer approved it (CHECK-19). An item under an approved item is delegated, and isn't a to-do. Approvals are recorded by `.syseng/spec approve`, only from the engineer's own words (AGENT-21).
 
 <a id="a004"></a>
-### A004: unapproved item at merge
-In merge mode (`.syseng/spec check --merge`), unapproved items are errors. Only what the engineer has seen may land on the main branch (CHECK-15).
+### A004: alteration awaiting the engineer's answer (to-do)
+A change altered an item the engineer approved, wrote or decided, and they haven't yet kept the alteration or had it rolled back (CHECK-21). Ask them, giving the line that keeps it, such as `CHECK-3 LGTM`. The merge check lists these before a branch lands, and never fails because of them (CHECK-15).
 
 <a id="a005"></a>
 ### A005: approval for an unknown item

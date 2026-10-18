@@ -15,6 +15,8 @@ The spec reads top-down. The engineer reads the top two layers. The rest is for 
 
 System elements form a tree, one `parent` each, with the system at the root. Reuse goes in `depends_on`, never in a second parent. When an element changes, everything that depends on it is affected.
 
+Place each requirement where the system's structure puts it, not where the engineer's request started. "Make a 3D game where the player's feet are purple" yields high-level requirements near the top and one detail deep in the tree (world → characters → player → model → textures), each quoting the words it expresses.
+
 ## Wording
 
 The checker enforces these rules. Its errors explain each one, and references/rules.md has the details.
@@ -30,7 +32,21 @@ The checker enforces these rules. Its errors explain each one, and references/ru
 - **No code names:** no identifiers, file names or call syntax. A rebuild in another language has to be able to follow the requirement.
 - **No test wording.** How a requirement is checked belongs in a verification item.
 
-Every requirement carries its rationale. Agent proposals use `why:`. The engineer's own words use `source:`, quoting them.
+Every requirement carries its rationale. Agent proposals use `why:`. The engineer's own words go in `quotes:`.
+
+## The engineer's words
+
+Quote the engineer on each requirement their words directly express. Not every requirement needs a quote: most are derived from a few statements.
+
+```yaml
+quotes:
+  - said: 2026-10-17 21:26        # when they said it
+    words: |-                     # exactly what they wrote, typos and all; their reasoning, not just "yes"
+      Like, the "players feet must be purple" shouldn't be close to the top of the tree.
+    context: Discussing where detailed requirements belong.   # what was being discussed, and nothing more
+```
+
+The context line frames the quote. It never adds claims of its own. Older items keep the engineer's words in `source:`.
 
 ## Verification items
 
@@ -44,8 +60,12 @@ System requirements also get system-level verification, such as an end-to-end ru
 
 ## Approvals
 
-The engineer approves meaning: needs, requirements, verification items, decision records and element definitions. Each approval stores a fingerprint of the item's meaning.
-- Rewording an item un-approves it.
-- Re-linking an item's tests doesn't.
+The engineer approves meaning: needs, requirements, verification items, decision records and element definitions. Each approval records who gave it, how (chat, a menu, the terminal, the review page, or a restatement), when, how many items were approved together, the engineer's words, and the decisions settled before it. Every approval is kept, oldest first.
 
-Links the checker can verify need no approval.
+Each item has a review state, computed every time and never stored:
+- **approved:** the engineer approved this exact content;
+- **changed:** they approved an earlier version, and it has changed since;
+- **delegated:** not approved itself, but under an item that is approved. It's yours to decide while that item still holds;
+- **unreviewed:** nothing above it is approved.
+
+Rewording an item changes its state. Re-linking its tests doesn't. Links the checker can verify need no approval.

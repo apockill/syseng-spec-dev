@@ -25,10 +25,11 @@ def test_rewording_unapproves_but_relinking_does_not(spec):
     assert "CORE-1" in {f.item for f in spec.findings() if f.code == "A003"}
 
 
-def test_unapproved_items_block_only_merges(spec):
-    spec.write()
-    assert "A003" in spec.codes(severity="todo") and "A004" not in spec.codes()
-    assert "A004" in spec.codes(merge=True)
+def test_merge_check_never_fails_because_of_approvals(spec, capsys):
+    root = spec.write()
+    assert "A003" in spec.codes(severity="todo")       # nothing is approved, so everything is unreviewed
+    assert cli.main(["--spec", str(root), "check", "--merge"]) == 0
+    assert "No alteration awaits the engineer's answer." in capsys.readouterr().out
 
 
 def test_approval_of_unknown_item_is_reported(spec):

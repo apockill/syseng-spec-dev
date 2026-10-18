@@ -80,7 +80,7 @@
   - AGENT
   requirements: SYS-33, SYS-34, SYS-35, SYS-36, SYS-37, SYS-38, SYS-39, SYS-40
   recorded: round 12 (spec-first)
-  status: proposed in round 12; not built yet.
+  status: built in round 12.
   context: The engineer wants to approve the key points of the requirement tree, let agents decide the rest, and have each later change to what they approved, wrote or decided brought back to them (NEED-14 to NEED-20). Today every item needs approval, and over 200 items are waiting.
   decision: |-
     Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).

@@ -64,3 +64,12 @@ def test_reasoning_check_subagent_starts_clean_and_cannot_read_the_spec():
 def test_auditor_subagent_is_described():
     meta = _frontmatter(init.ADAPTERS / "claude_code/agents/spec-auditor.md")
     assert meta["name"] == "spec-auditor" and meta["description"]
+
+
+def test_skill_teaches_the_approval_model():
+    text = (init.SKILL / "SKILL.md").read_text()
+    assert "{{SPEC}} propose" in text and "most consequential first" in text          # AGENT-51
+    assert "the line that keeps it" in text                                            # AGENT-52
+    assert "not just their \"yes\"" in text and "says only what was being discussed" in text  # AGENT-53, AGENT-54
+    assert "Place each requirement under the system element it constrains" in text     # AGENT-55
+    assert "add the engineer's words to them" in text and "--via <chat|menu|restated>" in text  # AGENT-56, AGENT-50

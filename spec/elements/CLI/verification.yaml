@@ -72,3 +72,25 @@
     - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
     - tests/test_init.py::test_check_reports_installed_files_that_drifted
     - tests/test_init.py::test_machine_launcher_is_kept_unless_replaced
+- id: CLI-V7
+  verifies:
+  - CLI-12
+  method: test
+  technique: unit test
+  origin: agent
+  description: Approving an item that a resolved decision involved records that decision with the approval.
+  tests:
+    python:
+    - tests/test_review.py::test_an_approval_lists_the_decisions_settled_before_it
+- id: CLI-V8
+  verifies:
+  - CLI-13
+  - CHANGE-16
+  method: test
+  technique: unit test
+  origin: agent
+  description: An edit's context shows the edited item's review state, such as the approved item it's delegated under. Each logged edit records its date and time.
+  tests:
+    python:
+    - tests/test_review.py::test_an_edit_shows_what_the_agent_should_weigh
+    - tests/test_review.py::test_each_logged_edit_records_when_it_happened

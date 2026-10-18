@@ -55,3 +55,30 @@
   traces_to: SYS-5
   origin: agent
   why: running setup again is how a repository picks up a newer skill or hook, and it must never overwrite the engineer's own settings, such as their other Claude Code hooks.
+- id: CLI-11
+  text: When no approver is named, the CLI shall record as approver the user name configured for the repository's version control.
+  traces_to: SYS-33
+  origin: agent
+  why: who approved is part of SYS-33, and the version-control user name is one the engineer has already set.
+- id: CLI-12
+  text: When recording an approval, the CLI shall record each resolved decision that involved the item.
+  traces_to: SYS-33
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 20:01
+    words: Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful.
+    context: Discussing which kinds of approval carry more signal.
+- id: CLI-13
+  text: Before applying an edit, and when showing an item, the CLI shall show the item's review state, its approvals with their channels, whether it carries the engineer's words or decision, its last edit and number of edits, the discussions that involved it, and how many items link to it.
+  traces_to: SYS-39
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 22:12
+    words: |-
+      I think whats better reflective of what I'm trying to say is 'metrics that can represent importance are surfaced to the llm in interfaces where it would be useful (last edit, # of discussion, approval types, # of context links, etc...) but not "IMPORTANT" or "NOT IMPORTANT" classification or scoring.
+    context: Approving SYS-40, which rules out a stored importance score.
+- id: CLI-14
+  text: The CLI shall record in the open change an agent's proposal that the engineer approve items, with the agent's reason.
+  traces_to: SYS-38
+  origin: agent
+  why: SYS-38 needs the proposals kept somewhere the engineer reviews, and the change record is that place.

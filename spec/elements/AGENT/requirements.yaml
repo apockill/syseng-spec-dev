@@ -246,3 +246,50 @@
   origin: engineer
   source: |-
     "Since I mentioend "I would like XYZ" and you said "ah that's accounted for in ABC", thats a case where I think "ABC" could be coutned as 'approved' for future notice." (2026-10-17)
+- id: AGENT-51
+  text: The agent shall propose for explicit approval each item that records a choice between alternatives, and each item that other items depend on.
+  traces_to: SYS-38
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 20:01
+    words: Then the idea here being that LLMs can fish for approval on key requirements, but humans don't _have_ to read all the requiremnets for everything (for example, business logic around 'when this button is clicked, X shall occur' is less interesting than two or three layers up the tree 'the X interface shall enable user to do Y'.
+    context: Discussing whether approval could pass down the requirement tree.
+- id: AGENT-52
+  text: Once a change is built and tested, the agent shall ask the engineer whether to keep each alteration the change record lists, giving the line that keeps it.
+  traces_to: SYS-37
+  origin: agent
+  why: the change record lists the alterations (CHANGE-14), and the agent's report is where the engineer answers them.
+- id: AGENT-53
+  text: The agent shall quote the engineer's reasoning wherever the engineer gave it, not only the engineer's assent.
+  traces_to: SYS-35
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 20:31
+    words: The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things. But for example, in the above paragraph I gave a lot of reasoning. That could go somewhere, and the context summary would provide more info.
+    context: Discussing where the engineer's words should be kept on the requirements.
+- id: AGENT-54
+  text: A quote's summary shall say only what was being discussed.
+  traces_to: SYS-35
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 20:31
+    words: The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things.
+    context: Discussing where the engineer's words should be kept on the requirements.
+- id: AGENT-55
+  text: The agent shall place each requirement the engineer states in detail under the system element it constrains, however high in the tree the engineer's request began.
+  traces_to: SYS-36
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 21:26
+    words: |-
+      Like, the "players feet must be purple" shouldn't be close to the top of the tree. It would be like, 'game world' -> 'game characters' -> 'player' -> 'player model' -> 'textures' -> 'req: purple feet, approved by human, quotes'.
+    context: Clarifying which requirements carry the engineer's words, and where in the tree they belong.
+- id: AGENT-56
+  text: When the engineer asks for something that existing items already account for, the agent shall add the engineer's words to those items.
+  traces_to: SYS-41
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 21:58
+    words: |-
+      This was helpful: surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework. It's helpful because it can help us weave the graph tighter through conversation, help find conenctions, etc.
+    context: Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.

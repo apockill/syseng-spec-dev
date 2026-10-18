@@ -318,6 +318,10 @@
   origin: engineer
   source: |-
     "It should feel more comfortable changing things that were less reviewed by humans, and more likely to call out / chat with a human about design over more pivitol historical decisions." (2026-10-17)
+  quotes:
+  - said: 2026-10-17 22:12
+    words: Timestamps and history of changes is important, so the agent can see some decisions are old, some are newer, and will know what is more likely 'ok to change' and what is likely 'fresh, and representative of the latest direction'
+    context: Approving SYS-39.
 - id: SYS-40
   kind: constraint
   text: The spec shall store no measure of an item's importance.
@@ -326,6 +330,11 @@
   origin: engineer
   source: |-
     "I don't want a 'value of decision' marker, but I want all of these to be useful for reasoning over as the LLM does large refactors." (2026-10-17)
+  quotes:
+  - said: 2026-10-17 22:12
+    words: |-
+      I'm open to this. If you think there's a way to quantify importance, sure. I think whats better reflective of what I'm trying to say is 'metrics that can represent importance are surfaced to the llm in interfaces where it would be useful (last edit, # of discussion, approval types, # of context links, etc...) but not "IMPORTANT" or "NOT IMPORTANT" classification or scoring.
+    context: Approving SYS-40.
 - id: SYS-41
   kind: system
   text: When the engineer asks for something that existing items already account for, the toolkit shall name those items to the engineer.

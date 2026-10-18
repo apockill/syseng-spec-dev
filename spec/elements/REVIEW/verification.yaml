@@ -40,3 +40,15 @@
   tests:
     python:
     - tests/test_decisions.py::test_view_puts_open_decisions_first_and_flags_the_engineers_items
+- id: REVIEW-V5
+  verifies:
+  - REVIEW-16
+  - REVIEW-17
+  method: test
+  technique: unit test
+  origin: agent
+  description: The requirements view marks an approved item, an item changed since approval, and a delegated item with the item it sits under. It shows a quote with its date and time and its context.
+  tests:
+    python:
+    - tests/test_review.py::test_views_mark_approved_changed_and_delegated_items
+    - tests/test_review.py::test_quotes_are_shown_with_when_and_what_was_discussed

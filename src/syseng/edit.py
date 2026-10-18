@@ -22,6 +22,7 @@ log every operation, with its reason, in the open change record.
 """
 
 import copy
+import datetime
 import difflib
 import re
 import shutil
@@ -29,17 +30,17 @@ import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from syseng import changes, check, fingerprint, model, render, yamlio
+from syseng import changes, check, fingerprint, model, render, review, yamlio
 from syseng.model import Spec
 
 KIND_FILES = {"need": "needs.yaml", "requirement": "requirements.yaml", "system": "requirements.yaml",
               "constraint": "requirements.yaml", "vi": "verification.yaml", "decision": "decisions.yaml"}
 FIELDS = {
-    "need": {"text", "origin", "source", "context"},
-    "requirement": {"text", "origin", "traces_to", "derived", "why", "source", "refines", "reworded",
+    "need": {"text", "origin", "source", "quotes", "context"},
+    "requirement": {"text", "origin", "traces_to", "derived", "why", "source", "quotes", "refines", "reworded",
                     "allocation_note", "verification_deferred"},
-    "system": {"kind", "text", "origin", "serves", "why", "source", "refines", "reworded", "allocation_note",
-               "verification_deferred"},
+    "system": {"kind", "text", "origin", "serves", "why", "source", "quotes", "refines", "reworded",
+               "allocation_note", "verification_deferred"},
     "vi": {"verifies", "method", "technique", "description", "origin", "tests"},
     "decision": {"title", "decided_by", "elements", "requirements", "recorded", "status", "context",
                  "decision", "alternatives", "consequences"},
@@ -237,11 +238,14 @@ def affected(spec: Spec, touched: list[str], adding: set[str]) -> dict[str, str]
     """Approved or depended-on items an edit affects, each with the reason it's affected."""
     out: dict[str, str] = {}
     approved = {s["id"] for s in check.approval_status(spec) if s["state"] == "approved"}
+    raised = {t: review.engineer_marks(spec, t) for t in touched if t not in adding}
     for t in touched:
         if t in adding:
             continue
         if t in approved:
             out[t] = "you approved it; this edit makes it unapproved again"
+        elif raised.get(t):  # SYS-37: the engineer will be asked about this alteration
+            out[t] = f"{' and '.join(raised[t])}; the change record will ask whether to keep this alteration"
         for r in spec.of_kind("requirement"):
             if r.data.get("traces_to") == t:
                 out.setdefault(r.id, f"refines {t}")
@@ -260,9 +264,9 @@ def affected(spec: Spec, touched: list[str], adding: set[str]) -> dict[str, str]
             if e.parent == t:
                 out.setdefault(e.id, f"is part of {t}")
     for t in touched:  # items edited in the same batch are handled by their own reason
-        if t not in approved:
+        if t not in approved and not raised.get(t):
             out.pop(t, None)
-    return {k: v for k, v in out.items() if k not in touched or k in approved}
+    return {k: v for k, v in out.items() if k not in touched or k in approved or raised.get(k)}
 
 
 def _fingerprint(spec: Spec, item_id: str) -> str | None:
@@ -308,6 +312,8 @@ def _context_lines(before: Spec, after: Spec, ops: list[Op], ids: list[str]) -> 
         parent = (_data(after, iid) or _data(before, iid)).get("traces_to")
         if parent:
             lines.append(f"  refines {changes._label(after, parent)}")
+        if op.op != "add":  # what an agent weighs before changing an item (CLI-13)
+            lines.append(f"  attention: {review.describe(before, iid)}")
     return lines
 
 
@@ -349,8 +355,14 @@ def run(root: Path, doc, dry_run: bool = False) -> Result:
         return result
     apply_ops(root, ops, change.id)
     after = model.load(root)
+    now = datetime.datetime.now().astimezone().isoformat(timespec="minutes")
     for op, iid in zip(ops, ids):
-        entry = {"op": op.op, "id": iid, "reason": op.reason}
+        entry = {"op": op.op, "id": iid, "at": now, "reason": op.reason}  # CHANGE-16
+        marks = review.engineer_marks(spec, iid) if iid in meaningful else []
+        if marks:  # CHANGE-14: listed in the change record until the engineer answers
+            entry["raised"] = marks
+            entry["fingerprint_before"] = _fingerprint(spec, iid)
+            entry["fingerprint_after"] = _fingerprint(after, iid)
         b, a = _diff(_data(spec, iid), _data(after, iid))
         if b:
             entry["before"] = b

@@ -38,4 +38,4 @@ def test_todo_lists_unapproved_items(spec, capsys):
     root = spec.write()
     cli.main(["--spec", str(root), "check", "--todo"])
     out = capsys.readouterr().out
-    assert "todo[A003] CORE-1 is unapproved" in out
+    assert "todo[A003] CORE-1 is unreviewed" in out

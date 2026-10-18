@@ -318,6 +318,18 @@
     Approve all five (Recommended): DR-33 to DR-37
   text: |-
     The change log records every changed field, not just meaning: Each log entry records the fields that changed, before and after, test links included. Meaning-only comparison is kept for deciding when acknowledgments are needed.
+- id: DR-44
+  fingerprint: 412d2ff133b9
+  approved_at: 2026-10-17T22:23-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > DR-44 (the approach): approval works like delegated authority in configuration management.
+    LGTM
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: |-
+    Approval works like delegated authority in configuration management: Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example). - The engineer approves key items explicitly, as a customer approves a baseline. Everything beneath an approved item is delegated: the agent decides it, as a contractor decides the detailed design. - A change that alters an item the engineer approved, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it. - Whether an item is approved, delegated or neither is computed from the approvals and the tree each time it's shown, and never stored (SYS-40). - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
 - id: NEED-1
   fingerprint: f4d032821275
   approved_on: '2026-10-11'
@@ -467,6 +479,17 @@
   via: chat
   words: need 20 lgtm
   text: The engineer needs the requirement tree to follow the system's structure, not the order or framing of their requests.
+- id: NEED-21
+  fingerprint: 369834e05842
+  approved_at: 2026-10-17T22:23-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > NEED-21
+    LGTM
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: The engineer needs agents to point out which existing items already account for what the engineer asks for.
 - id: SYS-1
   fingerprint: d9c7fec31355
   approved_on: '2026-10-11'
@@ -713,3 +736,102 @@
   via: chat
   words: SYS-32 LGTM
   text: The toolkit shall install and run on machines without Nix.
+- id: SYS-33
+  fingerprint: 379f8dd483d6
+  approved_at: 2026-10-17T22:22-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > SYS-33 (approval records): who approved, through which channel, how many items at once, your words, and the decisions you settled before approving.
+    LGTM
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: The toolkit shall record with each approval the approver, the channel, the number of items approved together, the engineer's words, and the decisions the engineer resolved about the item beforehand.
+- id: SYS-34
+  fingerprint: 38b3c18a29da
+  approved_at: 2026-10-17T22:22-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > SYS-34 (approval states): every view shows whether an item is explicitly approved or delegated.
+    LGTM.
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: Each view of an item shall show whether the engineer approved the item explicitly or the item is delegated under an item the engineer approved.
+- id: SYS-35
+  fingerprint: bc517ab91d0e
+  approved_at: 2026-10-17T22:22-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > SYS-35 (your words): your statements are kept on the requirements they express.
+    LGTM. I may drop this some day, I'm not sure I like the idea of committing all this level of rationale.
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: The toolkit shall keep each statement of the engineer word for word on the requirements that directly express it, with the date and time of the statement and a summary of what was being discussed.
+- id: SYS-36
+  fingerprint: 2b87d5a9b908
+  approved_at: 2026-10-17T22:22-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > SYS-36 (tree shape): the tree follows the system's structure, not how you framed a request.
+    LGTM
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: The toolkit shall place each requirement under the system element whose behavior the requirement constrains, whatever the order or framing of the request the requirement came from.
+- id: SYS-37
+  fingerprint: e34fc83dc2da
+  approved_at: 2026-10-17T22:22-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > SYS-37 (raising changes): once a change is built and tested, you're asked about any alteration to what you approved, wrote or decided.
+    LGTM, although 'approved, wrote or decided.' is kind of vague. Maybe child reqs specify this further.
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: Once a change is built and tested, the toolkit shall ask the engineer whether to keep each alteration the change made to an item the engineer approved, wrote or decided.
+- id: SYS-38
+  fingerprint: b5781f925492
+  approved_at: 2026-10-17T22:22-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > SYS-38 (proposals): agents propose items for your approval, with reasons.
+    LGTM
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: The toolkit shall present the items agents propose for the engineer's explicit approval, each with the reason it deserves the engineer's attention, most consequential first.
+- id: SYS-39
+  fingerprint: c23a013c5544
+  approved_at: 2026-10-17T22:22-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > SYS-39 (before changing): agents see an item's approval and history before changing it.
+    LGTM. Timestamps and history of changes is important, so the agent can see some decisions are old, some are newer, and will know what is more likely 'ok to change' and what is likely 'fresh, and representative of the latest direction'
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: Before an agent changes an item, the toolkit shall show the agent whether the engineer approved, wrote or decided the item, and the discussion behind it.
+- id: SYS-40
+  fingerprint: ecc4b86f8ec3
+  approved_at: 2026-10-17T22:23-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > SYS-40 (constraint): no importance score is stored.
+    I'm open to this. If you think there's a way to quantify importance, sure. I think whats better reflective of what I'm trying to say is 'metrics that can represent importance are surfaced to the llm in interfaces where it would be useful (last edit, # of discussion, approval types, # of context links, etc...) but not "IMPORTANT" or "NOT IMPORTANT" classification or scoring. Your SYS-40 is approved, but I wanted to add some color commentary here.
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: The spec shall store no measure of an item's importance.
+- id: SYS-41
+  fingerprint: 767135902e7f
+  approved_at: 2026-10-17T22:23-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: |-
+    > Sys-41
+    LGTM
+  note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
+  text: When the engineer asks for something that existing items already account for, the toolkit shall name those items to the engineer.

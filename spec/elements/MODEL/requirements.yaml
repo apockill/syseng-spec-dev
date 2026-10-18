@@ -175,3 +175,21 @@
   origin: agent
   traces_to: SYS-12
   why: keeps the cheap tier fast enough to run after every change. 60 seconds is a guess, which is why it's configurable.
+- id: MODEL-34
+  text: Each approval record shall hold the approver, the channel, the date and time, the number of items approved in the same action, the engineer's words, and the fingerprint of the content approved.
+  traces_to: SYS-33
+  origin: agent
+  why: SYS-33 lists what an approval must show. The channel is the review page, the terminal, chat, a harness menu or a restatement (AGENT-50).
+- id: MODEL-35
+  text: The spec shall keep every approval of an item, oldest first.
+  traces_to: SYS-39
+  origin: agent
+  why: an item approved several times, or approved again after a change, carries more signal than a single approval, and the dates show how fresh each approval is.
+- id: MODEL-36
+  text: A quote shall hold the engineer's exact words, the date and time the engineer said them, and a summary of what was being discussed.
+  traces_to: SYS-35
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 20:31
+    words: I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things.
+    context: Discussing where the engineer's words should be kept on the requirements.

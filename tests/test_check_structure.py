@@ -47,7 +47,7 @@ def test_unserved_need_is_reported(spec):
                                                   "origin": "engineer", "source": '"gadgets"'})
     spec.write()
     assert "T002" in spec.codes(severity="todo") and "T002" not in spec.codes()
-    assert "1 needs nothing serves yet" in check.summarize(spec.findings())
+    assert "1 need nothing serves yet" in check.summarize(spec.findings())
 
 
 def test_untraced_requirement_is_reported(spec):
