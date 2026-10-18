@@ -4,7 +4,7 @@ Every error the checker reports links here. Each rule says what it checks, why i
 
 The wording rules (W…) come from INCOSE's *Guide to Writing Requirements*, cited by rule number. The guide isn't freely available, so this page explains each rule on its own terms. The wording rules were tuned against this repository's own spec before they shipped (DR-30).
 
-Errors fail `spec check`. To-dos are listed by `spec check --todo` but don't fail it (DR-31).
+Errors fail `.syseng/spec check`. To-dos are listed by `.syseng/spec check --todo` but don't fail it (DR-31).
 
 ## Structure
 
@@ -52,7 +52,7 @@ A requirement that records a design choice rather than an ask can set `derived: 
 
 <a id="t002"></a>
 ### T002: need served by nothing
-No system requirement serves this need, so nothing will ever meet it (MODEL-12). Add one, or ask the engineer whether the need still stands.
+No system requirement serves this need, so nothing will ever meet it (MODEL-12). Add one, or ask the engineer whether the need still stands. It's a to-do rather than an error, because needs can be recorded before the requirements that serve them, as spec-first planning does (DR-31).
 
 <a id="t003"></a>
 ### T003: dangling reference
@@ -76,11 +76,11 @@ The rationale is what an agent reads first when someone asks why a requirement e
 
 <a id="a003"></a>
 ### A003: unapproved item (to-do)
-The engineer hasn't approved this item's current content, or it changed after approval (CHECK-14). Approvals are recorded by `spec approve`, only from the engineer's own words (AGENT-21).
+The engineer hasn't approved this item's current content, or it changed after approval (CHECK-14). Approvals are recorded by `.syseng/spec approve`, only from the engineer's own words (AGENT-21).
 
 <a id="a004"></a>
 ### A004: unapproved item at merge
-In merge mode (`spec check --merge`), unapproved items are errors. Only what the engineer has seen may land on the main branch (CHECK-15).
+In merge mode (`.syseng/spec check --merge`), unapproved items are errors. Only what the engineer has seen may land on the main branch (CHECK-15).
 
 <a id="a005"></a>
 ### A005: approval for an unknown item
@@ -100,7 +100,7 @@ A verification item needs:
 
 <a id="r001"></a>
 ### R001: rendered view out of date
-`requirements.md` and `decisions.md` are generated. A stale view shows the engineer a spec that no longer exists. Run `spec render`, and never edit the views by hand.
+`requirements.md` and `decisions.md` are generated. A stale view shows the engineer a spec that no longer exists. Run `.syseng/spec render`, and never edit the views by hand.
 
 ## Wording
 

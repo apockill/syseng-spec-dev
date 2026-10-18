@@ -79,3 +79,52 @@
   source: |-
     "Agents should be encouraged to modify this skill if the UX can be improved, or if the user is trying to use them in a new way … if an agent has to jump through 16 hoops to get something done, the human will never know, and therefore the skill will never be improved."
   context: agents are the toolkit's heaviest users. When one has to work around the toolkit, you only hear about it if the agent says so, and without that the toolkit never gets better. Agents should also adapt the toolkit when you start using it in a new way.
+- id: NEED-14
+  text: The engineer needs to see who approved each item and how.
+  origin: engineer
+  source: |-
+    "What matters is that in the future we can see WHO approved it and HOW." · "Approved directly by a human on a UI? probably higher value. Approved as part of a batch approve on UI? Lower value. Approved as part of a batch approve on LLM chat? About the same,  maybe slightly lower. Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful." (2026-10-17)
+  context: Asked who should record an approval given by picking an option in a menu. The engineer answered that who records it doesn't matter, and that the record of who approved and how does.
+- id: NEED-15
+  text: The engineer needs to tell which items they approved explicitly and which are delegated under an item they approved.
+  origin: engineer
+  source: |-
+    "As long as its clear what items got explicit approval, and which got approval by proxy, sure." · "Let's use delegated then. It'll imply the LLM chose it, and could be changed in the future, but at least we know where the req fits in the graph." (2026-10-17)
+  context: Asked whether approving an item should delegate everything under it in the requirement tree, and what to call that.
+- id: NEED-16
+  text: The engineer needs their statements kept word for word on the requirements those statements directly express.
+  origin: engineer
+  source: |-
+    "Just to be clear, the goal is not 'every requirement must have a quote'. After all, if I say "make a 3d game that does XYZ" there will be many many requirements spawned from that "the 3d engine must render in xyz time", getting super nitty gritty. However, If I said "make a 3d game that does xyz (high level statement) and make sure the players feet are purple" that might call out two very different parts of the requirement tree (purple feet being much closer to the 'character model' portion of components). So, the goal here is: 'spread out the quotes where applicable, but build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree"." (2026-10-17) · "Also important tto try to document anything I say and divvy it up across the requirements, so if some part of the tree is approved by proxy (therefore more likely to change in the future) but has some quotes from me, then it can be brought up in the future by the LLM if its changed as we add features. It's all about signaling importance and intent of each requirement." · "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things. But for example, in the above paragraph I gave a lot of reasoning. That could go somewhere, and the context summary would provide more info." (2026-10-17)
+  context: Discussing delegated requirements and where the engineer's words should be kept, then clarifying that not every requirement needs a quote.
+- id: NEED-17
+  text: The engineer needs agents to point out, once a change is built and tested, each item the engineer approved, wrote or decided that the change altered, and to ask whether to keep each alteration.
+  origin: engineer
+  source: |-
+    "It means: build and test the change, then say "hey, because of how I did this, XYZ had to change" and ask for permission to change them. It's all about surfacing things- oftentimes the user is like "LGTM, I saw the final product, its fine" but htis is all about surfacing the one thing the user actually cared a lot about "actually I really _do_ care about the camera view sticking in the view when scrolling down, if this has to change let's roll it back and discuss why {commence conversation}"" (2026-10-17)
+  context: Asked what raising a change to an approved item should mean in code-first mode, where the agent never stops to ask (DR-15).
+- id: NEED-18
+  text: The engineer needs to approve the key requirements without reading every requirement, with agents proposing which ones as they work.
+  origin: engineer
+  source: |-
+    "Then the idea here being that LLMs can fish for approval on key requirements, but humans don't _have_ to read all the requiremnets for everything (for example, business logic around 'when this button is clicked, X shall occur' is less interesting than two or three layers up the tree 'the X interface shall enable user to do Y'." · "it should be easy to have LLM propose different nodes in the graph for approval as it works- and take that feedback and 'lock' the requirement in so that in the future its less likely to be changed in sweeping changes (without it being brought up)." (2026-10-17)
+  context: Discussing whether approval could pass down the requirement tree, and whether anything about approvals should block a merge.
+- id: NEED-19
+  text: The engineer needs agents making large changes to weigh each item by the human attention it received.
+  origin: engineer
+  source: |-
+    "Everything about this system is geared towards: 1. documenting decisions 2. documenting the 'signal' these decisions provide. Every piece of software is like a fractal of decisions. If we want humans to have high leverage (produce 1000x more code) while keeping high intellectual control over the system, we need to document the nodes of the fractal." · "I don't want a 'value of decision' marker, but I want all of these to be useful for reasoning over as the LLM does large refactors. It should feel more comfortable changing things that were less reviewed by humans, and more likely to call out / chat with a human about design over more pivitol historical decisions." (2026-10-17)
+  context: Discussing what approval records are for.
+- id: NEED-20
+  text: The engineer needs the requirement tree to follow the system's structure, not the order or framing of their requests.
+  origin: engineer
+  source: |-
+    "However, If I said "make a 3d game that does xyz (high level statement) and make sure the players feet are purple" that might call out two very different parts of the requirement tree (purple feet being much closer to the 'character model' portion of components). So, the goal here is: 'spread out the quotes where applicable, but build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree". Like, the "players feet must be purple" shouldn't be close to the top of the tree. It would be like, 'game world' -> 'game characters' -> 'player' -> 'player model' -> 'textures' -> 'req: purple feet, approved by human, quotes'." (2026-10-17)
+  context: |-
+    Clarifying NEED-16: which requirements carry the engineer's words, and where in the tree those requirements belong.
+- id: NEED-21
+  text: The engineer needs agents to point out which existing items already account for what the engineer asks for.
+  origin: engineer
+  source: |-
+    "This was helpful: surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework. It's helpful because it can help us weave the graph tighter through conversation, help find conenctions, etc." (2026-10-17)
+  context: Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.

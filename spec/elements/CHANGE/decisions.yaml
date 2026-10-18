@@ -21,3 +21,29 @@
   decision: order questions and flags by how likely each answer is to change the spec or the other answers, most consequential first. Each one carries its reasons and a recommended option, and a set can be accepted in one line.
   alternatives: ordering by system element or by ID.
   consequences: the engineer can stop after the top few. The rest can usually be accepted as a block.
+- id: DR-33
+  title: Change records are YAML, one change is open at a time, and every edit needs one
+  decided_by: agent
+  elements:
+  - CHANGE
+  requirements: CHANGE-3, CHANGE-4, CHANGE-5, CHANGE-8, CHANGE-9
+  recorded: round 10 (slice 2)
+  context: Change records were hand-written Markdown, so nothing checked them and reasons were tracked by hand.
+  decision: |-
+    A change record is spec/changes/<date>-round-<N>[-<slug>].yaml, with a generated Markdown view beside it.
+    - `spec change start` opens one, with a summary of the request, the mode (code-first unless named) and the target implementation (the primary one unless named).
+    - At most one change is open at a time, and `spec edit` refuses to run without one.
+    - Rounds 2 to 9 stay as hand-written Markdown, and `spec show` still finds mentions in them.
+  alternatives: Logging edits in git commit messages, which fragments the reasons across commits and the engineer owns git anyway. Several open changes, which forces every edit to name its change.
+  consequences: Every edit's reason lands in one place the engineer reads. Starting a change is one extra command per change.
+- id: DR-37
+  title: The change log records every changed field, not just meaning
+  decided_by: agent
+  elements:
+  - CHANGE
+  requirements: CHANGE-5, AGENT-14, REVIEW-9
+  recorded: round 10 (slice 2)
+  context: The first version logged only meaning fields. A test-link change showed up as an empty diff, and re-pointed tests are exactly where test weakening hides.
+  decision: Each log entry records the fields that changed, before and after, test links included. Meaning-only comparison is kept for deciding when acknowledgments are needed.
+  alternatives: Logging meaning only, which hides test changes from auditors.
+  consequences: One entry from round 10 (MODEL-V7's new test links) was logged before this fix, so it carries a reason but no field diff.

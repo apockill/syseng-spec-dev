@@ -9,3 +9,63 @@
   decision: an edit that touches approved or depended-upon items needs an acknowledgment of each affected item, by name, with a one-line note. Other edits apply at once.
   alternatives: a generic confirmation on every edit, or no confirmation.
   consequences: friction appears only where there's something to weigh, and the notes become reasons the engineer can read.
+- id: DR-34
+  title: An edit runs on a scratch copy first, and only the errors it introduces block it
+  decided_by: agent
+  elements:
+  - CLI
+  - CHECK
+  requirements: CLI-5, CLI-7, SYS-25
+  recorded: round 10 (slice 2)
+  context: The engineer wanted the CLI to intercept edits and surface problems before they land. Pre-existing errors elsewhere in the spec shouldn't block an unrelated edit.
+  decision: |-
+    `spec edit` copies the spec, applies the whole batch there, and runs the checker on the result. An error that wasn't there before rejects the batch, with the usual teaching messages, and nothing is written. Otherwise the batch is applied for real, logged and re-rendered. `--dry-run` stops after the checks.
+  alternatives: Validating each operation on its own, which misses problems that only appear once the whole batch is applied. Rejecting any batch while any error exists, which blocks repairs.
+  consequences: A batch is all or nothing. Copying the spec costs a fraction of a second at this size.
+- id: DR-35
+  title: Acknowledgments are needed only when an item's meaning changes
+  decided_by: agent
+  elements:
+  - CLI
+  requirements: CLI-6
+  recorded: round 10 (slice 2)
+  context: DR-19 asked for named acknowledgments when an edit touches approved or depended-on items. Building it showed that a rationale-only edit, or a re-pointed test link, would have demanded acknowledgments for nothing.
+  decision: |-
+    An edit needs an acknowledgment only when it changes an item's meaning, which its fingerprint detects, or removes the item. The items that need one are:
+    - the item itself, if approved;
+    - the requirements that refine it;
+    - requirements serving it, if it's a need;
+    - the verification items that verify it;
+    - the decision records about it;
+    - for a system element, the elements that depend on it or are part of it.
+    The CLI prints a ready-to-fill `acks:` block, and exits with code 2.
+  alternatives: Acknowledging every touched item, which is pure friction for wording and link edits. No acknowledgments at all, which the engineer ruled out.
+  consequences: The acknowledgment notes land in the change record, as reasons the engineer can read.
+- id: DR-36
+  title: Removing an item retires its ID, and new IDs are allocated automatically
+  decided_by: agent
+  elements:
+  - CLI
+  - MODEL
+  requirements: MODEL-15, CLI-7
+  recorded: round 10 (slice 2)
+  context: IDs must never be reused (MODEL-15). Agents picking numbers by hand would collide or reuse.
+  decision: A removal moves the ID into retired.yaml with its reason, and drops the item's approval. A new item gets the next number after the highest live or retired ID with its prefix. An explicit `id` is still accepted, unless it's taken or retired.
+  alternatives: Leaving tombstones in place in the element files, which clutters the files every agent reads.
+  consequences: Agents never choose numbers, and a retired ID can't come back by accident.
+- id: DR-39
+  title: Two launchers, one committed with the repository and one per machine
+  decided_by: agent
+  elements:
+  - CLI
+  requirements: SYS-5, SYS-32, CLI-9
+  recorded: round 11 (slice 3)
+  context: Agents need one command that runs the toolkit in every checkout, including worktrees and teammates' clones, while each machine installs Python its own way. The engineer asked that Nix not be assumed (SYS-32).
+  decision: |-
+    `.syseng/spec` is a short shell script, committed with the repository. It runs this machine's launcher, ${XDG_CONFIG_HOME:-~/.config}/syseng/launcher.
+    - `spec init` writes the machine's launcher to run the Python that ran `spec init`, adding the toolkit's source directory when the toolkit isn't installed as a package.
+    - `--launcher CMD` replaces it, for setups such as a Nix shell. An existing launcher that works is otherwise kept.
+    - Without a machine launcher, `.syseng/spec` says the toolkit isn't set up and exits with code 127.
+  alternatives: One launcher per repository, ignored by git, which new worktrees and fresh clones don't have. Running `spec` from the PATH, which depends on which environment is active.
+  consequences: |-
+    `spec init` writes one file outside the repository. A machine with two toolkit installs uses whichever one `spec init --launcher` named last.

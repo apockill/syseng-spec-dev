@@ -30,9 +30,10 @@
   - AGENT
   requirements: AGENT-21, AGENT-33, AGENT-34
   recorded: round 4 (decided in round 3)
-  status: part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it.
+  status: |-
+    part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it. Narrowed in round 11 by DR-41: the hook records only approvals that name items by ID, and anything else is confirmed with the engineer first.
   context: the engineer wants to approve in chat, but only with unambiguous wording.
-  decision: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. The agent never records approvals.
+  decision: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. Approvals the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
   alternatives: letting the agent record approvals, which risks a misreading. Approving only on the review page, which is safe but slower.
   consequences: |-
     Q23 settled the phrasing: a message that starts with "approve" and names the items, or says to approve everything except some items. When the exceptions are given by description, every item they could refer to stays unapproved (AGENT-43). In harnesses without such a hook, chat approval falls back to the review page or the terminal.
@@ -81,3 +82,52 @@
   decision: every mention of a spec item gives its title alongside its ID, and links to it where the medium allows. The review page shows an item's text when you hover over or click its ID.
   alternatives: bare IDs, or titles only. Titles alone would lose the stable reference that traceability needs.
   consequences: messages run slightly longer, and nothing needs to be looked up.
+- id: DR-38
+  title: The skill ships inside the package, and setup installs it with the launcher's name filled in
+  decided_by: agent
+  elements:
+  - AGENT
+  - CLI
+  requirements: AGENT-42, SYS-27, CLI-9
+  recorded: round 11 (slice 3)
+  context: The method is one portable skill (DR-1). It has to reach each repository, and the commands it gives have to work there however the machine installs Python.
+  decision: |-
+    The skill lives in the Python package, so pip installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
+    - `spec init` copies it to where each harness looks for skills: .claude/skills/syseng for Claude Code, and .agents/skills/syseng, the cross-tool location that Hermes and Antigravity read. Hermes loads a repository's skills only after `hermes skills trust`.
+    - Each copy has the placeholder {{SPEC}} replaced by the repository's launcher, `.syseng/spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run (AGENT-49).
+    - The skill itself names no harness, tool or package manager. Harness-specific parts live in adapters.
+  alternatives: A skill that tells agents to run `spec` from the PATH, which breaks whenever the toolkit lives in a virtual environment the agent's shell hasn't activated. Keeping the skill outside the package, which pip wouldn't install.
+  consequences: The installed copy is committed with the repository, so it can fall behind the toolkit. `spec init --check` reports the difference and `spec init` refreshes it. The rules page moved from docs/ into the skill.
+- id: DR-40
+  title: Claude Code hooks are one standard-library script, committed with the repository
+  decided_by: agent
+  elements:
+  - AGENT
+  requirements: AGENT-20, AGENT-12, SYS-27
+  recorded: round 11 (slice 3)
+  context: The spec guard (DR-3), the done gate (DR-4) and chat approvals (DR-6) need hooks. The guard runs before every edit and shell command, so it must be fast, and it should work on a clone where the toolkit isn't installed yet.
+  decision: |-
+    `.syseng/hook` is one Python script that uses only the standard library. `spec init` copies it from the package and registers it in .claude/settings.json for three events: before each tool call, when the agent stops, and when the engineer sends a message.
+    - It refuses a tool call by exiting with code 2, giving the reason on standard error.
+    - The guard refuses edits to the files the toolkit manages: elements, change records, approvals, retired IDs and generated views. Its refusal names the command to use. toolkit.yaml and hand-written pages such as the glossary stay editable.
+    - For shell commands, it refuses plain writes into those files: redirections, tee, rm, mv, cp, and in-place sed or perl.
+    - Only the stop and prompt hooks run the toolkit, through the launcher. When the toolkit isn't set up, nothing is blocked, and the engineer sees a notice.
+  alternatives: Hooks that call the toolkit for everything, which costs a Python start-up with PyYAML on every tool call and fails on machines without the toolkit. A Claude Code plugin, which DR-1 ruled out.
+  consequences: A script that opens spec files itself, in python or awk, gets past the guard. The change log and the auditors are the backstop. The hook copy can fall behind the toolkit until `spec init` runs again.
+- id: DR-41
+  title: Chat approvals are recorded only when they name items by ID, and anything else is confirmed first
+  decided_by: agent
+  elements:
+  - AGENT
+  requirements: AGENT-21, AGENT-33, AGENT-34, AGENT-43
+  recorded: round 11 (slice 3)
+  context: |-
+    DR-6 has a hook record chat approvals: a message that starts with "approve" and names the items, or approves everything except some items. A hook can't tell which items "everything" covered in the agent's last message, or which items a described exception refers to (AGENT-43). It also can't see what the engineer was last shown (AGENT-34).
+  decision: |-
+    The prompt hook reads each line of the engineer's message on its own. A line approves when it starts with "approve" (or "approved") and its first clause names only item IDs and ranges, or when it is only item IDs followed by "LGTM", "approved" or "looks good", as in "SYS-32 LGTM".
+    - It records the whole message as the engineer's words, marked as given in chat, and tells the agent what it recorded.
+    - Any other approval, such as "approve everything except the wording ones", records nothing. The hook tells the agent to show the exact list, leaving out every item an exception could refer to, and to get the engineer's confirmation, in a menu where the harness has one.
+    - Quoted lines and pasted text never count, and a capitalized word counts as a system element only when that element exists. A message with "lgtm" or "looks good" and no IDs gets a note that it approves nothing.
+  alternatives: Reading "everything" as every unapproved item in the open change, which can approve items the engineer was never shown. Letting the agent interpret every approval, which DR-6 ruled out.
+  consequences: |-
+    "Approve everything except …" costs one extra confirmation. An approval covers the items as they are when the engineer sends the message, and the hook asks the agent to say if it changed any of them after showing them. Claude Code also runs this hook for messages from other sessions and from background subagents, so an agent that sent a message starting with "approve" could create an approval. The skill forbids that, and each approval records its words.

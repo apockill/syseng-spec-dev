@@ -1,0 +1,111 @@
+- id: AGENT-V1
+  verifies:
+  - AGENT-40
+  method: test
+  technique: unit test
+  origin: agent
+  description: An open decision is refused unless it says why it ranks where it does.
+  tests:
+    python:
+    - tests/test_decisions.py::test_decision_says_why_it_ranks_where_it_does
+- id: AGENT-V2
+  verifies:
+  - AGENT-20
+  method: test
+  technique: unit test
+  origin: agent
+  description: An agent's edit or write to each kind of file the toolkit manages is refused, and the refusal names the command to use instead. Edits to the toolkit's settings file, hand-written pages and code pass. Shell commands that redirect into, tee into, edit in place, remove, move or copy over a managed file are refused. Reading those files and running the toolkit pass.
+  tests:
+    python:
+    - tests/test_hooks.py::test_agents_cannot_edit_files_the_toolkit_manages
+    - tests/test_hooks.py::test_agents_may_edit_files_the_toolkit_does_not_manage
+    - tests/test_hooks.py::test_shell_writes_into_the_spec_are_refused
+    - tests/test_hooks.py::test_shell_reads_and_toolkit_commands_are_allowed
+- id: AGENT-V3
+  verifies:
+  - AGENT-12
+  method: test
+  technique: integration test
+  origin: agent
+  description: When the agent stops while the spec has errors, the stop hook blocks once, giving each finding in the checker's format. When the agent is already continuing because of that block, the hook lets it stop. With no errors the agent stops without a message. On a machine without the toolkit, the engineer gets a notice instead of a block.
+  tests:
+    python:
+    - tests/test_hooks.py::test_stop_blocks_once_with_the_findings
+    - tests/test_hooks.py::test_stop_lets_a_clean_spec_finish
+    - tests/test_hooks.py::test_stop_tells_the_engineer_when_the_toolkit_is_missing
+- id: AGENT-V4
+  verifies:
+  - AGENT-21
+  - AGENT-33
+  - AGENT-43
+  method: test
+  technique: integration test
+  origin: agent
+  description: A line that approves items by ID records each item's approval, with the whole message as the engineer's words, marked as given in chat, and the agent is told what was recorded. Such a line either starts with "approve" or is only IDs followed by "LGTM", and it may be any line of a longer message. Lines that approve "everything", give an exception by description, or mix IDs with other words record nothing, and the agent is told to confirm the exact list. "lgtm" without IDs, quoted lines, pasted text, capitalized words that aren't elements, and unknown IDs record nothing.
+  tests:
+    python:
+    - tests/test_hooks.py::test_approvals_that_name_items_by_id_are_read
+    - tests/test_hooks.py::test_approvals_that_need_interpreting_are_not_read
+    - tests/test_hooks.py::test_lines_that_approve_no_items_are_ignored
+    - tests/test_hooks.py::test_chat_approval_is_recorded_with_the_engineers_words
+    - tests/test_hooks.py::test_approval_on_any_line_of_a_longer_message
+    - tests/test_hooks.py::test_quoted_lines_are_not_approvals
+    - tests/test_hooks.py::test_described_exceptions_record_nothing
+    - tests/test_hooks.py::test_lgtm_is_not_an_approval
+    - tests/test_hooks.py::test_pasted_text_is_not_the_engineers_approval
+    - tests/test_hooks.py::test_unknown_ids_record_nothing
+- id: AGENT-V5
+  verifies:
+  - AGENT-42
+  method: inspection
+  technique: unit test
+  origin: agent
+  description: No page of the skill names an agent harness, a harness's own tools or instruction files, or Nix. The skill's front matter follows the Agent Skills format. Every toolkit command that the skill and the subagents name exists.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_names_no_particular_harness
+    - tests/test_skill.py::test_skill_frontmatter_follows_the_agent_skills_format
+    - tests/test_skill.py::test_every_command_the_skill_names_exists
+- id: AGENT-V6
+  verifies:
+  - AGENT-45
+  method: inspection
+  technique: unit test
+  origin: agent
+  description: The skill has a section that invites agents to improve it, and that section names the command for reporting friction.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_invites_agents_to_improve_it
+- id: AGENT-V7
+  verifies:
+  - AGENT-46
+  method: test
+  technique: unit test
+  origin: agent
+  description: Reporting friction records the workaround and the proposed improvement in the open change, where the engineer reads them.
+  tests:
+    python:
+    - tests/test_decisions.py::test_friction_is_logged_with_a_proposal
+- id: AGENT-V8
+  verifies:
+  - AGENT-47
+  - AGENT-49
+  method: test
+  technique: integration test
+  origin: agent
+  description: The skill installed for a harness without hooks says that none run, and that recording approvals, editing through the CLI and checking before reporting are the agent's job. The copy installed for Claude Code names each of its hooks and what it does. The skill itself leaves exactly one place for these notes.
+  tests:
+    python:
+    - tests/test_init.py::test_hermes_gets_the_cross_tool_skill_without_hooks
+    - tests/test_init.py::test_each_skill_copy_says_what_its_harness_hooks_do
+    - tests/test_skill.py::test_skill_leaves_one_slot_for_the_harness_notes
+- id: AGENT-V9
+  verifies:
+  - AGENT-48
+  method: inspection
+  technique: unit test
+  origin: agent
+  description: The skill tells agents to give the engineer the exact line that records an approval.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_tells_agents_to_give_the_exact_approval_line

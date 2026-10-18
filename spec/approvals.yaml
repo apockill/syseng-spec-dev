@@ -264,13 +264,12 @@
   text: |-
     Wording rules were calibrated against this spec before they shipped: - EARS is read loosely: condition clauses at the front are optional (When, While, If, Where, In, During, At and similar), and the subject may contain commas. - The check for conditions placed after "shall" was dropped. Only 1 of its 10 hits was real, because phrases like "decisions made while building" aren't conditions. Auditors judge condition placement instead. - Three exemptions cover the remaining false hits: "how many", capitalized words inside a proper name, and "both … and". - The other 11 findings were real, and those requirements were reworded.
 - id: DR-31
-  fingerprint: 4816ed10f4d5
-  approved_on: '2026-10-11'
-  via: chat (menu, round 9)
-  words: |-
-    Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
+  fingerprint: 553dfff40b8b
+  approved_on: '2026-10-17'
+  via: chat
+  words: DR-31 LGTM.
   text: |-
-    Missing verification and missing approvals are to-dos, not errors: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. In merge mode (`spec check --merge`, CHECK-15), unapproved items become errors. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches.
+    Missing verification, missing approvals and unserved needs are to-dos, not errors: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. In merge mode (`spec check --merge`, CHECK-15), unapproved items become errors. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12).
 - id: DR-32
   fingerprint: 1df7b1e7bcb8
   approved_on: '2026-10-11'
@@ -279,6 +278,46 @@
     Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
   text: |-
     A Nix flake for development, and standard packaging for everyone else: flake.nix provides Python with PyYAML and pytest, and `bin/spec` runs the CLI from the checkout. pyproject.toml keeps the toolkit installable with pip anywhere else. Until flake.nix is tracked by git, the dev shell starts with `nix develop path:.`.
+- id: DR-33
+  fingerprint: a35b5600b578
+  approved_on: '2026-10-11'
+  via: chat (menu, round 10)
+  words: |-
+    Approve all five (Recommended): DR-33 to DR-37
+  text: |-
+    Change records are YAML, one change is open at a time, and every edit needs one: A change record is spec/changes/<date>-round-<N>[-<slug>].yaml, with a generated Markdown view beside it. - `spec change start` opens one, with a summary of the request, the mode (code-first unless named) and the target implementation (the primary one unless named). - At most one change is open at a time, and `spec edit` refuses to run without one. - Rounds 2 to 9 stay as hand-written Markdown, and `spec show` still finds mentions in them.
+- id: DR-34
+  fingerprint: b0f5a4f76c89
+  approved_on: '2026-10-11'
+  via: chat (menu, round 10)
+  words: |-
+    Approve all five (Recommended): DR-33 to DR-37
+  text: |-
+    An edit runs on a scratch copy first, and only the errors it introduces block it: `spec edit` copies the spec, applies the whole batch there, and runs the checker on the result. An error that wasn't there before rejects the batch, with the usual teaching messages, and nothing is written. Otherwise the batch is applied for real, logged and re-rendered. `--dry-run` stops after the checks.
+- id: DR-35
+  fingerprint: 4f5e2f1898c5
+  approved_on: '2026-10-11'
+  via: chat (menu, round 10)
+  words: |-
+    Approve all five (Recommended): DR-33 to DR-37
+  text: |-
+    Acknowledgments are needed only when an item's meaning changes: An edit needs an acknowledgment only when it changes an item's meaning, which its fingerprint detects, or removes the item. The items that need one are: - the item itself, if approved; - the requirements that refine it; - requirements serving it, if it's a need; - the verification items that verify it; - the decision records about it; - for a system element, the elements that depend on it or are part of it. The CLI prints a ready-to-fill `acks:` block, and exits with code 2.
+- id: DR-36
+  fingerprint: 15a8d785174a
+  approved_on: '2026-10-11'
+  via: chat (menu, round 10)
+  words: |-
+    Approve all five (Recommended): DR-33 to DR-37
+  text: |-
+    Removing an item retires its ID, and new IDs are allocated automatically: A removal moves the ID into retired.yaml with its reason, and drops the item's approval. A new item gets the next number after the highest live or retired ID with its prefix. An explicit `id` is still accepted, unless it's taken or retired.
+- id: DR-37
+  fingerprint: 0dcafbb1bc94
+  approved_on: '2026-10-11'
+  via: chat (menu, round 10)
+  words: |-
+    Approve all five (Recommended): DR-33 to DR-37
+  text: |-
+    The change log records every changed field, not just meaning: Each log entry records the fields that changed, before and after, test links included. Meaning-only comparison is kept for deciding when acknowledgments are needed.
 - id: NEED-1
   fingerprint: f4d032821275
   approved_on: '2026-10-11'
@@ -382,6 +421,52 @@
   words: |-
     Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
   text: The engineer needs the toolkit to improve from the friction agents meet while using it.
+- id: NEED-14
+  fingerprint: 7252d18d649f
+  approved_on: '2026-10-17'
+  via: chat (pasted reply, confirmed in a typed message)
+  words: |-
+    "> NEED-14: see who approved each item, and how. > NEED-15: tell explicit approvals apart from delegated ones. LGTM" (pasted reply, confirmed by the typed message "It was my text fyi.")
+  text: The engineer needs to see who approved each item and how.
+- id: NEED-15
+  fingerprint: bc936ba321a0
+  approved_on: '2026-10-17'
+  via: chat (pasted reply, confirmed in a typed message)
+  words: |-
+    "> NEED-14: see who approved each item, and how. > NEED-15: tell explicit approvals apart from delegated ones. LGTM" (pasted reply, confirmed by the typed message "It was my text fyi.")
+  text: The engineer needs to tell which items they approved explicitly and which are delegated under an item they approved.
+- id: NEED-16
+  fingerprint: 46ebdf0af466
+  approved_on: '2026-10-17'
+  via: chat
+  words: need 16 LGTM
+  text: The engineer needs their statements kept word for word on the requirements those statements directly express.
+- id: NEED-17
+  fingerprint: 844c2b26ef49
+  approved_on: '2026-10-17'
+  via: chat
+  words: Need-17 lgtm.
+  text: The engineer needs agents to point out, once a change is built and tested, each item the engineer approved, wrote or decided that the change altered, and to ask whether to keep each alteration.
+- id: NEED-18
+  fingerprint: 1ab4c0078f2c
+  approved_on: '2026-10-17'
+  via: chat (pasted reply, confirmed in a typed message)
+  words: |-
+    "> NEED-18: approve the key requirements without reading every one, with agents proposing which. LGTM" (pasted reply, confirmed by the typed message "It was my text fyi.")
+  text: The engineer needs to approve the key requirements without reading every requirement, with agents proposing which ones as they work.
+- id: NEED-19
+  fingerprint: 1013794c1640
+  approved_on: '2026-10-17'
+  via: chat (pasted reply, confirmed in a typed message)
+  words: |-
+    "> NEED-19: weigh each item by the human attention it got when making large changes. LGTM" (pasted reply, confirmed by the typed message "It was my text fyi.")
+  text: The engineer needs agents making large changes to weigh each item by the human attention it received.
+- id: NEED-20
+  fingerprint: a1b82906c13e
+  approved_on: '2026-10-17'
+  via: chat
+  words: need 20 lgtm
+  text: The engineer needs the requirement tree to follow the system's structure, not the order or framing of their requests.
 - id: SYS-1
   fingerprint: d9c7fec31355
   approved_on: '2026-10-11'
@@ -622,3 +707,9 @@
   words: |-
     Approve all (Recommended): SYS-7, SYS-8, SYS-27, NEED-13, SYS-31 and DR-28 to DR-32
   text: The toolkit shall invite agents to improve the toolkit wherever they meet friction or a new way of working.
+- id: SYS-32
+  fingerprint: 25efbb955e60
+  approved_on: '2026-10-17'
+  via: chat
+  words: SYS-32 LGTM
+  text: The toolkit shall install and run on machines without Nix.

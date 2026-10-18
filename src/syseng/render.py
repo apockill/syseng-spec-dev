@@ -7,7 +7,7 @@ requirements, then each system element.
 
 from pathlib import Path
 
-from syseng import fingerprint
+from syseng import changes, fingerprint
 from syseng.model import Item, Spec
 
 MARK = {"engineer": "✅", "agent": "🟡"}
@@ -18,7 +18,10 @@ SUBFIELDS = [  # (data key, label) in display order
 
 
 def views(spec: Spec) -> dict[str, str]:
-    return {"requirements.md": requirements_view(spec), "decisions.md": decisions_view(spec)}
+    out = {"requirements.md": requirements_view(spec), "decisions.md": decisions_view(spec)}
+    for change in changes.all_changes(spec):
+        out[f"changes/{change.path.with_suffix('.md').name}"] = changes.view(spec, change)
+    return out
 
 
 def write_views(spec: Spec) -> list[Path]:
@@ -101,8 +104,9 @@ def _counts(spec: Spec) -> str:
 
 
 def _latest_change(spec: Spec) -> str | None:
-    changes = sorted((spec.root / "changes").glob("*.md"), key=lambda p: _change_key(p.name))
-    return changes[-1].name if changes else None
+    stems = {p.stem for p in (spec.root / "changes").glob("*") if p.suffix in (".md", ".yaml")}
+    latest = sorted(stems, key=_change_key)
+    return f"{latest[-1]}.md" if latest else None
 
 
 def _change_key(name: str):

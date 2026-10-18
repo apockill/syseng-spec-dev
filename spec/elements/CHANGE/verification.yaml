@@ -1,0 +1,66 @@
+- id: CHANGE-V1
+  verifies:
+  - CHANGE-3
+  method: test
+  technique: unit test
+  origin: agent
+  description: A change record keeps its open decisions, and its view lists them.
+  tests:
+    python:
+    - tests/test_decisions.py::test_view_puts_open_decisions_first_and_flags_the_engineers_items
+- id: CHANGE-V2
+  verifies:
+  - CHANGE-4
+  - CHANGE-8
+  - CHANGE-9
+  method: test
+  technique: unit test
+  origin: agent
+  description: Opening a change records a summary of the request; with no mode named the change is code-first, and its target defaults to the primary implementation.
+  tests:
+    python:
+    - tests/test_edit.py::test_change_defaults_to_code_first_and_the_primary_target
+    - tests/test_edit.py::test_spec_first_mode_is_recorded
+- id: CHANGE-V3
+  verifies:
+  - CHANGE-5
+  method: test
+  technique: unit test
+  origin: agent
+  description: Every edit is logged in the open change record with its reason and the item's meaning before and after; an edit without a reason, or with no change open, is refused.
+  tests:
+    python:
+    - tests/test_edit.py::test_edits_are_logged_with_reasons_in_the_change_record
+    - tests/test_edit.py::test_every_operation_needs_a_reason
+    - tests/test_edit.py::test_edit_requires_an_open_change
+- id: CHANGE-V4
+  verifies:
+  - CHANGE-10
+  method: test
+  technique: unit test
+  origin: agent
+  description: An open decision is refused unless it offers at least two options with exactly one recommended.
+  tests:
+    python:
+    - tests/test_decisions.py::test_decision_needs_options_with_exactly_one_recommended
+- id: CHANGE-V5
+  verifies:
+  - CHANGE-11
+  method: test
+  technique: unit test
+  origin: agent
+  description: An open decision involving an item the engineer stated is flagged in the change record view.
+  tests:
+    python:
+    - tests/test_decisions.py::test_view_puts_open_decisions_first_and_flags_the_engineers_items
+- id: CHANGE-V6
+  verifies:
+  - CHANGE-12
+  method: test
+  technique: unit test
+  origin: agent
+  description: One resolve command records the recommended option for every named decision, with the engineer's words.
+  tests:
+    python:
+    - tests/test_decisions.py::test_resolve_takes_the_recommended_options_for_a_set
+    - tests/test_decisions.py::test_resolve_a_specific_option

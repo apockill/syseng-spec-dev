@@ -46,3 +46,7 @@ def write(path: Path, data) -> None:
 
 def read(path: Path):
     return yaml.safe_load(path.read_text())
+
+
+def loads(text: str):
+    return yaml.safe_load(text)

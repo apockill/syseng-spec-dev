@@ -2,13 +2,30 @@
 
 Wording rules are the mechanically checkable subset of INCOSE's Guide to Writing
 Requirements (rule numbers in `ref`), plus a loose reading of EARS sentence shapes (DR-30).
-Every rule has an anchor in docs/rules.md, which explains it at length.
+Every rule has an anchor in the skill's rules page, which explains it at length.
 """
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
-RULES_DOC = "docs/rules.md"
+RULES_PAGE = Path(__file__).resolve().parent / "skill" / "references" / "rules.md"
+# Where `spec init` installs the skill, and with it the rules page.
+INSTALLED_RULES_PAGES = (".claude/skills/syseng/references/rules.md", ".agents/skills/syseng/references/rules.md")
+
+
+def rules_doc_for(spec_root: Path) -> str:
+    """Where findings link (DR-43): the toolkit's own page when it lives in this repository, else
+    the copy `spec init` installed, else the page inside the installed package."""
+    repo = spec_root.resolve().parent
+    try:
+        return str(RULES_PAGE.relative_to(repo))
+    except ValueError:
+        pass
+    for rel in INSTALLED_RULES_PAGES:
+        if (repo / rel).exists():
+            return rel
+    return str(RULES_PAGE)
 
 
 @dataclass(frozen=True)
@@ -20,9 +37,8 @@ class Rule:
     ref: str = ""
     severity: str = "error"  # error | todo
 
-    @property
-    def link(self) -> str:
-        return f"{RULES_DOC}#{self.code.lower()}"
+    def link(self, spec_root: Path) -> str:
+        return f"{rules_doc_for(spec_root)}#{self.code.lower()}"
 
 
 _RULES = [
@@ -57,7 +73,8 @@ _RULES = [
          "Point `traces_to` at an existing requirement (or `serves` at existing needs), or mark it `derived: true` with a `why`."),
     Rule("T002", "need served by nothing",
          "A need with no requirement under it will never be met (MODEL-12).",
-         "Add a system requirement that serves it, or ask the engineer whether the need still stands."),
+         "Add a system requirement that serves it, or ask the engineer whether the need still stands.",
+         severity="todo"),  # needs may land before their requirements, as in spec-first planning (DR-31)
     Rule("T003", "dangling reference",
          "A link to an item that doesn't exist (or was retired) points readers nowhere.",
          "Fix the ID, or drop the reference."),

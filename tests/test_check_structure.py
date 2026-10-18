@@ -1,6 +1,6 @@
 """Structure, trace and attribute checks (MODEL, SYS-6, CHECK-1)."""
 
-from syseng import yamlio
+from syseng import check, yamlio
 
 
 def test_valid_spec_has_no_errors(spec):
@@ -46,7 +46,8 @@ def test_unserved_need_is_reported(spec):
     spec.files["elements/SYS/needs.yaml"].append({"id": "NEED-2", "text": "The engineer needs gadgets.",
                                                   "origin": "engineer", "source": '"gadgets"'})
     spec.write()
-    assert "T002" in spec.codes()
+    assert "T002" in spec.codes(severity="todo") and "T002" not in spec.codes()
+    assert "1 needs nothing serves yet" in check.summarize(spec.findings())
 
 
 def test_untraced_requirement_is_reported(spec):

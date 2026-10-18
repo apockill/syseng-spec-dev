@@ -45,17 +45,17 @@ These are the decisions made while designing and building the toolkit, each atta
 - **Alternatives:** a fingerprint alone, which shows *that* something changed but not *what*. A git revision, which fails for approvals given before a commit.
 - **Consequences:** the review page can always show what changed since approval. [approvals.md](approvals.md) already follows this format by hand.
 
-### DR-6 🟡 🔒 Record chat approvals from the engineer's own message
+### DR-6 🟡 Record chat approvals from the engineer's own message
 *System elements:* AGENT · *Requirements:* AGENT-21, AGENT-33, AGENT-34 · *Recorded:* round 4 (decided in round 3)
-- **Status:** part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it.
+- **Status:** part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it. Narrowed in round 11 by DR-41: the hook records only approvals that name items by ID, and anything else is confirmed with the engineer first.
 - **Context:** the engineer wants to approve in chat, but only with unambiguous wording.
-- **Decision:** a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. The agent never records approvals.
+- **Decision:** a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. Approvals the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
 - **Alternatives:** letting the agent record approvals, which risks a misreading. Approving only on the review page, which is safe but slower.
 - **Consequences:** Q23 settled the phrasing: a message that starts with "approve" and names the items, or says to approve everything except some items. When the exceptions are given by description, every item they could refer to stays unapproved (AGENT-43). In harnesses without such a hook, chat approval falls back to the review page or the terminal.
 
-### DR-7 🟡 🔒 Run reasoning checks in an isolated subagent that can't see the spec
+### DR-7 🟡 Run reasoning checks in an isolated subagent that can't see the spec
 *System elements:* REASON · *Requirements:* REASON-2, REASON-5 · *Recorded:* round 4 (was REASON-6 and REASON-7)
-- **Status:** part of the Claude Code adapter (DR-1). The requirement itself is harness-neutral (DR-25): the skill describes the ideal reasoning-check subagent, and each agent sets one up with what its harness offers. This record covers how to do that in Claude Code. Q22 ruled out an API path.
+- **Status:** part of the Claude Code adapter (DR-1). The requirement itself is harness-neutral (DR-25): the skill describes the ideal reasoning-check subagent, and each agent sets one up with what its harness offers. This record covers how to do that in Claude Code. Q22 ruled out an API path. Refined in round 11 by DR-42: searches that could reach the spec are refused rather than filtered.
 - **Context:** the engineer wants reasoning checks to start with no project context and no conversation, and to read the code but not the spec.
 - **Decision:** use a custom, non-fork subagent. Its definition sets `omitClaudeMd`, so CLAUDE.md and AGENTS.md don't load. It has no shell tool. It carries its own hook that refuses reads under the spec directory and drops spec hits from search results.
 - **Alternatives:** a fork, which inherits the conversation and which the engineer ruled out. An instruction alone. A direct model-API call, which Q22 ruled out (DR-25).
@@ -239,16 +239,130 @@ These are the decisions made while designing and building the toolkit, each atta
 - **Alternatives:** Keeping every rule as first written and rewording around the false hits, which bends good requirements to fit bad rules. Turning the noisy rules into warnings, which the engineer had ruled out.
 - **Consequences:** Every remaining rule fires only on real problems in this spec. Each exemption has a regression test, so a later change to the rules can't silently bring the noise back.
 
-### DR-31 🟡 🔒 Missing verification and missing approvals are to-dos, not errors
-*System elements:* CHECK · *Requirements:* CHECK-10, CHECK-14, CHECK-15, MODEL-18 · *Recorded:* round 9 (slice 1)
+### DR-31 🟡 Missing verification, missing approvals and unserved needs are to-dos, not errors
+*System elements:* CHECK · *Requirements:* CHECK-10, CHECK-14, CHECK-15, MODEL-18, SYS-9 · *Recorded:* round 9 (slice 1)
 - **Context:** 169 requirements have no verification item yet, and most items aren't approved. If those were errors, the checker would fail on every run, and agents would learn to ignore it.
-- **Decision:** They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. In merge mode (`spec check --merge`, CHECK-15), unapproved items become errors. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches.
+- **Decision:** They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12). The merge check (`spec check --merge`, CHECK-15) never fails because of approvals: whether a branch lands is the engineer's call (round 12, D1).
 - **Alternatives:** Failing on every missing item from day one.
 - **Consequences:** The checker stays green while to-dos remain, so the summary line is what keeps them visible.
 
-### DR-32 🟡 🔒 A Nix flake for development, and standard packaging for everyone else
+### DR-32 🟡 A Nix flake for development, and standard packaging for everyone else
 *System elements:* SYS · *Requirements:* SYS-3 · *Recorded:* round 9 (slice 1)
 - **Context:** The engineer's machine runs NixOS, where generic Linux binaries such as uv's installer don't run. The engineer's other project already uses a flake.
-- **Decision:** flake.nix provides Python with PyYAML and pytest, and `bin/spec` runs the CLI from the checkout. pyproject.toml keeps the toolkit installable with pip anywhere else. Until flake.nix is tracked by git, the dev shell starts with `nix develop path:.`.
+- **Decision:** flake.nix provides Python with PyYAML and pytest for working on the toolkit, and `bin/spec` runs the CLI from the checkout. pyproject.toml keeps the toolkit installable with pip everywhere else. Nothing outside this repository's own development setup depends on Nix (SYS-32).
 - **Alternatives:** A pip virtual environment, which works here but isn't the engineer's convention.
-- **Consequences:** Commands run as `nix develop path:. -c spec check`. Once the files are committed, plain `nix develop` works.
+- **Consequences:** Agents in this repository run the toolkit through `.syseng/spec`, as in any other repository. On the engineer's machine, that launcher enters the flake's development shell (DR-39).
+
+### DR-33 🟡 🔒 Change records are YAML, one change is open at a time, and every edit needs one
+*System elements:* CHANGE · *Requirements:* CHANGE-3, CHANGE-4, CHANGE-5, CHANGE-8, CHANGE-9 · *Recorded:* round 10 (slice 2)
+- **Context:** Change records were hand-written Markdown, so nothing checked them and reasons were tracked by hand.
+- **Decision:** A change record is spec/changes/<date>-round-<N>[-<slug>].yaml, with a generated Markdown view beside it.
+  - `spec change start` opens one, with a summary of the request, the mode (code-first unless named) and the target implementation (the primary one unless named).
+  - At most one change is open at a time, and `spec edit` refuses to run without one.
+  - Rounds 2 to 9 stay as hand-written Markdown, and `spec show` still finds mentions in them.
+- **Alternatives:** Logging edits in git commit messages, which fragments the reasons across commits and the engineer owns git anyway. Several open changes, which forces every edit to name its change.
+- **Consequences:** Every edit's reason lands in one place the engineer reads. Starting a change is one extra command per change.
+
+### DR-34 🟡 🔒 An edit runs on a scratch copy first, and only the errors it introduces block it
+*System elements:* CLI, CHECK · *Requirements:* CLI-5, CLI-7, SYS-25 · *Recorded:* round 10 (slice 2)
+- **Context:** The engineer wanted the CLI to intercept edits and surface problems before they land. Pre-existing errors elsewhere in the spec shouldn't block an unrelated edit.
+- **Decision:** `spec edit` copies the spec, applies the whole batch there, and runs the checker on the result. An error that wasn't there before rejects the batch, with the usual teaching messages, and nothing is written. Otherwise the batch is applied for real, logged and re-rendered. `--dry-run` stops after the checks.
+- **Alternatives:** Validating each operation on its own, which misses problems that only appear once the whole batch is applied. Rejecting any batch while any error exists, which blocks repairs.
+- **Consequences:** A batch is all or nothing. Copying the spec costs a fraction of a second at this size.
+
+### DR-35 🟡 🔒 Acknowledgments are needed only when an item's meaning changes
+*System elements:* CLI · *Requirements:* CLI-6 · *Recorded:* round 10 (slice 2)
+- **Context:** DR-19 asked for named acknowledgments when an edit touches approved or depended-on items. Building it showed that a rationale-only edit, or a re-pointed test link, would have demanded acknowledgments for nothing.
+- **Decision:** An edit needs an acknowledgment only when it changes an item's meaning, which its fingerprint detects, or removes the item. The items that need one are:
+  - the item itself, if approved;
+  - the requirements that refine it;
+  - requirements serving it, if it's a need;
+  - the verification items that verify it;
+  - the decision records about it;
+  - for a system element, the elements that depend on it or are part of it.
+  The CLI prints a ready-to-fill `acks:` block, and exits with code 2.
+- **Alternatives:** Acknowledging every touched item, which is pure friction for wording and link edits. No acknowledgments at all, which the engineer ruled out.
+- **Consequences:** The acknowledgment notes land in the change record, as reasons the engineer can read.
+
+### DR-36 🟡 🔒 Removing an item retires its ID, and new IDs are allocated automatically
+*System elements:* CLI, MODEL · *Requirements:* MODEL-15, CLI-7 · *Recorded:* round 10 (slice 2)
+- **Context:** IDs must never be reused (MODEL-15). Agents picking numbers by hand would collide or reuse.
+- **Decision:** A removal moves the ID into retired.yaml with its reason, and drops the item's approval. A new item gets the next number after the highest live or retired ID with its prefix. An explicit `id` is still accepted, unless it's taken or retired.
+- **Alternatives:** Leaving tombstones in place in the element files, which clutters the files every agent reads.
+- **Consequences:** Agents never choose numbers, and a retired ID can't come back by accident.
+
+### DR-37 🟡 🔒 The change log records every changed field, not just meaning
+*System elements:* CHANGE · *Requirements:* CHANGE-5, AGENT-14, REVIEW-9 · *Recorded:* round 10 (slice 2)
+- **Context:** The first version logged only meaning fields. A test-link change showed up as an empty diff, and re-pointed tests are exactly where test weakening hides.
+- **Decision:** Each log entry records the fields that changed, before and after, test links included. Meaning-only comparison is kept for deciding when acknowledgments are needed.
+- **Alternatives:** Logging meaning only, which hides test changes from auditors.
+- **Consequences:** One entry from round 10 (MODEL-V7's new test links) was logged before this fix, so it carries a reason but no field diff.
+
+### DR-38 🟡 The skill ships inside the package, and setup installs it with the launcher's name filled in
+*System elements:* AGENT, CLI · *Requirements:* AGENT-42, SYS-27, CLI-9 · *Recorded:* round 11 (slice 3)
+- **Context:** The method is one portable skill (DR-1). It has to reach each repository, and the commands it gives have to work there however the machine installs Python.
+- **Decision:** The skill lives in the Python package, so pip installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
+  - `spec init` copies it to where each harness looks for skills: .claude/skills/syseng for Claude Code, and .agents/skills/syseng, the cross-tool location that Hermes and Antigravity read. Hermes loads a repository's skills only after `hermes skills trust`.
+  - Each copy has the placeholder {{SPEC}} replaced by the repository's launcher, `.syseng/spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run (AGENT-49).
+  - The skill itself names no harness, tool or package manager. Harness-specific parts live in adapters.
+- **Alternatives:** A skill that tells agents to run `spec` from the PATH, which breaks whenever the toolkit lives in a virtual environment the agent's shell hasn't activated. Keeping the skill outside the package, which pip wouldn't install.
+- **Consequences:** The installed copy is committed with the repository, so it can fall behind the toolkit. `spec init --check` reports the difference and `spec init` refreshes it. The rules page moved from docs/ into the skill.
+
+### DR-39 🟡 Two launchers, one committed with the repository and one per machine
+*System elements:* CLI · *Requirements:* SYS-5, SYS-32, CLI-9 · *Recorded:* round 11 (slice 3)
+- **Context:** Agents need one command that runs the toolkit in every checkout, including worktrees and teammates' clones, while each machine installs Python its own way. The engineer asked that Nix not be assumed (SYS-32).
+- **Decision:** `.syseng/spec` is a short shell script, committed with the repository. It runs this machine's launcher, ${XDG_CONFIG_HOME:-~/.config}/syseng/launcher.
+  - `spec init` writes the machine's launcher to run the Python that ran `spec init`, adding the toolkit's source directory when the toolkit isn't installed as a package.
+  - `--launcher CMD` replaces it, for setups such as a Nix shell. An existing launcher that works is otherwise kept.
+  - Without a machine launcher, `.syseng/spec` says the toolkit isn't set up and exits with code 127.
+- **Alternatives:** One launcher per repository, ignored by git, which new worktrees and fresh clones don't have. Running `spec` from the PATH, which depends on which environment is active.
+- **Consequences:** `spec init` writes one file outside the repository. A machine with two toolkit installs uses whichever one `spec init --launcher` named last.
+
+### DR-40 🟡 Claude Code hooks are one standard-library script, committed with the repository
+*System elements:* AGENT · *Requirements:* AGENT-20, AGENT-12, SYS-27 · *Recorded:* round 11 (slice 3)
+- **Context:** The spec guard (DR-3), the done gate (DR-4) and chat approvals (DR-6) need hooks. The guard runs before every edit and shell command, so it must be fast, and it should work on a clone where the toolkit isn't installed yet.
+- **Decision:** `.syseng/hook` is one Python script that uses only the standard library. `spec init` copies it from the package and registers it in .claude/settings.json for three events: before each tool call, when the agent stops, and when the engineer sends a message.
+  - It refuses a tool call by exiting with code 2, giving the reason on standard error.
+  - The guard refuses edits to the files the toolkit manages: elements, change records, approvals, retired IDs and generated views. Its refusal names the command to use. toolkit.yaml and hand-written pages such as the glossary stay editable.
+  - For shell commands, it refuses plain writes into those files: redirections, tee, rm, mv, cp, and in-place sed or perl.
+  - Only the stop and prompt hooks run the toolkit, through the launcher. When the toolkit isn't set up, nothing is blocked, and the engineer sees a notice.
+- **Alternatives:** Hooks that call the toolkit for everything, which costs a Python start-up with PyYAML on every tool call and fails on machines without the toolkit. A Claude Code plugin, which DR-1 ruled out.
+- **Consequences:** A script that opens spec files itself, in python or awk, gets past the guard. The change log and the auditors are the backstop. The hook copy can fall behind the toolkit until `spec init` runs again.
+
+### DR-41 🟡 Chat approvals are recorded only when they name items by ID, and anything else is confirmed first
+*System elements:* AGENT · *Requirements:* AGENT-21, AGENT-33, AGENT-34, AGENT-43 · *Recorded:* round 11 (slice 3)
+- **Context:** DR-6 has a hook record chat approvals: a message that starts with "approve" and names the items, or approves everything except some items. A hook can't tell which items "everything" covered in the agent's last message, or which items a described exception refers to (AGENT-43). It also can't see what the engineer was last shown (AGENT-34).
+- **Decision:** The prompt hook reads each line of the engineer's message on its own. A line approves when it starts with "approve" (or "approved") and its first clause names only item IDs and ranges, or when it is only item IDs followed by "LGTM", "approved" or "looks good", as in "SYS-32 LGTM".
+  - It records the whole message as the engineer's words, marked as given in chat, and tells the agent what it recorded.
+  - Any other approval, such as "approve everything except the wording ones", records nothing. The hook tells the agent to show the exact list, leaving out every item an exception could refer to, and to get the engineer's confirmation, in a menu where the harness has one.
+  - Quoted lines and pasted text never count, and a capitalized word counts as a system element only when that element exists. A message with "lgtm" or "looks good" and no IDs gets a note that it approves nothing.
+- **Alternatives:** Reading "everything" as every unapproved item in the open change, which can approve items the engineer was never shown. Letting the agent interpret every approval, which DR-6 ruled out.
+- **Consequences:** "Approve everything except …" costs one extra confirmation. An approval covers the items as they are when the engineer sends the message, and the hook asks the agent to say if it changed any of them after showing them. Claude Code also runs this hook for messages from other sessions and from background subagents, so an agent that sent a message starting with "approve" could create an approval. The skill forbids that, and each approval records its words.
+
+### DR-42 🟡 The reasoning check's read guard refuses every read or search that could reach the spec
+*System elements:* REASON · *Requirements:* REASON-5, REASON-2 · *Recorded:* round 11 (slice 3)
+- **Context:** DR-7 planned a hook that refuses reads under the spec directory and drops spec hits from search results, and said to fall back to an instruction if that proved fiddly.
+- **Decision:** The reasoning-check subagent gets only the read, search and file-listing tools, and its own hook refuses a read inside the spec directory and a search that could return a spec file.
+  - A search reaches the spec when it starts inside it, or starts above it with no file filter or with a filter that matches a spec file.
+  - Searches filtered to source files, or aimed at source directories, pass.
+- **Alternatives:** Filtering spec hits out of search results afterwards, which Claude Code allows but which means rewriting each tool's output format. The instruction alone.
+- **Consequences:** The guard covers every tool the subagent has. A subagent that searches the whole repository without a filter is refused once, and narrows its search.
+
+### DR-43 🟡 Rule links point at the rules page the repository has
+*System elements:* CHECK · *Requirements:* CHECK-16 · *Recorded:* round 11 (slice 3)
+- **Context:** The checker's findings link to the rule they break (CHECK-16). The rules page was docs/rules.md in the toolkit's repository, so links in every other repository pointed at a file that isn't there.
+- **Decision:** The rules page is part of the skill. A finding links to the toolkit's own copy inside the toolkit's repository, else to the copy `spec init` installed, else to the page inside the installed package.
+- **Alternatives:** A web address, which needs hosting and can disagree with the installed version.
+- **Consequences:** In every repository the toolkit has set up, links are relative paths an editor can open.
+
+### DR-44 🟡 Approval works like delegated authority in configuration management
+*System elements:* SYS, MODEL, CHANGE, AGENT · *Requirements:* SYS-33, SYS-34, SYS-35, SYS-36, SYS-37, SYS-38, SYS-39, SYS-40 · *Recorded:* round 12 (spec-first)
+- **Status:** proposed in round 12; not built yet.
+- **Context:** The engineer wants to approve the key points of the requirement tree, let agents decide the rest, and have each later change to what they approved, wrote or decided brought back to them (NEED-14 to NEED-20). Today every item needs approval, and over 200 items are waiting.
+- **Decision:** Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).
+  - The engineer approves key items explicitly, as a customer approves a baseline. Everything beneath an approved item is delegated: the agent decides it, as a contractor decides the detailed design.
+  - A change that alters an item the engineer approved, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it.
+  - Whether an item is approved, delegated or neither is computed from the approvals and the tree each time it's shown, and never stored (SYS-40).
+  - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
+- **Alternatives:** Approving every item, which is today's rule and doesn't scale. A stored importance score, which the engineer ruled out.
+- **Consequences:** The engineer approves a few key items per change instead of every item. Agents need each item's approval state at the moment they change it (SYS-39). The merge check never blocks; it lists the alterations the engineer hasn't answered yet (CHECK-15, round 12 D1).

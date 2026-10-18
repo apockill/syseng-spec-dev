@@ -45,3 +45,13 @@
   origin: agent
   traces_to: SYS-19
   why: this enforces CHANGE-5 at write time, while the reason is fresh.
+- id: CLI-9
+  text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists, the launcher, the skill, and the hooks and subagents for each harness the engineer names.
+  traces_to: SYS-5
+  origin: agent
+  why: SYS-5 asks for one-step setup. The launcher gives agents one command that works on every machine (DR-39). The skill and the harness glue are what make an agent follow the method (DR-38, DR-40).
+- id: CLI-10
+  text: When setup runs again, the CLI shall refresh the files it wrote and leave every other file and setting unchanged.
+  traces_to: SYS-5
+  origin: agent
+  why: running setup again is how a repository picks up a newer skill or hook, and it must never overwrite the engineer's own settings, such as their other Claude Code hooks.

@@ -15,13 +15,25 @@
   alternatives: Keeping every rule as first written and rewording around the false hits, which bends good requirements to fit bad rules. Turning the noisy rules into warnings, which the engineer had ruled out.
   consequences: Every remaining rule fires only on real problems in this spec. Each exemption has a regression test, so a later change to the rules can't silently bring the noise back.
 - id: DR-31
-  title: Missing verification and missing approvals are to-dos, not errors
+  title: Missing verification, missing approvals and unserved needs are to-dos, not errors
   decided_by: agent
   elements:
   - CHECK
-  requirements: CHECK-10, CHECK-14, CHECK-15, MODEL-18
+  requirements: CHECK-10, CHECK-14, CHECK-15, MODEL-18, SYS-9
   recorded: round 9 (slice 1)
   context: 169 requirements have no verification item yet, and most items aren't approved. If those were errors, the checker would fail on every run, and agents would learn to ignore it.
-  decision: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. In merge mode (`spec check --merge`, CHECK-15), unapproved items become errors. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches.
+  decision: |-
+    They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12). The merge check (`spec check --merge`, CHECK-15) never fails because of approvals: whether a branch lands is the engineer's call (round 12, D1).
   alternatives: Failing on every missing item from day one.
   consequences: The checker stays green while to-dos remain, so the summary line is what keeps them visible.
+- id: DR-43
+  title: Rule links point at the rules page the repository has
+  decided_by: agent
+  elements:
+  - CHECK
+  requirements: CHECK-16
+  recorded: round 11 (slice 3)
+  context: The checker's findings link to the rule they break (CHECK-16). The rules page was docs/rules.md in the toolkit's repository, so links in every other repository pointed at a file that isn't there.
+  decision: The rules page is part of the skill. A finding links to the toolkit's own copy inside the toolkit's repository, else to the copy `spec init` installed, else to the page inside the installed package.
+  alternatives: A web address, which needs hosting and can disagree with the installed version.
+  consequences: In every repository the toolkit has set up, links are relative paths an editor can open.

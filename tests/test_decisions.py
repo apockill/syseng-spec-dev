@@ -1,0 +1,81 @@
+"""Open decisions (CHANGE-3, CHANGE-10 to CHANGE-12) and the change record view (REVIEW-10, REVIEW-12)."""
+
+import pytest
+
+from syseng import changes, edit
+
+
+@pytest.fixture
+def change(spec):
+    spec.write()
+    return changes.start(spec.load(), "Make better widgets", None, None, None)
+
+
+def _decision(**over):
+    d = {"question": "Stamp twice or once?", "importance": "changes CORE-1's meaning",
+         "involves": ["CORE-1"],
+         "options": [{"label": "Twice", "recommended": True, "detail": "stronger proof"},
+                     {"label": "Once", "detail": "cheaper"}]}
+    d.update(over)
+    return d
+
+
+def test_decision_needs_options_with_exactly_one_recommended(change):
+    with pytest.raises(changes.ChangeError, match="at least two"):
+        changes.add_decision(change, _decision(options=[{"label": "Only", "recommended": True}]))
+    with pytest.raises(changes.ChangeError, match="exactly one option"):
+        changes.add_decision(change, _decision(options=[{"label": "A"}, {"label": "B"}]))
+
+
+def test_decision_says_why_it_ranks_where_it_does(change):
+    with pytest.raises(changes.ChangeError, match="importance"):
+        changes.add_decision(change, _decision(importance=""))
+
+
+def test_resolve_takes_the_recommended_options_for_a_set(change):
+    d1 = changes.add_decision(change, _decision())
+    d2 = changes.add_decision(change, _decision(question="Paint red or blue?",
+                                                options=[{"label": "Red"}, {"label": "Blue", "recommended": True}]))
+    changes.resolve(change, [d1, d2], "go with your recommendations", None)
+    chosen = {d["id"]: d["chosen"] for d in change.data["decisions"]}
+    assert chosen == {d1: "Twice", d2: "Blue"}
+    assert all(d["words"] == "go with your recommendations" for d in change.data["decisions"])
+
+
+def test_resolve_a_specific_option(change):
+    d1 = changes.add_decision(change, _decision())
+    changes.resolve(change, [d1], "once is enough", 2)
+    assert change.data["decisions"][0]["chosen"] == "Once"
+
+
+def test_view_puts_open_decisions_first_and_flags_the_engineers_items(spec, change):
+    edit.run(spec.root, [{"add": "requirement", "element": "CORE", "text": "The core shall polish each widget.",
+                          "traces_to": "SYS-1", "origin": "agent", "why": "shine.", "reason": "asked for polish"}])
+    changes.add_decision(change, _decision(involves=["SYS-1"]))   # SYS-1 is the engineer's own words
+    text = changes.view(spec.load(), changes.current(spec.load()))
+    assert text.index("## Open decisions") < text.index("## Changes to the spec")
+    assert "⚠" in text and "SYS-1" in text                          # CHANGE-11
+    assert "**(recommended)**" in text
+    assert "spec resolve D1" in text                                 # one statement accepts the set
+
+
+def test_view_shows_the_reason_beside_each_change(spec, change):
+    edit.run(spec.root, {"edits": [{"modify": "CORE-1", "set": {"text": "The core shall stamp each widget twice."},
+                                    "reason": "the engineer wants double stamps"}],
+                         "acks": {"CORE-V1": "the test now checks two stamps"}})
+    text = changes.view(spec.load(), changes.current(spec.load()))
+    assert "the engineer wants double stamps" in text
+    assert "~~The core shall stamp each widget.~~ → The core shall stamp each widget twice." in text
+
+
+def test_friction_is_logged_with_a_proposal(spec, change):
+    changes.log_friction(change, "edited YAML by hand", "add `spec edit`")
+    text = changes.view(spec.load(), change)
+    assert "edited YAML by hand" in text and "add `spec edit`" in text
+
+
+def test_change_view_keeps_the_structure_of_multi_line_text(spec, change):
+    change.data["entries"] = [{"op": "add", "id": "DR-1", "reason": "design",
+                               "after": {"decision": "Three parts:\n- one\n- two"}}]
+    text = changes.view(spec.load(), change)
+    assert "  - decision:\n    Three parts:\n    - one\n    - two" in text

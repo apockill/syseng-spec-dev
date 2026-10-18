@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from syseng import check, cli, model
+from syseng import check, cli, init, model
 
 REPO_SPEC = Path(__file__).resolve().parents[1] / "spec"
 
@@ -11,6 +11,13 @@ def test_repository_spec_passes_its_own_checker():
     findings = check.check(model.load(REPO_SPEC))
     errors = [f for f in findings if f.severity == "error"]
     assert errors == [], check.format_findings(errors, REPO_SPEC)
+
+
+def test_repository_runs_the_current_skill_and_hooks():
+    repo = REPO_SPEC.parent
+    harnesses = init.installed_harnesses(repo)
+    stale = [s.path for s in init.run(repo, harnesses, check_only=True) if s.status == "differs"]
+    assert harnesses and stale == [], f"run `bin/spec init` to refresh: {stale}"
 
 
 def test_show_prints_the_trace_up_to_the_needs(capsys):

@@ -67,6 +67,26 @@
   requirements: SYS-3
   recorded: round 9 (slice 1)
   context: The engineer's machine runs NixOS, where generic Linux binaries such as uv's installer don't run. The engineer's other project already uses a flake.
-  decision: flake.nix provides Python with PyYAML and pytest, and `bin/spec` runs the CLI from the checkout. pyproject.toml keeps the toolkit installable with pip anywhere else. Until flake.nix is tracked by git, the dev shell starts with `nix develop path:.`.
+  decision: flake.nix provides Python with PyYAML and pytest for working on the toolkit, and `bin/spec` runs the CLI from the checkout. pyproject.toml keeps the toolkit installable with pip everywhere else. Nothing outside this repository's own development setup depends on Nix (SYS-32).
   alternatives: A pip virtual environment, which works here but isn't the engineer's convention.
-  consequences: Commands run as `nix develop path:. -c spec check`. Once the files are committed, plain `nix develop` works.
+  consequences: Agents in this repository run the toolkit through `.syseng/spec`, as in any other repository. On the engineer's machine, that launcher enters the flake's development shell (DR-39).
+- id: DR-44
+  title: Approval works like delegated authority in configuration management
+  decided_by: agent
+  elements:
+  - SYS
+  - MODEL
+  - CHANGE
+  - AGENT
+  requirements: SYS-33, SYS-34, SYS-35, SYS-36, SYS-37, SYS-38, SYS-39, SYS-40
+  recorded: round 12 (spec-first)
+  status: proposed in round 12; not built yet.
+  context: The engineer wants to approve the key points of the requirement tree, let agents decide the rest, and have each later change to what they approved, wrote or decided brought back to them (NEED-14 to NEED-20). Today every item needs approval, and over 200 items are waiting.
+  decision: |-
+    Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).
+    - The engineer approves key items explicitly, as a customer approves a baseline. Everything beneath an approved item is delegated: the agent decides it, as a contractor decides the detailed design.
+    - A change that alters an item the engineer approved, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it.
+    - Whether an item is approved, delegated or neither is computed from the approvals and the tree each time it's shown, and never stored (SYS-40).
+    - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
+  alternatives: Approving every item, which is today's rule and doesn't scale. A stored importance score, which the engineer ruled out.
+  consequences: The engineer approves a few key items per change instead of every item. Agents need each item's approval state at the moment they change it (SYS-39). The merge check never blocks; it lists the alterations the engineer hasn't answered yet (CHECK-15, round 12 D1).

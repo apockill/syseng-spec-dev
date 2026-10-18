@@ -1,0 +1,74 @@
+- id: CLI-V1
+  verifies:
+  - CLI-5
+  method: test
+  technique: unit test
+  origin: agent
+  description: Before an edit is applied, the agent sees each touched item before and after, and what it refines.
+  tests:
+    python:
+    - tests/test_edit.py::test_edit_shows_context_before_and_after
+- id: CLI-V2
+  verifies:
+  - CLI-6
+  method: test
+  technique: unit test
+  origin: agent
+  description: An edit that changes the meaning of an approved or depended-on item is held until each affected item is acknowledged by name; edits that affect nothing, or change only a rationale, apply at once.
+  tests:
+    python:
+    - tests/test_edit.py::test_edit_touching_approved_item_needs_named_acks
+    - tests/test_edit.py::test_cli_exit_code_two_means_acks_needed
+    - tests/test_edit.py::test_edit_without_impact_applies_immediately
+    - tests/test_edit.py::test_rationale_only_change_needs_no_acks
+- id: CLI-V3
+  verifies:
+  - CLI-7
+  method: test
+  technique: unit test
+  origin: agent
+  description: One invocation applies several operations and allocates an ID for each new item.
+  tests:
+    python:
+    - tests/test_edit.py::test_multiple_operations_in_one_batch
+- id: CLI-V4
+  verifies:
+  - CLI-8
+  method: test
+  technique: unit test
+  origin: agent
+  description: An operation without a reason is refused, and nothing is written.
+  tests:
+    python:
+    - tests/test_edit.py::test_every_operation_needs_a_reason
+- id: CLI-V5
+  verifies:
+  - CLI-9
+  - SYS-5
+  method: test
+  technique: integration test
+  origin: agent
+  description: Setting up an empty repository writes a spec that the checker passes with no errors, the launcher, the skill with the launcher's name filled in, and the Claude Code hooks and subagents. The launcher then runs the checker from the repository, and on a machine without the toolkit it says so and exits with code 127. Setting up for Antigravity writes the skill and no Claude Code files. An existing spec is left as it was.
+  tests:
+    python:
+    - tests/test_init.py::test_init_sets_up_an_empty_repository
+    - tests/test_init.py::test_launcher_runs_the_toolkit_from_the_repository
+    - tests/test_init.py::test_launcher_explains_a_machine_without_the_toolkit
+    - tests/test_init.py::test_antigravity_gets_the_skill_without_claude_code_glue
+    - tests/test_init.py::test_existing_spec_is_left_alone
+- id: CLI-V6
+  verifies:
+  - CLI-10
+  method: test
+  technique: integration test
+  origin: agent
+  description: A second setup reports every file unchanged, and a setup run without naming harnesses refreshes every harness already set up. Settings and hooks that setup didn't write survive two runs, and setup's own hooks appear once. Unreadable settings stop setup without being overwritten. A skill page the skill no longer has is removed. The drift check reports an edited installed file and writes nothing. This machine's launcher is kept unless a new one is named.
+  tests:
+    python:
+    - tests/test_init.py::test_init_again_changes_nothing
+    - tests/test_init.py::test_a_plain_rerun_refreshes_every_installed_harness
+    - tests/test_init.py::test_init_keeps_other_settings_and_hooks
+    - tests/test_init.py::test_init_refuses_unreadable_settings
+    - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
+    - tests/test_init.py::test_check_reports_installed_files_that_drifted
+    - tests/test_init.py::test_machine_launcher_is_kept_unless_replaced

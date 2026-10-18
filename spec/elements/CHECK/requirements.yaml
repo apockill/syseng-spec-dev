@@ -83,10 +83,10 @@
   traces_to: SYS-7
   why: the checker runs every time an agent tries to finish, and slow checks get skipped.
 - id: CHECK-15
-  text: When preparing a merge, the checker shall report each unapproved item as a finding.
+  text: When preparing a merge, the checker shall list, without failing the check, each alteration to an item the engineer approved, wrote or decided that the engineer has not yet kept or rolled back.
   origin: agent
   traces_to: SYS-14
-  why: keeps the main branch limited to what you've seen. Approving takes a click (REVIEW-13) or an explicit message in chat (AGENT-33).
+  why: whether a branch lands is the engineer's call (round 12, D1), so the check shows what they'd want to see first instead of blocking. Approvals that are missing don't matter here; alterations nobody has answered for do (SYS-37).
 - id: CHECK-17
   text: Within one run, the checker shall explain a rule in full only at its first finding, and refer back to that explanation for later findings of the same rule.
   origin: agent

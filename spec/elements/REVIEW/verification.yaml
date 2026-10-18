@@ -20,3 +20,23 @@
   tests:
     python:
     - tests/test_render.py::test_view_hides_verification_items
+- id: REVIEW-V3
+  verifies:
+  - REVIEW-10
+  method: test
+  technique: unit test
+  origin: agent
+  description: The change record view shows each change's reason beside it, with the old and new wording.
+  tests:
+    python:
+    - tests/test_decisions.py::test_view_shows_the_reason_beside_each_change
+- id: REVIEW-V4
+  verifies:
+  - REVIEW-12
+  method: test
+  technique: unit test
+  origin: agent
+  description: The change record view puts open decisions above the changes to the spec.
+  tests:
+    python:
+    - tests/test_decisions.py::test_view_puts_open_decisions_first_and_flags_the_engineers_items

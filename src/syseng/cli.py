@@ -2,8 +2,14 @@
 
   spec check [--merge] [--todo] [--json]   report everything unfinished (CHECK-1)
   spec render                               regenerate the Markdown views
-  spec show ID                              one item with its trace, children and approval
+  spec show ID                              one item: trace, children, verification, history
   spec approve ID... --words TEXT           record the engineer's approval (AGENT-21)
+  spec change start|close|show              open and close the change record edits are logged in
+  spec edit [--dry-run] < edits.yaml        change the spec (CLI-5 to CLI-8)
+  spec decide < decision.yaml               add an open decision with options (CHANGE-10)
+  spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12)
+  spec friction --workaround … --proposal … report friction with the toolkit (AGENT-46)
+  spec init [--harness NAME] [--launcher CMD]  set up a repository in one step (SYS-5)
 
 Run from anywhere inside a repository that has spec/toolkit.yaml, or pass --spec DIR.
 """
@@ -15,8 +21,8 @@ import re
 import sys
 from pathlib import Path
 
+from syseng import changes, edit, fingerprint, init, model, render, yamlio
 from syseng import check as checker
-from syseng import fingerprint, model, render, yamlio
 
 
 def _load(args) -> model.Spec:
@@ -98,7 +104,20 @@ def cmd_show(args) -> int:
     drs = [x for x in spec.of_kind("decision") if re.search(rf"\b{re.escape(iid)}\b", str(x.data.get("requirements", "")))]
     for x in drs:
         print(f"  decided in {x.id}: {x.data.get('title', '')}")
+    _print_history(spec, iid)
     return 0
+
+
+def _print_history(spec: model.Spec, iid: str) -> None:
+    """A requirement's history (CLI-3): each logged change with its reason, then older mentions."""
+    for change in changes.all_changes(spec):
+        for e in change.data.get("entries") or []:
+            if e.get("id") == iid:
+                print(f"  history: {e.get('op')} in {change.id}: {e.get('reason', '')}")
+    yaml_named = {c.path.with_suffix(".md").name for c in changes.all_changes(spec)}
+    for md in sorted((spec.root / "changes").glob("*.md")):
+        if md.name not in yaml_named and re.search(rf"\b{re.escape(iid)}\b", md.read_text()):
+            print(f"  mentioned in changes/{md.name}")
 
 
 def _expand(ids: list[str]) -> list[str]:
@@ -130,12 +149,166 @@ def cmd_approve(args) -> int:
         by_id[iid] = {"id": iid, "fingerprint": fingerprint.of(kind, data), "approved_on": today,
                       "via": args.via, "words": args.words, "text": fingerprint.summary(kind, data)}
     yamlio.write(spec.root / "approvals.yaml", sorted(by_id.values(), key=lambda a: render._id_key(a["id"])))
-    print(f"approved {len(ids)} item{'s' if len(ids) != 1 else ''}")
+    print(f"approved {len(ids)} item{'s' if len(ids) != 1 else ''}:")
+    for iid in ids:
+        print(f"  {changes._label(spec, iid) if iid in spec.items else f'{iid} ({spec.elements[iid].title})'}")
     render.write_views(model.load(spec.root))
     return 0
 
 
-def main(argv=None) -> int:
+def _read_doc(args):
+    text = Path(args.file).read_text() if getattr(args, "file", None) else sys.stdin.read()
+    try:
+        return yamlio.loads(text)
+    except Exception as e:  # report YAML problems the same way as any other edit problem
+        raise edit.EditError(f"can't read the YAML you sent: {e}") from e
+
+
+def cmd_change(args) -> int:
+    spec = _load(args)
+    try:
+        if args.action == "start":
+            if not args.request:
+                print("spec change start: say what the engineer asked for, in a sentence")
+                return 1
+            c = changes.start(spec, args.request, args.mode, args.target, args.slug)
+            print(f"opened {c.id} ({c.data['mode']}, target {c.data['target']}). Every `spec edit` is logged here.")
+        elif args.action == "close":
+            c = changes.current(spec)
+            if c is None:
+                print("no change is open")
+                return 1
+            open_ds = [d["id"] for d in c.data.get("decisions") or [] if d.get("status") == "open"]
+            changes.close(c)
+            print(f"closed {c.id}" + (f"; open decisions left for the engineer: {', '.join(open_ds)}" if open_ds else ""))
+        else:
+            c = changes.current(spec)
+            if c is None:
+                print("no change is open")
+                return 0
+            print(f"{c.id}: {c.data.get('request', '')} ({c.data.get('mode')}, target {c.data.get('target')}); "
+                  f"{len(c.data.get('entries') or [])} edits, "
+                  f"{sum(1 for d in c.data.get('decisions') or [] if d.get('status') == 'open')} open decisions")
+    except changes.ChangeError as e:
+        print(f"spec change: {e}")
+        return 1
+    render.write_views(model.load(spec.root))
+    return 0
+
+
+def cmd_edit(args) -> int:
+    spec = _load(args)
+    try:
+        result = edit.run(spec.root, _read_doc(args), dry_run=args.dry_run)
+    except (edit.EditError, changes.ChangeError) as e:
+        print(f"spec edit: {e}")
+        return 1
+    print("\n".join(result.context))
+    if result.needs_acks:
+        print("\nThis edit affects approved or depended-on items. Nothing was written. Acknowledge each one by name")
+        print("(a line on why the edit is fine for it, or what else must change), then send the batch again with:\n")
+        print("acks:")
+        for iid, why in result.needs_acks.items():
+            print(f"  {iid}: \"<note>\"   # {changes._label(model.load(spec.root), iid)}: {why}")
+        return 2
+    if result.errors:
+        print("\nThis edit would introduce errors, so nothing was written:\n")
+        print(checker.format_findings(result.errors, spec.root))
+        return 1
+    if args.dry_run:
+        print("\ndry run: the edit is valid; nothing was written")
+        return 0
+    print(f"\napplied {len(result.ids)} operation{'s' if len(result.ids) != 1 else ''}: {', '.join(result.ids)}")
+    print(checker.summarize(checker.check(model.load(spec.root))))
+    return 0
+
+
+def cmd_decide(args) -> int:
+    spec = _load(args)
+    c = changes.current(spec)
+    if c is None:
+        print("spec decide: no change is open")
+        return 1
+    try:
+        did = changes.add_decision(c, _read_doc(args) or {})
+    except (changes.ChangeError, edit.EditError) as e:
+        print(f"spec decide: {e}")
+        return 1
+    render.write_views(model.load(spec.root))
+    print(f"added open decision {did} to {c.id}")
+    return 0
+
+
+def cmd_resolve(args) -> int:
+    spec = _load(args)
+    c = changes.current(spec) or (changes.all_changes(spec) or [None])[-1]
+    if c is None:
+        print("spec resolve: no change record found")
+        return 1
+    try:
+        done = changes.resolve(c, args.ids, args.words, args.option)
+    except changes.ChangeError as e:
+        print(f"spec resolve: {e}")
+        return 1
+    render.write_views(model.load(spec.root))
+    print(f"resolved {', '.join(done)}")
+    return 0
+
+
+def cmd_friction(args) -> int:
+    spec = _load(args)
+    c = changes.current(spec)
+    if c is None:
+        print("spec friction: no change is open")
+        return 1
+    changes.log_friction(c, args.workaround, args.proposal)
+    render.write_views(model.load(spec.root))
+    print(f"logged in {c.id}; the engineer sees it in the change record")
+    return 0
+
+
+def _repo_root(start: Path) -> Path:
+    for d in [start, *start.parents]:
+        if (d / ".git").exists():
+            return d
+    return start
+
+
+def cmd_init(args) -> int:
+    repo = (Path(args.repo) if args.repo else _repo_root(Path.cwd())).resolve()
+    harnesses = args.harness or init.installed_harnesses(repo) or ["claude-code"]  # a re-run refreshes them all
+    try:
+        steps = init.run(repo, harnesses, args.launcher, check_only=args.check)
+    except init.InitError as e:
+        print(f"spec init: {e}")
+        return 1
+    if args.check:
+        stale = [s for s in steps if s.status == "differs"]
+        for s in stale:
+            print(f"  {s.path}: {s.note}")
+        print("spec init --check: " + (f"{len(stale)} files differ; run `spec init` to refresh them"
+                                       if stale else "up to date"))
+        return 1 if stale else 0
+    print(f"spec init: {repo}")
+    shown: dict[str, list[init.Step]] = {}
+    for s in steps:  # a skill's files are reported as one line
+        home = next((h for h in init.SKILL_HOMES.values() if s.path.startswith(h + "/")), None)
+        shown.setdefault(home + "/" if home else s.path, []).append(s)
+    for path, group in shown.items():
+        changed = [s for s in group if s.status not in ("unchanged", "kept")]
+        status = (changed[0].status if len({s.status for s in changed}) == 1 else "updated") if changed \
+            else group[0].status
+        note = group[0].note if len(group) == 1 else f"{len(group)} files"
+        print(f"  {status:<9} {path}" + (f"  ({note})" if note else ""))
+    print("\nCommit the files in the repository. The launcher outside it belongs to this machine.")
+    if "hermes" in harnesses:
+        print("Hermes loads a repository's skills only once you trust it: run `hermes skills trust` here.")
+    if steps[0].status == "created":
+        print("Next, ask your agent to onboard the project. The syseng skill tells it how.")
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="spec", description="Systems-engineering spec toolkit")
     parser.add_argument("--spec", help="spec directory (default: find spec/ from here upward)")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -154,5 +327,48 @@ def main(argv=None) -> int:
     p.add_argument("--words", required=True, help="the engineer's words, as evidence")
     p.add_argument("--via", default="terminal", help="where the approval was given (terminal, chat, page)")
     p.set_defaults(fn=cmd_approve)
-    args = parser.parse_args(argv)
+    p = sub.add_parser("change", help="open, close or show the change record edits are logged in")
+    p.add_argument("action", choices=["start", "close", "show"])
+    p.add_argument("request", nargs="?", help="start: what the engineer asked for, summarized")
+    p.add_argument("--mode", choices=list(changes.MODES), help="default: code-first (CHANGE-9)")
+    p.add_argument("--target", help="implementation the change targets (default: the primary one)")
+    p.add_argument("--slug", help="a few words for the file name")
+    p.set_defaults(fn=cmd_change)
+    p = sub.add_parser("edit", help="change the spec with a YAML batch on stdin (see `spec edit --help`)",
+                       description=edit.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--dry-run", action="store_true", help="show context and validate, but write nothing")
+    p.add_argument("--file", help="read the batch from a file instead of stdin")
+    p.set_defaults(fn=cmd_edit)
+    p = sub.add_parser("decide", help="add an open decision (YAML on stdin: question, importance, involves, options)")
+    p.add_argument("--file", help="read the decision from a file instead of stdin")
+    p.set_defaults(fn=cmd_decide)
+    p = sub.add_parser("resolve", help="record the engineer's choice on open decisions")
+    p.add_argument("ids", nargs="+")
+    p.add_argument("--words", required=True, help="the engineer's words, as evidence")
+    p.add_argument("--option", type=int, help="the option number chosen (default: the recommended one)")
+    p.set_defaults(fn=cmd_resolve)
+    p = sub.add_parser("friction", help="report a workaround you needed, with a proposed improvement (AGENT-46)")
+    p.add_argument("--workaround", required=True)
+    p.add_argument("--proposal", required=True)
+    p.set_defaults(fn=cmd_friction)
+    p = sub.add_parser("init", help="set up a repository: spec skeleton, launcher, skill and harness glue",
+                       description=init.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--harness", action="append", choices=list(init.HARNESSES),
+                   help="agent harness to set up for; repeat for several (default: the ones already set up, "
+                        "else claude-code)")
+    p.add_argument("--repo", help="repository to set up (default: the one containing the current directory)")
+    p.add_argument("--launcher", help="command that runs the toolkit on this machine, replacing the default "
+                                      "(this Python)")
+    p.add_argument("--check", action="store_true", help="report files that differ from a fresh setup; write nothing")
+    p.set_defaults(fn=cmd_init)
+    return parser
+
+
+def commands() -> set[str]:
+    sub = next(a for a in build_parser()._actions if isinstance(a, argparse._SubParsersAction))
+    return set(sub.choices)
+
+
+def main(argv=None) -> int:
+    args = build_parser().parse_args(argv)
     return args.fn(args)

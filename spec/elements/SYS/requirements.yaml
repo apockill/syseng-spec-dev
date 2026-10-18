@@ -36,7 +36,7 @@
   - NEED-4
   - NEED-6
   source: |-
-    "the specs should mark in some way what has been implemented yet, and what has not … the todo list can be regenerated but for an entire different implementation"
+    "the specs should mark in some way what has been implemented yet, and what has not … the todo list can be regenerated but for an entire different implementation" · "'the state of a requirements implmeentation should be trackable for a given implementation' … That way you can spec things first, and the agent can spawn subagents and agentically build (it just opens doors to have this coordination scaffodling)." (2026-10-17, suggesting what DR-31 is for)
 - id: SYS-10
   text: The toolkit shall verify each requirement by test, analysis, demonstration or inspection.
   origin: engineer
@@ -256,3 +256,81 @@
   kind: constraint
   source: |-
     Q22: "Requirement is 'there must be SOME harness involved' and that harness has to support subagents." This is your constraint, so it traces to no need.
+- id: SYS-32
+  kind: constraint
+  text: The toolkit shall install and run on machines without Nix.
+  origin: engineer
+  source: |-
+    "Let's not overindex too much on nix. Most users of this might not use nix, after all." (round 11, replying to a friction report)
+- id: SYS-33
+  kind: system
+  text: The toolkit shall record with each approval the approver, the channel, the number of items approved together, the engineer's words, and the decisions the engineer resolved about the item beforehand.
+  serves:
+  - NEED-14
+  origin: engineer
+  source: |-
+    "What matters is that in the future we can see WHO approved it and HOW." · "Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful." (2026-10-17)
+- id: SYS-34
+  kind: system
+  text: Each view of an item shall show whether the engineer approved the item explicitly or the item is delegated under an item the engineer approved.
+  serves:
+  - NEED-15
+  origin: engineer
+  source: |-
+    "As long as its clear what items got explicit approval, and which got approval by proxy, sure." · "Let's use delegated then. It'll imply the LLM chose it, and could be changed in the future, but at least we know where the req fits in the graph." (2026-10-17)
+- id: SYS-35
+  kind: system
+  text: The toolkit shall keep each statement of the engineer word for word on the requirements that directly express it, with the date and time of the statement and a summary of what was being discussed.
+  serves:
+  - NEED-16
+  origin: engineer
+  source: |-
+    "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things." · "Just to be clear, the goal is not 'every requirement must have a quote'." (2026-10-17)
+- id: SYS-36
+  kind: system
+  text: The toolkit shall place each requirement under the system element whose behavior the requirement constrains, whatever the order or framing of the request the requirement came from.
+  serves:
+  - NEED-20
+  origin: engineer
+  source: |-
+    "build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree" (2026-10-17)
+- id: SYS-37
+  kind: system
+  text: Once a change is built and tested, the toolkit shall ask the engineer whether to keep each alteration the change made to an item the engineer approved, wrote or decided.
+  serves:
+  - NEED-17
+  origin: engineer
+  source: |-
+    "It means: build and test the change, then say "hey, because of how I did this, XYZ had to change" and ask for permission to change them." (2026-10-17)
+- id: SYS-38
+  kind: system
+  text: The toolkit shall present the items agents propose for the engineer's explicit approval, each with the reason it deserves the engineer's attention, most consequential first.
+  serves:
+  - NEED-18
+  origin: engineer
+  source: |-
+    "it should be easy to have LLM propose different nodes in the graph for approval as it works- and take that feedback and 'lock' the requirement in so that in the future its less likely to be changed in sweeping changes (without it being brought up)." (2026-10-17)
+- id: SYS-39
+  kind: system
+  text: Before an agent changes an item, the toolkit shall show the agent whether the engineer approved, wrote or decided the item, and the discussion behind it.
+  serves:
+  - NEED-19
+  origin: engineer
+  source: |-
+    "It should feel more comfortable changing things that were less reviewed by humans, and more likely to call out / chat with a human about design over more pivitol historical decisions." (2026-10-17)
+- id: SYS-40
+  kind: constraint
+  text: The spec shall store no measure of an item's importance.
+  serves:
+  - NEED-19
+  origin: engineer
+  source: |-
+    "I don't want a 'value of decision' marker, but I want all of these to be useful for reasoning over as the LLM does large refactors." (2026-10-17)
+- id: SYS-41
+  kind: system
+  text: When the engineer asks for something that existing items already account for, the toolkit shall name those items to the engineer.
+  serves:
+  - NEED-21
+  origin: engineer
+  source: |-
+    "surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework." (2026-10-17)

@@ -37,3 +37,21 @@
   tests:
     python:
     - tests/test_repo_spec.py::test_todo_lists_unapproved_items
+- id: SYS-V5
+  verifies:
+  - SYS-15
+  method: test
+  technique: unit test
+  origin: agent
+  description: A change's record lists every spec item it added, modified or removed, with the old and new wording and the reason.
+  tests:
+    python:
+    - tests/test_edit.py::test_edits_are_logged_with_reasons_in_the_change_record
+    - tests/test_decisions.py::test_view_shows_the_reason_beside_each_change
+- id: SYS-V6
+  verifies:
+  - SYS-32
+  method: demonstration
+  technique: manual
+  origin: agent
+  description: On a machine with Python but without Nix tooling, install the toolkit with pip into a new virtual environment, run setup in a scratch repository, then run the repository's launcher to check the spec. Each step succeeds, and the checker reports no errors.

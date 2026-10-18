@@ -288,7 +288,7 @@ def format_findings(findings: list[Finding], root: Path) -> str:
             explained.add(f.code)
             lines.append(f"   = why: {rule.why}" + (f" ({rule.ref})" if rule.ref else ""))
             lines.append(f"   = fix: {rule.fix}")
-            lines.append(f"   = rule: {rule.link}")
+            lines.append(f"   = rule: {rule.link(root)}")
         lines.append("")
     return "\n".join(lines)
 
@@ -298,8 +298,10 @@ def summarize(findings: list[Finding]) -> str:
     todos = [f for f in findings if f.severity == "todo"]
     unverified = sum(1 for f in todos if f.code == "T004")
     unapproved = sum(1 for f in todos if f.code == "A003")
+    unserved = sum(1 for f in todos if f.code == "T002")
     parts = [f"{len(errors)} error{'s' if len(errors) != 1 else ''}"]
     if todos:
-        parts.append(f"{len(todos)} to-dos ({unverified} requirements without verification items, "
+        served = f"{unserved} needs nothing serves yet, " if unserved else ""
+        parts.append(f"{len(todos)} to-dos ({served}{unverified} requirements without verification items, "
                      f"{unapproved} unapproved items; list them with `spec check --todo`)")
     return "spec check: " + ", ".join(parts)

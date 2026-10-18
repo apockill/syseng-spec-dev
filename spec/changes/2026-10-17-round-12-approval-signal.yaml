@@ -1,0 +1,353 @@
+request: |-
+  Approvals carry their signal: who approved each item and how, what is delegated under an approval, the engineer's words kept on the requirements they inform, and changes to locked items raised with the engineer
+mode: spec-first
+target: python
+status: open
+opened: '2026-10-17'
+entries:
+- op: modify
+  id: DR-31
+  reason: recording round 12's needs before their requirements was rejected, because an unserved need was an error. Spec-first planning records needs first, and an unserved need is unfinished work, like a requirement without verification.
+  before:
+    title: Missing verification and missing approvals are to-dos, not errors
+    decision: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. In merge mode (`spec check --merge`, CHECK-15), unapproved items become errors. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches.
+  after:
+    title: Missing verification, missing approvals and unserved needs are to-dos, not errors
+    decision: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. In merge mode (`spec check --merge`, CHECK-15), unapproved items become errors. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12).
+  acks:
+    DR-31: the decision stands for verification and approvals; this adds unserved needs to the to-dos, so it needs your permission and re-approval.
+- op: modify
+  id: CLI-V6
+  reason: a plain re-run of setup refreshed only the Claude Code copy of the skill and left the Hermes copy stale; fixed, with a test.
+  before:
+    description: A second setup reports every file unchanged. Settings and hooks that setup didn't write survive two runs, and setup's own hooks appear once. Unreadable settings stop setup without being overwritten. A skill page the skill no longer has is removed. The drift check reports an edited installed file and writes nothing. This machine's launcher is kept unless a new one is named.
+    tests:
+      python:
+      - tests/test_init.py::test_init_again_changes_nothing
+      - tests/test_init.py::test_init_keeps_other_settings_and_hooks
+      - tests/test_init.py::test_init_refuses_unreadable_settings
+      - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
+      - tests/test_init.py::test_check_reports_installed_files_that_drifted
+      - tests/test_init.py::test_machine_launcher_is_kept_unless_replaced
+  after:
+    description: A second setup reports every file unchanged, and a setup run without naming harnesses refreshes every harness already set up. Settings and hooks that setup didn't write survive two runs, and setup's own hooks appear once. Unreadable settings stop setup without being overwritten. A skill page the skill no longer has is removed. The drift check reports an edited installed file and writes nothing. This machine's launcher is kept unless a new one is named.
+    tests:
+      python:
+      - tests/test_init.py::test_init_again_changes_nothing
+      - tests/test_init.py::test_a_plain_rerun_refreshes_every_installed_harness
+      - tests/test_init.py::test_init_keeps_other_settings_and_hooks
+      - tests/test_init.py::test_init_refuses_unreadable_settings
+      - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
+      - tests/test_init.py::test_check_reports_installed_files_that_drifted
+      - tests/test_init.py::test_machine_launcher_is_kept_unless_replaced
+- op: add
+  id: NEED-14
+  reason: the engineer's words in round 12.
+  after:
+    text: The engineer needs to see who approved each item and how.
+    origin: engineer
+    source: |-
+      "What matters is that in the future we can see WHO approved it and HOW." · "Approved directly by a human on a UI? probably higher value. Approved as part of a batch approve on UI? Lower value. Approved as part of a batch approve on LLM chat? About the same,  maybe slightly lower. Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful." (2026-10-17)
+    context: Asked who should record an approval given by picking an option in a menu. The engineer answered that who records it doesn't matter, and that the record of who approved and how does.
+- op: add
+  id: NEED-15
+  reason: the engineer's words in round 12.
+  after:
+    text: The engineer needs to tell which items they approved explicitly and which are delegated under an item they approved.
+    origin: engineer
+    source: |-
+      "As long as its clear what items got explicit approval, and which got approval by proxy, sure." · "Let's use delegated then. It'll imply the LLM chose it, and could be changed in the future, but at least we know where the req fits in the graph." (2026-10-17)
+    context: Asked whether approving an item should delegate everything under it in the requirement tree, and what to call that.
+- op: add
+  id: NEED-16
+  reason: the engineer's words in round 12.
+  after:
+    text: The engineer needs their own statements of intent and reasoning kept word for word on each requirement they inform.
+    origin: engineer
+    source: |-
+      "Also important tto try to document anything I say and divvy it up across the requirements, so if some part of the tree is approved by proxy (therefore more likely to change in the future) but has some quotes from me, then it can be brought up in the future by the LLM if its changed as we add features. It's all about signaling importance and intent of each requirement." · "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things. But for example, in the above paragraph I gave a lot of reasoning. That could go somewhere, and the context summary would provide more info." (2026-10-17)
+    context: Discussing delegated requirements, and where the engineer's words should be kept.
+- op: add
+  id: NEED-17
+  reason: the engineer's words in round 12.
+  after:
+    text: The engineer needs each change to an item they approved, wrote or decided to be raised with them once the work is built and tested, with a request for their permission.
+    origin: engineer
+    source: |-
+      "It means: build and test the change, then say "hey, because of how I did this, XYZ had to change" and ask for permission to change them. It's all about surfacing things- oftentimes the user is like "LGTM, I saw the final product, its fine" but htis is all about surfacing the one thing the user actually cared a lot about "actually I really _do_ care about the camera view sticking in the view when scrolling down, if this has to change let's roll it back and discuss why {commence conversation}"" (2026-10-17)
+    context: Asked what raising a change to an approved item should mean in code-first mode, where the agent never stops to ask (DR-15).
+- op: add
+  id: NEED-18
+  reason: the engineer's words in round 12.
+  after:
+    text: The engineer needs to approve the key requirements without reading every requirement, with agents proposing which ones as they work.
+    origin: engineer
+    source: |-
+      "Then the idea here being that LLMs can fish for approval on key requirements, but humans don't _have_ to read all the requiremnets for everything (for example, business logic around 'when this button is clicked, X shall occur' is less interesting than two or three layers up the tree 'the X interface shall enable user to do Y'." · "it should be easy to have LLM propose different nodes in the graph for approval as it works- and take that feedback and 'lock' the requirement in so that in the future its less likely to be changed in sweeping changes (without it being brought up)." (2026-10-17)
+    context: Discussing whether approval could pass down the requirement tree, and whether anything about approvals should block a merge.
+- op: add
+  id: NEED-19
+  reason: the engineer's words in round 12.
+  after:
+    text: The engineer needs agents making large changes to weigh each item by the human attention it received.
+    origin: engineer
+    source: |-
+      "Everything about this system is geared towards: 1. documenting decisions 2. documenting the 'signal' these decisions provide. Every piece of software is like a fractal of decisions. If we want humans to have high leverage (produce 1000x more code) while keeping high intellectual control over the system, we need to document the nodes of the fractal." · "I don't want a 'value of decision' marker, but I want all of these to be useful for reasoning over as the LLM does large refactors. It should feel more comfortable changing things that were less reviewed by humans, and more likely to call out / chat with a human about design over more pivitol historical decisions." (2026-10-17)
+    context: Discussing what approval records are for.
+- op: modify
+  id: NEED-16
+  reason: the engineer clarified that only the requirements their words directly express should carry them; reworded to match, with their reasoning quoted.
+  before:
+    text: The engineer needs their own statements of intent and reasoning kept word for word on each requirement they inform.
+    source: |-
+      "Also important tto try to document anything I say and divvy it up across the requirements, so if some part of the tree is approved by proxy (therefore more likely to change in the future) but has some quotes from me, then it can be brought up in the future by the LLM if its changed as we add features. It's all about signaling importance and intent of each requirement." · "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things. But for example, in the above paragraph I gave a lot of reasoning. That could go somewhere, and the context summary would provide more info." (2026-10-17)
+    context: Discussing delegated requirements, and where the engineer's words should be kept.
+  after:
+    text: The engineer needs their statements kept word for word on the requirements those statements directly express.
+    source: |-
+      "Just to be clear, the goal is not 'every requirement must have a quote'. After all, if I say "make a 3d game that does XYZ" there will be many many requirements spawned from that "the 3d engine must render in xyz time", getting super nitty gritty. However, If I said "make a 3d game that does xyz (high level statement) and make sure the players feet are purple" that might call out two very different parts of the requirement tree (purple feet being much closer to the 'character model' portion of components). So, the goal here is: 'spread out the quotes where applicable, but build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree"." (2026-10-17) · "Also important tto try to document anything I say and divvy it up across the requirements, so if some part of the tree is approved by proxy (therefore more likely to change in the future) but has some quotes from me, then it can be brought up in the future by the LLM if its changed as we add features. It's all about signaling importance and intent of each requirement." · "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things. But for example, in the above paragraph I gave a lot of reasoning. That could go somewhere, and the context summary would provide more info." (2026-10-17)
+    context: Discussing delegated requirements and where the engineer's words should be kept, then clarifying that not every requirement needs a quote.
+- op: add
+  id: NEED-20
+  reason: the engineer's words in round 12.
+  after:
+    text: The engineer needs the requirement tree to follow the system's structure, not the order or framing of their requests.
+    origin: engineer
+    source: |-
+      "However, If I said "make a 3d game that does xyz (high level statement) and make sure the players feet are purple" that might call out two very different parts of the requirement tree (purple feet being much closer to the 'character model' portion of components). So, the goal here is: 'spread out the quotes where applicable, but build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree". Like, the "players feet must be purple" shouldn't be close to the top of the tree. It would be like, 'game world' -> 'game characters' -> 'player' -> 'player model' -> 'textures' -> 'req: purple feet, approved by human, quotes'." (2026-10-17)
+    context: |-
+      Clarifying NEED-16: which requirements carry the engineer's words, and where in the tree those requirements belong.
+- op: modify
+  id: NEED-17
+  reason: |-
+    the engineer found the first wording hard to follow outside this conversation: "Soudns good, but the wording is a bit confusing 'raise changes...' makes sense only in this conversations context."
+  before:
+    text: The engineer needs each change to an item they approved, wrote or decided to be raised with them once the work is built and tested, with a request for their permission.
+  after:
+    text: The engineer needs agents to point out, once a change is built and tested, each item the engineer approved, wrote or decided that the change altered, and to ask whether to keep each alteration.
+- op: add
+  id: SYS-33
+  reason: serves NEED-14 (who approved and how).
+  after:
+    kind: system
+    text: The toolkit shall record with each approval the approver, the channel, the number of items approved together, the engineer's words, and the decisions the engineer resolved about the item beforehand.
+    serves:
+    - NEED-14
+    origin: engineer
+    source: |-
+      "What matters is that in the future we can see WHO approved it and HOW." · "Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful." (2026-10-17)
+- op: add
+  id: SYS-34
+  reason: serves NEED-15 (explicit versus delegated).
+  after:
+    kind: system
+    text: Each view of an item shall show whether the engineer approved the item explicitly or the item is delegated under an item the engineer approved.
+    serves:
+    - NEED-15
+    origin: engineer
+    source: |-
+      "As long as its clear what items got explicit approval, and which got approval by proxy, sure." · "Let's use delegated then. It'll imply the LLM chose it, and could be changed in the future, but at least we know where the req fits in the graph." (2026-10-17)
+- op: add
+  id: SYS-35
+  reason: serves NEED-16 (your words on the requirements they express).
+  after:
+    kind: system
+    text: The toolkit shall keep each statement of the engineer word for word on the requirements that directly express it, with the date and time of the statement and a summary of what was being discussed.
+    serves:
+    - NEED-16
+    origin: engineer
+    source: |-
+      "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things." · "Just to be clear, the goal is not 'every requirement must have a quote'." (2026-10-17)
+- op: add
+  id: SYS-36
+  reason: serves NEED-20 (the tree follows the system's structure).
+  after:
+    kind: system
+    text: The toolkit shall place each requirement under the system element whose behavior the requirement constrains, whatever the order or framing of the request the requirement came from.
+    serves:
+    - NEED-20
+    origin: engineer
+    source: |-
+      "build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree" (2026-10-17)
+- op: add
+  id: SYS-37
+  reason: serves NEED-17 (changes to what you approved, wrote or decided come back to you).
+  after:
+    kind: system
+    text: Once a change is built and tested, the toolkit shall ask the engineer whether to keep each alteration the change made to an item the engineer approved, wrote or decided.
+    serves:
+    - NEED-17
+    origin: engineer
+    source: |-
+      "It means: build and test the change, then say "hey, because of how I did this, XYZ had to change" and ask for permission to change them." (2026-10-17)
+- op: add
+  id: SYS-38
+  reason: serves NEED-18 (agents propose the key items).
+  after:
+    kind: system
+    text: The toolkit shall present the items agents propose for the engineer's explicit approval, each with the reason it deserves the engineer's attention, most consequential first.
+    serves:
+    - NEED-18
+    origin: engineer
+    source: |-
+      "it should be easy to have LLM propose different nodes in the graph for approval as it works- and take that feedback and 'lock' the requirement in so that in the future its less likely to be changed in sweeping changes (without it being brought up)." (2026-10-17)
+- op: add
+  id: SYS-39
+  reason: serves NEED-19 (weigh items by the attention they got).
+  after:
+    kind: system
+    text: Before an agent changes an item, the toolkit shall show the agent whether the engineer approved, wrote or decided the item, and the discussion behind it.
+    serves:
+    - NEED-19
+    origin: engineer
+    source: |-
+      "It should feel more comfortable changing things that were less reviewed by humans, and more likely to call out / chat with a human about design over more pivitol historical decisions." (2026-10-17)
+- op: add
+  id: SYS-40
+  reason: the engineer's constraint on NEED-19.
+  after:
+    kind: constraint
+    text: The spec shall store no measure of an item's importance.
+    serves:
+    - NEED-19
+    origin: engineer
+    source: |-
+      "I don't want a 'value of decision' marker, but I want all of these to be useful for reasoning over as the LLM does large refactors." (2026-10-17)
+- op: add
+  id: DR-44
+  reason: records the approach behind round 12's system requirements.
+  after:
+    title: Approval works like delegated authority in configuration management
+    decided_by: agent
+    elements:
+    - SYS
+    - MODEL
+    - CHANGE
+    - AGENT
+    requirements: SYS-33, SYS-34, SYS-35, SYS-36, SYS-37, SYS-38, SYS-39, SYS-40
+    recorded: round 12 (spec-first)
+    status: proposed in round 12; not built yet.
+    context: The engineer wants to approve the key points of the requirement tree, let agents decide the rest, and have each later change to what they approved, wrote or decided brought back to them (NEED-14 to NEED-20). Today every item needs approval, and over 200 items are waiting.
+    decision: |-
+      Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).
+      - The engineer approves key items explicitly, as a customer approves a baseline. Everything beneath an approved item is delegated: the agent decides it, as a contractor decides the detailed design.
+      - A change that alters an item the engineer approved, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it.
+      - Whether an item is approved, delegated or neither is computed from the approvals and the tree each time it's shown, and never stored (SYS-40).
+      - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
+    alternatives: Approving every item, which is today's rule and doesn't scale. A stored importance score, which the engineer ruled out.
+    consequences: The engineer approves a few key items per change instead of every item. Agents need each item's approval state at the moment they change it (SYS-39). Whether the merge check still blocks anything is open (round 12, D1).
+- op: modify
+  id: SYS-9
+  reason: the engineer restated this requirement in round 12, with the reasoning behind it.
+  before:
+    source: |-
+      "the specs should mark in some way what has been implemented yet, and what has not … the todo list can be regenerated but for an entire different implementation"
+  after:
+    source: |-
+      "the specs should mark in some way what has been implemented yet, and what has not … the todo list can be regenerated but for an entire different implementation" · "'the state of a requirements implmeentation should be trackable for a given implementation' … That way you can spec things first, and the agent can spawn subagents and agentically build (it just opens doors to have this coordination scaffodling)." (2026-10-17, suggesting what DR-31 is for)
+- op: modify
+  id: DR-31
+  reason: D1 in round 12. The engineer said "Yeah I think its up to the user to decide." about whether approvals can stop a branch from landing, so the merge check no longer turns unapproved items into errors. Also linked to SYS-9, the tracking these to-dos serve.
+  before:
+    requirements: CHECK-10, CHECK-14, CHECK-15, MODEL-18
+    decision: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. In merge mode (`spec check --merge`, CHECK-15), unapproved items become errors. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12).
+  after:
+    requirements: CHECK-10, CHECK-14, CHECK-15, MODEL-18, SYS-9
+    decision: |-
+      They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12). The merge check (`spec check --merge`, CHECK-15) never fails because of approvals: whether a branch lands is the engineer's call (round 12, D1).
+  acks:
+    DR-31: D1 changed its merge sentence, so it needs your permission again, just after your approval.
+- op: modify
+  id: CHECK-15
+  reason: D1 in round 12.
+  before:
+    text: When preparing a merge, the checker shall report each unapproved item as a finding.
+    why: keeps the main branch limited to what you've seen. Approving takes a click (REVIEW-13) or an explicit message in chat (AGENT-33).
+  after:
+    text: When preparing a merge, the checker shall list, without failing the check, each alteration to an item the engineer approved, wrote or decided that the engineer has not yet kept or rolled back.
+    why: whether a branch lands is the engineer's call (round 12, D1), so the check shows what they'd want to see first instead of blocking. Approvals that are missing don't matter here; alterations nobody has answered for do (SYS-37).
+  acks:
+    DR-31: D1 changed its merge sentence, so it needs your permission again, just after your approval.
+    CHECK-V4: its description and test still check the old merge behavior; both change when round 12 is built.
+- op: modify
+  id: DR-44
+  reason: D1 in round 12.
+  before:
+    consequences: The engineer approves a few key items per change instead of every item. Agents need each item's approval state at the moment they change it (SYS-39). Whether the merge check still blocks anything is open (round 12, D1).
+  after:
+    consequences: The engineer approves a few key items per change instead of every item. Agents need each item's approval state at the moment they change it (SYS-39). The merge check never blocks; it lists the alterations the engineer hasn't answered yet (CHECK-15, round 12 D1).
+- op: add
+  id: NEED-21
+  reason: the engineer's words in round 12.
+  after:
+    text: The engineer needs agents to point out which existing items already account for what the engineer asks for.
+    origin: engineer
+    source: |-
+      "This was helpful: surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework. It's helpful because it can help us weave the graph tighter through conversation, help find conenctions, etc." (2026-10-17)
+    context: Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.
+- op: add
+  id: SYS-41
+  reason: serves NEED-21 (connecting what the engineer says to the graph).
+  after:
+    kind: system
+    text: When the engineer asks for something that existing items already account for, the toolkit shall name those items to the engineer.
+    serves:
+    - NEED-21
+    origin: engineer
+    source: |-
+      "surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework." (2026-10-17)
+- op: add
+  id: AGENT-50
+  reason: the engineer's words in round 12.
+  after:
+    text: When the engineer restates what an existing item already says, the agent shall record the restatement as the engineer's approval of that item, marked as given by restatement.
+    traces_to: SYS-41
+    origin: engineer
+    source: |-
+      "Since I mentioend "I would like XYZ" and you said "ah that's accounted for in ABC", thats a case where I think "ABC" could be coutned as 'approved' for future notice." (2026-10-17)
+- op: modify
+  id: AGENT-21
+  reason: AGENT-50 makes a restatement count as an approval, at the engineer's suggestion.
+  before:
+    text: |-
+      Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, or an explicit approval in chat.
+  after:
+    text: |-
+      Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, an explicit approval in chat, or a restatement in chat of what an item already says.
+  acks:
+    AGENT-V4: still verifies the hook's ID-only approvals. Restatement approvals are recorded by the agent, and no verification item covers them yet.
+    DR-6: unchanged. The hook records lines that approve by ID, and the agent records the rest, now including restatements.
+    DR-41: unchanged. The hook never interprets restatements; the agent does (AGENT-50).
+- op: modify
+  id: AGENT-33
+  reason: a restatement now counts as an approval of a different kind (AGENT-50), so this rule now covers explicit approvals only.
+  before:
+    text: A chat message shall count as an approval only when it states unambiguously which items it approves.
+  after:
+    text: A chat message shall count as an explicit approval only when it states unambiguously which items it approves.
+  acks:
+    AGENT-V4: still verifies the hook's ID-only approvals. Restatement approvals are recorded by the agent, and no verification item covers them yet.
+    DR-6: unchanged. The hook records lines that approve by ID, and the agent records the rest, now including restatements.
+    DR-41: unchanged. The hook never interprets restatements; the agent does (AGENT-50).
+decisions:
+- id: D1
+  question: Should anything about approvals stop a branch from landing on master?
+  importance: It decides whether the check you run before landing a branch (`spec check --merge`) can stop you, or only shows you what changed. You answered "presumably nothing" before asking what merge meant, so this confirms it. CHECK-15 and DR-31 change with the answer.
+  involves:
+  - CHECK-15
+  - DR-31
+  - NEED-18
+  options:
+  - label: Nothing blocks; show what changed
+    recommended: true
+    detail: Before a branch lands, the check lists every item you approved, wrote or decided that changed since the branch left master, so you see them first. It never fails because of approvals. This matches your answer, and with delegation most items never need your approval at all.
+  - label: Changed locked items block
+    detail: |-
+      Landing fails while an item you approved, wrote or decided has changed without your permission. Delegated items never block. Stricter: it turns "raise it with me" into a gate.
+  - label: Keep today's rule
+    detail: Every unapproved item blocks landing, delegated ones included, which means approving everything.
+  status: resolved
+  chosen: Nothing blocks; show what changed
+  words: Yeah I think its up to the user to decide.
+  resolved: '2026-10-17'
+friction: []

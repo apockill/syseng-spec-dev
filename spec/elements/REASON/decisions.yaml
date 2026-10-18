@@ -6,8 +6,22 @@
   requirements: REASON-2, REASON-5
   recorded: round 4 (was REASON-6 and REASON-7)
   status: |-
-    part of the Claude Code adapter (DR-1). The requirement itself is harness-neutral (DR-25): the skill describes the ideal reasoning-check subagent, and each agent sets one up with what its harness offers. This record covers how to do that in Claude Code. Q22 ruled out an API path.
+    part of the Claude Code adapter (DR-1). The requirement itself is harness-neutral (DR-25): the skill describes the ideal reasoning-check subagent, and each agent sets one up with what its harness offers. This record covers how to do that in Claude Code. Q22 ruled out an API path. Refined in round 11 by DR-42: searches that could reach the spec are refused rather than filtered.
   context: the engineer wants reasoning checks to start with no project context and no conversation, and to read the code but not the spec.
   decision: use a custom, non-fork subagent. Its definition sets `omitClaudeMd`, so CLAUDE.md and AGENTS.md don't load. It has no shell tool. It carries its own hook that refuses reads under the spec directory and drops spec hits from search results.
   alternatives: a fork, which inherits the conversation and which the engineer ruled out. An instruction alone. A direct model-API call, which Q22 ruled out (DR-25).
   consequences: if the read-blocking hook proves fiddly, drop it and keep the instruction (the engineer's call).
+- id: DR-42
+  title: The reasoning check's read guard refuses every read or search that could reach the spec
+  decided_by: agent
+  elements:
+  - REASON
+  requirements: REASON-5, REASON-2
+  recorded: round 11 (slice 3)
+  context: DR-7 planned a hook that refuses reads under the spec directory and drops spec hits from search results, and said to fall back to an instruction if that proved fiddly.
+  decision: |-
+    The reasoning-check subagent gets only the read, search and file-listing tools, and its own hook refuses a read inside the spec directory and a search that could return a spec file.
+    - A search reaches the spec when it starts inside it, or starts above it with no file filter or with a filter that matches a spec file.
+    - Searches filtered to source files, or aimed at source directories, pass.
+  alternatives: Filtering spec hits out of search results afterwards, which Claude Code allows but which means rewriting each tool's output format. The instruction alone.
+  consequences: The guard covers every tool the subagent has. A subagent that searches the whole repository without a filter is refused once, and narrows its search.

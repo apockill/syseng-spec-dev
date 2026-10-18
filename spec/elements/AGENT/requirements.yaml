@@ -66,7 +66,7 @@
     "I think yes, and with a flag to the user for these cases- like, 'hey, because of X or Y we needed to change the REQ. The alternatives are A B or C'"
 - id: AGENT-21
   text: |-
-    Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, or an explicit approval in chat.
+    Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, an explicit approval in chat, or a restatement in chat of what an item already says.
   origin: engineer
   traces_to: SYS-14
   source: |-
@@ -108,7 +108,7 @@
   source: |-
     "Let's not encode this in the skill. Agent harnesses are getting better and better, I don't want to be overly prescriptive."
 - id: AGENT-33
-  text: A chat message shall count as an approval only when it states unambiguously which items it approves.
+  text: A chat message shall count as an explicit approval only when it states unambiguously which items it approves.
   origin: engineer
   traces_to: SYS-14
   source: |-
@@ -222,3 +222,27 @@
   refines: |-
     "I'll more likely just say 'approve everything except {description}, lets workshop that- {feedback}'"
   why: a described exception has to be interpreted. Resolving every doubt toward "not approved" means a misreading can only hold an item back. It can never approve something you meant to exclude.
+- id: AGENT-47
+  text: Each step of the method shall be achievable in a harness that runs none of the toolkit's hooks.
+  traces_to: SYS-27
+  origin: engineer
+  source: |-
+    "the framework must still work without the hooks, the hooks are convenience and guardrails to improve experience, but should not be core. I'm using hermes agent for some coding, and other times it defers to claude code. When hermes uses the system it should still work, but obviously the claude code one will be less likely to make mistakes due to the harnesses, etc." (2026-10-17, deciding to keep the Claude Code hooks)
+- id: AGENT-48
+  text: When an agent asks the engineer to approve items, the agent shall give the exact line that records the approval of those items.
+  traces_to: SYS-14
+  origin: engineer
+  source: |-
+    "Those sessions are okay, as long as the agent knows about them and can tell me things like "please state Approve" and "LGTM" for the specific items. That way I know what to do and can be trained into it." (2026-10-17; "those sessions" are the Claude Code session hooks)
+- id: AGENT-49
+  text: In a harness where the toolkit's hooks run, the installed skill shall tell the agent what each hook does.
+  traces_to: SYS-29
+  origin: engineer
+  source: |-
+    "Those sessions are okay, as long as the agent knows about them" (2026-10-17; "those sessions" are the Claude Code session hooks)
+- id: AGENT-50
+  text: When the engineer restates what an existing item already says, the agent shall record the restatement as the engineer's approval of that item, marked as given by restatement.
+  traces_to: SYS-41
+  origin: engineer
+  source: |-
+    "Since I mentioend "I would like XYZ" and you said "ah that's accounted for in ABC", thats a case where I think "ABC" could be coutned as 'approved' for future notice." (2026-10-17)

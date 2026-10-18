@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-# Runs the toolkit's CLI from this checkout.
-exec python3 -m syseng "$@"
+# Runs the toolkit's CLI from this source checkout, from any directory.
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PYTHONPATH="$here/src${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m syseng "$@"
