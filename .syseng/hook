@@ -276,9 +276,20 @@ _LEAD = re.compile(r"^\s*approved?\b:?", re.I)
 _ENDORSE = re.compile(r"^(?P<clause>.*?)[\s,:\-\u2013\u2014]*\b(?:lgtm|sgtm|approved|looks? good)\b[\s.!]*$", re.I)
 
 
+def _spelled_out(clause: str, elements: set[str] | None) -> str:
+    """'Change 13' or 'need 16' as CHANGE-13 or NEED-16, when the word is a system element, NEED or DR (AGENT-57)."""
+    if elements is None:
+        return clause
+    prefixes = {e.upper() for e in elements} | {"NEED", "DR"}
+    return re.sub(r"\b([A-Za-z]+)[ ](V?\d+)\b",
+                  lambda m: f"{m.group(1).upper()}-{m.group(2).upper()}" if m.group(1).upper() in prefixes else m.group(0),
+                  clause)
+
+
 def _ids_only(clause: str, elements: set[str] | None) -> tuple[list[str], str | None]:
     """The IDs a clause names, if it names nothing else. Bare capitalized words count as
     system element IDs only when they are elements (any, when `elements` is None)."""
+    clause = _spelled_out(clause, elements)
     ids, pos = [], 0
     while pos < len(clause):
         m = _TOKEN.match(clause, pos)
@@ -305,7 +316,7 @@ def parse_approval(line: str, elements: set[str] | None = None) -> tuple[list[st
     m = _ENDORSE.match(line)
     if m:
         ids, problem = _ids_only(m.group("clause"), elements)
-        if ids or re.search(_ID, m.group("clause")):
+        if ids or re.search(_ID, _spelled_out(m.group("clause"), elements)):
             return ids, problem
     return None, None
 
