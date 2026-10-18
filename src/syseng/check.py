@@ -8,7 +8,7 @@ mode: whether a branch lands is the engineer's call (CHECK-15, DR-31).
 from dataclasses import dataclass
 from pathlib import Path
 
-from syseng import render, review
+from syseng import naming, render, review, testlinks
 from syseng.model import Spec
 from syseng.rules import METHODS, RULES, TECHNIQUES, check_wording
 
@@ -40,6 +40,7 @@ def check(spec: Spec) -> list[Finding]:
     out += _attributes(spec)
     out += _wording(spec)
     out += _verification(spec)
+    out += _test_links(spec)
     out += _approvals(spec)
     out += _rendered(spec)
     return out
@@ -237,6 +238,28 @@ def _verification(spec: Spec) -> list[Finding]:
     return out
 
 
+def _test_links(spec: Spec) -> list[Finding]:
+    """CHECK-4: each test a verification item links to exists, as a file and a test name in it."""
+    roots = {i.get("name"): spec.repo_root() / str(i.get("root") or ".")
+             for i in spec.config.get("implementations") or [] if isinstance(i, dict)}
+    out, cache = [], {}
+    for vi in spec.of_kind("vi"):
+        tests = vi.data.get("tests") or {}
+        if not isinstance(tests, dict):
+            out.append(_f("V001", f"{vi.id}'s `tests` must map each implementation to a list of links", vi.id, vi))
+            continue
+        for impl, links in tests.items():
+            if impl not in roots:
+                out.append(_f("V002", f"{vi.id} links tests for {impl!r}, which toolkit.yaml doesn't name as an "
+                                      f"implementation", vi.id, vi))
+                continue
+            for link in links or []:
+                problem = testlinks.missing(roots[impl], str(link), cache)
+                if problem:
+                    out.append(_f("V002", f"{vi.id} links {link}, but {problem}", vi.id, vi))
+    return out
+
+
 # ---------------------------------------------------------------- approvals
 def _approvals(spec: Spec) -> list[Finding]:
     out = []
@@ -306,7 +329,7 @@ def format_findings(findings: list[Finding], root: Path) -> str:
         else:
             explained.add(f.code)
             lines.append(f"   = why: {rule.why}" + (f" ({rule.ref})" if rule.ref else ""))
-            lines.append(f"   = fix: {rule.fix}")
+            lines.append(f"   = fix: {naming.localize(rule.fix, root)}")
             lines.append(f"   = rule: {rule.link(root)}")
         lines.append("")
     return "\n".join(lines)
@@ -328,5 +351,6 @@ def summarize(findings: list[Finding]) -> str:
         served = f"{_n(unserved, 'need')} nothing serves yet, " if unserved else ""
         answers = f"{_n(unanswered, 'alteration')} awaiting the engineer's answer, " if unanswered else ""
         parts.append(f"{_n(len(todos), 'to-do')} ({answers}{served}{_n(unverified, 'requirement')} without "
-                     f"verification items, {_n(unreviewed, 'unreviewed item')}; list them with `spec check --todo`)")
+                     f"verification items, {_n(unreviewed, 'unreviewed item')}; list them with "
+                     f"{naming.cmd('check --todo')})")
     return "spec check: " + ", ".join(parts)

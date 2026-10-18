@@ -111,6 +111,7 @@
     - It refuses a tool call by exiting with code 2, giving the reason on standard error.
     - The guard refuses edits to the files the toolkit manages: elements, change records, approvals, retired IDs and generated views. Its refusal names the command to use. toolkit.yaml and hand-written pages such as the glossary stay editable.
     - For shell commands, it refuses plain writes into those files: redirections, tee, rm, mv, cp, and in-place sed or perl.
+    - When the agent stops with errors in the spec, it sends the findings back as feedback, which Claude Code doesn't show as an error.
     - Only the stop and prompt hooks run the toolkit, through the launcher. When the toolkit isn't set up, nothing is blocked, and the engineer sees a notice.
   alternatives: Hooks that call the toolkit for everything, which costs a Python start-up with PyYAML on every tool call and fails on machines without the toolkit. A Claude Code plugin, which DR-1 ruled out.
   consequences: A script that opens spec files itself, in python or awk, gets past the guard. The change log and the auditors are the backstop. The hook copy can fall behind the toolkit until `spec init` runs again.

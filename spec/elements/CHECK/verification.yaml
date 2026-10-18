@@ -66,3 +66,16 @@
   tests:
     python:
     - tests/test_review.py::test_quotes_need_words_a_date_and_context
+- id: CHECK-V7
+  verifies:
+  - CHECK-4
+  method: test
+  technique: unit test
+  origin: agent
+  description: Links to an existing file, pytest test, class method, parametrized test, GoogleTest (TEST, TEST_F, TEST_P) or a name in another file pass. A missing file, test, class or GoogleTest, a C++ name not written as Suite.Test, and tests linked for an implementation the spec doesn't name are each reported, saying what's missing. An edit is checked against the real repository's tests, so a valid re-link is accepted and a typo rejected.
+  tests:
+    python:
+    - tests/test_testlinks.py::test_links_to_existing_tests_pass
+    - tests/test_testlinks.py::test_links_to_missing_tests_say_what_is_missing
+    - tests/test_testlinks.py::test_the_checker_reports_broken_links_and_unknown_implementations
+    - tests/test_testlinks.py::test_edits_check_links_against_the_real_repository

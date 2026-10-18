@@ -94,3 +94,44 @@
     python:
     - tests/test_review.py::test_an_edit_shows_what_the_agent_should_weigh
     - tests/test_review.py::test_each_logged_edit_records_when_it_happened
+- id: CLI-V9
+  verifies:
+  - CLI-15
+  - AGENT-58
+  method: test
+  technique: integration test
+  origin: agent
+  description: In a repository set up with the launcher, messages and views name `.syseng/spec`; without it, `spec`. In a set-up host repository, the output of check, show, edit and the help texts, and every page the toolkit wrote, cite no requirement IDs except the host's own and illustrative examples.
+  tests:
+    python:
+    - tests/test_agent_experience.py::test_messages_name_the_command_this_repository_uses
+    - tests/test_agent_experience.py::test_a_repository_without_the_launcher_says_spec
+    - tests/test_agent_experience.py::test_a_host_repository_sees_no_toolkit_requirement_ids
+- id: CLI-V10
+  verifies:
+  - CLI-16
+  - CLI-20
+  method: test
+  technique: integration test
+  origin: agent
+  description: Setup appends the section to an existing instruction file, keeps the rest of the file, and changes nothing when run again. It leaves a CLAUDE.md that includes AGENTS.md alone, and with instructions turned off it writes no instruction file. It allows the everyday commands without allowing approve or resolve, and lists each rule once.
+  tests:
+    python:
+    - tests/test_init.py::test_init_points_every_session_at_the_skill
+    - tests/test_init.py::test_init_leaves_a_claude_md_that_includes_agents_md
+    - tests/test_init.py::test_init_can_leave_instruction_files_alone
+    - tests/test_init.py::test_agents_may_run_the_everyday_commands_without_asking
+- id: CLI-V11
+  verifies:
+  - CLI-17
+  - CLI-18
+  - CLI-19
+  method: test
+  technique: integration test
+  origin: agent
+  description: An edit that needs acknowledgments says how to retry it, a retry with only acknowledgments applies it, and a retry with nothing left to retry says so. The status command shows the open change, the request, the alteration awaiting the engineer with its line, and the check summary. An edit's context shows a two-line value as two lines.
+  tests:
+    python:
+    - tests/test_agent_experience.py::test_a_batch_can_be_retried_with_acknowledgments_alone
+    - tests/test_agent_experience.py::test_status_says_what_is_open_and_what_awaits_the_engineer
+    - tests/test_agent_experience.py::test_edit_context_keeps_the_lines_of_multi_line_text

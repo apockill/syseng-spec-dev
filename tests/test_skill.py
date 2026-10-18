@@ -57,8 +57,10 @@ def test_reasoning_check_subagent_starts_clean_and_cannot_read_the_spec():
     meta = _frontmatter(init.ADAPTERS / "claude_code/agents/spec-reasoning-check.md")
     assert meta["omitClaudeMd"] is True
     assert {t.strip() for t in meta["tools"].split(",")} == {"Read", "Grep", "Glob"}
-    commands = [h["command"] for g in meta["hooks"]["PreToolUse"] for h in g["hooks"]]
-    assert any(".syseng/hook read-guard" in c for c in commands)
+    reads = [g for e, m, a in init.HOOKS if a == "read-guard" for g in [m]]
+    assert reads == ["Read|Grep|Glob|NotebookRead"]           # in settings, which every folder honors
+    from syseng.adapters import hook
+    assert meta["name"] == hook.READING_AGENT
 
 
 def test_auditor_subagent_is_described():

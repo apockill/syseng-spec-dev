@@ -16,7 +16,7 @@
   2. Every record that weighed alternatives: Today's rule. Nothing slips past you, at the cost of reading mechanics like DR-45 and DR-48.
   3. Never: Agent decision records stay as memory only. Choices that matter to you would have to surface as requirements or open decisions instead.
 
-To accept every recommendation: `spec resolve D1 --words "<your words>"`.
+To accept every recommendation: `.syseng/spec resolve D1 --words "<your words>"`.
 
 ## Changes to the spec
 

@@ -135,7 +135,7 @@ def pre_tool(event: dict) -> int:
     for p in paths:
         hint = managed(p) if p is not None else None
         if hint:
-            print(f"{p} is managed by the spec toolkit, so agents don't edit it directly (AGENT-20). {hint}",
+            print(f"{p} is managed by the spec toolkit, so agents don't edit it directly. {hint}",
                   file=sys.stderr)
             return 2
     return 0
@@ -186,7 +186,12 @@ def _reaches(where: Path, roots: list[Path], pattern: str | None, basename_only:
     return False
 
 
+READING_AGENT = "spec-reasoning-check"  # the only agent the read guard applies to
+
+
 def read_guard(event: dict) -> int:
+    if event.get("agent_type") != READING_AGENT:  # registered for every agent; guards only reasoning checks
+        return 0
     tool, ti, cwd = _tool_call(event)
     refusal = None
     if tool in ("Read", "NotebookRead"):
@@ -213,7 +218,7 @@ def read_guard(event: dict) -> int:
                            f"doesn't contain it, such as the source directory, or narrow the file pattern.")
     if refusal:
         print(f"Refused: {refusal} A reasoning check reaches its verdict from the product's code alone, so it "
-              f"never reads the spec (REASON-5).", file=sys.stderr)
+              f"never reads the spec.", file=sys.stderr)
         return 2
     return 0
 
@@ -249,11 +254,11 @@ def stop(event: dict) -> int:
     run = _toolkit(["check"], _work_dir(event))
     if run.returncode == 0:
         return 0
-    if run.returncode == 1 and "error[" in run.stdout:
-        print(json.dumps({"decision": "block", "reason":
-                          "The spec has errors, so this work isn't finished (AGENT-12). Fix each one, then "
+    if run.returncode == 1 and "error[" in run.stdout:  # feedback, not an error: the work continues once
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "Stop", "additionalContext":
+                          "The spec has errors, so this work isn't finished. Fix each one, then "
                           "finish. If you're stopping to ask the engineer something, ask now.\n\n"
-                          + run.stdout.strip()}))
+                          + run.stdout.strip()}}))
         return 0
     if run.returncode == NOT_SET_UP:
         print(json.dumps({"systemMessage": _setup_notice("the spec wasn't checked")}))
@@ -335,12 +340,12 @@ def prompt(event: dict) -> int:
         ids += [i for i in found or [] if i not in ids]
     if unclear:
         print("Note from the spec toolkit: the engineer's message reads as an approval the toolkit can't pin to "
-              f"exact items, so it recorded nothing for it (DR-41): {'; '.join(unclear)}. Show the engineer the exact "
-              "items you'd approve, leaving out every item an exception could refer to (AGENT-43), and ask them to "
+              f"exact items, so it recorded nothing for it: {'; '.join(unclear)}. Show the engineer the exact "
+              "items you'd approve, leaving out every item an exception could refer to, and ask them to "
               f"confirm. Use a menu if you have one. Then record their answer with `{SPEC} approve`.")
     if not ids:
         if not unclear and _LOOSE.search("\n".join(own)):
-            print("Note from the spec toolkit: this message approves no spec items (AGENT-33). An approval in chat "
+            print("Note from the spec toolkit: this message approves no spec items. An approval in chat "
                   "names the items, as in \"approve CHECK-3\" or \"CHECK-3 LGTM\", so don't record one from it.")
         return 0
     run = _toolkit(["approve", *ids, "--words", words[:2000], "--via", "chat"], where)

@@ -82,3 +82,33 @@
   traces_to: SYS-38
   origin: agent
   why: SYS-38 needs the proposals kept somewhere the engineer reviews, and the change record is that place.
+- id: CLI-15
+  text: Every message and generated view shall name the toolkit's command in the form that runs it in the repository at hand.
+  traces_to: SYS-25
+  origin: agent
+  why: agents type what messages tell them. In a repository `spec init` set up, the command is `.syseng/spec`, and a message saying `spec` sends them to a command that may not exist.
+- id: CLI-16
+  text: Setup shall add to the host repository's instruction file a section, between markers, that tells every session to follow the skill.
+  traces_to: SYS-5
+  origin: agent
+  why: a session only loads the skill when something tells it to, and the instruction file is what every harness reads at the start.
+- id: CLI-17
+  text: When an edit needs acknowledgments or has errors, the CLI shall accept the same edit again with only the acknowledgments added.
+  traces_to: SYS-25
+  origin: agent
+  why: sending a large batch again just to add acknowledgments costs tokens and invites copying mistakes.
+- id: CLI-18
+  text: The CLI shall summarize in one command the open change, its open decisions, the alterations and proposals awaiting the engineer, and the check's result.
+  traces_to: SYS-14
+  origin: agent
+  why: an agent starting work, or an engineer catching up, otherwise has to piece this together from four commands.
+- id: CLI-19
+  text: An edit's context shall show multi-line text with its lines intact.
+  traces_to: SYS-30
+  origin: agent
+  why: decision records use bullet lists, and flattening them into one line makes them unreadable.
+- id: CLI-20
+  text: For harnesses with permission rules, setup shall let agents run the toolkit's commands without asking, except the commands that record the engineer's words.
+  traces_to: SYS-5
+  origin: agent
+  why: without the rules every check and edit waits for a click. Approving and resolving record the engineer's words, so the engineer sees and confirms each of those.

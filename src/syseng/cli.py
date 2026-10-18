@@ -24,7 +24,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from syseng import changes, edit, fingerprint, init, model, render, review, yamlio
+from syseng import changes, edit, fingerprint, init, model, naming, render, review, yamlio
 from syseng import check as checker
 
 
@@ -210,7 +210,8 @@ def cmd_change(args) -> int:
                 print("spec change start: say what the engineer asked for, in a sentence")
                 return 1
             c = changes.start(spec, args.request, args.mode, args.target, args.slug)
-            print(f"opened {c.id} ({c.data['mode']}, target {c.data['target']}). Every `spec edit` is logged here.")
+            print(f"opened {c.id} ({c.data['mode']}, target {c.data['target']}). Every {naming.cmd('edit')} is "
+                  f"logged here.")
         elif args.action == "close":
             c = changes.current(spec)
             if c is None:
@@ -237,27 +238,65 @@ def cmd_change(args) -> int:
 def cmd_edit(args) -> int:
     spec = _load(args)
     try:
-        result = edit.run(spec.root, _read_doc(args), dry_run=args.dry_run)
+        doc = edit.load_last(spec.root) if args.retry else _read_doc(args)
+        if args.ack:
+            doc = edit.with_acks(doc, args.ack)
+        result = edit.run(spec.root, doc, dry_run=args.dry_run)
     except (edit.EditError, changes.ChangeError) as e:
         print(f"spec edit: {e}")
         return 1
     print("\n".join(result.context))
     if result.needs_acks:
+        edit.save_last(spec.root, doc)
         print("\nThis edit affects approved or depended-on items. Nothing was written. Acknowledge each one by name")
         print("(a line on why the edit is fine for it, or what else must change), then send the batch again with:\n")
         print("acks:")
         for iid, why in result.needs_acks.items():
             print(f"  {iid}: \"<note>\"   # {changes._label(model.load(spec.root), iid)}: {why}")
+        retry = " ".join(f"--ack '{iid}=<note>'" for iid in result.needs_acks)
+        print(f"\nOr reuse the batch without sending it again: {naming.cmd(f'edit --retry {retry}')}")
         return 2
     if result.errors:
+        edit.save_last(spec.root, doc)
         print("\nThis edit would introduce errors, so nothing was written:\n")
         print(checker.format_findings(result.errors, spec.root))
         return 1
+    if not args.dry_run:
+        edit.clear_last(spec.root)
     if args.dry_run:
         print("\ndry run: the edit is valid; nothing was written")
         return 0
     print(f"\napplied {len(result.ids)} operation{'s' if len(result.ids) != 1 else ''}: {', '.join(result.ids)}")
     print(checker.summarize(checker.check(model.load(spec.root))))
+    return 0
+
+
+def cmd_status(args) -> int:
+    """Where things stand, for an agent starting work or an engineer catching up (CLI-18)."""
+    spec = _load(args)
+    c = changes.current(spec)
+    if c is None:
+        start = naming.cmd('change start "<what was asked>"')
+        print(f"No change is open. Start one before editing the spec: {start}")
+    else:
+        d = c.data
+        entries = d.get("entries") or []
+        last = f", last {entries[-1].get('at')}" if entries and entries[-1].get("at") else ""
+        print(f"Open change: {c.id} ({d.get('mode')}, target {d.get('target')}), {len(entries)} edits{last}")
+        print(f"  asked: {' '.join(str(d.get('request', '')).split())}")
+        for x in d.get("decisions") or []:
+            if x.get("status") == "open":
+                print(f"  open decision {x['id']}: {x.get('question', '')}")
+    pending = review.unanswered(spec)
+    if pending:
+        print("Awaiting the engineer's answer:")
+        for cid, alt in pending:
+            print(f"  {changes._label(spec, alt['id'])}, altered in {cid}. Keep it: `{alt['id']} LGTM`")
+    waiting = [i for ch in changes.all_changes(spec) for p in ch.data.get("proposals") or [] for i in p.get("ids") or []
+               if review.kind_and_data(spec, i) and review.state_of(spec, i).state != review.APPROVED]
+    if waiting:
+        print(f"Proposed for the engineer's approval: `approve {', '.join(dict.fromkeys(waiting))}`")
+    print(checker.summarize(checker.check(spec)))
     return 0
 
 
@@ -337,7 +376,7 @@ def cmd_init(args) -> int:
     repo = (Path(args.repo) if args.repo else _repo_root(Path.cwd())).resolve()
     harnesses = args.harness or init.installed_harnesses(repo) or ["claude-code"]  # a re-run refreshes them all
     try:
-        steps = init.run(repo, harnesses, args.launcher, check_only=args.check)
+        steps = init.run(repo, harnesses, args.launcher, check_only=args.check, instructions=not args.no_instructions)
     except init.InitError as e:
         print(f"spec init: {e}")
         return 1
@@ -387,7 +426,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("ids", nargs="+", help="IDs, or ranges like NEED-1..NEED-12")
     p.add_argument("--words", required=True, help="the engineer's words, as evidence")
     p.add_argument("--via", default="terminal", choices=["terminal", "chat", "menu", "page", "restated"],
-                   help="how the engineer gave it; `restated` when they restated what the item says (AGENT-50)")
+                   help="how the engineer gave it; `restated` when they restated what the item says")
     p.add_argument("--by", help="who approved (default: the repository's version-control user name)")
     p.add_argument("--note", help="anything else about how it was given, such as a pasted reply they confirmed")
     p.set_defaults(fn=cmd_approve)
@@ -398,7 +437,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("change", help="open, close or show the change record edits are logged in")
     p.add_argument("action", choices=["start", "close", "show"])
     p.add_argument("request", nargs="?", help="start: what the engineer asked for, summarized")
-    p.add_argument("--mode", choices=list(changes.MODES), help="default: code-first (CHANGE-9)")
+    p.add_argument("--mode", choices=list(changes.MODES), help="default: code-first")
     p.add_argument("--target", help="implementation the change targets (default: the primary one)")
     p.add_argument("--slug", help="a few words for the file name")
     p.set_defaults(fn=cmd_change)
@@ -406,7 +445,12 @@ def build_parser() -> argparse.ArgumentParser:
                        description=edit.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--dry-run", action="store_true", help="show context and validate, but write nothing")
     p.add_argument("--file", help="read the batch from a file instead of stdin")
+    p.add_argument("--retry", action="store_true",
+                   help="send again the last batch that needed acknowledgments or had errors")
+    p.add_argument("--ack", action="append", metavar="ID=NOTE", help="acknowledge an affected item; repeat for each")
     p.set_defaults(fn=cmd_edit)
+    p = sub.add_parser("status", help="what's open, what awaits the engineer, and the check summary")
+    p.set_defaults(fn=cmd_status)
     p = sub.add_parser("decide", help="add an open decision (YAML on stdin: question, importance, involves, options)")
     p.add_argument("--file", help="read the decision from a file instead of stdin")
     p.set_defaults(fn=cmd_decide)
@@ -415,7 +459,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--words", required=True, help="the engineer's words, as evidence")
     p.add_argument("--option", type=int, help="the option number chosen (default: the recommended one)")
     p.set_defaults(fn=cmd_resolve)
-    p = sub.add_parser("friction", help="report a workaround you needed, with a proposed improvement (AGENT-46)")
+    p = sub.add_parser("friction", help="report a workaround you needed, with a proposed improvement")
     p.add_argument("--workaround", required=True)
     p.add_argument("--proposal", required=True)
     p.set_defaults(fn=cmd_friction)
@@ -428,6 +472,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--launcher", help="command that runs the toolkit on this machine, replacing the default "
                                       "(this Python)")
     p.add_argument("--check", action="store_true", help="report files that differ from a fresh setup; write nothing")
+    p.add_argument("--no-instructions", action="store_true",
+                   help="leave AGENTS.md and CLAUDE.md alone instead of adding the section that points sessions at the skill")
     p.set_defaults(fn=cmd_init)
     return parser
 
@@ -439,4 +485,5 @@ def commands() -> set[str]:
 
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
+    naming.use(Path(args.spec) if args.spec else model.find_spec_root(Path.cwd()))
     return args.fn(args)

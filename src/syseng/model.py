@@ -74,6 +74,11 @@ class Spec:
     questions: list[dict] = field(default_factory=list)
     load_errors: list[tuple[Path, str]] = field(default_factory=list)
     nested_element_files: list[Path] = field(default_factory=list)
+    repo: Path | None = None  # set when the spec is a scratch copy of one inside this repository
+
+    def repo_root(self) -> Path:
+        """The repository the spec describes, where test links resolve."""
+        return self.repo or self.root.parent
 
     def of_kind(self, *kinds: str) -> list[Item]:
         return [i for i in self.items.values() if i.kind in kinds]

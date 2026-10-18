@@ -74,7 +74,8 @@ def test_init_keeps_other_settings_and_hooks(repo, machine):
     assert data["model"] == "opus"
     pre = data["hooks"]["PreToolUse"]
     assert pre[0] == {"matcher": "Bash", "hooks": [theirs]}
-    assert sum(".syseng/hook" in h["command"] for g in pre for h in g["hooks"]) == 1
+    ours = [h["command"] for g in pre for h in g["hooks"] if ".syseng/hook" in h["command"]]
+    assert sorted(c.split()[-1] for c in ours) == ["pre-tool", "read-guard"]   # each once, after two runs
 
 
 def test_init_refuses_unreadable_settings(repo, machine):
@@ -153,3 +154,35 @@ def test_a_plain_rerun_refreshes_every_installed_harness(repo, machine):
         (repo / copy).write_text("stale")
     assert cli.main(["init", "--repo", str(repo)]) == 0
     assert all(s.status != "differs" for s in init.run(repo, ["claude-code", "hermes"], check_only=True))
+
+
+def test_init_points_every_session_at_the_skill(repo, machine):
+    (repo / "AGENTS.md").write_text("# Project rules\n\nBe kind to the build.\n")
+    init.run(repo, ["claude-code"])
+    text = (repo / "AGENTS.md").read_text()
+    assert text.startswith("# Project rules\n\nBe kind to the build.\n\n<!-- syseng:")
+    assert "follow the `syseng` skill" in text and ".syseng/spec edit" in text
+    init.run(repo, ["claude-code"])
+    assert (repo / "AGENTS.md").read_text() == text                  # a re-run changes nothing
+
+
+def test_init_leaves_a_claude_md_that_includes_agents_md(repo, machine):
+    (repo / "AGENTS.md").write_text("rules\n")
+    (repo / "CLAUDE.md").write_text("@AGENTS.md\n")
+    init.run(repo, ["claude-code"])
+    assert (repo / "CLAUDE.md").read_text() == "@AGENTS.md\n" and "syseng" in (repo / "AGENTS.md").read_text()
+
+
+def test_init_can_leave_instruction_files_alone(repo, machine):
+    init.run(repo, ["claude-code"], instructions=False)
+    assert not (repo / "AGENTS.md").exists()
+    assert not [s for s in init.run(repo, ["claude-code"], check_only=True) if s.status == "differs"]
+
+
+def test_agents_may_run_the_everyday_commands_without_asking(repo, machine):
+    init.run(repo, ["claude-code"])
+    init.run(repo, ["claude-code"])
+    allow = json.loads((repo / ".claude/settings.json").read_text())["permissions"]["allow"]
+    assert "Bash(.syseng/spec edit *)" in allow and "Bash(.syseng/spec status *)" in allow
+    assert not [r for r in allow if "approve" in r or "resolve" in r]   # those record the engineer's words
+    assert len(allow) == len(set(allow))

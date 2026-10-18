@@ -298,3 +298,8 @@
   traces_to: SYS-14
   origin: agent
   why: the engineer writes approvals that way ("Change 13 LGTM.", "need 16 LGTM"). Without this, the reader would tell the agent such a message approves nothing.
+- id: AGENT-58
+  text: The messages and pages the toolkit shows or installs in a host repository shall cite none of the toolkit's own requirement IDs.
+  traces_to: SYS-30
+  origin: agent
+  why: a host repository has its own SYS-6 or CHECK-15, so a citation of the toolkit's would point a reader at the wrong item, or at nothing.

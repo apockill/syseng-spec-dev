@@ -150,7 +150,7 @@ None.
   - alternatives: Logging meaning only, which hides test changes from auditors.
   - consequences: One entry from round 10 (MODEL-V7's new test links) was logged before this fix, so it carries a reason but no field diff.
 
-## Agent friction (AGENT-46)
+## Agent friction
 
 - **Worked around:** Wrapped commands in `nix develop -c bash -c '...'`; an apostrophe in the YAML broke the outer quotes. **Proposal:** Send heredocs straight to `nix develop -c spec edit`, or use direnv so `spec` is on PATH. The skill's examples should use that form.
 - **Worked around:** Rejected edits pointed at the scratch copy's temporary path, not the real file. **Proposal:** Fixed in this change: findings are mapped back to the real files.

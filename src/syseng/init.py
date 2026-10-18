@@ -1,18 +1,20 @@
-"""`spec init`: sets up a repository for the toolkit in one step (SYS-5, CLI-9).
+"""`spec init`: sets up a repository for the toolkit in one step.
 
 It writes:
 - spec/, with a root system element, when the repository has no spec yet;
 - .syseng/spec, the launcher agents run the toolkit with. It's committed, and hands over to
-  this machine's launcher (DR-39);
+  this machine's launcher;
 - this machine's launcher, ${XDG_CONFIG_HOME:-~/.config}/syseng/launcher, which says which
   Python runs the toolkit. An existing one that works is kept unless --launcher replaces it;
 - the skill, for each harness named: .claude/skills/syseng for Claude Code, and .agents/skills/syseng,
   the cross-tool location, for Hermes and Antigravity. Each copy has the launcher's name and a note on
-  what that harness's hooks do filled in (DR-38, AGENT-49);
+  what that harness's hooks do filled in;
 - for Claude Code: .syseng/hook, the hooks that run it in .claude/settings.json, and the auditor
-  and reasoning-check subagents in .claude/agents (DR-40).
+  and reasoning-check subagents in .claude/agents;
+- a short section in AGENTS.md (or CLAUDE.md), between markers, telling every session to follow
+  the skill. --no-instructions leaves those files alone.
 
-Running it again refreshes these files and leaves every other setting alone (CLI-10).
+Running it again refreshes these files and leaves every other setting alone.
 """
 
 import json
@@ -37,13 +39,32 @@ SKILL_HOMES = {"claude-code": ".claude/skills/syseng", "hermes": ".agents/skills
 HARNESS_NOTES = {"claude-code": ADAPTERS / "claude_code" / "skill-notes.md"}  # the others run no hooks
 GENERIC_NOTES = ADAPTERS / "generic" / "skill-notes.md"
 HOOK_MARK = ".syseng/hook"
-HOOKS = {  # event: (matcher, argument to the hook script)
-    "PreToolUse": ("Edit|Write|MultiEdit|NotebookEdit|Bash|PowerShell", "pre-tool"),
-    "Stop": (None, "stop"),
-    "UserPromptSubmit": (None, "prompt"),
-}
+# Toolkit commands agents may run without asking (CLI-20). `approve` and `resolve` record the engineer's
+# words, so they stay with the harness's permission prompt: the engineer sees and confirms each one.
+ALLOWED = [f"Bash(.syseng/spec {cmd} *)" for cmd in
+           ("status", "check", "show", "render", "edit", "change", "decide", "propose", "friction")]
+HOOKS = [  # (event, matcher, argument to the hook script)
+    ("PreToolUse", "Edit|Write|MultiEdit|NotebookEdit|Bash|PowerShell", "pre-tool"),
+    # Here rather than in the subagent's own definition, whose hooks Claude Code skips in untrusted folders.
+    ("PreToolUse", "Read|Grep|Glob|NotebookRead", "read-guard"),
+    ("Stop", None, "stop"),
+    ("UserPromptSubmit", None, "prompt"),
+]
 _LANGUAGES = [("pyproject.toml", "python"), ("setup.py", "python"), ("Cargo.toml", "rust"), ("go.mod", "go"),
               ("CMakeLists.txt", "cpp"), ("tsconfig.json", "typescript"), ("package.json", "javascript")]
+
+INSTRUCTIONS_BEGIN = "<!-- syseng: written by `spec init`, which rewrites everything up to the closing marker -->"
+INSTRUCTIONS_END = "<!-- /syseng -->"
+INSTRUCTIONS = """## Requirements and design decisions
+
+This repository keeps its needs, requirements, verification items and design decisions in `spec/`, managed
+with the syseng toolkit. For every change, follow the `syseng` skill:
+
+- open a change with `.syseng/spec change start "<what was asked>"`;
+- change the spec only with `.syseng/spec edit`, never by editing files under `spec/`;
+- run `.syseng/spec check` before reporting a change as done.
+
+`.syseng/spec status` shows what's open and what awaits the engineer."""
 
 REPO_LAUNCHER = """#!/bin/sh
 # Runs the spec toolkit for this repository. Written by `spec init`; commit it.
@@ -112,6 +133,30 @@ def _guess_language(repo: Path) -> tuple[str, str]:
     return "main", "no build file recognized"
 
 
+def instruction_files(repo: Path) -> list[str]:
+    """The host's instruction files to carry the section: AGENTS.md and CLAUDE.md, unless one includes the other."""
+    found = [n for n in ("AGENTS.md", "CLAUDE.md") if (repo / n).exists()]
+    if len(found) == 2:
+        claude = repo / "CLAUDE.md"
+        if claude.is_symlink() or "@AGENTS.md" in claude.read_text():
+            found.remove("CLAUDE.md")
+    return found or ["AGENTS.md"]
+
+
+def merge_instructions(text: str | None) -> str:
+    """The file with the toolkit's section added, or replaced between its markers (CLI-16)."""
+    block = f"{INSTRUCTIONS_BEGIN}\n{INSTRUCTIONS}\n{INSTRUCTIONS_END}\n"
+    text = text or ""
+    start, end = text.find("<!-- syseng:"), text.find(INSTRUCTIONS_END)
+    if start != -1 and end > start:
+        return text[:start] + block + text[end + len(INSTRUCTIONS_END):].lstrip("\n")
+    return (text.rstrip("\n") + "\n\n" if text.strip() else "") + block
+
+
+def has_instructions(repo: Path) -> bool:
+    return any("<!-- syseng:" in (repo / n).read_text() for n in ("AGENTS.md", "CLAUDE.md") if (repo / n).exists())
+
+
 def merge_settings(text: str | None) -> str:
     """Claude Code settings with this toolkit's hooks, replacing older copies and keeping everything else."""
     try:
@@ -120,21 +165,31 @@ def merge_settings(text: str | None) -> str:
         raise InitError(f"can't read .claude/settings.json ({e}). Fix it, then run `spec init` again.") from e
     if not isinstance(data, dict):
         raise InitError(".claude/settings.json isn't a JSON object. Fix it, then run `spec init` again.")
+    permissions = data.setdefault("permissions", {})
+    allow = [r for r in permissions.get("allow") or [] if not str(r).startswith("Bash(.syseng/spec ")]
+    permissions["allow"] = allow + ALLOWED
     hooks = data.setdefault("hooks", {})
-    for event, (matcher, arg) in HOOKS.items():
+    for event in dict.fromkeys(e for e, _, _ in HOOKS):
         kept = []
         for group in hooks.get(event) or []:
             inner = [h for h in group.get("hooks") or [] if HOOK_MARK not in str(h.get("command", ""))]
             if inner:
                 kept.append({**group, "hooks": inner})
-        ours = {"hooks": [{"type": "command", "command": f'"$CLAUDE_PROJECT_DIR"/{HOOK_MARK} {arg}'}]}
-        hooks[event] = kept + [{"matcher": matcher, **ours} if matcher else ours]
+        for e, matcher, arg in HOOKS:
+            if e == event:
+                ours = {"hooks": [{"type": "command", "command": f'"$CLAUDE_PROJECT_DIR"/{HOOK_MARK} {arg}'}]}
+                kept.append({"matcher": matcher, **ours} if matcher else ours)
+        hooks[event] = kept
     return json.dumps(data, indent=2) + "\n"
 
 
-def planned_files(repo: Path, harnesses: list[str]) -> dict[str, tuple[str, bool]]:
+def planned_files(repo: Path, harnesses: list[str], instructions: bool = False) -> dict[str, tuple[str, bool]]:
     """Every file `spec init` keeps up to date in the repository: path -> (content, executable)."""
     files = {SPEC_CMD: (REPO_LAUNCHER, True)}
+    if instructions:
+        for name in instruction_files(repo):
+            path = repo / name
+            files[name] = (merge_instructions(path.read_text() if path.exists() else None), False)
     for h in harnesses:
         if h in SKILL_HOMES:
             for src in sorted(p for p in SKILL.rglob("*") if p.is_file() and p.suffix == ".md"):
@@ -179,19 +234,20 @@ def _skeleton(repo: Path) -> Step:
         yamlio.write(root / "elements" / "SYS" / name, [])
     for name in ("approvals.yaml", "retired.yaml"):
         yamlio.write(root / name, [])
-    render.write_views(model.load(root))
     return Step("created", "spec/", f"root system element SYS; implementation {language!r}, {how}")
 
 
-def run(repo: Path, harnesses: list[str], launcher: str | None = None, check_only: bool = False) -> list[Step]:
+def run(repo: Path, harnesses: list[str], launcher: str | None = None, check_only: bool = False,
+        instructions: bool = True) -> list[Step]:
     """Sets up `repo`, or with check_only reports what differs from a fresh setup without writing."""
+    instructions = has_instructions(repo) if check_only else instructions
     unknown = [h for h in harnesses if h not in HARNESSES]
     if unknown:
         raise InitError(f"unknown harness {', '.join(unknown)}; choose from {', '.join(HARNESSES)}")
     steps: list[Step] = []
     if not check_only:
         steps.append(_skeleton(repo))
-    for rel, (content, executable) in planned_files(repo, harnesses).items():
+    for rel, (content, executable) in planned_files(repo, harnesses, instructions).items():
         path = repo / rel
         current = path.read_text() if path.exists() else None
         if current == content and (not executable or os.access(path, os.X_OK)):
@@ -212,6 +268,10 @@ def run(repo: Path, harnesses: list[str], launcher: str | None = None, check_onl
                 steps.append(Step("differs" if check_only else "removed", rel, "no longer part of the skill"))
     if not check_only:
         steps.append(_machine_launcher(launcher))
+        spec_root = repo / "spec"  # views name the launcher, so they're rendered once it exists (CLI-15)
+        if (spec_root / "toolkit.yaml").exists() and render.write_views(model.load(spec_root)) \
+                and steps[0].status != "created":
+            steps.append(Step("updated", "spec/ views", "they name the launcher now"))
     return steps
 
 

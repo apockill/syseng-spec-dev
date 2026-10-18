@@ -23,6 +23,10 @@
   traces_to: SYS-7
   source: |-
     "XYZ tests are referenced in VERs but don't exist"
+  quotes:
+  - said: 2026-10-17 23:07
+    words: while we don't need to be a test running framework, we probably should have some simple verifictation the tests exist. We could start simple, and add requirements later (like maybe even just verifying the file / test name exists is good enough to start with, everything else is 'to be decided/scoped' later)
+    context: Deciding what the toolkit needs before a first real project.
 - id: CHECK-5
   text: When a system element's related code has changed and its requirements have not, the checker shall report that system element together with its current requirements.
   origin: engineer

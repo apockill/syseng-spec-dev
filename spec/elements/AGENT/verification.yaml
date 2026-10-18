@@ -27,7 +27,7 @@
   method: test
   technique: integration test
   origin: agent
-  description: When the agent stops while the spec has errors, the stop hook blocks once, giving each finding in the checker's format. When the agent is already continuing because of that block, the hook lets it stop. With no errors the agent stops without a message. On a machine without the toolkit, the engineer gets a notice instead of a block.
+  description: When the agent stops while the spec has errors, the stop hook sends it back once with each finding in the checker's format, as feedback rather than an error. When the agent is already continuing because of that, the hook lets it stop. With no errors the agent stops without a message. On a machine without the toolkit, the engineer gets a notice instead.
   tests:
     python:
     - tests/test_hooks.py::test_stop_blocks_once_with_the_findings
@@ -137,3 +137,14 @@
     python:
     - tests/test_hooks.py::test_ids_written_out_in_words_are_read
     - tests/test_hooks.py::test_words_that_only_look_like_ids_are_not_read
+- id: AGENT-V12
+  verifies:
+  - AGENT-12
+  - AGENT-20
+  - AGENT-21
+  - REASON-5
+  method: demonstration
+  technique: manual
+  origin: agent
+  description: |-
+    In headless Claude Code sessions in a scratch repository set up by `spec init`, whose spec has one wording error: finishing a turn brings the error back as feedback, an Edit to a spec file is refused with the command to use, "need 1 lgtm" records NEED-1's approval in chat, and the reasoning-check subagent's search of the whole repository is refused.

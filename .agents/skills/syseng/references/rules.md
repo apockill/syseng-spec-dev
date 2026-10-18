@@ -2,9 +2,9 @@
 
 Every error the checker reports links here. Each rule says what it checks, why it exists and how to fix a finding.
 
-The wording rules (W…) come from INCOSE's *Guide to Writing Requirements*, cited by rule number. The guide isn't freely available, so this page explains each rule on its own terms. The wording rules were tuned against this repository's own spec before they shipped (DR-30).
+The wording rules (W…) come from INCOSE's *Guide to Writing Requirements*, cited by rule number. The guide isn't freely available, so this page explains each rule on its own terms. The wording rules were tuned against this repository's own spec before they shipped.
 
-Errors fail `.syseng/spec check`. To-dos are listed by `.syseng/spec check --todo` but don't fail it (DR-31).
+Errors fail `.syseng/spec check`. To-dos are listed by `.syseng/spec check --todo` but don't fail it.
 
 ## Structure
 
@@ -18,19 +18,19 @@ Two items share one ID, which makes traces, approvals and history ambiguous. Giv
 
 <a id="s003"></a>
 ### S003: retired ID reused
-`retired.yaml` lists IDs that were removed. Old change records still refer to them, so reusing one would silently rewrite history (MODEL-15). Pick a fresh number.
+`retired.yaml` lists IDs that were removed. Old change records still refer to them, so reusing one would silently rewrite history. Pick a fresh number.
 
 <a id="s004"></a>
 ### S004: nested system element
-System elements live in one flat directory, `spec/elements/<ID>/` (MODEL-1). The hierarchy is expressed by `parent:`, not by folders.
+System elements live in one flat directory, `spec/elements/<ID>/`. The hierarchy is expressed by `parent:`, not by folders.
 
 <a id="s005"></a>
 ### S005: broken decomposition tree
-Requirements flow down `parent` links, so the links must form one tree: exactly one root (the system), every other element with exactly one existing parent, and no loops (MODEL-2, MODEL-11). Reuse belongs in `depends_on`, never in a second parent (DR-8).
+Requirements flow down `parent` links, so the links must form one tree: exactly one root (the system), every other element with exactly one existing parent, and no loops. Reuse belongs in `depends_on`, never in a second parent.
 
 <a id="s006"></a>
 ### S006: broken dependency graph
-`depends_on` drives change impact: when an element changes, everything that depends on it is affected. It must name real elements and contain no cycles (MODEL-3, MODEL-4). To break a cycle, extract the shared part into its own element that both sides depend on.
+`depends_on` drives change impact: when an element changes, everything that depends on it is affected. It must name real elements and contain no cycles. To break a cycle, extract the shared part into its own element that both sides depend on.
 
 <a id="s007"></a>
 ### S007: missing or invalid field
@@ -38,13 +38,13 @@ A required field is missing or has a value the toolkit doesn't know. The message
 
 <a id="s008"></a>
 ### S008: item in the wrong system element
-An item lives in the directory its ID names: `MODEL-3` in `elements/MODEL/`, needs and system requirements in the system's directory, and a decision record with the first element it lists.
+An item lives in the directory its ID names: `CORE-3` in `elements/CORE/`, needs and system requirements in the system's directory, and a decision record with the first element it lists.
 
 ## Traceability
 
 <a id="t001"></a>
 ### T001: broken trace
-Every requirement answers "why do I exist?" by pointing upward (SYS-6):
+Every requirement answers "why do I exist?" by pointing upward:
 - An element requirement points to one requirement with `traces_to`.
 - A system requirement points to the needs it `serves`.
 
@@ -52,7 +52,7 @@ A requirement that records a design choice rather than an ask can set `derived: 
 
 <a id="t002"></a>
 ### T002: need served by nothing
-No system requirement serves this need, so nothing will ever meet it (MODEL-12). Add one, or ask the engineer whether the need still stands. It's a to-do rather than an error, because needs can be recorded before the requirements that serve them, as spec-first planning does (DR-31).
+No system requirement serves this need, so nothing will ever meet it. Add one, or ask the engineer whether the need still stands. It's a to-do rather than an error, because needs can be recorded before the requirements that serve them, as spec-first planning does.
 
 <a id="t003"></a>
 ### T003: dangling reference
@@ -60,27 +60,27 @@ A decision record, approval or verification item points at an ID that doesn't ex
 
 <a id="t004"></a>
 ### T004: requirement without verification (to-do)
-The requirement has no verification item yet (MODEL-18). This is listed as a to-do, not an error. For requirements a change touches, the done gate will make it one (CHECK-11).
+The requirement has no verification item yet. This is listed as a to-do, not an error. For requirements a change touches, the done gate will make it one.
 
 ## Attributes
 
 <a id="a001"></a>
 ### A001: requirement without rationale
-The rationale is what an agent reads first when someone asks why a requirement exists (MODEL-13):
+The rationale is what an agent reads first when someone asks why a requirement exists:
 - If the requirement is the engineer's own words, set `source` to the quote.
 - If an agent proposed it, set `why` to the reasoning.
 
 <a id="a002"></a>
 ### A002: missing origin
-`origin` says whose idea an item is: `engineer` (from their words) or `agent` (a proposal). The review page uses it to show the engineer what to read (MODEL-14).
+`origin` says whose idea an item is: `engineer` (from their words) or `agent` (a proposal). The review page uses it to show the engineer what to read.
 
 <a id="a003"></a>
 ### A003: unreviewed item (to-do)
-Nothing covers this item: neither it nor anything above it in the trace graph is approved, or it changed after the engineer approved it (CHECK-19). An item under an approved item is delegated, and isn't a to-do. Approvals are recorded by `.syseng/spec approve`, only from the engineer's own words (AGENT-21).
+Nothing covers this item: neither it nor anything above it in the trace graph is approved, or it changed after the engineer approved it. An item under an approved item is delegated, and isn't a to-do. Approvals are recorded by `.syseng/spec approve`, only from the engineer's own words.
 
 <a id="a004"></a>
 ### A004: alteration awaiting the engineer's answer (to-do)
-A change altered an item the engineer approved, wrote or decided, and they haven't yet kept the alteration or had it rolled back (CHECK-21). Ask them, giving the line that keeps it, such as `CHECK-3 LGTM`. The merge check lists these before a branch lands, and never fails because of them (CHECK-15).
+A change altered an item the engineer approved, wrote or decided, and they haven't yet kept the alteration or had it rolled back. Ask them, giving the line that keeps it, such as `CHECK-3 LGTM`. The merge check lists these before a branch lands, and never fails because of them.
 
 <a id="a005"></a>
 ### A005: approval for an unknown item
@@ -94,9 +94,13 @@ A verification item needs:
 - `verifies`: the requirements it checks;
 - a `method`: test, analysis, demonstration or inspection;
 - a `technique`: unit test, integration test, reasoning check or manual;
-- a language-independent `description` (MODEL-30).
+- a language-independent `description`.
 
 ## Rendered views
+
+<a id="v002"></a>
+### V002: linked test not found
+A verification item links a test that doesn't exist: the file is missing, or the file has no test by that name. A link is `path` or `path::name`, resolved against the implementation's root. In a Python file the name is a pytest test (`test_x`, or `TestThing::test_x`, with any `[parameters]` ignored). In a C++ file it's a GoogleTest (`Suite.Test`, declared with `TEST`, `TEST_F`, `TEST_P` or `TYPED_TEST`). In any other file, the name only has to appear in it. Fix the link, or remove it if the test is gone.
 
 <a id="r001"></a>
 ### R001: rendered view out of date
@@ -156,12 +160,12 @@ These are exempt: "how many" (a quantity, not a vague amount), and capitalized w
 "In order to" and "so that" add a second claim, the purpose, which nothing verifies. Reasons belong in `why`.
 
 <a id="w009"></a>
-### W009: language-specific name (INCOSE R31; MODEL-17)
-Requirements describe behavior in terms any implementation can meet, so a Rust rebuild can follow them (NEED-4). Code spans, file names, snake_case or camelCase identifiers and call syntax belong in test links and related-code lists.
+### W009: language-specific name (INCOSE R31)
+Requirements describe behavior in terms any implementation can meet, so a Rust rebuild can follow them. Code spans, file names, snake_case or camelCase identifiers and call syntax belong in test links and related-code lists.
 
 <a id="w010"></a>
 ### W010: requirement states its own test (INCOSE R31)
-A requirement says what must hold. How it's checked belongs in a verification item, written separately, so that verification stays independent (NEED-9).
+A requirement says what must hold. How it's checked belongs in a verification item, written separately, so that verification stays independent.
 
 - ✗ The checker shall be verified by a unit test that…
 - ✓ The checker shall report each duplicate ID. *(The unit test lives in a verification item.)*

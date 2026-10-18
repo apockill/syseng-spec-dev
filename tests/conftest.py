@@ -42,6 +42,10 @@ class SpecBuilder:
         self.files = _base()
 
     def write(self, render_views: bool = True) -> Path:
+        tests = self.root.parent / "tests" / "test_core.py"  # the tests the base spec links to (CHECK-4)
+        if not tests.exists():
+            tests.parent.mkdir(parents=True, exist_ok=True)
+            tests.write_text("def test_stamp():\n    pass\n\n\ndef test_other():\n    pass\n")
         for rel, data in self.files.items():
             yamlio.write(self.root / rel, data)
         if render_views:

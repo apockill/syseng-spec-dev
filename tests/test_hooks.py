@@ -24,8 +24,8 @@ def repo(spec, tmp_path, monkeypatch):
     return root.parent
 
 
-def _guard(handler, repo, tool, **tool_input):
-    return handler({"cwd": str(repo), "tool_name": tool, "tool_input": tool_input})
+def _guard(handler, repo, tool, agent_type="spec-reasoning-check", **tool_input):
+    return handler({"cwd": str(repo), "tool_name": tool, "tool_input": tool_input, "agent_type": agent_type})
 
 
 def _run(repo, event_name, event, env=None):
@@ -101,7 +101,7 @@ def test_reasoning_checks_cannot_reach_the_spec(repo, capsys, tool, tool_input):
     if "file_path" in tool_input:
         tool_input = {"file_path": str(repo / tool_input["file_path"])}
     assert _guard(hook.read_guard, repo, tool, **tool_input) == 2
-    assert "REASON-5" in capsys.readouterr().err
+    assert "never reads the spec" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("tool, tool_input", [
@@ -117,14 +117,18 @@ def test_reasoning_checks_may_search_the_code(repo, tool, tool_input):
     assert _guard(hook.read_guard, repo, tool, **tool_input) == 0
 
 
+def test_other_agents_may_read_the_spec(repo):
+    assert _guard(hook.read_guard, repo, "Read", agent_type=None, file_path=str(repo / "spec/requirements.md")) == 0
+
+
 # ---------------------------------------------------------------- the done gate
 
 def test_stop_blocks_once_with_the_findings(repo, spec):
     spec.files["elements/CORE/requirements.yaml"][0]["text"] = "The core shall stamp widgets where possible."
     spec.write()
-    decision = json.loads(_run(repo, "stop", {}))
-    assert decision["decision"] == "block"
-    assert "error[W003]" in decision["reason"] and "AGENT-12" in decision["reason"]
+    feedback = json.loads(_run(repo, "stop", {}))["hookSpecificOutput"]
+    assert feedback["hookEventName"] == "Stop"                  # feedback, which Claude Code doesn't show as an error
+    assert "error[W003]" in feedback["additionalContext"] and "isn't finished" in feedback["additionalContext"]
     assert _run(repo, "stop", {"stop_hook_active": True}) == ""   # already continuing: let it stop
 
 
@@ -194,7 +198,7 @@ def test_chat_approval_is_recorded_with_the_engineers_words(repo):
 def test_described_exceptions_record_nothing(repo):
     out = _run(repo, "prompt", {"prompt": "approve everything except the stamping one"})
     assert _approvals(repo) == {}
-    assert "AGENT-43" in out and "recorded nothing" in out
+    assert "leaving out every item an exception could refer to" in out and "recorded nothing" in out
 
 
 def test_approval_on_any_line_of_a_longer_message(repo):

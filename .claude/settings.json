@@ -9,6 +9,15 @@
             "command": "\"$CLAUDE_PROJECT_DIR\"/.syseng/hook pre-tool"
           }
         ]
+      },
+      {
+        "matcher": "Read|Grep|Glob|NotebookRead",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.syseng/hook read-guard"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -30,6 +39,19 @@
           }
         ]
       }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(.syseng/spec status *)",
+      "Bash(.syseng/spec check *)",
+      "Bash(.syseng/spec show *)",
+      "Bash(.syseng/spec render *)",
+      "Bash(.syseng/spec edit *)",
+      "Bash(.syseng/spec change *)",
+      "Bash(.syseng/spec decide *)",
+      "Bash(.syseng/spec propose *)",
+      "Bash(.syseng/spec friction *)"
     ]
   }
 }

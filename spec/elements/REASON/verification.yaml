@@ -4,9 +4,10 @@
   method: test
   technique: unit test
   origin: agent
-  description: The reasoning-check subagent's guard refuses reading a spec file, searching inside the spec directory, and searching above it without a filter or with a filter that matches spec files. Reading code, and searching code directories or with filters for code files, pass. The subagent's definition gives it only the read, search and file-listing tools, leaves out the project's instruction files, and installs the guard.
+  description: The reasoning-check subagent's guard refuses reading a spec file, searching inside the spec directory, and searching above it without a filter or with a filter that matches spec files. Reading code, and searching code directories or with filters for code files, pass. Other agents' reads aren't guarded. The guard is registered in the project's settings, and the subagent's definition gives it only the read, search and file-listing tools and leaves out the project's instruction files.
   tests:
     python:
     - tests/test_hooks.py::test_reasoning_checks_cannot_reach_the_spec
     - tests/test_hooks.py::test_reasoning_checks_may_search_the_code
+    - tests/test_hooks.py::test_other_agents_may_read_the_spec
     - tests/test_skill.py::test_reasoning_check_subagent_starts_clean_and_cannot_read_the_spec

@@ -17,7 +17,11 @@ spec init                               # one step: spec/, the launcher, the ski
 - `spec/`, with a root system element, if the repository has none;
 - `.syseng/spec`, the command agents run the toolkit with, and `.syseng/hook`, the Claude Code hooks;
 - the skill, in `.claude/skills/syseng/` (and `.agents/skills/syseng/` with `--harness antigravity`);
-- the hooks in `.claude/settings.json`, and two subagents in `.claude/agents/`: an auditor and a reasoning check.
+- the hooks in `.claude/settings.json`, and two subagents in `.claude/agents/`: an auditor and a reasoning check;
+- permission rules that let agents run the everyday commands without asking. Claude Code applies a project's rules once you've trusted the folder. `approve` and `resolve` still ask, so you see each command that records your words;
+- a short section in `AGENTS.md`, or `CLAUDE.md`, telling every session to follow the skill. `--no-instructions` leaves those files alone.
+
+For Hermes, add `--harness hermes`: the skill goes in `.agents/skills/syseng/`, and you run `hermes skills trust` once in the repository.
 
 Commit all of these. `spec init` also writes one file outside the repository: this machine's launcher, `~/.config/syseng/launcher`, which says which Python runs the toolkit. If your Python comes from somewhere special, such as a Nix shell, name the command yourself with `--launcher`. Run `spec init` again to pick up a newer skill or hook. It leaves your other settings alone, and `spec init --check` reports installed files that are out of date.
 
@@ -26,7 +30,8 @@ Commit all of these. `spec init` also writes one file outside the repository: th
 Agents follow the skill, so most of the time you just talk to your agent. The commands:
 
 ```sh
-.syseng/spec check            # everything unfinished in the spec (--todo lists to-dos, --merge gates a merge)
+.syseng/spec status           # what's open, what awaits you, and the check's summary
+.syseng/spec check            # everything unfinished in the spec (--todo lists to-dos, --merge before landing a branch)
 .syseng/spec show MODEL-1     # one item: its trace, what refines it, its verification, its history
 .syseng/spec approve SYS-7 --words "approve SYS-7"   # record the engineer's approval, fingerprinted
 .syseng/spec render           # regenerate spec/requirements.md, spec/decisions.md and the change views
@@ -50,7 +55,9 @@ YAML
 .syseng/spec change close
 ```
 
-Use a distinctive heredoc delimiter, such as `YAML`, so a batch can't collide with an `EOF` in your own script.
+Use a distinctive heredoc delimiter, such as `YAML`, so a batch can't collide with an `EOF` in your own script. When an edit asks for acknowledgments, `.syseng/spec edit --retry --ack 'ID=note'` sends the same batch again without retyping it.
+
+Verification items link tests as `path::name`: a pytest test (`tests/test_x.py::test_y`) or a GoogleTest (`tests/x_test.cpp::Suite.Test`). The checker confirms each linked test exists.
 
 ## Working on the toolkit
 

@@ -239,6 +239,6 @@ None.
     - Each copy has the placeholder {{SPEC}} replaced by the repository's launcher, `.syseng/spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run (AGENT-49).
     - The skill itself names no harness, tool or package manager. Harness-specific parts live in adapters.
 
-## Agent friction (AGENT-46)
+## Agent friction
 
 - **Worked around:** Toolkit messages name commands as `spec …` (for example "list them with `spec check --todo`"), but agents in a set-up repository run `.syseng/spec`; an agent following a message literally gets 'command not found' and has to translate. **Proposal:** Have the repository launcher export the name it was run as (SYSENG_PROG=.syseng/spec), and build every command mentioned in messages from it.

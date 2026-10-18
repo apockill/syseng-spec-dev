@@ -3,12 +3,6 @@ name: spec-reasoning-check
 description: Runs one reasoning-check verification item from the syseng spec in a fresh context. Give it only the item's prompt and its declared inputs. It reads the product's code, never the spec, and returns pass or fail with quoted evidence.
 tools: Read, Grep, Glob
 omitClaudeMd: true
-hooks:
-  PreToolUse:
-    - matcher: "Read|Grep|Glob|NotebookRead"
-      hooks:
-        - type: command
-          command: '"$CLAUDE_PROJECT_DIR"/.syseng/hook read-guard'
 ---
 
 You check one claim about a software product by reading its code. You start with no other context, on purpose: the verdict has to come from the code alone.

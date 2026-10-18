@@ -69,3 +69,16 @@
   alternatives: One launcher per repository, ignored by git, which new worktrees and fresh clones don't have. Running `spec` from the PATH, which depends on which environment is active.
   consequences: |-
     `spec init` writes one file outside the repository. A machine with two toolkit installs uses whichever one `spec init --launcher` named last.
+- id: DR-51
+  title: Setup points sessions at the skill and lets agents run everyday commands
+  decided_by: agent
+  elements:
+  - CLI
+  - AGENT
+  requirements: CLI-16, CLI-20
+  recorded: round 14
+  context: The engineer put the agent in charge of agent experience. In a live run, every toolkit command waited for permission, and nothing told a new session the method existed.
+  decision: |-
+    `spec init` writes a short section between markers into AGENTS.md, or CLAUDE.md when that's the file the repository has, and rewrites only that section on later runs. It adds Claude Code allow rules for status, check, show, render, edit, change, decide, propose and friction. Approve and resolve stay with the permission prompt, so the engineer confirms each command that records their words.
+  alternatives: Relying on the skill's description to trigger, which a quick request may not do. Allowing every toolkit command, which would let an approval be recorded without the engineer seeing it.
+  consequences: Claude Code ignores a project's allow rules until the engineer has trusted the folder once, interactively. `--no-instructions` leaves the instruction files alone.

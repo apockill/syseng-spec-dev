@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from syseng import review, yamlio
+from syseng import naming, review, yamlio
 from syseng.model import Spec
 
 MODES = ("code-first", "spec-first")
@@ -55,7 +55,7 @@ def current(spec: Spec) -> Change | None:
     open_changes = [c for c in all_changes(spec) if c.is_open]
     if len(open_changes) > 1:
         raise ChangeError("more than one change is open: " + ", ".join(c.id for c in open_changes)
-                          + ". Close all but one with `spec change close --id <id>`.")
+                          + f". Close all but one with {naming.cmd('change close --id <id>')}.")
     return open_changes[0] if open_changes else None
 
 
@@ -65,7 +65,7 @@ class ChangeError(Exception):
 
 def start(spec: Spec, request: str, mode: str | None, target: str | None, slug: str | None) -> Change:
     if current(spec):
-        raise ChangeError(f"change {current(spec).id} is still open. Close it first with `spec change close`.")
+        raise ChangeError(f"change {current(spec).id} is still open. Close it first with {naming.cmd('change close')}.")
     mode = mode or "code-first"  # CHANGE-9: a request that names no mode is code-first
     if mode not in MODES:
         raise ChangeError(f"mode must be one of {', '.join(MODES)}")
@@ -102,11 +102,11 @@ def add_decision(change: Change, decision: dict) -> str:
     if not decision.get("question"):
         raise ChangeError("a decision needs a `question`")
     if len(options) < 2:
-        raise ChangeError("a decision needs at least two `options` (CHANGE-10)")
+        raise ChangeError("a decision needs at least two `options`")
     if sum(1 for o in options if o.get("recommended")) != 1:
-        raise ChangeError("mark exactly one option `recommended: true` (CHANGE-10)")
+        raise ChangeError("mark exactly one option `recommended: true`")
     if not decision.get("importance"):
-        raise ChangeError("say why this decision ranks where it does, in `importance` (AGENT-40)")
+        raise ChangeError("say why this decision ranks where it does, in `importance`")
     decisions = change.data.setdefault("decisions", [])
     did = f"D{len(decisions) + 1}"
     entry = {"id": did, "question": decision["question"], "importance": decision["importance"],
@@ -143,7 +143,7 @@ def log_friction(change: Change, workaround: str, proposal: str) -> None:
 def add_proposal(change: Change, ids: list[str], why: str) -> None:
     """SYS-38: an agent proposes items for the engineer's explicit approval, saying why they deserve it."""
     if not (why or "").strip():
-        raise ChangeError("say why these items deserve the engineer's attention (AGENT-40)")
+        raise ChangeError("say why these items deserve the engineer's attention")
     change.data.setdefault("proposals", []).append(
         {"ids": ids, "why": why, "proposed": datetime.datetime.now().astimezone().isoformat(timespec="minutes")})
     change.save()
@@ -202,7 +202,7 @@ def view(spec: Spec, change: Change) -> str:
             detail = f": {o['detail']}" if o.get("detail") else ""
             out.append(f"  {n}. {o.get('label', '')}{rec}{detail}")
     if open_ds:
-        out += ["", f"To accept every recommendation: `spec resolve {' '.join(x['id'] for x in open_ds)} "
+        out += ["", f"To accept every recommendation: `{naming.command(spec.root)} resolve {' '.join(x['id'] for x in open_ds)} "
                     f"--words \"<your words>\"`.", ""]
     out += _alterations_section(spec, change) + _proposals_section(spec, change)
     resolved = [x for x in decisions if x.get("status") == "resolved"]
@@ -235,7 +235,7 @@ def view(spec: Spec, change: Change) -> str:
             out.append(f"  - *Acknowledged {_label(spec, ack_id)}:* {note}")
     friction = d.get("friction") or []
     if friction:
-        out += ["", "## Agent friction (AGENT-46)", ""]
+        out += ["", "## Agent friction", ""]
         out += [f"- **Worked around:** {f.get('workaround', '')} **Proposal:** {f.get('proposal', '')}"
                 for f in friction]
     return "\n".join(out).rstrip("\n") + "\n"

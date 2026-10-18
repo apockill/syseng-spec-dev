@@ -1,4 +1,4 @@
-"""Editing the spec through the CLI (SYS-25; CLI-5 to CLI-8; DR-2, DR-19).
+"""Editing the spec through the CLI.
 
 An edit is a batch of operations, sent as one YAML document:
 
@@ -6,17 +6,17 @@ An edit is a batch of operations, sent as one YAML document:
       - add: requirement            # need | requirement | system | constraint | vi | decision | element
         element: CLI                # where it goes (not needed for needs, system requirements, constraints)
         text: The CLI shall …       # plus the kind's other fields; `id` is allocated when omitted
-        reason: why this is added   # every operation needs a reason (CHANGE-5, CLI-8)
+        reason: why this is added   # every operation needs a reason
       - modify: CLI-3
         set: {text: …}              # fields to set; `unset: [field]` removes fields
         reason: …
       - remove: CLI-9
         reason: …
-    acks:                           # one note per affected item, when the CLI asks for them (CLI-6)
+    acks:                           # one note per affected item, when the CLI asks for them
       CLI-V1: still verifies the new wording
 
-The batch runs against a scratch copy first. The CLI shows each operation's context (CLI-5),
-asks for acknowledgments only where an approved or depended-on item is affected (DR-19), and
+The batch runs against a scratch copy first. The CLI shows each operation's context,
+asks for acknowledgments only where an approved or depended-on item is affected, and
 rejects the batch if it would introduce checker errors. Only then does it write the spec and
 log every operation, with its reason, in the open change record.
 """
@@ -24,13 +24,14 @@ log every operation, with its reason, in the open change record.
 import copy
 import datetime
 import difflib
+import hashlib
 import re
 import shutil
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from syseng import changes, check, fingerprint, model, render, review, yamlio
+from syseng import changes, check, fingerprint, model, naming, render, review, yamlio
 from syseng.model import Spec
 
 KIND_FILES = {"need": "needs.yaml", "requirement": "requirements.yaml", "system": "requirements.yaml",
@@ -95,7 +96,7 @@ def parse(doc) -> tuple[list[Op], dict]:
         if not reason:  # CLI-8, CHANGE-5
             target = raw.get(verb)
             raise EditError(f"operation {n} ({verb} {target}) has no `reason`. Every change to the spec records "
-                            "why it was made, so the engineer can ask later (CHANGE-5).")
+                            "why it was made, so the engineer can ask later.")
         if verb == "add":
             kind = raw["add"]
             if kind not in FIELDS:
@@ -176,7 +177,7 @@ def _add(spec: Spec, root: Path, op: Op) -> str:
     if new_id in spec.items:
         raise EditError(f"{new_id} already exists; omit `id` to have one allocated")
     if new_id in spec.retired_ids():
-        raise EditError(f"{new_id} was retired and can't be reused (MODEL-15); omit `id` to get a fresh one")
+        raise EditError(f"{new_id} was retired and can't be reused; omit `id` to get a fresh one")
     entry = {"id": new_id}
     if kind in ("system", "constraint"):
         entry["kind"] = kind
@@ -293,8 +294,51 @@ def _diff(before: dict, after: dict) -> tuple[dict, dict]:
     return {k: before[k] for k in keys if k in before}, {k: after[k] for k in keys if k in after}
 
 
+# ---------------------------------------------------------------- retrying a batch (CLI-17)
+def _last_path(root: Path) -> Path:
+    key = hashlib.sha1(str(root.resolve()).encode()).hexdigest()[:12]
+    return Path(tempfile.gettempdir()) / "syseng" / key / "last-edit.yaml"
+
+
+def save_last(root: Path, doc) -> None:
+    """Keeps a batch that needs acknowledgments or fixes, so `spec edit --retry` can send it again."""
+    yamlio.write(_last_path(root), doc)
+
+
+def load_last(root: Path):
+    path = _last_path(root)
+    if not path.exists():
+        raise EditError("there's no batch to retry: `--retry` reuses the last batch that needed acknowledgments "
+                        "or had errors")
+    return yamlio.read(path)
+
+
+def clear_last(root: Path) -> None:
+    _last_path(root).unlink(missing_ok=True)
+
+
+def with_acks(doc, acks: list[str]):
+    """Adds `ID=note` acknowledgments from the command line to a batch."""
+    doc = {"edits": doc} if isinstance(doc, list) else dict(doc or {})
+    merged = dict(doc.get("acks") or {})
+    for ack in acks:
+        iid, sep, note = ack.partition("=")
+        if not sep or not iid.strip() or not note.strip():
+            raise EditError(f"an acknowledgment looks like ID=note; got {ack!r}")
+        merged[iid.strip()] = note.strip()
+    doc["acks"] = merged
+    return doc
+
+
 def _brief(text: str, limit: int = 90) -> str:
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
+def _value_lines(prefix: str, value) -> list[str]:
+    """A field's value, keeping the lines of multi-line text (CLI-19)."""
+    if isinstance(value, str) and "\n" in value.strip():
+        return [prefix] + [f"      {line}" if line.strip() else "" for line in value.strip().splitlines()]
+    return [f"{prefix} {changes._one_line(value)}"]
 
 
 def _context_lines(before: Spec, after: Spec, ops: list[Op], ids: list[str]) -> list[str]:
@@ -306,9 +350,10 @@ def _context_lines(before: Spec, after: Spec, ops: list[Op], ids: list[str]) -> 
         lines.append(f"{op.op} {iid} [{where}]")
         for key in dict.fromkeys(list(b) + list(a)):
             if key in b:
-                lines.append(f"  - {key}: {changes._one_line(b[key])}")
+                lines += _value_lines(f"  - {key}:", b[key])
             if key in a:  # additions are echoed briefly; the change record keeps the full text
-                lines.append(f"  + {key}: {_brief(changes._one_line(a[key])) if op.op == 'add' else changes._one_line(a[key])}")
+                lines += ([f"  + {key}: {_brief(changes._one_line(a[key]))}"] if op.op == "add"
+                          else _value_lines(f"  + {key}:", a[key]))
         parent = (_data(after, iid) or _data(before, iid)).get("traces_to")
         if parent:
             lines.append(f"  refines {changes._label(after, parent)}")
@@ -323,14 +368,16 @@ def run(root: Path, doc, dry_run: bool = False) -> Result:
     spec = model.load(root)
     change = changes.current(spec)
     if change is None:
-        raise EditError("no change is open. Start one with `spec change start \"<what the engineer asked for>\"`; "
-                        "every edit is logged in it with its reason (CHANGE-5).")
+        start = naming.cmd('change start "<what the engineer asked for>"')
+        raise EditError(f"no change is open. Start one with {start}; "
+                        "every edit is logged in it with its reason.")
     result = Result()
     with tempfile.TemporaryDirectory() as tmp:
         scratch = Path(tmp) / "spec"
         shutil.copytree(root, scratch)
         ids = apply_ops(scratch, ops, change.id)
         after = model.load(scratch)
+        after.repo = spec.repo_root()  # test links resolve in the real repository (CHECK-4)
         result.ids = ids
         result.context = _context_lines(spec, after, ops, ids)
         adding = {i for op, i in zip(ops, ids) if op.op == "add"}
