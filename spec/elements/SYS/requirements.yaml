@@ -205,6 +205,11 @@
   - NEED-11
   source: |-
     "IDs are really hard to remember … Otherwise, I'm left Ctrl+f'ing to figure out what the heck you're asking."
+  quotes:
+  - said: 2026-10-17 22:47
+    words: |-
+      The UX for the round 12 record isn't really useful. CUJ: In '## Proposed for your explicit approval' You state 'change-13' and give a brief truncated description, but I'm not really sure of the full context, or the full text. I then had to ctrl-f change 13, and read it, then scroll all the way back to the top to the '## Proposed for your explicit approval' section.
+    context: Reviewing round 12's change record, whose proposals section broke this requirement.
 - id: SYS-31
   kind: system
   text: The toolkit shall invite agents to improve the toolkit wherever they meet friction or a new way of working.

@@ -14,20 +14,89 @@ None.
 
 This change altered items you approved, wrote or decided. Keep each one with the line shown, or ask for it to be rolled back.
 
-- **CHECK-14 (The checker shall report each item whose content no…)**, because it carries your words. Keep it: `CHECK-14 LGTM`
-  - CHECK-14 reported every item without an approval. Under delegation (DR-44), an item under an approved item isn't a to-do (CHECK-19), so CHECK-14 keeps only the change detection the engineer asked for.
-- **DR-44 (Approval works like delegated authority in configuration management)**, because you approved it. Keep it: `DR-44 LGTM`
-  - the approach is built; the status said it wasn't yet.
+### DR-44: Approval works like delegated authority in configuration management
+
+**Why you're asked:** you approved it. Keep it: `DR-44 LGTM`
+
+- *Changed because:* the approach is built; the status said it wasn't yet.
+  - *status, before:* proposed in round 12; not built yet.
+  - *status, now:* built in round 12.
+- *Decides:*
+  - SYS-33: The toolkit shall record with each approval the approver, the channel, the number of items approved together, the engineer's words, and the decisions the engineer resolved about the item beforehand.
+  - SYS-34: Each view of an item shall show whether the engineer approved the item explicitly or the item is delegated under an item the engineer approved.
+  - SYS-35: The toolkit shall keep each statement of the engineer word for word on the requirements that directly express it, with the date and time of the statement and a summary of what was being discussed.
+  - SYS-36: The toolkit shall place each requirement under the system element whose behavior the requirement constrains, whatever the order or framing of the request the requirement came from.
+  - SYS-37: Once a change is built and tested, the toolkit shall ask the engineer whether to keep each alteration the change made to an item the engineer approved, wrote or decided.
+  - SYS-38: The toolkit shall present the items agents propose for the engineer's explicit approval, each with the reason it deserves the engineer's attention, most consequential first.
+  - SYS-39: Before an agent changes an item, the toolkit shall show the agent whether the engineer approved, wrote or decided the item, and the discussion behind it.
+  - SYS-40: The spec shall store no measure of an item's importance.
+- *Context:* The engineer wants to approve the key points of the requirement tree, let agents decide the rest, and have each later change to what they approved, wrote or decided brought back to them (NEED-14 to NEED-20). Today every item needs approval, and over 200 items are waiting.
+- *Decision:* Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).
+  - The engineer approves key items explicitly, as a customer approves a baseline. Everything beneath an approved item is delegated: the agent decides it, as a contractor decides the detailed design.
+  - A change that alters an item the engineer approved, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it.
+  - Whether an item is approved, delegated or neither is computed from the approvals and the tree each time it's shown, and never stored (SYS-40).
+  - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
+- *Alternatives:* Approving every item, which is today's rule and doesn't scale. A stored importance score, which the engineer ruled out.
+- *Consequences:* The engineer approves a few key items per change instead of every item. Agents need each item's approval state at the moment they change it (SYS-39). The merge check never blocks; it lists the alterations the engineer hasn't answered yet (CHECK-15, round 12 D1).
+- *Mentioned:* NEED-14 (The engineer needs to see who approved each item…); NEED-20 (The engineer needs the requirement tree to follow the…); CHECK-15 (When preparing a merge, the checker shall list, without…)
+
+*Answered:* CHECK-14 (kept)
 
 ## Proposed for your explicit approval
 
-- CHANGE-13 (An item shall count as approved, written or decided…): you asked for it when approving SYS-37: it pins down what counts as approved, written or decided, which decides what gets raised with you
-- DR-47 (An item's ancestors, for delegation, are what it traces…): it decides what delegation covers: approving a need delegates everything beneath it, system requirements included, so proposals are how key items still reach you
-- SYS (The toolkit: the system as a whole, a system element): the root system element: approving it delegates the other 12 element definitions, the last unreviewed items apart from decision records
-- DR-46 (The engineer's words go in a quotes list beside…): your older quotes stay in Source without dates or context; only new ones are exact and dated, because back-filling would mean inventing metadata
-- DR-45 (Approvals are kept as a history, each with who…), DR-48 (Alterations to the engineer's items are flagged when logged,…): the mechanics behind approval history and raised alterations; lower stakes, but each was a choice between alternatives
+### SYS: The toolkit: the system as a whole
 
-To approve the ones still waiting: `approve CHANGE-13, DR-47, SYS, DR-46, DR-45, DR-48`
+**Why I'm asking:** the root system element: approving it delegates the other 12 element definitions, the last unreviewed items apart from decision records
+
+- *System element:* A reusable systems-engineering toolkit: a command-line tool, one portable skill and optional adapters for agent harnesses. It lets one engineer direct AI agents on a large codebase by reading requirements instead of code.
+- *Part of:* nothing (it is the root)
+
+### DR-46: The engineer's words go in a quotes list beside the older source field
+
+**Why I'm asking:** your older quotes stay in Source without dates or context; only new ones are exact and dated, because back-filling would mean inventing metadata
+
+- *Decides:*
+  - MODEL-36: A quote shall hold the engineer's exact words, the date and time the engineer said them, and a summary of what was being discussed.
+  - CHECK-20: The checker shall report each quote that lacks the engineer's words, the date and time they were said, or a summary of what was being discussed.
+  - REVIEW-17: The requirements view shall show each quote with the date and time it was said and the summary of what was being discussed.
+- *Context:* SYS-35 asks for the engineer's exact words with the date and time and the context. Existing items keep their words in a free-text `source` field, often with typos fixed and without dates.
+- *Decision:* Items take a `quotes` list, each with `said`, `words` and `context`, and the checker requires all three. Existing `source` fields stay as they are. They aren't migrated, because their dates and contexts were never recorded and filling them in would mean inventing them.
+- *Alternatives:* Migrating every `source` field with guessed dates, which would put invented metadata next to the engineer's words.
+- *Consequences:* Two places hold the engineer's words until older items are revisited. The requirements view shows both, and its legend explains the difference.
+- *Mentioned:* SYS-35 (The toolkit shall keep each statement of the engineer…)
+
+### DR-45: Approvals are kept as a history, each with who and how
+
+**Why I'm asking:** the mechanics behind approval history and raised alterations; lower stakes, but each was a choice between alternatives
+
+- *Decides:*
+  - MODEL-34: Each approval record shall hold the approver, the channel, the date and time, the number of items approved in the same action, the engineer's words, and the fingerprint of the content approved.
+  - MODEL-35: The spec shall keep every approval of an item, oldest first.
+  - CLI-11: When no approver is named, the CLI shall record as approver the user name configured for the repository's version control.
+  - CLI-12: When recording an approval, the CLI shall record each resolved decision that involved the item.
+- *Context:* The approvals file held one record per item, so approving again overwrote the earlier record and its words. SYS-33 asks what an approval says about who and how, and SYS-39 asks for history.
+- *Decision:* Every approval is appended, never replaced, and each records the approver, the channel (terminal, chat, menu, page or restated), the date and time, how many items were approved together, the engineer's words, an optional note, and the resolved decisions that involved the item. An item's current approval is any record whose fingerprint matches its content, the latest one first.
+- *Alternatives:* One record per item with a list of past approvals inside it, which makes the file harder to read in a diff. A separate history file, which splits what one approval means across two places.
+- *Consequences:* The approvals file grows with every approval. Records from before round 12 lack the new fields, and the toolkit treats the missing fields as unknown.
+- *Mentioned:* SYS-33 (The toolkit shall record with each approval the approver,…); SYS-39 (Before an agent changes an item, the toolkit shall…)
+
+### DR-48: Alterations to the engineer's items are flagged when logged, and answered by approval or rollback
+
+**Why I'm asking:** the mechanics behind approval history and raised alterations; lower stakes, but each was a choice between alternatives
+
+- *Decides:*
+  - CHANGE-13: An item shall count as approved, written or decided by the engineer when it has an approval record, when its origin is the engineer or it quotes the engineer, or when it is a decision record the engineer made.
+  - CHANGE-14: Each change record shall list each alteration the change made to an item the engineer approved, wrote or decided, with the line that keeps it, until the engineer keeps it or it is rolled back.
+  - CHECK-21: The checker shall report as a to-do each alteration to an item the engineer approved, wrote or decided that the engineer has not kept or had rolled back.
+- *Context:* SYS-37 asks that each alteration to what the engineer approved, wrote or decided be raised after the work is built and tested, and the engineer described rolling back what they care about.
+- *Decision:* When an edit changes the meaning of such an item, the change log records why it counts (approved, their words, their decision) and the item's fingerprints before and after. Before applying it, the CLI asks the agent to acknowledge it. The alteration stays listed in the change record, and as a to-do, until the engineer approves the item as it now is (kept), or it's back to its earlier content (rolled back). A removed item is listed but can't be kept by approval.
+- *Alternatives:* Comparing against git history, which the toolkit doesn't read and which can't tell why an item counts. An explicit "answered" flag, which an agent could set without the engineer.
+- *Consequences:* Alterations logged before round 12 carry no flag, so the mechanism starts with this round. Keeping an alteration is one line from the engineer, such as `CHECK-14 LGTM`.
+- *Mentioned:* SYS-37 (Once a change is built and tested, the toolkit…); CHECK-14 (The checker shall report each item whose content no…)
+
+To approve every item above: `approve SYS, DR-46, DR-45, DR-48`
+
+*Already approved:* CHANGE-13 (An item shall count as approved, written or decided…), DR-47 (An item's ancestors, for delegation, are what it traces…)
 
 ## Resolved decisions
 

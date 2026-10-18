@@ -87,3 +87,19 @@
   traces_to: SYS-35
   origin: agent
   why: SYS-35 keeps the date and the context so readers can see them.
+- id: REVIEW-18
+  text: Each item the change record asks the engineer to approve or answer for shall be shown in full, with its parent and rationale for a requirement, and with its context, decision, alternatives, consequences and the requirements it decides for a decision record.
+  traces_to: SYS-30
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 22:47
+    words: You state 'change-13' and give a brief truncated description, but I'm not really sure of the full context, or the full text. I then had to ctrl-f change 13, and read it, then scroll all the way back to the top to the '## Proposed for your explicit approval' section.
+    context: Reviewing round 12's change record.
+- id: REVIEW-19
+  text: Wherever the change record shows an item for the engineer to approve or answer for, it shall list with their titles the other items that the shown text mentions.
+  traces_to: SYS-30
+  origin: engineer
+  quotes:
+  - said: 2026-10-17 22:47
+    words: dr-47, similar to change-13, but I couldn't remember the exact context for it. CHECK-18 or CHECK-19 for example.
+    context: Reviewing round 12's change record.

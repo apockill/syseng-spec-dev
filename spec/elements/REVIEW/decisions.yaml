@@ -1,0 +1,13 @@
+- id: DR-49
+  title: Review sections carry their context inline instead of linking to it
+  decided_by: agent
+  elements:
+  - REVIEW
+  - CHANGE
+  requirements: REVIEW-18, REVIEW-19
+  recorded: round 13
+  context: In round 12's record the engineer had to search for each proposed item's full text and scroll back. They read change records as raw Markdown in the editor, where links show no preview on hover.
+  decision: |-
+    Wherever the change record asks the engineer to approve or answer for an item, it repeats what's needed to judge it right there: the full text, what it sits under, its rationale and the engineer's words; for a decision record, its reasoning and the full text of the requirements it decides. The other IDs the shown text mentions are listed with their titles.
+  alternatives: Linking each ID to its item with the text on hover, which only works in a Markdown preview. A glossary at the end of the record, which still means scrolling.
+  consequences: Change records get longer, and the same text can appear in two sections. Each review section can be read on its own.

@@ -293,3 +293,8 @@
     words: |-
       This was helpful: surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework. It's helpful because it can help us weave the graph tighter through conversation, help find conenctions, etc.
     context: Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.
+- id: AGENT-57
+  text: The approval reader shall read an ID written as a word and a number, such as "Change 13", when the word names a system element, needs or decision records.
+  traces_to: SYS-14
+  origin: agent
+  why: the engineer writes approvals that way ("Change 13 LGTM.", "need 16 LGTM"). Without this, the reader would tell the agent such a message approves nothing.

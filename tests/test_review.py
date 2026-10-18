@@ -115,9 +115,27 @@ def test_proposals_are_listed_with_reasons_until_approved(spec):
     s = model.load(root)
     view = changes.view(s, changes.current(s))
     assert "## Proposed for your explicit approval" in view and "`approve CORE-1`" in view
+    assert "> The core shall stamp each widget." in view                     # its full text, on the spot
+    assert "*Under:* SYS-1 (The system shall make widgets.)" in view        # and what it sits under
     _approve(spec, root, "CORE-1", "--words", "approve CORE-1")
     s = model.load(root)
-    assert "*(approved)*" in changes.view(s, changes.current(s))
+    assert "*Already approved:* CORE-1" in changes.view(s, changes.current(s))
+
+
+def test_a_proposed_decision_shows_its_reasoning_and_what_it_mentions(spec):
+    spec.files["elements/CORE/decisions.yaml"] = [{
+        "id": "DR-1", "title": "Stamp with ink", "decided_by": "agent", "elements": ["CORE"], "requirements": "CORE-1",
+        "context": "Stamps must last.", "decision": "Ink, because CORE-1 needs every widget stamped.",
+        "alternatives": "Lasers, which SYS-1 can't afford.", "consequences": "Ink costs money."}]
+    root = spec.write()
+    changes.start(spec.load(), "widgets", None, None, None)
+    assert cli.main(["--spec", str(root), "propose", "DR-1", "--why", "it decides how widgets look"]) == 0
+    s = model.load(root)
+    view = changes.view(s, changes.current(s))
+    assert "### DR-1: Stamp with ink" in view
+    assert "*Alternatives:* Lasers, which SYS-1 can't afford." in view
+    assert "  - CORE-1: The core shall stamp each widget." in view               # what it decides, in full
+    assert "*Mentioned:* SYS-1 (The system shall make widgets.)" in view
 
 
 def test_a_proposal_needs_a_reason(spec):

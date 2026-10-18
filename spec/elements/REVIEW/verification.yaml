@@ -52,3 +52,15 @@
     python:
     - tests/test_review.py::test_views_mark_approved_changed_and_delegated_items
     - tests/test_review.py::test_quotes_are_shown_with_when_and_what_was_discussed
+- id: REVIEW-V6
+  verifies:
+  - REVIEW-18
+  - REVIEW-19
+  method: test
+  technique: unit test
+  origin: agent
+  description: A proposed requirement is shown with its full text and the item it sits under. A proposed decision record is shown with its context, decision and alternatives, the full text of each requirement it decides, and the titles of the other items its text mentions.
+  tests:
+    python:
+    - tests/test_review.py::test_proposals_are_listed_with_reasons_until_approved
+    - tests/test_review.py::test_a_proposed_decision_shows_its_reasoning_and_what_it_mentions

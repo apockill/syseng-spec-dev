@@ -1,3 +1,19 @@
+- id: CHANGE-13
+  fingerprint: d0754061b7ad
+  approved_at: 2026-10-17T22:49-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: Change 13 LGTM.
+  text: An item shall count as approved, written or decided by the engineer when it has an approval record, when its origin is the engineer or it quotes the engineer, or when it is a decision record the engineer made.
+- id: CHECK-14
+  fingerprint: edd78f0eb7a1
+  approved_at: 2026-10-17T23:00-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: check 14 lgtm
+  text: The checker shall report each item whose content no longer matches the fingerprint of its latest approval.
 - id: DR-1
   fingerprint: 0b72ae3a99ed
   approved_on: '2026-10-11'
@@ -330,6 +346,15 @@
   note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it
   text: |-
     Approval works like delegated authority in configuration management: Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example). - The engineer approves key items explicitly, as a customer approves a baseline. Everything beneath an approved item is delegated: the agent decides it, as a contractor decides the detailed design. - A change that alters an item the engineer approved, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it. - Whether an item is approved, delegated or neither is computed from the approvals and the tree each time it's shown, and never stored (SYS-40). - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
+- id: DR-47
+  fingerprint: 6031b58792b3
+  approved_at: 2026-10-17T23:00-07:00
+  by: Alex Thiele
+  via: chat
+  batch: 1
+  words: dr-47 lgtm
+  text: |-
+    An item's ancestors, for delegation, are what it traces to: An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest approved ancestor. An item that changed since its own approval isn't delegated: its change awaits the engineer. Nothing about the result is stored.
 - id: NEED-1
   fingerprint: f4d032821275
   approved_on: '2026-10-11'

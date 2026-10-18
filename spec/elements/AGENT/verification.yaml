@@ -125,3 +125,15 @@
   tests:
     python:
     - tests/test_skill.py::test_skill_teaches_the_approval_model
+- id: AGENT-V11
+  verifies:
+  - AGENT-57
+  method: test
+  technique: unit test
+  origin: agent
+  description: |-
+    "Core 13 LGTM.", "need 16 LGTM" and "approve dr 4 and Core 2" approve the items they name when CORE is a system element. "Round 12 LGTM" approves nothing.
+  tests:
+    python:
+    - tests/test_hooks.py::test_ids_written_out_in_words_are_read
+    - tests/test_hooks.py::test_words_that_only_look_like_ids_are_not_read

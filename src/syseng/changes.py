@@ -245,6 +245,62 @@ def _is_block(value) -> bool:
     return isinstance(value, str) and "\n" in value.strip()
 
 
+_MENTION = re.compile(r"\b(?:[A-Z]+-V?\d+)\b")
+_CONTEXT_FIELDS = {  # what the engineer needs to judge an item without looking anything up (REVIEW-18)
+    "decision": [("context", "Context"), ("decision", "Decision"), ("alternatives", "Alternatives"),
+                 ("consequences", "Consequences")],
+    "vi": [("description", "Checks"), ("verifies", "Verifies")],
+}
+_REQUIREMENT_FIELDS = [("why", "Why"), ("refines", "Refines"), ("source", "Source"), ("context", "Context")]
+
+
+def _full(spec: Spec, iid: str) -> tuple[str, list[str]]:
+    """An item's heading and full context, with a line naming every other item it mentions (REVIEW-18, REVIEW-19)."""
+    if iid in spec.elements:
+        e = spec.elements[iid]
+        body = [f"- *System element:* {e.data.get('purpose', '')}", f"- *Part of:* {_label(spec, e.parent) if e.parent else 'nothing (it is the root)'}"]
+        return f"{iid}: {e.title}", body + _mentions(spec, iid, body)
+    item = spec.items.get(iid)
+    if item is None:
+        return iid, []
+    d = item.data
+    if item.kind == "decision":
+        head = f"{iid}: {d.get('title', '')}"
+        decided = [r for r in review.parents(spec, iid) if r in spec.items]
+        body = [_block("- *Decides:*", "")] if decided else []
+        body += [_block(f"  - {r}:", spec.items[r].data.get("text", "")) for r in decided]
+    else:
+        head = iid
+        body = [_block(">", d.get("text") or d.get("description") or "")]
+        ups = review.parents(spec, iid)
+        if ups and item.kind != "vi":
+            body.append(f"- *Under:* {', '.join(_label(spec, u) for u in ups)}")
+    for key, label in _CONTEXT_FIELDS.get(item.kind, _REQUIREMENT_FIELDS):
+        value = d.get(key)
+        if value:
+            shown = ", ".join(_label(spec, v) for v in value) if isinstance(value, list) else str(value)
+            body.append(_block(f"- *{label}:*", shown))
+    for q in d.get("quotes") or []:
+        if isinstance(q, dict):
+            body.append(_block(f"- *Your words, {q.get('said', '')}:*", f'"{q.get("words", "")}" ({q.get("context", "")})'))
+    return head, body + _mentions(spec, iid, body)
+
+
+def _block(prefix: str, text: str) -> str:
+    lines = str(text).strip().splitlines() or [""]
+    indent = "  " if prefix.startswith("-") else "> " if prefix == ">" else "  "
+    first = f"{prefix} {lines[0]}".rstrip()
+    return "\n".join([first] + [f"{indent}{ln}" if ln else (">" if prefix == ">" else "") for ln in lines[1:]])
+
+
+def _mentions(spec: Spec, iid: str, body: list[str]) -> list[str]:
+    seen = [m for m in dict.fromkeys(_MENTION.findall("\n".join(body))) if m != iid and m in spec.items]
+    labelled = {m for line in body if "*Under:*" in line or "*Verifies:*" in line or line.startswith("  - ")
+                for m in _MENTION.findall(line.split(":")[0] if line.startswith("  - ") else line)}
+    rest = [m for m in seen if m not in labelled]
+    return [f"- *Mentioned:* {'; '.join(_label(spec, m) for m in rest)}"] if rest else []
+
+
 def _alterations_section(spec: Spec, change: Change) -> list[str]:
     """CHANGE-14: what this change altered among the items the engineer approved, wrote or decided."""
     alts = review.alterations(spec, change)
@@ -252,39 +308,51 @@ def _alterations_section(spec: Spec, change: Change) -> list[str]:
         return []
     out = ["## Alterations awaiting your answer", ""]
     pending = [a for a in alts if not a["answered"] and not a["removed"]]
-    if pending:
-        out += ["This change altered items you approved, wrote or decided. Keep each one with the line shown, "
-                "or ask for it to be rolled back.", ""]
-    else:
-        out += ["None left.", ""]
+    out += (["This change altered items you approved, wrote or decided. Keep each one with the line shown, or ask "
+             "for it to be rolled back.", ""] if pending else ["None left.", ""])
     for a in pending:
-        out.append(f"- **{_label(spec, a['id'])}**, because {' and '.join(a['reasons'])}. Keep it: "
-                   f"`{a['id']} LGTM`")
-        out += [f"  - {e.get('reason', '')}" for e in a["entries"]]
+        head, body = _full(spec, a["id"])
+        out += [f"### {head}", "", f"**Why you're asked:** {' and '.join(a['reasons'])}. Keep it: `{a['id']} LGTM`", ""]
+        for e in a["entries"]:
+            out.append(f"- *Changed because:* {e.get('reason', '')}")
+            before, after = e.get("before") or {}, e.get("after") or {}
+            for key in dict.fromkeys(list(before) + list(after)):
+                if key in before:
+                    out.append(_block(f"  - *{key}, before:*", _one_line(before[key])))
+                if key in after:
+                    out.append(_block(f"  - *{key}, now:*", _one_line(after[key])))
+        if any("text" in (e.get("after") or {}) for e in a["entries"]):
+            body = [line for line in body if not line.startswith(">")]  # the new text is shown just above
+        out += [*body, ""]
     removed = [a["id"] for a in alts if a["removed"]]
     if removed:
-        out.append(f"- *Removed:* {', '.join(removed)}. Say if any should come back.")
+        out += [f"*Removed:* {', '.join(removed)}. Say if any should come back.", ""]
     answered = [f"{a['id']} ({'rolled back' if a['rolled_back'] else 'kept'})" for a in alts if a["answered"]]
     if answered:
-        out.append(f"- *Answered:* {', '.join(answered)}")
-    return out + [""]
+        out += [f"*Answered:* {', '.join(answered)}", ""]
+    return out
 
 
 def _proposals_section(spec: Spec, change: Change) -> list[str]:
-    """CHANGE-15: items an agent proposed for the engineer's explicit approval, in the order proposed."""
+    """CHANGE-15: items proposed for the engineer's explicit approval, each readable on the spot (REVIEW-18)."""
     proposals = change.data.get("proposals") or []
     if not proposals:
         return []
-    out, pending = ["## Proposed for your explicit approval", ""], []
+    out, pending, done = ["## Proposed for your explicit approval", ""], [], []
     for p in proposals:
         ids = [i for i in p.get("ids") or [] if review.kind_and_data(spec, i)]
-        waiting = [i for i in ids if review.state_of(spec, i).state != review.APPROVED]
-        pending += [i for i in waiting if i not in pending]
-        done = "" if waiting else " *(approved)*"
-        out.append(f"- {', '.join(_label(spec, i) for i in ids)}: {p.get('why', '')}{done}")
+        for iid in ids:
+            if review.state_of(spec, iid).state == review.APPROVED:
+                done.append(iid)
+                continue
+            pending.append(iid)
+            head, body = _full(spec, iid)
+            out += [f"### {head}", "", f"**Why I'm asking:** {p.get('why', '')}", "", *body, ""]
     if pending:
-        out += ["", f"To approve the ones still waiting: `approve {', '.join(pending)}`"]
-    return out + [""]
+        out += [f"To approve every item above: `approve {', '.join(pending)}`", ""]
+    if done:
+        out += [f"*Already approved:* {', '.join(_label(spec, i) for i in done)}", ""]
+    return out
 
 
 def _one_line(value) -> str:

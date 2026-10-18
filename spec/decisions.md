@@ -333,6 +333,7 @@ These are the decisions made while designing and building the toolkit, each atta
 *System elements:* AGENT · *Requirements:* AGENT-21, AGENT-33, AGENT-34, AGENT-43 · *Recorded:* round 11 (slice 3)
 - **Context:** DR-6 has a hook record chat approvals: a message that starts with "approve" and names the items, or approves everything except some items. A hook can't tell which items "everything" covered in the agent's last message, or which items a described exception refers to (AGENT-43). It also can't see what the engineer was last shown (AGENT-34).
 - **Decision:** The prompt hook reads each line of the engineer's message on its own. A line approves when it starts with "approve" (or "approved") and its first clause names only item IDs and ranges, or when it is only item IDs followed by "LGTM", "approved" or "looks good", as in "SYS-32 LGTM".
+  - An ID may be written as a word and a number, such as "Change 13", when the word names a system element, needs or decision records (AGENT-57).
   - It records the whole message as the engineer's words, marked as given in chat, and tells the agent what it recorded.
   - Any other approval, such as "approve everything except the wording ones", records nothing. The hook tells the agent to show the exact list, leaving out every item an exception could refer to, and to get the engineer's confirmation, in a menu where the harness has one.
   - Quoted lines and pasted text never count, and a capitalized word counts as a system element only when that element exists. A message with "lgtm" or "looks good" and no IDs gets a note that it approves nothing.
@@ -381,16 +382,23 @@ These are the decisions made while designing and building the toolkit, each atta
 - **Alternatives:** Migrating every `source` field with guessed dates, which would put invented metadata next to the engineer's words.
 - **Consequences:** Two places hold the engineer's words until older items are revisited. The requirements view shows both, and its legend explains the difference.
 
-### DR-47 🟡 ⤷SYS-34 An item's ancestors, for delegation, are what it traces to
+### DR-47 🟡 🔒 An item's ancestors, for delegation, are what it traces to
 *System elements:* CHECK · *Requirements:* CHECK-18, CHECK-19 · *Recorded:* round 12
 - **Context:** Delegation needs a definition of "above" that covers every kind of item (DR-44).
 - **Decision:** An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest approved ancestor. An item that changed since its own approval isn't delegated: its change awaits the engineer. Nothing about the result is stored.
 - **Alternatives:** Delegating only through the requirement tree, which would leave every verification item, decision record and element unreviewed.
 - **Consequences:** Approving a need delegates everything beneath it, including system requirements. The agent's proposals (SYS-38) are how key items still reach the engineer.
 
-### DR-48 🟡 ⤷SYS-37 Alterations to the engineer's items are flagged when logged, and answered by approval or rollback
+### DR-48 🟡 ⤷CHANGE-13 Alterations to the engineer's items are flagged when logged, and answered by approval or rollback
 *System elements:* CHANGE, CLI, CHECK · *Requirements:* CHANGE-13, CHANGE-14, CHECK-21 · *Recorded:* round 12
 - **Context:** SYS-37 asks that each alteration to what the engineer approved, wrote or decided be raised after the work is built and tested, and the engineer described rolling back what they care about.
 - **Decision:** When an edit changes the meaning of such an item, the change log records why it counts (approved, their words, their decision) and the item's fingerprints before and after. Before applying it, the CLI asks the agent to acknowledge it. The alteration stays listed in the change record, and as a to-do, until the engineer approves the item as it now is (kept), or it's back to its earlier content (rolled back). A removed item is listed but can't be kept by approval.
 - **Alternatives:** Comparing against git history, which the toolkit doesn't read and which can't tell why an item counts. An explicit "answered" flag, which an agent could set without the engineer.
 - **Consequences:** Alterations logged before round 12 carry no flag, so the mechanism starts with this round. Keeping an alteration is one line from the engineer, such as `CHECK-14 LGTM`.
+
+### DR-49 🟡 ⤷SYS-30 Review sections carry their context inline instead of linking to it
+*System elements:* REVIEW, CHANGE · *Requirements:* REVIEW-18, REVIEW-19 · *Recorded:* round 13
+- **Context:** In round 12's record the engineer had to search for each proposed item's full text and scroll back. They read change records as raw Markdown in the editor, where links show no preview on hover.
+- **Decision:** Wherever the change record asks the engineer to approve or answer for an item, it repeats what's needed to judge it right there: the full text, what it sits under, its rationale and the engineer's words; for a decision record, its reasoning and the full text of the requirements it decides. The other IDs the shown text mentions are listed with their titles.
+- **Alternatives:** Linking each ID to its item with the text on hover, which only works in a Markdown preview. A glossary at the end of the record, which still means scrolling.
+- **Consequences:** Change records get longer, and the same text can appear in two sections. Each review section can be read on its own.

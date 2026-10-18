@@ -1,0 +1,134 @@
+request: |-
+  Make the review surfaces readable without looking anything up (SYS-30): proposals show each item's full text and context, every ID in a generated view links to its item with its text on hover, and the approval reader understands IDs written like 'Change 13'
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-17'
+entries:
+- op: modify
+  id: SYS-30
+  at: 2026-10-17T22:53-07:00
+  reason: the engineer's report of where SYS-30 wasn't met.
+  after:
+    quotes:
+    - said: 2026-10-17 22:47
+      words: |-
+        The UX for the round 12 record isn't really useful. CUJ: In '## Proposed for your explicit approval' You state 'change-13' and give a brief truncated description, but I'm not really sure of the full context, or the full text. I then had to ctrl-f change 13, and read it, then scroll all the way back to the top to the '## Proposed for your explicit approval' section.
+      context: Reviewing round 12's change record, whose proposals section broke this requirement.
+- op: add
+  id: REVIEW-18
+  at: 2026-10-17T22:53-07:00
+  reason: fixes the proposals and alterations sections.
+  after:
+    text: Each item the change record asks the engineer to approve or answer for shall be shown in full, with its parent and rationale for a requirement, and with its context, decision, alternatives, consequences and the requirements it decides for a decision record.
+    traces_to: SYS-30
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 22:47
+      words: You state 'change-13' and give a brief truncated description, but I'm not really sure of the full context, or the full text. I then had to ctrl-f change 13, and read it, then scroll all the way back to the top to the '## Proposed for your explicit approval' section.
+      context: Reviewing round 12's change record.
+- op: add
+  id: REVIEW-19
+  at: 2026-10-17T22:53-07:00
+  reason: fixes the proposals and alterations sections.
+  after:
+    text: Wherever the change record shows an item for the engineer to approve or answer for, it shall list with their titles the other items that the shown text mentions.
+    traces_to: SYS-30
+    origin: engineer
+    quotes:
+    - said: 2026-10-17 22:47
+      words: dr-47, similar to change-13, but I couldn't remember the exact context for it. CHECK-18 or CHECK-19 for example.
+      context: Reviewing round 12's change record.
+- op: add
+  id: AGENT-57
+  at: 2026-10-17T22:53-07:00
+  reason: the engineer's own phrasing in rounds 12 and 13.
+  after:
+    text: The approval reader shall read an ID written as a word and a number, such as "Change 13", when the word names a system element, needs or decision records.
+    traces_to: SYS-14
+    origin: agent
+    why: the engineer writes approvals that way ("Change 13 LGTM.", "need 16 LGTM"). Without this, the reader would tell the agent such a message approves nothing.
+- op: add
+  id: REVIEW-V6
+  at: 2026-10-17T22:53-07:00
+  reason: verifies the readable review sections.
+  after:
+    verifies:
+    - REVIEW-18
+    - REVIEW-19
+    method: test
+    technique: unit test
+    origin: agent
+    description: A proposed requirement is shown with its full text and the item it sits under. A proposed decision record is shown with its context, decision and alternatives, the full text of each requirement it decides, and the titles of the other items its text mentions.
+    tests:
+      python:
+      - tests/test_review.py::test_proposals_are_listed_with_reasons_until_approved
+      - tests/test_review.py::test_a_proposed_decision_shows_its_reasoning_and_what_it_mentions
+- op: add
+  id: AGENT-V11
+  at: 2026-10-17T22:53-07:00
+  reason: verifies the approval reader's reading of spelled-out IDs.
+  after:
+    verifies:
+    - AGENT-57
+    method: test
+    technique: unit test
+    origin: agent
+    description: |-
+      "Core 13 LGTM.", "need 16 LGTM" and "approve dr 4 and Core 2" approve the items they name when CORE is a system element. "Round 12 LGTM" approves nothing.
+    tests:
+      python:
+      - tests/test_hooks.py::test_ids_written_out_in_words_are_read
+      - tests/test_hooks.py::test_words_that_only_look_like_ids_are_not_read
+- op: add
+  id: DR-49
+  at: 2026-10-17T22:53-07:00
+  reason: design decision of round 13.
+  after:
+    title: Review sections carry their context inline instead of linking to it
+    decided_by: agent
+    elements:
+    - REVIEW
+    - CHANGE
+    requirements: REVIEW-18, REVIEW-19
+    recorded: round 13
+    context: In round 12's record the engineer had to search for each proposed item's full text and scroll back. They read change records as raw Markdown in the editor, where links show no preview on hover.
+    decision: |-
+      Wherever the change record asks the engineer to approve or answer for an item, it repeats what's needed to judge it right there: the full text, what it sits under, its rationale and the engineer's words; for a decision record, its reasoning and the full text of the requirements it decides. The other IDs the shown text mentions are listed with their titles.
+    alternatives: Linking each ID to its item with the text on hover, which only works in a Markdown preview. A glossary at the end of the record, which still means scrolling.
+    consequences: Change records get longer, and the same text can appear in two sections. Each review section can be read on its own.
+- op: modify
+  id: DR-41
+  at: 2026-10-17T22:53-07:00
+  reason: the engineer's "Change 13 LGTM." would have been read as approving nothing.
+  before:
+    decision: |-
+      The prompt hook reads each line of the engineer's message on its own. A line approves when it starts with "approve" (or "approved") and its first clause names only item IDs and ranges, or when it is only item IDs followed by "LGTM", "approved" or "looks good", as in "SYS-32 LGTM".
+      - It records the whole message as the engineer's words, marked as given in chat, and tells the agent what it recorded.
+      - Any other approval, such as "approve everything except the wording ones", records nothing. The hook tells the agent to show the exact list, leaving out every item an exception could refer to, and to get the engineer's confirmation, in a menu where the harness has one.
+      - Quoted lines and pasted text never count, and a capitalized word counts as a system element only when that element exists. A message with "lgtm" or "looks good" and no IDs gets a note that it approves nothing.
+  after:
+    decision: |-
+      The prompt hook reads each line of the engineer's message on its own. A line approves when it starts with "approve" (or "approved") and its first clause names only item IDs and ranges, or when it is only item IDs followed by "LGTM", "approved" or "looks good", as in "SYS-32 LGTM".
+      - An ID may be written as a word and a number, such as "Change 13", when the word names a system element, needs or decision records (AGENT-57).
+      - It records the whole message as the engineer's words, marked as given in chat, and tells the agent what it recorded.
+      - Any other approval, such as "approve everything except the wording ones", records nothing. The hook tells the agent to show the exact list, leaving out every item an exception could refer to, and to get the engineer's confirmation, in a menu where the harness has one.
+      - Quoted lines and pasted text never count, and a capitalized word counts as a system element only when that element exists. A message with "lgtm" or "looks good" and no IDs gets a note that it approves nothing.
+decisions:
+- id: D1
+  question: Which of an agent's decision records should be proposed for your explicit approval?
+  importance: It decides how many decision records land in front of you each round. Right now AGENT-51 proposes every record that weighed alternatives, which is nearly all of them, and that's how DR-45, DR-47 and DR-48 reached you in round 12.
+  involves:
+  - AGENT-51
+  options:
+  - label: Only those whose consequences reach you
+    recommended: true
+    detail: |-
+      Propose an agent's decision record only when it changes what you see, approve or do: DR-47 (approving a need delegates what's under it) qualifies, DR-45 (how approval history is stored) doesn't. The rest stay recorded and delegated: future agents read them as reasoning and may revise them, recording why.
+  - label: Every record that weighed alternatives
+    detail: Today's rule. Nothing slips past you, at the cost of reading mechanics like DR-45 and DR-48.
+  - label: Never
+    detail: Agent decision records stay as memory only. Choices that matter to you would have to surface as requirements or open decisions instead.
+  status: open
+friction: []
+closed: '2026-10-17'

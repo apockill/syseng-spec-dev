@@ -125,6 +125,7 @@
     DR-6 has a hook record chat approvals: a message that starts with "approve" and names the items, or approves everything except some items. A hook can't tell which items "everything" covered in the agent's last message, or which items a described exception refers to (AGENT-43). It also can't see what the engineer was last shown (AGENT-34).
   decision: |-
     The prompt hook reads each line of the engineer's message on its own. A line approves when it starts with "approve" (or "approved") and its first clause names only item IDs and ranges, or when it is only item IDs followed by "LGTM", "approved" or "looks good", as in "SYS-32 LGTM".
+    - An ID may be written as a word and a number, such as "Change 13", when the word names a system element, needs or decision records (AGENT-57).
     - It records the whole message as the engineer's words, marked as given in chat, and tells the agent what it recorded.
     - Any other approval, such as "approve everything except the wording ones", records nothing. The hook tells the agent to show the exact list, leaving out every item an exception could refer to, and to get the engineer's confirmation, in a menu where the harness has one.
     - Quoted lines and pasted text never count, and a capitalized word counts as a system element only when that element exists. A message with "lgtm" or "looks good" and no IDs gets a note that it approves nothing.

@@ -166,6 +166,19 @@ def test_approvals_that_need_interpreting_are_not_read(message):
     assert ids == [] and problem
 
 
+@pytest.mark.parametrize("line, ids", [
+    ("Core 13 LGTM.", ["CORE-13"]),
+    ("need 16 LGTM", ["NEED-16"]),
+    ("approve dr 4 and Core 2", ["DR-4", "CORE-2"]),
+])
+def test_ids_written_out_in_words_are_read(line, ids):
+    assert hook.parse_approval(line, elements={"SYS", "CORE"}) == (ids, None)
+
+
+def test_words_that_only_look_like_ids_are_not_read():
+    assert hook.parse_approval("Round 12 LGTM", elements={"SYS", "CORE"}) == (None, None)
+
+
 @pytest.mark.parametrize("line", ["Generally, it LGTM!", "the API looks good", "API looks good", "lgtm", "Approval workflow"])
 def test_lines_that_approve_no_items_are_ignored(line):
     assert hook.parse_approval(line, elements={"SYS", "CORE"}) == (None, None)
