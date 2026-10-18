@@ -43,15 +43,15 @@
   },
   "permissions": {
     "allow": [
-      "Bash(.syseng/spec status *)",
-      "Bash(.syseng/spec check *)",
-      "Bash(.syseng/spec show *)",
-      "Bash(.syseng/spec render *)",
-      "Bash(.syseng/spec edit *)",
-      "Bash(.syseng/spec change *)",
-      "Bash(.syseng/spec decide *)",
-      "Bash(.syseng/spec propose *)",
-      "Bash(.syseng/spec friction *)"
+      "Bash(spec status *)",
+      "Bash(spec check *)",
+      "Bash(spec show *)",
+      "Bash(spec render *)",
+      "Bash(spec edit *)",
+      "Bash(spec change *)",
+      "Bash(spec decide *)",
+      "Bash(spec propose *)",
+      "Bash(spec friction *)"
     ]
   }
 }

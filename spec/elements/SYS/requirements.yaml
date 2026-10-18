@@ -267,6 +267,11 @@
   origin: engineer
   source: |-
     "Let's not overindex too much on nix. Most users of this might not use nix, after all." (round 11, replying to a friction report)
+  quotes:
+  - said: 2026-10-18 08:33
+    words: |-
+      Why do they have to do this: .syseng/spec Rather than a pip install -e . or something that puts the binary in your env? (or some more modern pip feature I don't know about)
+    context: Questioning the per-repository launcher, before the first real project.
 - id: SYS-33
   kind: system
   text: The toolkit shall record with each approval the approver, the channel, the number of items approved together, the engineer's words, and the decisions the engineer resolved about the item beforehand.

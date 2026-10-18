@@ -31,7 +31,7 @@ import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from syseng import changes, check, fingerprint, model, naming, render, review, yamlio
+from syseng import changes, check, fingerprint, model, render, review, yamlio
 from syseng.model import Spec
 
 KIND_FILES = {"need": "needs.yaml", "requirement": "requirements.yaml", "system": "requirements.yaml",
@@ -368,8 +368,7 @@ def run(root: Path, doc, dry_run: bool = False) -> Result:
     spec = model.load(root)
     change = changes.current(spec)
     if change is None:
-        start = naming.cmd('change start "<what the engineer asked for>"')
-        raise EditError(f"no change is open. Start one with {start}; "
+        raise EditError("no change is open. Start one with `spec change start \"<what the engineer asked for>\"`; "
                         "every edit is logged in it with its reason.")
     result = Result()
     with tempfile.TemporaryDirectory() as tmp:

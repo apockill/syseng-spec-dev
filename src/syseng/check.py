@@ -8,7 +8,7 @@ mode: whether a branch lands is the engineer's call (CHECK-15, DR-31).
 from dataclasses import dataclass
 from pathlib import Path
 
-from syseng import naming, render, review, testlinks
+from syseng import render, review, testlinks
 from syseng.model import Spec
 from syseng.rules import METHODS, RULES, TECHNIQUES, check_wording
 
@@ -329,7 +329,7 @@ def format_findings(findings: list[Finding], root: Path) -> str:
         else:
             explained.add(f.code)
             lines.append(f"   = why: {rule.why}" + (f" ({rule.ref})" if rule.ref else ""))
-            lines.append(f"   = fix: {naming.localize(rule.fix, root)}")
+            lines.append(f"   = fix: {rule.fix}")
             lines.append(f"   = rule: {rule.link(root)}")
         lines.append("")
     return "\n".join(lines)
@@ -352,5 +352,5 @@ def summarize(findings: list[Finding]) -> str:
         answers = f"{_n(unanswered, 'alteration')} awaiting the engineer's answer, " if unanswered else ""
         parts.append(f"{_n(len(todos), 'to-do')} ({answers}{served}{_n(unverified, 'requirement')} without "
                      f"verification items, {_n(unreviewed, 'unreviewed item')}; list them with "
-                     f"{naming.cmd('check --todo')})")
+                     f"`spec check --todo`)")
     return "spec check: " + ", ".join(parts)

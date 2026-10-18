@@ -10,14 +10,6 @@ from syseng import check, cli, init, model
 
 
 @pytest.fixture
-def machine(tmp_path, monkeypatch):
-    """This machine's config directory, kept inside the test's temporary directory."""
-    xdg = tmp_path / "xdg"
-    monkeypatch.setenv("XDG_CONFIG_HOME", str(xdg))
-    return xdg
-
-
-@pytest.fixture
 def repo(tmp_path):
     path = tmp_path / "repo"
     path.mkdir()
@@ -35,26 +27,27 @@ def test_init_sets_up_an_empty_repository(repo, machine):
     assert [f for f in check.check(spec) if f.severity == "error"] == []
     assert spec.config["implementations"][0]["language"] == "python"
     skill = (repo / ".claude/skills/syseng/SKILL.md").read_text()
-    assert "{{SPEC}}" not in skill and ".syseng/spec edit" in skill
+    assert "{{SPEC}}" not in skill and "`spec edit`" in skill
     assert (repo / ".claude/skills/syseng/references/rules.md").exists()
-    assert os.access(repo / ".syseng/hook", os.X_OK) and os.access(repo / ".syseng/spec", os.X_OK)
+    assert os.access(repo / ".syseng/hook", os.X_OK) and not (repo / ".syseng/spec").exists()
     hooks = json.loads((repo / ".claude/settings.json").read_text())["hooks"]
     assert set(hooks) == {"PreToolUse", "Stop", "UserPromptSubmit"}
     assert (repo / ".claude/agents/spec-reasoning-check.md").exists()
-    assert os.access(machine / "syseng/launcher", os.X_OK)
 
 
-def test_launcher_runs_the_toolkit_from_the_repository(repo, machine):
-    init.run(repo, ["claude-code"])
-    out = subprocess.run([str(repo / ".syseng/spec"), "check"], cwd=repo, capture_output=True, text=True)
-    assert out.returncode == 0 and "spec check: 0 errors" in out.stdout
+def test_init_says_when_spec_is_not_on_the_path(repo, tmp_path, monkeypatch):
+    (tmp_path / "empty").mkdir()
+    monkeypatch.setenv("PATH", str(tmp_path / "empty"))
+    notes = [s for s in init.run(repo, ["claude-code"]) if s.status == "note"]
+    assert notes and "pipx install" in notes[0].note
 
 
-def test_launcher_explains_a_machine_without_the_toolkit(repo, machine, tmp_path):
-    init.run(repo, ["claude-code"])
-    env = {**os.environ, "XDG_CONFIG_HOME": str(tmp_path / "elsewhere")}
-    out = subprocess.run([str(repo / ".syseng/spec"), "check"], cwd=repo, capture_output=True, text=True, env=env)
-    assert out.returncode == 127 and "not set up on this machine" in out.stderr
+def test_init_removes_the_launcher_earlier_setups_wrote(repo, machine):
+    old = repo / ".syseng/spec"
+    old.parent.mkdir()
+    old.write_text("#!/bin/sh\n# Runs the spec toolkit for this repository. Written by `spec init`; commit it.\n")
+    assert _statuses(init.run(repo, ["claude-code"]))[".syseng/spec"] == "removed"
+    assert not old.exists()
 
 
 def test_init_again_changes_nothing(repo, machine):
@@ -103,21 +96,6 @@ def test_check_reports_installed_files_that_drifted(repo, machine):
     assert (repo / ".claude/skills/syseng/SKILL.md").read_text() == "edited"   # check writes nothing
 
 
-def test_machine_launcher_is_kept_unless_replaced(repo, machine):
-    init.run(repo, ["claude-code"])
-    launcher = machine / "syseng/launcher"
-    first = launcher.read_text()
-    init.run(repo, ["claude-code"])
-    assert launcher.read_text() == first
-    init.run(repo, ["claude-code"], launcher="/opt/py/bin/python3 -m syseng")
-    assert 'exec /opt/py/bin/python3 -m syseng "$@"' in launcher.read_text()
-
-
-def test_default_launcher_uses_plain_python(machine):
-    command = init.default_launcher()
-    assert "-m syseng" in command and "nix" not in command.replace(init.sys.executable, "")
-
-
 def test_antigravity_gets_the_skill_without_claude_code_glue(repo, machine):
     init.run(repo, ["antigravity"])
     assert (repo / ".agents/skills/syseng/SKILL.md").exists()
@@ -161,7 +139,7 @@ def test_init_points_every_session_at_the_skill(repo, machine):
     init.run(repo, ["claude-code"])
     text = (repo / "AGENTS.md").read_text()
     assert text.startswith("# Project rules\n\nBe kind to the build.\n\n<!-- syseng:")
-    assert "follow the `syseng` skill" in text and ".syseng/spec edit" in text
+    assert "follow the `syseng` skill" in text and "`spec edit`" in text
     init.run(repo, ["claude-code"])
     assert (repo / "AGENTS.md").read_text() == text                  # a re-run changes nothing
 
@@ -183,6 +161,6 @@ def test_agents_may_run_the_everyday_commands_without_asking(repo, machine):
     init.run(repo, ["claude-code"])
     init.run(repo, ["claude-code"])
     allow = json.loads((repo / ".claude/settings.json").read_text())["permissions"]["allow"]
-    assert "Bash(.syseng/spec edit *)" in allow and "Bash(.syseng/spec status *)" in allow
+    assert "Bash(spec edit *)" in allow and "Bash(spec status *)" in allow
     assert not [r for r in allow if "approve" in r or "resolve" in r]   # those record the engineer's words
     assert len(allow) == len(set(allow))

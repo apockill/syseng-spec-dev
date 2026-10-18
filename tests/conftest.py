@@ -1,5 +1,6 @@
 """Builds small specs on disk for tests."""
 
+import os
 import sys
 from pathlib import Path
 
@@ -65,3 +66,16 @@ class SpecBuilder:
 @pytest.fixture
 def spec(tmp_path) -> SpecBuilder:
     return SpecBuilder(tmp_path / "spec")
+
+
+@pytest.fixture
+def machine(tmp_path, monkeypatch) -> Path:
+    """A machine with the toolkit installed: `spec` on the PATH, running this checkout."""
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    shim = bin_dir / "spec"
+    src = Path(__file__).resolve().parents[1] / "src"
+    shim.write_text(f'#!/bin/sh\nPYTHONPATH="{src}" exec "{sys.executable}" -m syseng "$@"\n')
+    shim.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}")
+    return bin_dir

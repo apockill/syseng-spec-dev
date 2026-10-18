@@ -69,7 +69,7 @@
   context: The engineer's machine runs NixOS, where generic Linux binaries such as uv's installer don't run. The engineer's other project already uses a flake.
   decision: flake.nix provides Python with PyYAML and pytest for working on the toolkit, and `bin/spec` runs the CLI from the checkout. pyproject.toml keeps the toolkit installable with pip everywhere else. Nothing outside this repository's own development setup depends on Nix (SYS-32).
   alternatives: A pip virtual environment, which works here but isn't the engineer's convention.
-  consequences: Agents in this repository run the toolkit through `.syseng/spec`, as in any other repository. On the engineer's machine, that launcher enters the flake's development shell (DR-39).
+  consequences: Agents run `spec` from the PATH, as in any other repository. On the engineer's machine it's installed with `pipx install --editable` from this checkout, so changes apply at once (DR-52).
 - id: DR-44
   title: Approval works like delegated authority in configuration management
   decided_by: agent

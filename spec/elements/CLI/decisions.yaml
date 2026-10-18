@@ -69,6 +69,7 @@
   alternatives: One launcher per repository, ignored by git, which new worktrees and fresh clones don't have. Running `spec` from the PATH, which depends on which environment is active.
   consequences: |-
     `spec init` writes one file outside the repository. A machine with two toolkit installs uses whichever one `spec init --launcher` named last.
+  status: superseded in round 15 by DR-52, which runs the toolkit as `spec` from the PATH.
 - id: DR-51
   title: Setup points sessions at the skill and lets agents run everyday commands
   decided_by: agent
@@ -82,3 +83,18 @@
     `spec init` writes a short section between markers into AGENTS.md, or CLAUDE.md when that's the file the repository has, and rewrites only that section on later runs. It adds Claude Code allow rules for status, check, show, render, edit, change, decide, propose and friction. Approve and resolve stay with the permission prompt, so the engineer confirms each command that records their words.
   alternatives: Relying on the skill's description to trigger, which a quick request may not do. Allowing every toolkit command, which would let an approval be recorded without the engineer seeing it.
   consequences: Claude Code ignores a project's allow rules until the engineer has trusted the folder once, interactively. `--no-instructions` leaves the instruction files alone.
+- id: DR-52
+  title: Agents and hooks run the toolkit as `spec` from the PATH
+  decided_by: agent
+  elements:
+  - CLI
+  - AGENT
+  requirements: SYS-5, SYS-32, CLI-9, CLI-15
+  recorded: round 15
+  context: The engineer asked why agents had to type `.syseng/spec` instead of installing the toolkit so that `spec` is simply on the PATH. The launchers (DR-39) existed so agents and hooks could find a toolkit installed in a virtual environment their shell hadn't activated, and to fit the engineer's Nix setup, which the engineer had asked not to design around.
+  decision: |-
+    The toolkit is installed with a Python tool installer, `pipx install` or `uv tool install`, which puts `spec` on the PATH in an isolated environment. `--editable` runs a checkout, so changes to the toolkit apply at once. Agents, messages, the skill and the hooks all use plain `spec`.
+    - `spec init` no longer writes launchers, removes the one earlier setups wrote, and says when `spec` isn't on the PATH.
+    - `.syseng/hook` stays in the repository, using only the standard library, so the guards keep working on a clone whose machine lacks the toolkit.
+  alternatives: The two launchers (DR-39), which solved the same problem the standard tools solve, at the cost of a longer command, a file outside the repository and extra code. Installing into a project's virtual environment, which agents' shells often don't activate.
+  consequences: Each machine needs the toolkit on its PATH, and the setup notice says how. One toolkit version serves every repository on a machine. A different program named `spec` earlier on the PATH would shadow the toolkit.

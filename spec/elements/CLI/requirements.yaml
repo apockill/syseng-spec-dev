@@ -46,7 +46,7 @@
   traces_to: SYS-19
   why: this enforces CHANGE-5 at write time, while the reason is fresh.
 - id: CLI-9
-  text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists, the launcher, the skill, and the hooks and subagents for each harness the engineer names.
+  text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists, the skill, and the hooks and subagents for each harness the engineer names.
   traces_to: SYS-5
   origin: agent
   why: SYS-5 asks for one-step setup. The launcher gives agents one command that works on every machine (DR-39). The skill and the harness glue are what make an agent follow the method (DR-38, DR-40).
@@ -86,7 +86,7 @@
   text: Every message and generated view shall name the toolkit's command in the form that runs it in the repository at hand.
   traces_to: SYS-25
   origin: agent
-  why: agents type what messages tell them. In a repository `spec init` set up, the command is `.syseng/spec`, and a message saying `spec` sends them to a command that may not exist.
+  why: agents type what messages tell them. With the toolkit on the PATH, that is `spec` in every repository, and no message may name another form.
 - id: CLI-16
   text: Setup shall add to the host repository's instruction file a section, between markers, that tells every session to follow the skill.
   traces_to: SYS-5

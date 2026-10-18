@@ -48,12 +48,12 @@
   method: test
   technique: integration test
   origin: agent
-  description: Setting up an empty repository writes a spec that the checker passes with no errors, the launcher, the skill with the launcher's name filled in, and the Claude Code hooks and subagents. The launcher then runs the checker from the repository, and on a machine without the toolkit it says so and exits with code 127. Setting up for Antigravity writes the skill and no Claude Code files. An existing spec is left as it was.
+  description: Setting up an empty repository writes a spec that the checker passes with no errors, the skill, and the Claude Code hooks and subagents, and no launcher. Setup says when `spec` isn't on the PATH, and removes the launcher an earlier setup wrote. Setting up for Antigravity writes the skill and no Claude Code files. An existing spec is left as it was.
   tests:
     python:
     - tests/test_init.py::test_init_sets_up_an_empty_repository
-    - tests/test_init.py::test_launcher_runs_the_toolkit_from_the_repository
-    - tests/test_init.py::test_launcher_explains_a_machine_without_the_toolkit
+    - tests/test_init.py::test_init_says_when_spec_is_not_on_the_path
+    - tests/test_init.py::test_init_removes_the_launcher_earlier_setups_wrote
     - tests/test_init.py::test_antigravity_gets_the_skill_without_claude_code_glue
     - tests/test_init.py::test_existing_spec_is_left_alone
 - id: CLI-V6
@@ -62,7 +62,7 @@
   method: test
   technique: integration test
   origin: agent
-  description: A second setup reports every file unchanged, and a setup run without naming harnesses refreshes every harness already set up. Settings and hooks that setup didn't write survive two runs, and setup's own hooks appear once. Unreadable settings stop setup without being overwritten. A skill page the skill no longer has is removed. The drift check reports an edited installed file and writes nothing. This machine's launcher is kept unless a new one is named.
+  description: A second setup reports every file unchanged, and a setup run without naming harnesses refreshes every harness already set up. Settings and hooks that setup didn't write survive two runs, and setup's own hooks appear once. Unreadable settings stop setup without being overwritten. A skill page the skill no longer has is removed. The drift check reports an edited installed file and writes nothing.
   tests:
     python:
     - tests/test_init.py::test_init_again_changes_nothing
@@ -71,7 +71,6 @@
     - tests/test_init.py::test_init_refuses_unreadable_settings
     - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
     - tests/test_init.py::test_check_reports_installed_files_that_drifted
-    - tests/test_init.py::test_machine_launcher_is_kept_unless_replaced
 - id: CLI-V7
   verifies:
   - CLI-12
@@ -101,12 +100,12 @@
   method: test
   technique: integration test
   origin: agent
-  description: In a repository set up with the launcher, messages and views name `.syseng/spec`; without it, `spec`. In a set-up host repository, the output of check, show, edit and the help texts, and every page the toolkit wrote, cite no requirement IDs except the host's own and illustrative examples.
+  description: Messages and views name `spec`. In a set-up host repository, the output of check, show, edit and the help texts, and every page the toolkit wrote, cite no requirement IDs except the host's own and illustrative examples, and the engineer's quoted words are rendered unchanged.
   tests:
     python:
-    - tests/test_agent_experience.py::test_messages_name_the_command_this_repository_uses
-    - tests/test_agent_experience.py::test_a_repository_without_the_launcher_says_spec
+    - tests/test_agent_experience.py::test_messages_name_the_spec_command
     - tests/test_agent_experience.py::test_a_host_repository_sees_no_toolkit_requirement_ids
+    - tests/test_agent_experience.py::test_the_engineers_words_are_never_rewritten
 - id: CLI-V10
   verifies:
   - CLI-16

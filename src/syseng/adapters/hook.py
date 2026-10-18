@@ -17,14 +17,14 @@ import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-LAUNCHER = HERE / "spec"  # the repository's launcher, which `spec init` writes next to this file
-SPEC = ".syseng/spec"     # how agents run the toolkit from the repository root
-NOT_SET_UP = 127          # the launcher's exit code when this machine has no toolkit
+SPEC = "spec"     # the toolkit's command, which agents and this script find on the PATH
+NOT_SET_UP = 127  # how a missing toolkit is reported below
 
 # ---------------------------------------------------------------- finding spec directories
 
@@ -226,10 +226,11 @@ def read_guard(event: dict) -> int:
 # ---------------------------------------------------------------- stop: the done gate
 
 def _toolkit(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
-    if not LAUNCHER.exists():
-        return subprocess.CompletedProcess(args, NOT_SET_UP, "", f"{LAUNCHER} is missing")
+    exe = shutil.which(SPEC)
+    if exe is None:
+        return subprocess.CompletedProcess(args, NOT_SET_UP, "", f"`{SPEC}` isn't on the PATH")
     try:
-        return subprocess.run([str(LAUNCHER), *args], cwd=str(cwd), capture_output=True, text=True, timeout=100)
+        return subprocess.run([exe, *args], cwd=str(cwd), capture_output=True, text=True, timeout=100)
     except (OSError, subprocess.TimeoutExpired) as e:
         return subprocess.CompletedProcess(args, NOT_SET_UP, "", str(e))
 
@@ -244,8 +245,8 @@ def _work_dir(event: dict) -> Path:
 
 
 def _setup_notice(what: str) -> str:
-    return (f"The spec toolkit isn't set up on this machine, so {what}. Install it and run `spec init` "
-            f"in this repository.")
+    return (f"The spec toolkit isn't installed on this machine, so {what}. Install it with `pipx install` or "
+            f"`uv tool install`, so that `spec` is on the PATH.")
 
 
 def stop(event: dict) -> int:

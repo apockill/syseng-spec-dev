@@ -12,7 +12,6 @@ EXAMPLES = {"CHECK-3", "CHECK-5", "CHECK-9", "CLI-3", "CLI-9", "CLI-V1", "DR-41"
 
 
 def _set_up(spec, tmp_path, monkeypatch):
-    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "xdg"))
     root = spec.write()
     init.run(root.parent, ["claude-code"])
     return root
@@ -23,15 +22,10 @@ def _run(*argv, capsys) -> str:
     return capsys.readouterr().out
 
 
-def test_messages_name_the_command_this_repository_uses(spec, tmp_path, monkeypatch, capsys):
+def test_messages_name_the_spec_command(spec, tmp_path, monkeypatch, capsys):
     root = _set_up(spec, tmp_path, monkeypatch)
-    assert "`.syseng/spec check --todo`" in _run("--spec", str(root), "check", capsys=capsys)
-    assert "`.syseng/spec render`" in (root / "requirements.md").read_text()
-
-
-def test_a_repository_without_the_launcher_says_spec(spec, capsys):
-    root = spec.write()
     assert "`spec check --todo`" in _run("--spec", str(root), "check", capsys=capsys)
+    assert "`spec render`" in (root / "requirements.md").read_text()
 
 
 def test_a_host_repository_sees_no_toolkit_requirement_ids(spec, tmp_path, monkeypatch, capsys):
@@ -101,7 +95,7 @@ def test_the_engineers_words_are_never_rewritten(spec, tmp_path, monkeypatch):
         {"words": "just run `spec edit` for it", "said": "2026-10-17 09:00", "context": "talking about edits"}]
     root = _set_up(spec, tmp_path, monkeypatch)
     text = (root / "requirements.md").read_text()
-    assert "just run `spec edit` for it" in text and "`.syseng/spec render`" in text
+    assert "just run `spec edit` for it" in text
 
 
 def test_f_strings_keep_to_what_python_3_11_accepts():

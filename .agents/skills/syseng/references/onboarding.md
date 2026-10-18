@@ -2,7 +2,7 @@
 
 Onboarding records what the project is, and why. It doesn't redesign anything. Do as much of the thinking as you can, so that the engineer only confirms the needs and approves the rest in one go. The rigor goes into the changes that follow.
 
-1. **Open the change:** `.syseng/spec change start "Onboard <project>"`. If `.syseng/spec` doesn't exist yet, the repository hasn't been set up: ask the engineer to run `spec init`.
+1. **Open the change:** `spec change start "Onboard <project>"`. If `spec` doesn't exist yet, the repository hasn't been set up: ask the engineer to run `spec init`.
 2. **Map the system elements** from the code's structure: one tree, with the project as the root, and `depends_on` for reuse.
 3. **Draft needs from what the engineer has said and written:** README files, design notes, issue text. Mark each one as needing the engineer's confirmation. Needs are the engineer's, so draft them, don't invent them.
 4. **Extract requirements** from the code, the tests and the comments, describing the current behavior. Don't propose changes. A requirement the project doesn't actually meet becomes an open decision, not a fix.

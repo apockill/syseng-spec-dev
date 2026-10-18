@@ -66,7 +66,7 @@ None.
   - traces_to: SYS-5
   - origin: agent
   - why: without the rules every check and edit waits for a click. Approving and resolving record the engineer's words, so the engineer sees and confirms each of those.
-- **add CLI-V9 (In a repository set up with the launcher, messages…)**: verifies the agent-facing text.
+- **add CLI-V9 (Messages and views name `spec`. In a set-up host…)**: verifies the agent-facing text.
   - verifies: CLI-15, AGENT-58
   - method: test
   - technique: integration test

@@ -1,14 +1,11 @@
 """`spec init`: sets up a repository for the toolkit in one step.
 
-It writes:
+Agents and hooks run the toolkit as `spec`, from the PATH: install it with `pipx install` or
+`uv tool install` (add `--editable` to run a checkout). It writes:
 - spec/, with a root system element, when the repository has no spec yet;
-- .syseng/spec, the launcher agents run the toolkit with. It's committed, and hands over to
-  this machine's launcher;
-- this machine's launcher, ${XDG_CONFIG_HOME:-~/.config}/syseng/launcher, which says which
-  Python runs the toolkit. An existing one that works is kept unless --launcher replaces it;
 - the skill, for each harness named: .claude/skills/syseng for Claude Code, and .agents/skills/syseng,
-  the cross-tool location, for Hermes and Antigravity. Each copy has the launcher's name and a note on
-  what that harness's hooks do filled in;
+  the cross-tool location, for Hermes and Antigravity. Each copy has a note on what that harness's
+  hooks do filled in;
 - for Claude Code: .syseng/hook, the hooks that run it in .claude/settings.json, and the auditor
   and reasoning-check subagents in .claude/agents;
 - a short section in AGENTS.md (or CLAUDE.md), between markers, telling every session to follow
@@ -19,11 +16,8 @@ Running it again refreshes these files and leaves every other setting alone.
 
 import json
 import os
-import shlex
+import shutil
 import stat
-import subprocess
-import sys
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -32,7 +26,8 @@ from syseng import model, render, yamlio
 PACKAGE = Path(__file__).resolve().parent
 SKILL = PACKAGE / "skill"
 ADAPTERS = PACKAGE / "adapters"
-SPEC_CMD = ".syseng/spec"
+SPEC_CMD = "spec"
+OLD_LAUNCHER = ".syseng/spec"  # what setups before round 15 wrote; removed when found (DR-52)
 HARNESSES = ("claude-code", "hermes", "antigravity", "none")
 SKILL_HOMES = {"claude-code": ".claude/skills/syseng", "hermes": ".agents/skills/syseng",
                "antigravity": ".agents/skills/syseng"}
@@ -41,8 +36,9 @@ GENERIC_NOTES = ADAPTERS / "generic" / "skill-notes.md"
 HOOK_MARK = ".syseng/hook"
 # Toolkit commands agents may run without asking (CLI-20). `approve` and `resolve` record the engineer's
 # words, so they stay with the harness's permission prompt: the engineer sees and confirms each one.
-ALLOWED = [f"Bash(.syseng/spec {cmd} *)" for cmd in
-           ("status", "check", "show", "render", "edit", "change", "decide", "propose", "friction")]
+_EVERYDAY = ("status", "check", "show", "render", "edit", "change", "decide", "propose", "friction")
+ALLOWED = [f"Bash(spec {cmd} *)" for cmd in _EVERYDAY]
+_OURS = set(ALLOWED) | {f"Bash(.syseng/spec {cmd} *)" for cmd in _EVERYDAY}  # this and earlier setups' rules
 HOOKS = [  # (event, matcher, argument to the hook script)
     ("PreToolUse", "Edit|Write|MultiEdit|NotebookEdit|Bash|PowerShell", "pre-tool"),
     # Here rather than in the subagent's own definition, whose hooks Claude Code skips in untrusted folders.
@@ -60,24 +56,11 @@ INSTRUCTIONS = """## Requirements and design decisions
 This repository keeps its needs, requirements, verification items and design decisions in `spec/`, managed
 with the syseng toolkit. For every change, follow the `syseng` skill:
 
-- open a change with `.syseng/spec change start "<what was asked>"`;
-- change the spec only with `.syseng/spec edit`, never by editing files under `spec/`;
-- run `.syseng/spec check` before reporting a change as done.
+- open a change with `spec change start "<what was asked>"`;
+- change the spec only with `spec edit`, never by editing files under `spec/`;
+- run `spec check` before reporting a change as done.
 
-`.syseng/spec status` shows what's open and what awaits the engineer."""
-
-REPO_LAUNCHER = """#!/bin/sh
-# Runs the spec toolkit for this repository. Written by `spec init`; commit it.
-# Which Python runs the toolkit is a per-machine choice, kept in
-# ${XDG_CONFIG_HOME:-$HOME/.config}/syseng/launcher, which `spec init` also writes.
-machine="${XDG_CONFIG_HOME:-$HOME/.config}/syseng/launcher"
-if [ -x "$machine" ]; then
-  exec "$machine" "$@"
-fi
-echo "The spec toolkit is not set up on this machine. Install it with pip, then run 'spec init' in this repository." >&2
-exit 127
-"""
-
+`spec status` shows what's open and what awaits the engineer."""
 
 class InitError(Exception):
     pass
@@ -88,35 +71,6 @@ class Step:
     status: str  # created | updated | unchanged | kept | removed | differs
     path: str
     note: str = ""
-
-
-def machine_launcher_path() -> Path:
-    return Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "syseng" / "launcher"
-
-
-def default_launcher() -> str:
-    """The command that runs this toolkit: this Python, plus its source directory when it isn't installed."""
-    py = shlex.quote(sys.executable)
-    env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
-    probe = subprocess.run([sys.executable, "-c", "import syseng; print(syseng.__file__)"], env=env,
-                           cwd=tempfile.gettempdir(), capture_output=True, text=True)
-    if probe.returncode == 0 and Path(probe.stdout.strip()).resolve().parent == PACKAGE:
-        return f"{py} -m syseng"
-    src = shlex.quote(str(PACKAGE.parent))
-    return f'env PYTHONPATH={src}"${{PYTHONPATH:+:$PYTHONPATH}}" {py} -m syseng'
-
-
-def machine_launcher_text(command: str) -> str:
-    return ("#!/bin/sh\n"
-            "# This machine's spec toolkit, which each repository's .syseng/spec runs. Written by `spec init`.\n"
-            f'exec {command} "$@"\n')
-
-
-def _works(launcher: Path) -> bool:
-    try:
-        return subprocess.run([str(launcher), "--help"], capture_output=True, timeout=60).returncode == 0
-    except (OSError, subprocess.TimeoutExpired):
-        return False
 
 
 def _fill(text: str, harness: str | None = None) -> str:
@@ -166,7 +120,7 @@ def merge_settings(text: str | None) -> str:
     if not isinstance(data, dict):
         raise InitError(".claude/settings.json isn't a JSON object. Fix it, then run `spec init` again.")
     permissions = data.setdefault("permissions", {})
-    allow = [r for r in permissions.get("allow") or [] if not str(r).startswith("Bash(.syseng/spec ")]
+    allow = [r for r in permissions.get("allow") or [] if r not in _OURS]
     permissions["allow"] = allow + ALLOWED
     hooks = data.setdefault("hooks", {})
     for event in dict.fromkeys(e for e, _, _ in HOOKS):
@@ -185,7 +139,7 @@ def merge_settings(text: str | None) -> str:
 
 def planned_files(repo: Path, harnesses: list[str], instructions: bool = False) -> dict[str, tuple[str, bool]]:
     """Every file `spec init` keeps up to date in the repository: path -> (content, executable)."""
-    files = {SPEC_CMD: (REPO_LAUNCHER, True)}
+    files: dict[str, tuple[str, bool]] = {}
     if instructions:
         for name in instruction_files(repo):
             path = repo / name
@@ -237,8 +191,7 @@ def _skeleton(repo: Path) -> Step:
     return Step("created", "spec/", f"root system element SYS; implementation {language!r}, {how}")
 
 
-def run(repo: Path, harnesses: list[str], launcher: str | None = None, check_only: bool = False,
-        instructions: bool = True) -> list[Step]:
+def run(repo: Path, harnesses: list[str], check_only: bool = False, instructions: bool = True) -> list[Step]:
     """Sets up `repo`, or with check_only reports what differs from a fresh setup without writing."""
     instructions = has_instructions(repo) if check_only else instructions
     unknown = [h for h in harnesses if h not in HARNESSES]
@@ -266,20 +219,16 @@ def run(repo: Path, harnesses: list[str], launcher: str | None = None, check_onl
                 if not check_only:
                     old.unlink()
                 steps.append(Step("differs" if check_only else "removed", rel, "no longer part of the skill"))
+    old = repo / OLD_LAUNCHER
+    if old.is_file() and "Written by `spec init`" in old.read_text():
+        if not check_only:
+            old.unlink()
+        steps.append(Step("differs" if check_only else "removed", OLD_LAUNCHER, "agents now run `spec` from the PATH"))
     if not check_only:
-        steps.append(_machine_launcher(launcher))
-        spec_root = repo / "spec"  # views name the launcher, so they're rendered once it exists (CLI-15)
-        if (spec_root / "toolkit.yaml").exists() and render.write_views(model.load(spec_root)) \
-                and steps[0].status != "created":
-            steps.append(Step("updated", "spec/ views", "they name the launcher now"))
+        spec_root = repo / "spec"
+        if (spec_root / "toolkit.yaml").exists():
+            render.write_views(model.load(spec_root))
+        if shutil.which(SPEC_CMD) is None:
+            steps.append(Step("note", "PATH", "`spec` isn't on the PATH, so agents and hooks can't run it: install the "
+                                              "toolkit with `pipx install` or `uv tool install`"))
     return steps
-
-
-def _machine_launcher(command: str | None) -> Step:
-    path = machine_launcher_path()
-    if command is None and path.exists() and _works(path):
-        return Step("kept", str(path), "this machine's launcher; --launcher replaces it")
-    status = "created" if not path.exists() else "updated"
-    command = command or default_launcher()
-    _write(path, machine_launcher_text(command), True)
-    return Step(status, str(path), "this machine's launcher: " + command)

@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from syseng import naming, review, yamlio
+from syseng import review, yamlio
 from syseng.model import Spec
 
 MODES = ("code-first", "spec-first")
@@ -55,7 +55,7 @@ def current(spec: Spec) -> Change | None:
     open_changes = [c for c in all_changes(spec) if c.is_open]
     if len(open_changes) > 1:
         raise ChangeError("more than one change is open: " + ", ".join(c.id for c in open_changes)
-                          + f". Close all but one with {naming.cmd('change close --id <id>')}.")
+                          + ". Close all but one with `spec change close --id <id>`.")
     return open_changes[0] if open_changes else None
 
 
@@ -65,7 +65,7 @@ class ChangeError(Exception):
 
 def start(spec: Spec, request: str, mode: str | None, target: str | None, slug: str | None) -> Change:
     if current(spec):
-        raise ChangeError(f"change {current(spec).id} is still open. Close it first with {naming.cmd('change close')}.")
+        raise ChangeError(f"change {current(spec).id} is still open. Close it first with `spec change close`.")
     mode = mode or "code-first"  # CHANGE-9: a request that names no mode is code-first
     if mode not in MODES:
         raise ChangeError(f"mode must be one of {', '.join(MODES)}")
@@ -202,7 +202,7 @@ def view(spec: Spec, change: Change) -> str:
             detail = f": {o['detail']}" if o.get("detail") else ""
             out.append(f"  {n}. {o.get('label', '')}{rec}{detail}")
     if open_ds:
-        out += ["", f"To accept every recommendation: `{naming.command(spec.root)} resolve {' '.join(x['id'] for x in open_ds)} "
+        out += ["", f"To accept every recommendation: `spec resolve {' '.join(x['id'] for x in open_ds)} "
                     f"--words \"<your words>\"`.", ""]
     out += _alterations_section(spec, change) + _proposals_section(spec, change)
     resolved = [x for x in decisions if x.get("status") == "resolved"]

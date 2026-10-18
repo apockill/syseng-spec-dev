@@ -1,0 +1,184 @@
+request: Run the toolkit as plain 'spec' on PATH, installed with pipx or uv (editable for development), instead of the per-repository and per-machine launchers
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-18'
+entries:
+- op: add
+  id: DR-52
+  at: 2026-10-18T08:39-07:00
+  reason: the engineer's question in round 15.
+  after:
+    title: Agents and hooks run the toolkit as `spec` from the PATH
+    decided_by: agent
+    elements:
+    - CLI
+    - AGENT
+    requirements: SYS-5, SYS-32, CLI-9, CLI-15
+    recorded: round 15
+    context: The engineer asked why agents had to type `.syseng/spec` instead of installing the toolkit so that `spec` is simply on the PATH. The launchers (DR-39) existed so agents and hooks could find a toolkit installed in a virtual environment their shell hadn't activated, and to fit the engineer's Nix setup, which the engineer had asked not to design around.
+    decision: |-
+      The toolkit is installed with a Python tool installer, `pipx install` or `uv tool install`, which puts `spec` on the PATH in an isolated environment. `--editable` runs a checkout, so changes to the toolkit apply at once. Agents, messages, the skill and the hooks all use plain `spec`.
+      - `spec init` no longer writes launchers, removes the one earlier setups wrote, and says when `spec` isn't on the PATH.
+      - `.syseng/hook` stays in the repository, using only the standard library, so the guards keep working on a clone whose machine lacks the toolkit.
+    alternatives: The two launchers (DR-39), which solved the same problem the standard tools solve, at the cost of a longer command, a file outside the repository and extra code. Installing into a project's virtual environment, which agents' shells often don't activate.
+    consequences: Each machine needs the toolkit on its PATH, and the setup notice says how. One toolkit version serves every repository on a machine. A different program named `spec` earlier on the PATH would shadow the toolkit.
+- op: modify
+  id: DR-39
+  at: 2026-10-18T08:39-07:00
+  reason: replaced by DR-52.
+  after:
+    status: superseded in round 15 by DR-52, which runs the toolkit as `spec` from the PATH.
+- op: modify
+  id: SYS-32
+  at: 2026-10-18T08:39-07:00
+  reason: the engineer's words on how the toolkit should install.
+  after:
+    quotes:
+    - said: 2026-10-18 08:33
+      words: |-
+        Why do they have to do this: .syseng/spec Rather than a pip install -e . or something that puts the binary in your env? (or some more modern pip feature I don't know about)
+      context: Questioning the per-repository launcher, before the first real project.
+- op: modify
+  id: CLI-9
+  at: 2026-10-18T08:39-07:00
+  reason: setup no longer writes a launcher (DR-52).
+  before:
+    text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists, the launcher, the skill, and the hooks and subagents for each harness the engineer names.
+  after:
+    text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists, the skill, and the hooks and subagents for each harness the engineer names.
+- op: modify
+  id: CLI-15
+  at: 2026-10-18T08:39-07:00
+  reason: setup no longer writes a launcher (DR-52).
+  before:
+    why: agents type what messages tell them. In a repository `spec init` set up, the command is `.syseng/spec`, and a message saying `spec` sends them to a command that may not exist.
+  after:
+    why: agents type what messages tell them. With the toolkit on the PATH, that is `spec` in every repository, and no message may name another form.
+- op: modify
+  id: CLI-V5
+  at: 2026-10-18T08:39-07:00
+  reason: setup no longer writes a launcher (DR-52).
+  before:
+    description: Setting up an empty repository writes a spec that the checker passes with no errors, the launcher, the skill with the launcher's name filled in, and the Claude Code hooks and subagents. The launcher then runs the checker from the repository, and on a machine without the toolkit it says so and exits with code 127. Setting up for Antigravity writes the skill and no Claude Code files. An existing spec is left as it was.
+    tests:
+      python:
+      - tests/test_init.py::test_init_sets_up_an_empty_repository
+      - tests/test_init.py::test_launcher_runs_the_toolkit_from_the_repository
+      - tests/test_init.py::test_launcher_explains_a_machine_without_the_toolkit
+      - tests/test_init.py::test_antigravity_gets_the_skill_without_claude_code_glue
+      - tests/test_init.py::test_existing_spec_is_left_alone
+  after:
+    description: Setting up an empty repository writes a spec that the checker passes with no errors, the skill, and the Claude Code hooks and subagents, and no launcher. Setup says when `spec` isn't on the PATH, and removes the launcher an earlier setup wrote. Setting up for Antigravity writes the skill and no Claude Code files. An existing spec is left as it was.
+    tests:
+      python:
+      - tests/test_init.py::test_init_sets_up_an_empty_repository
+      - tests/test_init.py::test_init_says_when_spec_is_not_on_the_path
+      - tests/test_init.py::test_init_removes_the_launcher_earlier_setups_wrote
+      - tests/test_init.py::test_antigravity_gets_the_skill_without_claude_code_glue
+      - tests/test_init.py::test_existing_spec_is_left_alone
+- op: modify
+  id: CLI-V6
+  at: 2026-10-18T08:39-07:00
+  reason: setup no longer writes a launcher (DR-52).
+  before:
+    description: A second setup reports every file unchanged, and a setup run without naming harnesses refreshes every harness already set up. Settings and hooks that setup didn't write survive two runs, and setup's own hooks appear once. Unreadable settings stop setup without being overwritten. A skill page the skill no longer has is removed. The drift check reports an edited installed file and writes nothing. This machine's launcher is kept unless a new one is named.
+    tests:
+      python:
+      - tests/test_init.py::test_init_again_changes_nothing
+      - tests/test_init.py::test_a_plain_rerun_refreshes_every_installed_harness
+      - tests/test_init.py::test_init_keeps_other_settings_and_hooks
+      - tests/test_init.py::test_init_refuses_unreadable_settings
+      - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
+      - tests/test_init.py::test_check_reports_installed_files_that_drifted
+      - tests/test_init.py::test_machine_launcher_is_kept_unless_replaced
+  after:
+    description: A second setup reports every file unchanged, and a setup run without naming harnesses refreshes every harness already set up. Settings and hooks that setup didn't write survive two runs, and setup's own hooks appear once. Unreadable settings stop setup without being overwritten. A skill page the skill no longer has is removed. The drift check reports an edited installed file and writes nothing.
+    tests:
+      python:
+      - tests/test_init.py::test_init_again_changes_nothing
+      - tests/test_init.py::test_a_plain_rerun_refreshes_every_installed_harness
+      - tests/test_init.py::test_init_keeps_other_settings_and_hooks
+      - tests/test_init.py::test_init_refuses_unreadable_settings
+      - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
+      - tests/test_init.py::test_check_reports_installed_files_that_drifted
+- op: modify
+  id: CLI-V9
+  at: 2026-10-18T08:39-07:00
+  reason: setup no longer writes a launcher (DR-52).
+  before:
+    description: In a repository set up with the launcher, messages and views name `.syseng/spec`; without it, `spec`. In a set-up host repository, the output of check, show, edit and the help texts, and every page the toolkit wrote, cite no requirement IDs except the host's own and illustrative examples.
+    tests:
+      python:
+      - tests/test_agent_experience.py::test_messages_name_the_command_this_repository_uses
+      - tests/test_agent_experience.py::test_a_repository_without_the_launcher_says_spec
+      - tests/test_agent_experience.py::test_a_host_repository_sees_no_toolkit_requirement_ids
+  after:
+    description: Messages and views name `spec`. In a set-up host repository, the output of check, show, edit and the help texts, and every page the toolkit wrote, cite no requirement IDs except the host's own and illustrative examples, and the engineer's quoted words are rendered unchanged.
+    tests:
+      python:
+      - tests/test_agent_experience.py::test_messages_name_the_spec_command
+      - tests/test_agent_experience.py::test_a_host_repository_sees_no_toolkit_requirement_ids
+      - tests/test_agent_experience.py::test_the_engineers_words_are_never_rewritten
+- op: modify
+  id: DR-38
+  at: 2026-10-18T08:39-07:00
+  reason: the toolkit's command is `spec` on the PATH (DR-52).
+  before:
+    decision: |-
+      The skill lives in the Python package, so pip installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
+      - `spec init` copies it to where each harness looks for skills: .claude/skills/syseng for Claude Code, and .agents/skills/syseng, the cross-tool location that Hermes and Antigravity read. Hermes loads a repository's skills only after `hermes skills trust`.
+      - Each copy has the placeholder {{SPEC}} replaced by the repository's launcher, `.syseng/spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run (AGENT-49).
+      - The skill itself names no harness, tool or package manager. Harness-specific parts live in adapters.
+  after:
+    decision: |-
+      The skill lives in the Python package, so installing the toolkit installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
+      - `spec init` copies it to where each harness looks for skills: .claude/skills/syseng for Claude Code, and .agents/skills/syseng, the cross-tool location that Hermes and Antigravity read. Hermes loads a repository's skills only after `hermes skills trust`.
+      - Each copy has the placeholder {{SPEC}} replaced by the toolkit's command, `spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run.
+      - The skill itself names no harness, tool or package manager. Harness-specific parts live in adapters.
+- op: modify
+  id: DR-40
+  at: 2026-10-18T08:39-07:00
+  reason: the toolkit's command is `spec` on the PATH (DR-52).
+  before:
+    decision: |-
+      `.syseng/hook` is one Python script that uses only the standard library. `spec init` copies it from the package and registers it in .claude/settings.json for three events: before each tool call, when the agent stops, and when the engineer sends a message.
+      - It refuses a tool call by exiting with code 2, giving the reason on standard error.
+      - The guard refuses edits to the files the toolkit manages: elements, change records, approvals, retired IDs and generated views. Its refusal names the command to use. toolkit.yaml and hand-written pages such as the glossary stay editable.
+      - For shell commands, it refuses plain writes into those files: redirections, tee, rm, mv, cp, and in-place sed or perl.
+      - When the agent stops with errors in the spec, it sends the findings back as feedback, which Claude Code doesn't show as an error.
+      - Only the stop and prompt hooks run the toolkit, through the launcher. When the toolkit isn't set up, nothing is blocked, and the engineer sees a notice.
+  after:
+    decision: |-
+      `.syseng/hook` is one Python script that uses only the standard library. `spec init` copies it from the package and registers it in .claude/settings.json for three events: before each tool call, when the agent stops, and when the engineer sends a message.
+      - It refuses a tool call by exiting with code 2, giving the reason on standard error.
+      - The guard refuses edits to the files the toolkit manages: elements, change records, approvals, retired IDs and generated views. Its refusal names the command to use. toolkit.yaml and hand-written pages such as the glossary stay editable.
+      - For shell commands, it refuses plain writes into those files: redirections, tee, rm, mv, cp, and in-place sed or perl.
+      - When the agent stops with errors in the spec, it sends the findings back as feedback, which Claude Code doesn't show as an error.
+      - Only the stop and prompt hooks run the toolkit, as `spec` from the PATH. When it isn't installed, nothing is blocked, and the engineer sees a notice.
+- op: modify
+  id: DR-32
+  at: 2026-10-18T08:39-07:00
+  reason: the launcher this described is gone (DR-52).
+  raised:
+  - you approved it
+  fingerprint_before: b6e8d511eefb
+  fingerprint_after: b86ef257d509
+  before:
+    consequences: Agents in this repository run the toolkit through `.syseng/spec`, as in any other repository. On the engineer's machine, that launcher enters the flake's development shell (DR-39).
+  after:
+    consequences: Agents run `spec` from the PATH, as in any other repository. On the engineer's machine it's installed with `pipx install --editable` from this checkout, so changes apply at once (DR-52).
+  acks:
+    DR-32: |-
+      only its consequences change: the launcher it described is gone, and you install the toolkit with pipx install --editable
+- op: modify
+  id: SYS-V6
+  at: 2026-10-18T08:39-07:00
+  reason: the toolkit's command is `spec` on the PATH (DR-52).
+  before:
+    description: On a machine with Python but without Nix tooling, install the toolkit with pip into a new virtual environment, run setup in a scratch repository, then run the repository's launcher to check the spec. Each step succeeds, and the checker reports no errors.
+  after:
+    description: On a machine with Python but without Nix tooling, install the toolkit with pip or pipx into its own environment, run setup in a scratch repository, then run `spec check` there. Each step succeeds, and the checker reports no errors.
+decisions: []
+friction: []
+closed: '2026-10-18'

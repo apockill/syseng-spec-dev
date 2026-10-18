@@ -4,6 +4,7 @@
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -13,9 +14,8 @@ from syseng.adapters import hook
 
 
 @pytest.fixture
-def repo(spec, tmp_path, monkeypatch):
-    """The base spec in a repository set up for Claude Code, with this machine's config kept local."""
-    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "xdg"))
+def repo(spec, tmp_path, machine):
+    """The base spec in a repository set up for Claude Code, on a machine with the toolkit installed."""
     spec.files["glossary.md"] = "terms"
     root = spec.write()
     (tmp_path / "src").mkdir()
@@ -30,7 +30,8 @@ def _guard(handler, repo, tool, agent_type="spec-reasoning-check", **tool_input)
 
 def _run(repo, event_name, event, env=None):
     """Runs the installed hook script the way Claude Code does."""
-    out = subprocess.run([str(repo / ".syseng/hook"), event_name], input=json.dumps({"cwd": str(repo), **event}),
+    out = subprocess.run([sys.executable, str(repo / ".syseng/hook"), event_name],
+                         input=json.dumps({"cwd": str(repo), **event}),
                          capture_output=True, text=True, env=env or os.environ.copy())
     assert out.returncode == 0, out.stderr
     return out.stdout
@@ -43,12 +44,12 @@ def _approvals(repo):
 # ---------------------------------------------------------------- the spec guard
 
 @pytest.mark.parametrize("rel, names", [
-    ("spec/elements/CORE/requirements.yaml", ".syseng/spec edit"),
-    ("spec/elements/NEW/element.yaml", ".syseng/spec edit"),
-    ("spec/approvals.yaml", ".syseng/spec approve"),
-    ("spec/changes/2026-01-01-round-1.yaml", ".syseng/spec decide"),
-    ("spec/requirements.md", ".syseng/spec render"),
-    ("spec/retired.yaml", ".syseng/spec edit"),
+    ("spec/elements/CORE/requirements.yaml", "`spec edit`"),
+    ("spec/elements/NEW/element.yaml", "`spec edit`"),
+    ("spec/approvals.yaml", "`spec approve"),
+    ("spec/changes/2026-01-01-round-1.yaml", "`spec decide`"),
+    ("spec/requirements.md", "`spec render`"),
+    ("spec/retired.yaml", "`spec edit`"),
 ])
 def test_agents_cannot_edit_files_the_toolkit_manages(repo, capsys, rel, names):
     assert _guard(hook.pre_tool, repo, "Write", file_path=str(repo / rel), content="x") == 2
@@ -80,7 +81,7 @@ def test_shell_writes_into_the_spec_are_refused(repo, command):
     "grep -n stamp spec/elements/*/requirements.yaml 2>/dev/null | head",
     "sed -n '1,5p' spec/requirements.md",
     "cp spec/requirements.md /tmp/review.md",
-    ".syseng/spec edit <<'YAML'\nedits:\n  - modify: CORE-1\n    set: {text: a > b}\n    reason: r\nYAML",
+    "spec edit <<'YAML'\nedits:\n  - modify: CORE-1\n    set: {text: a > b}\n    reason: r\nYAML",
     "python -m pytest > /tmp/out.txt 2>&1",
 ])
 def test_shell_reads_and_toolkit_commands_are_allowed(repo, command):
@@ -137,9 +138,10 @@ def test_stop_lets_a_clean_spec_finish(repo):
 
 
 def test_stop_tells_the_engineer_when_the_toolkit_is_missing(repo, tmp_path):
-    env = {**os.environ, "XDG_CONFIG_HOME": str(tmp_path / "elsewhere")}
+    (tmp_path / "empty").mkdir()
+    env = {**os.environ, "PATH": str(tmp_path / "empty")}
     notice = json.loads(_run(repo, "stop", {}, env=env))
-    assert "isn't set up on this machine" in notice["systemMessage"]
+    assert "isn't installed on this machine" in notice["systemMessage"]
 
 
 # ---------------------------------------------------------------- chat approvals
@@ -236,4 +238,4 @@ def test_malformed_events_never_block(repo):
 def test_hook_script_is_standard_library_only():
     source = Path(hook.__file__).read_text()
     imports = {line.split()[1].split(".")[0] for line in source.splitlines() if line.startswith(("import ", "from "))}
-    assert imports <= {"__future__", "json", "os", "re", "shlex", "subprocess", "sys", "pathlib"}
+    assert imports <= {"__future__", "json", "os", "re", "shlex", "shutil", "subprocess", "sys", "pathlib"}

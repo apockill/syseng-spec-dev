@@ -92,9 +92,9 @@
   recorded: round 11 (slice 3)
   context: The method is one portable skill (DR-1). It has to reach each repository, and the commands it gives have to work there however the machine installs Python.
   decision: |-
-    The skill lives in the Python package, so pip installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
+    The skill lives in the Python package, so installing the toolkit installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
     - `spec init` copies it to where each harness looks for skills: .claude/skills/syseng for Claude Code, and .agents/skills/syseng, the cross-tool location that Hermes and Antigravity read. Hermes loads a repository's skills only after `hermes skills trust`.
-    - Each copy has the placeholder {{SPEC}} replaced by the repository's launcher, `.syseng/spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run (AGENT-49).
+    - Each copy has the placeholder {{SPEC}} replaced by the toolkit's command, `spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run.
     - The skill itself names no harness, tool or package manager. Harness-specific parts live in adapters.
   alternatives: A skill that tells agents to run `spec` from the PATH, which breaks whenever the toolkit lives in a virtual environment the agent's shell hasn't activated. Keeping the skill outside the package, which pip wouldn't install.
   consequences: The installed copy is committed with the repository, so it can fall behind the toolkit. `spec init --check` reports the difference and `spec init` refreshes it. The rules page moved from docs/ into the skill.
@@ -112,7 +112,7 @@
     - The guard refuses edits to the files the toolkit manages: elements, change records, approvals, retired IDs and generated views. Its refusal names the command to use. toolkit.yaml and hand-written pages such as the glossary stay editable.
     - For shell commands, it refuses plain writes into those files: redirections, tee, rm, mv, cp, and in-place sed or perl.
     - When the agent stops with errors in the spec, it sends the findings back as feedback, which Claude Code doesn't show as an error.
-    - Only the stop and prompt hooks run the toolkit, through the launcher. When the toolkit isn't set up, nothing is blocked, and the engineer sees a notice.
+    - Only the stop and prompt hooks run the toolkit, as `spec` from the PATH. When it isn't installed, nothing is blocked, and the engineer sees a notice.
   alternatives: Hooks that call the toolkit for everything, which costs a Python start-up with PyYAML on every tool call and fails on machines without the toolkit. A Claude Code plugin, which DR-1 ruled out.
   consequences: A script that opens spec files itself, in python or awk, gets past the guard. The change log and the auditors are the backstop. The hook copy can fall behind the toolkit until `spec init` runs again.
 - id: DR-41

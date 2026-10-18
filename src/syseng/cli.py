@@ -10,7 +10,7 @@
   spec decide < decision.yaml               add an open decision with options (CHANGE-10)
   spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12)
   spec friction --workaround … --proposal … report friction with the toolkit (AGENT-46)
-  spec init [--harness NAME] [--launcher CMD]  set up a repository in one step (SYS-5)
+  spec init [--harness NAME]                set up a repository in one step (SYS-5)
 
 Run from anywhere inside a repository that has spec/toolkit.yaml, or pass --spec DIR.
 """
@@ -24,7 +24,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from syseng import changes, edit, fingerprint, init, model, naming, render, review, yamlio
+from syseng import changes, edit, fingerprint, init, model, render, review, yamlio
 from syseng import check as checker
 
 
@@ -210,8 +210,7 @@ def cmd_change(args) -> int:
                 print("spec change start: say what the engineer asked for, in a sentence")
                 return 1
             c = changes.start(spec, args.request, args.mode, args.target, args.slug)
-            print(f"opened {c.id} ({c.data['mode']}, target {c.data['target']}). Every {naming.cmd('edit')} is "
-                  f"logged here.")
+            print(f"opened {c.id} ({c.data['mode']}, target {c.data['target']}). Every `spec edit` is logged here.")
         elif args.action == "close":
             c = changes.current(spec)
             if c is None:
@@ -254,7 +253,7 @@ def cmd_edit(args) -> int:
         for iid, why in result.needs_acks.items():
             print(f"  {iid}: \"<note>\"   # {changes._label(model.load(spec.root), iid)}: {why}")
         retry = " ".join(f"--ack '{iid}=<note>'" for iid in result.needs_acks)
-        print(f"\nOr reuse the batch without sending it again: {naming.cmd(f'edit --retry {retry}')}")
+        print(f"\nOr reuse the batch without sending it again: `spec edit --retry {retry}`")
         return 2
     if result.errors:
         edit.save_last(spec.root, doc)
@@ -276,8 +275,7 @@ def cmd_status(args) -> int:
     spec = _load(args)
     c = changes.current(spec)
     if c is None:
-        start = naming.cmd('change start "<what was asked>"')
-        print(f"No change is open. Start one before editing the spec: {start}")
+        print('No change is open. Start one before editing the spec: `spec change start "<what was asked>"`')
     else:
         d = c.data
         entries = d.get("entries") or []
@@ -376,7 +374,7 @@ def cmd_init(args) -> int:
     repo = (Path(args.repo) if args.repo else _repo_root(Path.cwd())).resolve()
     harnesses = args.harness or init.installed_harnesses(repo) or ["claude-code"]  # a re-run refreshes them all
     try:
-        steps = init.run(repo, harnesses, args.launcher, check_only=args.check, instructions=not args.no_instructions)
+        steps = init.run(repo, harnesses, check_only=args.check, instructions=not args.no_instructions)
     except init.InitError as e:
         print(f"spec init: {e}")
         return 1
@@ -398,7 +396,7 @@ def cmd_init(args) -> int:
             else group[0].status
         note = group[0].note if len(group) == 1 else f"{len(group)} files"
         print(f"  {status:<9} {path}" + (f"  ({note})" if note else ""))
-    print("\nCommit the files in the repository. The launcher outside it belongs to this machine.")
+    print("\nCommit the files it wrote.")
     if "hermes" in harnesses:
         print("Hermes loads a repository's skills only once you trust it: run `hermes skills trust` here.")
     if steps[0].status == "created":
@@ -463,14 +461,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--workaround", required=True)
     p.add_argument("--proposal", required=True)
     p.set_defaults(fn=cmd_friction)
-    p = sub.add_parser("init", help="set up a repository: spec skeleton, launcher, skill and harness glue",
+    p = sub.add_parser("init", help="set up a repository: spec skeleton, skill and harness glue",
                        description=init.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--harness", action="append", choices=list(init.HARNESSES),
                    help="agent harness to set up for; repeat for several (default: the ones already set up, "
                         "else claude-code)")
     p.add_argument("--repo", help="repository to set up (default: the one containing the current directory)")
-    p.add_argument("--launcher", help="command that runs the toolkit on this machine, replacing the default "
-                                      "(this Python)")
     p.add_argument("--check", action="store_true", help="report files that differ from a fresh setup; write nothing")
     p.add_argument("--no-instructions", action="store_true",
                    help="leave AGENTS.md and CLAUDE.md alone instead of adding the section that points sessions at the skill")
@@ -485,5 +481,4 @@ def commands() -> set[str]:
 
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
-    naming.use(Path(args.spec) if args.spec else model.find_spec_root(Path.cwd()))
     return args.fn(args)
