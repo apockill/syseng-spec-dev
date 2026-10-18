@@ -4,7 +4,7 @@ Every error the checker reports links here. Each rule says what it checks, why i
 
 The wording rules (W…) come from INCOSE's *Guide to Writing Requirements*, cited by rule number. The guide isn't freely available, so this page explains each rule on its own terms. The wording rules were tuned against this repository's own spec before they shipped.
 
-Errors fail `{{SPEC}} check`. To-dos are listed by `{{SPEC}} check --todo` but don't fail it.
+Errors fail `spec check`. To-dos are listed by `spec check --todo` but don't fail it.
 
 ## Structure
 
@@ -76,7 +76,7 @@ The rationale is what an agent reads first when someone asks why a requirement e
 
 <a id="a003"></a>
 ### A003: unreviewed item (to-do)
-Nothing covers this item: neither it nor anything above it in the trace graph is approved, or it changed after the engineer approved it. An item under an approved item is delegated, and isn't a to-do. Approvals are recorded by `{{SPEC}} approve`, only from the engineer's own words.
+Nothing covers this item: neither it nor anything above it in the trace graph is approved, or it changed after the engineer approved it. An item under an approved item is delegated, and isn't a to-do. Approvals are recorded by `spec approve`, only from the engineer's own words.
 
 <a id="a004"></a>
 ### A004: alteration awaiting the engineer's answer (to-do)
@@ -104,7 +104,7 @@ A verification item links a test that doesn't exist: the file is missing, or the
 
 <a id="r001"></a>
 ### R001: rendered view out of date
-`requirements.md` and `decisions.md` are generated. A stale view shows the engineer a spec that no longer exists. Run `{{SPEC}} render`, and never edit the views by hand.
+`requirements.md` and `decisions.md` are generated. A stale view shows the engineer a spec that no longer exists. Run `spec render`, and never edit the views by hand.
 
 ## Wording
 

@@ -1,15 +1,21 @@
 """`spec init`: sets up a repository for the toolkit in one step.
 
 Agents and hooks run the toolkit as `spec`, from the PATH: install it with `pipx install` or
-`uv tool install` (add `--editable` to run a checkout). It writes:
+`uv tool install` (add `--editable` to run a checkout).
+
+In the repository, it writes:
 - spec/, with a root system element, when the repository has no spec yet;
-- the skill, for each harness named: .claude/skills/syseng for Claude Code, and .agents/skills/syseng,
-  the cross-tool location, for Hermes and Antigravity. Each copy has a note on what that harness's
-  hooks do filled in;
-- for Claude Code: .syseng/hook, the hooks that run it in .claude/settings.json, and the auditor
-  and reasoning-check subagents in .claude/agents;
-- a short section in AGENTS.md (or CLAUDE.md), between markers, telling every session to follow
-  the skill. --no-instructions leaves those files alone.
+- for Claude Code: .syseng/hook and the hooks that run it in .claude/settings.json;
+- a short section in AGENTS.md (or CLAUDE.md), between markers, telling every session to follow the
+  skill and what this repository's hooks do. --no-instructions leaves those files alone.
+
+On this machine, once, it links the user-level folders to the installed toolkit, so every repository
+uses the skill and subagents of the toolkit that's installed, and updating the toolkit updates them:
+~/.claude/skills/syseng and the two subagents in ~/.claude/agents for Claude Code, and
+~/.hermes/skills/syseng for Hermes. Antigravity, with no user-level folder known, gets a copy of the
+skill in the repository's .agents/skills/syseng.
+
+It records the harnesses it set up in spec/toolkit.yaml, and a later run without --harness uses them.
 
 Running it again refreshes these files and leaves every other setting alone.
 """
@@ -29,10 +35,12 @@ ADAPTERS = PACKAGE / "adapters"
 SPEC_CMD = "spec"
 OLD_LAUNCHER = ".syseng/spec"  # what setups before round 15 wrote; removed when found (DR-52)
 HARNESSES = ("claude-code", "hermes", "antigravity", "none")
-SKILL_HOMES = {"claude-code": ".claude/skills/syseng", "hermes": ".agents/skills/syseng",
-               "antigravity": ".agents/skills/syseng"}
-HARNESS_NOTES = {"claude-code": ADAPTERS / "claude_code" / "skill-notes.md"}  # the others run no hooks
-GENERIC_NOTES = ADAPTERS / "generic" / "skill-notes.md"
+AGENT_DEFINITIONS = ADAPTERS / "claude_code" / "agents"
+SKILL_COPY = ".agents/skills/syseng"   # the skill, copied into the repository for Antigravity only
+CLAUDE_LINK = ".claude/skills/syseng"  # where setups before round 17 put Claude Code's copy
+OLD_AGENTS = (".claude/agents/spec-auditor.md", ".claude/agents/spec-reasoning-check.md")  # same
+CLAUDE_NOTES = ADAPTERS / "claude_code" / "instructions.md"
+GENERIC_NOTES = ADAPTERS / "generic" / "instructions.md"
 HOOK_MARK = ".syseng/hook"
 # Toolkit commands agents may run without asking (CLI-20). `approve` and `resolve` record the engineer's
 # words, so they stay with the harness's permission prompt: the engineer sees and confirms each one.
@@ -73,13 +81,6 @@ class Step:
     note: str = ""
 
 
-def _fill(text: str, harness: str | None = None) -> str:
-    if "{{HARNESS_NOTES}}" in text:
-        notes = HARNESS_NOTES.get(harness, GENERIC_NOTES).read_text().strip()
-        text = text.replace("{{HARNESS_NOTES}}", notes)
-    return text.replace("{{SPEC}}", SPEC_CMD)
-
-
 def _guess_language(repo: Path) -> tuple[str, str]:
     for marker, language in _LANGUAGES:
         if (repo / marker).exists():
@@ -97,9 +98,19 @@ def instruction_files(repo: Path) -> list[str]:
     return found or ["AGENTS.md"]
 
 
-def merge_instructions(text: str | None) -> str:
+def instructions_for(harnesses: list[str]) -> str:
+    """The section's text: the method, then what this repository's hooks do, harness by harness (AGENT-49)."""
+    parts = [INSTRUCTIONS]
+    if "claude-code" in harnesses:
+        parts.append(CLAUDE_NOTES.read_text().strip())
+    if any(h not in ("claude-code", "none") for h in harnesses) or "claude-code" not in harnesses:
+        parts.append(GENERIC_NOTES.read_text().strip())
+    return "\n\n".join(parts)
+
+
+def merge_instructions(text: str | None, harnesses: list[str] = ("claude-code",)) -> str:
     """The file with the toolkit's section added, or replaced between its markers (CLI-16)."""
-    block = f"{INSTRUCTIONS_BEGIN}\n{INSTRUCTIONS}\n{INSTRUCTIONS_END}\n"
+    block = f"{INSTRUCTIONS_BEGIN}\n{instructions_for(list(harnesses))}\n{INSTRUCTIONS_END}\n"
     text = text or ""
     start, end = text.find("<!-- syseng:"), text.find(INSTRUCTIONS_END)
     if start != -1 and end > start:
@@ -143,27 +154,96 @@ def planned_files(repo: Path, harnesses: list[str], instructions: bool = False) 
     if instructions:
         for name in instruction_files(repo):
             path = repo / name
-            files[name] = (merge_instructions(path.read_text() if path.exists() else None), False)
-    for h in harnesses:
-        if h in SKILL_HOMES:
-            for src in sorted(p for p in SKILL.rglob("*") if p.is_file() and p.suffix == ".md"):
-                files[f"{SKILL_HOMES[h]}/{src.relative_to(SKILL).as_posix()}"] = (_fill(src.read_text(), h), False)
+            files[name] = (merge_instructions(path.read_text() if path.exists() else None, harnesses), False)
+    if "antigravity" in harnesses:
+        for src in sorted(p for p in SKILL.rglob("*") if p.is_file() and p.suffix == ".md"):
+            files[f"{SKILL_COPY}/{src.relative_to(SKILL).as_posix()}"] = (src.read_text(), False)
     if "claude-code" in harnesses:
         files[HOOK_MARK] = ((ADAPTERS / "hook.py").read_text(), True)
-        for src in sorted((ADAPTERS / "claude_code" / "agents").glob("*.md")):
-            files[f".claude/agents/{src.name}"] = (_fill(src.read_text()), False)
         settings = repo / ".claude" / "settings.json"
         files[".claude/settings.json"] = (merge_settings(settings.read_text() if settings.exists() else None), False)
     return files
 
 
+def claude_home() -> Path:
+    return Path(os.environ.get("CLAUDE_CONFIG_DIR") or Path.home() / ".claude")
+
+
+def hermes_home() -> Path:
+    return Path.home() / ".hermes"
+
+
+def machine_links(harnesses: list[str]) -> dict[Path, Path]:
+    """Links in this machine's user-level folders: path -> what it points at in the installed toolkit (CLI-21)."""
+    links: dict[Path, Path] = {}
+    if "claude-code" in harnesses:
+        links[claude_home() / "skills" / "syseng"] = SKILL
+        for src in sorted(AGENT_DEFINITIONS.glob("*.md")):
+            links[claude_home() / "agents" / src.name] = src
+    if "hermes" in harnesses and hermes_home().is_dir():
+        links[hermes_home() / "skills" / "syseng"] = SKILL
+    return links
+
+
+def _tilde(path: Path) -> str:
+    home = str(Path.home())
+    text = str(path)
+    return "~" + text[len(home):] if text == home or text.startswith(home + os.sep) else text
+
+
+def _machine_link(path: Path, target: Path, check_only: bool) -> Step:
+    shown = _tilde(path)
+    if path.is_symlink() and Path(os.readlink(path)) == target:
+        return Step("unchanged", shown)
+    if path.exists() and not path.is_symlink():
+        return Step("note", shown, "left alone: it isn't a link `spec init` made")
+    if check_only:
+        return Step("differs", shown, f"should be a link to {_tilde(target)}")
+    existed = path.is_symlink()
+    if existed:
+        path.unlink()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    os.symlink(target, path, target_is_directory=target.is_dir())
+    return Step("updated" if existed else "created", shown, f"a link to {_tilde(target)}")
+
+
+def _older_installs(repo: Path, harnesses: list[str]) -> list[str]:
+    """What setups before round 17 put in the repository and the user-level links now replace."""
+    found = []
+    for rel in (CLAUDE_LINK, SKILL_COPY):
+        path = repo / rel
+        if rel == SKILL_COPY and "antigravity" in harnesses:
+            continue  # still the copy Antigravity reads
+        skill = path / "SKILL.md"
+        if path.is_symlink() or (path.is_dir() and skill.is_file() and "name: syseng" in skill.read_text()):
+            found.append(rel)
+    found += [rel for rel in OLD_AGENTS if (repo / rel).is_file() and "name: spec-" in (repo / rel).read_text()]
+    return found
+
+
 def installed_harnesses(repo: Path) -> list[str]:
-    """One harness per installed skill copy (Hermes and Antigravity share theirs)."""
-    found: dict[str, str] = {}
-    for h, home in SKILL_HOMES.items():
-        if (repo / home).is_dir():
-            found.setdefault(home, h)
-    return list(found.values())
+    """The harnesses spec/toolkit.yaml records, or, for older setups, those the skill's folders show."""
+    config = repo / "spec" / "toolkit.yaml"
+    recorded = (yamlio.read(config) or {}).get("harnesses") if config.exists() else None
+    if recorded:
+        return [h for h in recorded if h in HARNESSES]
+    found = []  # setups before round 16 recorded nothing; their copies show the harnesses
+    if (repo / CLAUDE_LINK).exists() or (repo / HOOK_MARK).exists():
+        found.append("claude-code")
+    if (repo / SKILL_COPY).is_dir() and not (repo / CLAUDE_LINK).is_symlink():
+        found.append("hermes")
+    return found
+
+
+def _record_harnesses(repo: Path, harnesses: list[str]) -> None:
+    config = repo / "spec" / "toolkit.yaml"
+    if not config.exists():
+        return
+    data = yamlio.read(config) or {}
+    merged = list(dict.fromkeys([*(data.get("harnesses") or []), *(h for h in harnesses if h != "none")]))
+    if merged != data.get("harnesses"):
+        data["harnesses"] = merged
+        yamlio.write(config, data)
 
 
 def _write(path: Path, content: str, executable: bool) -> None:
@@ -191,8 +271,10 @@ def _skeleton(repo: Path) -> Step:
     return Step("created", "spec/", f"root system element SYS; implementation {language!r}, {how}")
 
 
-def run(repo: Path, harnesses: list[str], check_only: bool = False, instructions: bool = True) -> list[Step]:
-    """Sets up `repo`, or with check_only reports what differs from a fresh setup without writing."""
+def run(repo: Path, harnesses: list[str], check_only: bool = False, instructions: bool = True,
+        machine: bool = True) -> list[Step]:
+    """Sets up `repo` and, with `machine`, this machine's user-level links; with check_only, reports
+    what differs from a fresh setup without writing."""
     instructions = has_instructions(repo) if check_only else instructions
     unknown = [h for h in harnesses if h not in HARNESSES]
     if unknown:
@@ -210,21 +292,36 @@ def run(repo: Path, harnesses: list[str], check_only: bool = False, instructions
         else:
             _write(path, content, executable)
             steps.append(Step("created" if current is None else "updated", rel))
-    for h in harnesses:  # files an older skill had and this one doesn't
-        home = SKILL_HOMES.get(h)
-        planned = set(planned_files(repo, [h]))
-        for old in sorted((repo / home).rglob("*.md")) if home and (repo / home).is_dir() else []:
-            rel = old.relative_to(repo).as_posix()
-            if rel not in planned:
-                if not check_only:
-                    old.unlink()
-                steps.append(Step("differs" if check_only else "removed", rel, "no longer part of the skill"))
+    for rel in _older_installs(repo, harnesses):
+        path = repo / rel
+        if not check_only:
+            if path.is_symlink() or path.is_file():
+                path.unlink()
+            else:
+                shutil.rmtree(path)
+        steps.append(Step("differs" if check_only else "removed", rel, "installed once per machine now"))
+        for parent in [] if check_only else (path.parent, path.parent.parent):  # e.g. .agents/skills, .agents
+            if parent != repo and parent.is_dir() and not any(parent.iterdir()):
+                parent.rmdir()
+    if machine:
+        steps += [_machine_link(path, target, check_only) for path, target in machine_links(harnesses).items()]
+        if "hermes" in harnesses and not hermes_home().is_dir():
+            steps.append(Step("note", "~/.hermes", "Hermes isn't set up on this machine, so its skill link wasn't made"))
+    planned = set(planned_files(repo, harnesses))
+    copy = repo / SKILL_COPY
+    for old in sorted(copy.rglob("*.md")) if copy.is_dir() and not copy.is_symlink() else []:
+        rel = old.relative_to(repo).as_posix()  # files an older skill had and this one doesn't
+        if rel not in planned:
+            if not check_only:
+                old.unlink()
+            steps.append(Step("differs" if check_only else "removed", rel, "no longer part of the skill"))
     old = repo / OLD_LAUNCHER
     if old.is_file() and "Written by `spec init`" in old.read_text():
         if not check_only:
             old.unlink()
         steps.append(Step("differs" if check_only else "removed", OLD_LAUNCHER, "agents now run `spec` from the PATH"))
     if not check_only:
+        _record_harnesses(repo, harnesses)
         spec_root = repo / "spec"
         if (spec_root / "toolkit.yaml").exists():
             render.write_views(model.load(spec_root))

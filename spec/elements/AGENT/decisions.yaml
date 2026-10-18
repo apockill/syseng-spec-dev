@@ -93,11 +93,12 @@
   context: The method is one portable skill (DR-1). It has to reach each repository, and the commands it gives have to work there however the machine installs Python.
   decision: |-
     The skill lives in the Python package, so installing the toolkit installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
-    - `spec init` copies it to where each harness looks for skills: .claude/skills/syseng for Claude Code, and .agents/skills/syseng, the cross-tool location that Hermes and Antigravity read. Hermes loads a repository's skills only after `hermes skills trust`.
-    - Each copy has the placeholder {{SPEC}} replaced by the toolkit's command, `spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run.
-    - The skill itself names no harness, tool or package manager. Harness-specific parts live in adapters.
+    - `spec init` writes one copy, in .agents/skills/syseng, the cross-tool location Hermes and Antigravity read. For Claude Code, which reads only .claude/skills, .claude/skills/syseng is a link to that copy. Hermes loads a repository's skills only after `hermes skills trust`.
+    - The copy is the skill exactly as written: it has no placeholders and names no harness, tool or package manager.
+    - What each harness's hooks do goes in the instruction-file section, which every harness reads.
   alternatives: A skill that tells agents to run `spec` from the PATH, which breaks whenever the toolkit lives in a virtual environment the agent's shell hasn't activated. Keeping the skill outside the package, which pip wouldn't install.
-  consequences: The installed copy is committed with the repository, so it can fall behind the toolkit. `spec init --check` reports the difference and `spec init` refreshes it. The rules page moved from docs/ into the skill.
+  consequences: The installed copy is committed with the repository, so it can fall behind the toolkit; `spec init --check` reports the difference and `spec init` refreshes it. A checkout on a system without symlinks would see the link as a plain file, and Claude Code would miss the skill there. The rules page moved from docs/ into the skill.
+  status: superseded in round 17 by DR-53 on where the skill is installed. Its rules for the skill's content still hold.
 - id: DR-40
   title: Claude Code hooks are one standard-library script, committed with the repository
   decided_by: agent

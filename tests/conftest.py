@@ -68,6 +68,14 @@ def spec(tmp_path) -> SpecBuilder:
     return SpecBuilder(tmp_path / "spec")
 
 
+@pytest.fixture(autouse=True)
+def _own_home(tmp_path, monkeypatch):
+    """Every test gets a home folder of its own, so `spec init`'s user-level links never touch the real one."""
+    (tmp_path / "home").mkdir(exist_ok=True)
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
+
+
 @pytest.fixture
 def machine(tmp_path, monkeypatch) -> Path:
     """A machine with the toolkit installed: `spec` on the PATH, running this checkout."""

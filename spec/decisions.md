@@ -300,13 +300,14 @@ These are the decisions made while designing and building the toolkit, each atta
 
 ### DR-38 🟡 ⤷SYS-27 The skill ships inside the package, and setup installs it with the launcher's name filled in
 *System elements:* AGENT, CLI · *Requirements:* AGENT-42, SYS-27, CLI-9 · *Recorded:* round 11 (slice 3)
+- **Status:** superseded in round 17 by DR-53 on where the skill is installed. Its rules for the skill's content still hold.
 - **Context:** The method is one portable skill (DR-1). It has to reach each repository, and the commands it gives have to work there however the machine installs Python.
 - **Decision:** The skill lives in the Python package, so installing the toolkit installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
-  - `spec init` copies it to where each harness looks for skills: .claude/skills/syseng for Claude Code, and .agents/skills/syseng, the cross-tool location that Hermes and Antigravity read. Hermes loads a repository's skills only after `hermes skills trust`.
-  - Each copy has the placeholder {{SPEC}} replaced by the toolkit's command, `spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run.
-  - The skill itself names no harness, tool or package manager. Harness-specific parts live in adapters.
+  - `spec init` writes one copy, in .agents/skills/syseng, the cross-tool location Hermes and Antigravity read. For Claude Code, which reads only .claude/skills, .claude/skills/syseng is a link to that copy. Hermes loads a repository's skills only after `hermes skills trust`.
+  - The copy is the skill exactly as written: it has no placeholders and names no harness, tool or package manager.
+  - What each harness's hooks do goes in the instruction-file section, which every harness reads.
 - **Alternatives:** A skill that tells agents to run `spec` from the PATH, which breaks whenever the toolkit lives in a virtual environment the agent's shell hasn't activated. Keeping the skill outside the package, which pip wouldn't install.
-- **Consequences:** The installed copy is committed with the repository, so it can fall behind the toolkit. `spec init --check` reports the difference and `spec init` refreshes it. The rules page moved from docs/ into the skill.
+- **Consequences:** The installed copy is committed with the repository, so it can fall behind the toolkit; `spec init --check` reports the difference and `spec init` refreshes it. A checkout on a system without symlinks would see the link as a plain file, and Claude Code would miss the skill there. The rules page moved from docs/ into the skill.
 
 ### DR-39 🟡 ⤷SYS-5 Two launchers, one committed with the repository and one per machine
 *System elements:* CLI · *Requirements:* SYS-5, SYS-32, CLI-9 · *Recorded:* round 11 (slice 3)
@@ -428,3 +429,14 @@ These are the decisions made while designing and building the toolkit, each atta
   - `.syseng/hook` stays in the repository, using only the standard library, so the guards keep working on a clone whose machine lacks the toolkit.
 - **Alternatives:** The two launchers (DR-39), which solved the same problem the standard tools solve, at the cost of a longer command, a file outside the repository and extra code. Installing into a project's virtual environment, which agents' shells often don't activate.
 - **Consequences:** Each machine needs the toolkit on its PATH, and the setup notice says how. One toolkit version serves every repository on a machine. A different program named `spec` earlier on the PATH would shadow the toolkit.
+
+### DR-53 🟡 ⤷SYS-5 The skill and subagents are installed once per machine, as links to the installed toolkit
+*System elements:* CLI, AGENT · *Requirements:* CLI-9, CLI-21, AGENT-42 · *Recorded:* round 17
+- **Context:** With a copy of the skill in every repository, an update to the toolkit reached a repository only when someone ran setup there and committed the result, and a repository's copy could disagree with the `spec` installed on the machine. The engineer asked how updates would reach their other repositories, and chose the user-level location.
+- **Decision:** `spec init` links the user-level folders to the installed toolkit: ~/.claude/skills/syseng and the two subagents in ~/.claude/agents for Claude Code, and ~/.hermes/skills/syseng for Hermes when Hermes is set up on the machine.
+  - With an editable install, an edit to the toolkit reaches every repository at once. Otherwise, upgrading the toolkit does.
+  - A repository keeps its spec, the instruction-file section, and Claude Code's hook script and settings. Setup removes the copies earlier setups put in repositories.
+  - A skill or subagent of the engineer's own at those paths is left alone.
+  - Antigravity, with no user-level folder known, still gets a copy in the repository.
+- **Alternatives:** A copy per repository, refreshed by setup and flagged when stale, which keeps each repository self-contained at the cost of a commit per update per repository. A Claude Code plugin, which DR-1 ruled out.
+- **Consequences:** The skill an agent follows always matches the `spec` command it describes. A machine needs the toolkit installed and setup run once before its sessions get the skill. Claude Code's cloud sessions don't read user-level skills.

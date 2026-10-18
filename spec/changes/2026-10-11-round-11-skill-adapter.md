@@ -212,12 +212,12 @@ None.
   - traces_to: SYS-14
   - origin: engineer
   - source: "Those sessions are okay, as long as the agent knows about them and can tell me things like "please state Approve" and "LGTM" for the specific items. That way I know what to do and can be trained into it." (2026-10-17; "those sessions" are the Claude Code session hooks)
-- **add AGENT-49 (In a harness where the toolkit's hooks run, the…)**: the engineer's words in round 11.
+- **add AGENT-49 (In a repository whose harness runs the toolkit's hooks,…)**: the engineer's words in round 11.
   - text: In a harness where the toolkit's hooks run, the installed skill shall tell the agent what each hook does.
   - traces_to: SYS-29
   - origin: engineer
   - source: "Those sessions are okay, as long as the agent knows about them" (2026-10-17; "those sessions" are the Claude Code session hooks)
-- **add AGENT-V8 (The skill installed for a harness without hooks says…)**: verifies the harness notes.
+- **add AGENT-V8 (For a harness without hooks, the instruction-file section says…)**: verifies the harness notes.
   - verifies: AGENT-47, AGENT-49
   - method: test
   - technique: integration test

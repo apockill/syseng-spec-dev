@@ -4,14 +4,14 @@ The agent that wrote a change shouldn't be the only one checking it. Before the 
 - A fresh subagent isn't a fork, so it doesn't inherit the conversation.
 - Give each auditor one task and only the inputs that task needs.
 - Each auditor reports findings with evidence.
-- Turn the findings into fixes, or into open decisions (`{{SPEC}} decide`).
+- Turn the findings into fixes, or into open decisions (`spec decide`).
 
 ## The audits
 
 1. **Drift.** Inputs:
    - the change record;
    - the code diff;
-   - `{{SPEC}} show` for each system element the change touched.
+   - `spec show` for each system element the change touched.
 
    Find requirements the code no longer meets, behavior that no requirement covers, and spec edits with no matching code.
 2. **Weakened tests.** Inputs: the diffs of tests and verification items that existed before the change and that it modified or deleted. Look for:

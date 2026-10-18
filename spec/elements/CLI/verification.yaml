@@ -134,3 +134,16 @@
     - tests/test_agent_experience.py::test_a_batch_can_be_retried_with_acknowledgments_alone
     - tests/test_agent_experience.py::test_status_says_what_is_open_and_what_awaits_the_engineer
     - tests/test_agent_experience.py::test_edit_context_keeps_the_lines_of_multi_line_text
+- id: CLI-V12
+  verifies:
+  - CLI-21
+  method: test
+  technique: integration test
+  origin: agent
+  description: Setup links the machine's user-level skill and subagent folders to the installed toolkit and copies nothing into the repository. It removes the copies earlier setups put in a repository, keeps other skills there, and changes nothing when run again with the recorded harnesses. A skill of the engineer's own at the user-level path is left alone. Hermes gets its link only when Hermes is set up on the machine.
+  tests:
+    python:
+    - tests/test_init.py::test_init_sets_up_an_empty_repository
+    - tests/test_init.py::test_older_per_repository_installs_move_to_the_machine
+    - tests/test_init.py::test_skills_and_agents_of_your_own_are_left_alone
+    - tests/test_init.py::test_hermes_gets_its_link_and_the_note_that_no_hooks_run

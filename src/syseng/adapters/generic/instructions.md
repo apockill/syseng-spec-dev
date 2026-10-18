@@ -1,0 +1,1 @@
+In other harnesses no toolkit hooks run, so nothing stops a direct edit to the spec or a finish with errors. Record the engineer's approvals yourself, edit the spec only with `spec edit`, and run `spec check` before you report.

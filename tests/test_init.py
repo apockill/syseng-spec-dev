@@ -5,6 +5,7 @@ import os
 import subprocess
 
 import pytest
+from pathlib import Path
 
 from syseng import check, cli, init, model
 
@@ -26,13 +27,14 @@ def test_init_sets_up_an_empty_repository(repo, machine):
     spec = model.load(repo / "spec")
     assert [f for f in check.check(spec) if f.severity == "error"] == []
     assert spec.config["implementations"][0]["language"] == "python"
-    skill = (repo / ".claude/skills/syseng/SKILL.md").read_text()
-    assert "{{SPEC}}" not in skill and "`spec edit`" in skill
-    assert (repo / ".claude/skills/syseng/references/rules.md").exists()
+    home = Path.home()
+    assert (home / ".claude/skills/syseng").resolve() == init.SKILL                 # the machine's toolkit
+    assert (home / ".claude/agents/spec-reasoning-check.md").is_symlink()
+    assert not (repo / ".claude/skills").exists() and not (repo / ".agents").exists()   # no copies here
+    assert init.installed_harnesses(repo) == ["claude-code"]
     assert os.access(repo / ".syseng/hook", os.X_OK) and not (repo / ".syseng/spec").exists()
     hooks = json.loads((repo / ".claude/settings.json").read_text())["hooks"]
     assert set(hooks) == {"PreToolUse", "Stop", "UserPromptSubmit"}
-    assert (repo / ".claude/agents/spec-reasoning-check.md").exists()
 
 
 def test_init_says_when_spec_is_not_on_the_path(repo, tmp_path, monkeypatch):
@@ -81,19 +83,19 @@ def test_init_refuses_unreadable_settings(repo, machine):
 
 
 def test_init_removes_skill_files_the_skill_no_longer_has(repo, machine):
-    init.run(repo, ["claude-code"])
-    stale = repo / ".claude/skills/syseng/references/old.md"
+    init.run(repo, ["antigravity"])
+    stale = repo / ".agents/skills/syseng/references/old.md"
     stale.write_text("gone")
-    assert _statuses(init.run(repo, ["claude-code"]))[".claude/skills/syseng/references/old.md"] == "removed"
+    assert _statuses(init.run(repo, ["antigravity"]))[".agents/skills/syseng/references/old.md"] == "removed"
     assert not stale.exists()
 
 
 def test_check_reports_installed_files_that_drifted(repo, machine):
     init.run(repo, ["claude-code"])
-    (repo / ".claude/skills/syseng/SKILL.md").write_text("edited")
+    (repo / ".syseng/hook").write_text("edited")
     steps = init.run(repo, ["claude-code"], check_only=True)
-    assert _statuses(steps)[".claude/skills/syseng/SKILL.md"] == "differs"
-    assert (repo / ".claude/skills/syseng/SKILL.md").read_text() == "edited"   # check writes nothing
+    assert _statuses(steps)[".syseng/hook"] == "differs"
+    assert (repo / ".syseng/hook").read_text() == "edited"                     # check writes nothing
 
 
 def test_antigravity_gets_the_skill_without_claude_code_glue(repo, machine):
@@ -110,26 +112,52 @@ def test_existing_spec_is_left_alone(spec, machine):
     assert (root / "elements/SYS/element.yaml").read_text() == before
 
 
-def test_hermes_gets_the_cross_tool_skill_without_hooks(repo, machine):
+def test_hermes_gets_its_link_and_the_note_that_no_hooks_run(repo, machine):
+    steps = init.run(repo, ["hermes"])
+    assert any(s.status == "note" and s.path == "~/.hermes" for s in steps)      # no Hermes here yet
+    (Path.home() / ".hermes").mkdir()
     init.run(repo, ["hermes"])
-    skill = (repo / ".agents/skills/syseng/SKILL.md").read_text()
-    assert "No toolkit hooks run in this harness" in skill and "{{HARNESS_NOTES}}" not in skill
-    assert not (repo / ".claude").exists() and not (repo / ".syseng/hook").exists()
-    assert init.installed_harnesses(repo) == ["hermes"]
+    assert (Path.home() / ".hermes/skills/syseng").resolve() == init.SKILL
+    text = (repo / "AGENTS.md").read_text()
+    assert "no toolkit hooks run" in text and "Spec guard" not in text
+    assert not (repo / ".claude").exists() and not (repo / ".agents").exists()
 
 
-def test_each_skill_copy_says_what_its_harness_hooks_do(repo, machine):
+def test_the_instructions_say_what_each_harness_hooks_do(repo, machine):
     init.run(repo, ["claude-code", "hermes"])
-    claude = (repo / ".claude/skills/syseng/SKILL.md").read_text()
+    text = (repo / "AGENTS.md").read_text()
     for hook in ("Spec guard", "Done gate", "Approval reader"):
-        assert hook in claude
-    assert "Spec guard" not in (repo / ".agents/skills/syseng/SKILL.md").read_text()
+        assert hook in text
+    assert "In other harnesses no toolkit hooks run" in text
+
+
+def test_older_per_repository_installs_move_to_the_machine(repo, machine):
+    for rel in (".claude/skills/syseng", ".agents/skills/syseng"):
+        (repo / rel).mkdir(parents=True)
+        (repo / rel / "SKILL.md").write_text("---\nname: syseng\n---\nold copy\n")
+    (repo / ".claude/agents").mkdir()
+    (repo / ".claude/agents/spec-auditor.md").write_text("---\nname: spec-auditor\n---\n")
+    (repo / ".agents/skills/benchmarking").mkdir()                             # someone else's skill stays
+    steps = _statuses(init.run(repo, ["claude-code"]))
+    for rel in (".claude/skills/syseng", ".agents/skills/syseng", ".claude/agents/spec-auditor.md"):
+        assert steps[rel] == "removed" and not (repo / rel).exists()
+    assert (repo / ".agents/skills/benchmarking").is_dir() and not (repo / ".claude/skills").exists()
+    assert steps["~/.claude/skills/syseng"] == "created"
+    assert _statuses(init.run(repo, init.installed_harnesses(repo)))["~/.claude/skills/syseng"] == "unchanged"
+
+
+def test_skills_and_agents_of_your_own_are_left_alone(repo, machine):
+    own = Path.home() / ".claude/skills/syseng"
+    own.mkdir(parents=True)
+    (own / "SKILL.md").write_text("mine")
+    steps = init.run(repo, ["claude-code"])
+    assert any(s.status == "note" and s.path == "~/.claude/skills/syseng" for s in steps)
+    assert (own / "SKILL.md").read_text() == "mine"
 
 
 def test_a_plain_rerun_refreshes_every_installed_harness(repo, machine):
     init.run(repo, ["claude-code", "hermes"])
-    for copy in (".claude/skills/syseng/SKILL.md", ".agents/skills/syseng/SKILL.md"):
-        (repo / copy).write_text("stale")
+    (repo / ".syseng/hook").write_text("stale")
     assert cli.main(["init", "--repo", str(repo)]) == 0
     assert all(s.status != "differs" for s in init.run(repo, ["claude-code", "hermes"], check_only=True))
 

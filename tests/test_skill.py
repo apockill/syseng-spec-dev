@@ -31,10 +31,11 @@ def test_skill_names_no_particular_harness(path):
     assert not re.search(r"\bnix\b", text, re.I), f"{path.name} mentions Nix"
 
 
-def test_skill_leaves_one_slot_for_the_harness_notes():
-    assert (init.SKILL / "SKILL.md").read_text().count("{{HARNESS_NOTES}}") == 1
-    for notes in [init.GENERIC_NOTES, *init.HARNESS_NOTES.values()]:
-        assert notes.read_text().startswith("## What this harness does for you")
+def test_the_skill_is_installed_as_is():
+    for path in SKILL_FILES + AGENT_FILES:
+        assert "{{" not in path.read_text(), f"{path.name} still has a placeholder"
+    for notes in (init.CLAUDE_NOTES, init.GENERIC_NOTES):
+        assert "hooks" in notes.read_text()
 
 
 def test_skill_tells_agents_to_give_the_exact_approval_line():
@@ -49,7 +50,7 @@ def test_skill_invites_agents_to_improve_it():
 def test_every_command_the_skill_names_exists():
     named = set()
     for path in SKILL_FILES + AGENT_FILES:
-        named |= set(re.findall(r"\{\{SPEC\}\} ([a-z]+)", path.read_text()))
+        named |= set(re.findall(r"`spec ([a-z]+)", path.read_text()))
     assert named and named <= cli.commands(), named - cli.commands()
 
 
@@ -70,7 +71,7 @@ def test_auditor_subagent_is_described():
 
 def test_skill_teaches_the_approval_model():
     text = (init.SKILL / "SKILL.md").read_text()
-    assert "{{SPEC}} propose" in text and "most consequential first" in text          # AGENT-51
+    assert "spec propose" in text and "most consequential first" in text          # AGENT-51
     assert "the line that keeps it" in text                                            # AGENT-52
     assert "not just their \"yes\"" in text and "says only what was being discussed" in text  # AGENT-53, AGENT-54
     assert "Place each requirement under the system element it constrains" in text     # AGENT-55

@@ -1,0 +1,85 @@
+request: |-
+  Keep one copy of the skill in each repository: .agents/skills/syseng, with Claude Code's .claude/skills/syseng a link to it; the hooks' description moves into the instruction-file section
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-18'
+entries:
+- op: add
+  id: CLI-21
+  at: 2026-10-18T08:52-07:00
+  reason: the engineer's question in round 16.
+  after:
+    text: Setup shall keep one copy of the skill in a repository, whichever harnesses the repository uses.
+    traces_to: SYS-5
+    origin: agent
+    why: copies drift apart and make a reviewer wonder which one is real. The engineer noticed two copies and asked whether the skill was duplicated.
+- op: modify
+  id: AGENT-49
+  at: 2026-10-18T08:52-07:00
+  reason: one copy of the skill now serves every harness (CLI-21), so the part that differs by harness, what its hooks do, moved into the instruction-file section every harness reads.
+  raised:
+  - it carries your words
+  fingerprint_before: fbaa3ad5f94a
+  fingerprint_after: 7e3a4f60d9a0
+  before:
+    text: In a harness where the toolkit's hooks run, the installed skill shall tell the agent what each hook does.
+  after:
+    text: In a repository whose harness runs the toolkit's hooks, the repository's instruction file shall tell the agent what each hook does.
+  acks:
+    AGENT-49: the agent still learns what each hook does, now from the instruction file every harness reads, because one copy of the skill serves every harness.
+    AGENT-V8: rewritten in this batch to check the instruction file.
+- op: modify
+  id: AGENT-V8
+  at: 2026-10-18T08:52-07:00
+  reason: follows the change to AGENT-49.
+  before:
+    description: The skill installed for a harness without hooks says that none run, and that recording approvals, editing through the CLI and checking before reporting are the agent's job. The copy installed for Claude Code names each of its hooks and what it does. The skill itself leaves exactly one place for these notes.
+    tests:
+      python:
+      - tests/test_init.py::test_hermes_gets_the_cross_tool_skill_without_hooks
+      - tests/test_init.py::test_each_skill_copy_says_what_its_harness_hooks_do
+      - tests/test_skill.py::test_skill_leaves_one_slot_for_the_harness_notes
+  after:
+    description: For a harness without hooks, the instruction-file section says that none run and that recording approvals, editing through the CLI and checking before reporting are the agent's job. With Claude Code set up too, it also names each hook and what it does. The skill has no placeholders, so it's installed exactly as written.
+    tests:
+      python:
+      - tests/test_init.py::test_hermes_gets_the_one_copy_and_the_note_that_no_hooks_run
+      - tests/test_init.py::test_the_instructions_say_what_each_harness_hooks_do
+      - tests/test_skill.py::test_the_skill_is_installed_as_is
+- op: add
+  id: CLI-V12
+  at: 2026-10-18T08:52-07:00
+  reason: verifies CLI-21.
+  after:
+    verifies:
+    - CLI-21
+    method: test
+    technique: integration test
+    origin: agent
+    description: Setting up for Claude Code and Hermes writes one copy of the skill, in the cross-tool folder, and makes Claude Code's skill folder a link to it, replacing a separate copy an older setup made. Setup records the harnesses, and running it again with them changes nothing.
+    tests:
+      python:
+      - tests/test_init.py::test_one_copy_serves_every_harness
+      - tests/test_init.py::test_init_sets_up_an_empty_repository
+- op: modify
+  id: DR-38
+  at: 2026-10-18T08:52-07:00
+  reason: one copy of the skill per repository (CLI-21).
+  before:
+    decision: |-
+      The skill lives in the Python package, so installing the toolkit installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
+      - `spec init` copies it to where each harness looks for skills: .claude/skills/syseng for Claude Code, and .agents/skills/syseng, the cross-tool location that Hermes and Antigravity read. Hermes loads a repository's skills only after `hermes skills trust`.
+      - Each copy has the placeholder {{SPEC}} replaced by the toolkit's command, `spec`, and {{HARNESS_NOTES}} replaced by what that harness's hooks do, or by a note that none run.
+      - The skill itself names no harness, tool or package manager. Harness-specific parts live in adapters.
+    consequences: The installed copy is committed with the repository, so it can fall behind the toolkit. `spec init --check` reports the difference and `spec init` refreshes it. The rules page moved from docs/ into the skill.
+  after:
+    decision: |-
+      The skill lives in the Python package, so installing the toolkit installs it. It is SKILL.md plus four reference pages: writing requirements, auditing, onboarding, and the rules page the checker links to.
+      - `spec init` writes one copy, in .agents/skills/syseng, the cross-tool location Hermes and Antigravity read. For Claude Code, which reads only .claude/skills, .claude/skills/syseng is a link to that copy. Hermes loads a repository's skills only after `hermes skills trust`.
+      - The copy is the skill exactly as written: it has no placeholders and names no harness, tool or package manager.
+      - What each harness's hooks do goes in the instruction-file section, which every harness reads.
+    consequences: The installed copy is committed with the repository, so it can fall behind the toolkit; `spec init --check` reports the difference and `spec init` refreshes it. A checkout on a system without symlinks would see the link as a plain file, and Claude Code would miss the skill there. The rules page moved from docs/ into the skill.
+decisions: []
+friction: []
+closed: '2026-10-18'

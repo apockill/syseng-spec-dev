@@ -235,7 +235,7 @@
   source: |-
     "Those sessions are okay, as long as the agent knows about them and can tell me things like "please state Approve" and "LGTM" for the specific items. That way I know what to do and can be trained into it." (2026-10-17; "those sessions" are the Claude Code session hooks)
 - id: AGENT-49
-  text: In a harness where the toolkit's hooks run, the installed skill shall tell the agent what each hook does.
+  text: In a repository whose harness runs the toolkit's hooks, the repository's instruction file shall tell the agent what each hook does.
   traces_to: SYS-29
   origin: engineer
   source: |-

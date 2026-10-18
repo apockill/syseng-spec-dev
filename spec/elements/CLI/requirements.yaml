@@ -46,7 +46,7 @@
   traces_to: SYS-19
   why: this enforces CHANGE-5 at write time, while the reason is fresh.
 - id: CLI-9
-  text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists, the skill, and the hooks and subagents for each harness the engineer names.
+  text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists and the hooks for each harness the engineer names, and linking this machine's user-level folders to the toolkit's skill and subagents.
   traces_to: SYS-5
   origin: agent
   why: SYS-5 asks for one-step setup. The launcher gives agents one command that works on every machine (DR-39). The skill and the harness glue are what make an agent follow the method (DR-38, DR-40).
@@ -112,3 +112,8 @@
   traces_to: SYS-5
   origin: agent
   why: without the rules every check and edit waits for a click. Approving and resolving record the engineer's words, so the engineer sees and confirms each of those.
+- id: CLI-21
+  text: Setup shall install the skill and the subagents once per machine, as links to the installed toolkit, instead of copying them into repositories.
+  traces_to: SYS-5
+  origin: agent
+  why: copies drift apart and fall behind the toolkit. The engineer noticed two copies of the skill, asked how updates would reach their other repositories, and chose the user-level location.

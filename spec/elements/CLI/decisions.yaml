@@ -98,3 +98,20 @@
     - `.syseng/hook` stays in the repository, using only the standard library, so the guards keep working on a clone whose machine lacks the toolkit.
   alternatives: The two launchers (DR-39), which solved the same problem the standard tools solve, at the cost of a longer command, a file outside the repository and extra code. Installing into a project's virtual environment, which agents' shells often don't activate.
   consequences: Each machine needs the toolkit on its PATH, and the setup notice says how. One toolkit version serves every repository on a machine. A different program named `spec` earlier on the PATH would shadow the toolkit.
+- id: DR-53
+  title: The skill and subagents are installed once per machine, as links to the installed toolkit
+  decided_by: agent
+  elements:
+  - CLI
+  - AGENT
+  requirements: CLI-9, CLI-21, AGENT-42
+  recorded: round 17
+  context: With a copy of the skill in every repository, an update to the toolkit reached a repository only when someone ran setup there and committed the result, and a repository's copy could disagree with the `spec` installed on the machine. The engineer asked how updates would reach their other repositories, and chose the user-level location.
+  decision: |-
+    `spec init` links the user-level folders to the installed toolkit: ~/.claude/skills/syseng and the two subagents in ~/.claude/agents for Claude Code, and ~/.hermes/skills/syseng for Hermes when Hermes is set up on the machine.
+    - With an editable install, an edit to the toolkit reaches every repository at once. Otherwise, upgrading the toolkit does.
+    - A repository keeps its spec, the instruction-file section, and Claude Code's hook script and settings. Setup removes the copies earlier setups put in repositories.
+    - A skill or subagent of the engineer's own at those paths is left alone.
+    - Antigravity, with no user-level folder known, still gets a copy in the repository.
+  alternatives: A copy per repository, refreshed by setup and flagged when stale, which keeps each repository self-contained at the cost of a commit per update per repository. A Claude Code plugin, which DR-1 ruled out.
+  consequences: The skill an agent follows always matches the `spec` command it describes. A machine needs the toolkit installed and setup run once before its sessions get the skill. Claude Code's cloud sessions don't read user-level skills.

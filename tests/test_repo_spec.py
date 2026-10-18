@@ -16,7 +16,7 @@ def test_repository_spec_passes_its_own_checker():
 def test_repository_runs_the_current_skill_and_hooks():
     repo = REPO_SPEC.parent
     harnesses = init.installed_harnesses(repo)
-    stale = [s.path for s in init.run(repo, harnesses, check_only=True) if s.status == "differs"]
+    stale = [s.path for s in init.run(repo, harnesses, check_only=True, machine=False) if s.status == "differs"]
     assert harnesses and stale == [], f"run `bin/spec init` to refresh: {stale}"
 
 

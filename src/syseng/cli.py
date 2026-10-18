@@ -388,7 +388,7 @@ def cmd_init(args) -> int:
     print(f"spec init: {repo}")
     shown: dict[str, list[init.Step]] = {}
     for s in steps:  # a skill's files are reported as one line
-        home = next((h for h in init.SKILL_HOMES.values() if s.path.startswith(h + "/")), None)
+        home = init.SKILL_COPY if s.path.startswith(init.SKILL_COPY + "/") else None
         shown.setdefault(home + "/" if home else s.path, []).append(s)
     for path, group in shown.items():
         changed = [s for s in group if s.status not in ("unchanged", "kept")]
@@ -396,9 +396,7 @@ def cmd_init(args) -> int:
             else group[0].status
         note = group[0].note if len(group) == 1 else f"{len(group)} files"
         print(f"  {status:<9} {path}" + (f"  ({note})" if note else ""))
-    print("\nCommit the files it wrote.")
-    if "hermes" in harnesses:
-        print("Hermes loads a repository's skills only once you trust it: run `hermes skills trust` here.")
+    print("\nCommit the files it wrote in the repository. The links in your home folder are this machine's.")
     if steps[0].status == "created":
         print("Next, ask your agent to onboard the project. The syseng skill tells it how.")
     return 0

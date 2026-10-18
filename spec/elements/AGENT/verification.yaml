@@ -93,12 +93,12 @@
   method: test
   technique: integration test
   origin: agent
-  description: The skill installed for a harness without hooks says that none run, and that recording approvals, editing through the CLI and checking before reporting are the agent's job. The copy installed for Claude Code names each of its hooks and what it does. The skill itself leaves exactly one place for these notes.
+  description: For a harness without hooks, the instruction-file section says that none run and that recording approvals, editing through the CLI and checking before reporting are the agent's job. With Claude Code set up too, it also names each hook and what it does. The skill has no placeholders, so it's installed exactly as written.
   tests:
     python:
-    - tests/test_init.py::test_hermes_gets_the_cross_tool_skill_without_hooks
-    - tests/test_init.py::test_each_skill_copy_says_what_its_harness_hooks_do
-    - tests/test_skill.py::test_skill_leaves_one_slot_for_the_harness_notes
+    - tests/test_init.py::test_hermes_gets_its_link_and_the_note_that_no_hooks_run
+    - tests/test_init.py::test_the_instructions_say_what_each_harness_hooks_do
+    - tests/test_skill.py::test_the_skill_is_installed_as_is
 - id: AGENT-V9
   verifies:
   - AGENT-48

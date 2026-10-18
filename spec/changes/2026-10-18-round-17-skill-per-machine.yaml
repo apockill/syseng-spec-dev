@@ -1,0 +1,94 @@
+request: Install the skill and the subagents once per machine, as links in the user-level folders to the installed toolkit, instead of copying them into each repository
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-18'
+entries:
+- op: add
+  id: DR-53
+  at: 2026-10-18T09:07-07:00
+  reason: the engineer chose the user-level location in round 17.
+  after:
+    title: The skill and subagents are installed once per machine, as links to the installed toolkit
+    decided_by: agent
+    elements:
+    - CLI
+    - AGENT
+    requirements: CLI-9, CLI-21, AGENT-42
+    recorded: round 17
+    context: With a copy of the skill in every repository, an update to the toolkit reached a repository only when someone ran setup there and committed the result, and a repository's copy could disagree with the `spec` installed on the machine. The engineer asked how updates would reach their other repositories, and chose the user-level location.
+    decision: |-
+      `spec init` links the user-level folders to the installed toolkit: ~/.claude/skills/syseng and the two subagents in ~/.claude/agents for Claude Code, and ~/.hermes/skills/syseng for Hermes when Hermes is set up on the machine.
+      - With an editable install, an edit to the toolkit reaches every repository at once. Otherwise, upgrading the toolkit does.
+      - A repository keeps its spec, the instruction-file section, and Claude Code's hook script and settings. Setup removes the copies earlier setups put in repositories.
+      - A skill or subagent of the engineer's own at those paths is left alone.
+      - Antigravity, with no user-level folder known, still gets a copy in the repository.
+    alternatives: A copy per repository, refreshed by setup and flagged when stale, which keeps each repository self-contained at the cost of a commit per update per repository. A Claude Code plugin, which DR-1 ruled out.
+    consequences: The skill an agent follows always matches the `spec` command it describes. A machine needs the toolkit installed and setup run once before its sessions get the skill. Claude Code's cloud sessions don't read user-level skills.
+- op: modify
+  id: DR-38
+  at: 2026-10-18T09:07-07:00
+  reason: DR-53 installs the skill once per machine.
+  after:
+    status: superseded in round 17 by DR-53 on where the skill is installed. Its rules for the skill's content still hold.
+- op: modify
+  id: CLI-21
+  at: 2026-10-18T09:07-07:00
+  reason: DR-53.
+  before:
+    text: Setup shall keep one copy of the skill in a repository, whichever harnesses the repository uses.
+    why: copies drift apart and make a reviewer wonder which one is real. The engineer noticed two copies and asked whether the skill was duplicated.
+  after:
+    text: Setup shall install the skill and the subagents once per machine, as links to the installed toolkit, instead of copying them into repositories.
+    why: copies drift apart and fall behind the toolkit. The engineer noticed two copies of the skill, asked how updates would reach their other repositories, and chose the user-level location.
+- op: modify
+  id: CLI-9
+  at: 2026-10-18T09:07-07:00
+  reason: DR-53.
+  before:
+    text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists, the skill, and the hooks and subagents for each harness the engineer names.
+  after:
+    text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists and the hooks for each harness the engineer names, and linking this machine's user-level folders to the toolkit's skill and subagents.
+  acks:
+    CLI-V5: |-
+      still holds: setup writes the skeleton and hooks; the skill now comes from the user-level links, which CLI-V12 checks
+    DR-39: already superseded by DR-52; unaffected
+    DR-52: |-
+      unaffected: agents still run spec from the PATH
+- op: modify
+  id: CLI-V12
+  at: 2026-10-18T09:07-07:00
+  reason: DR-53.
+  before:
+    description: Setting up for Claude Code and Hermes writes one copy of the skill, in the cross-tool folder, and makes Claude Code's skill folder a link to it, replacing a separate copy an older setup made. Setup records the harnesses, and running it again with them changes nothing.
+    tests:
+      python:
+      - tests/test_init.py::test_one_copy_serves_every_harness
+      - tests/test_init.py::test_init_sets_up_an_empty_repository
+  after:
+    description: Setup links the machine's user-level skill and subagent folders to the installed toolkit and copies nothing into the repository. It removes the copies earlier setups put in a repository, keeps other skills there, and changes nothing when run again with the recorded harnesses. A skill of the engineer's own at the user-level path is left alone. Hermes gets its link only when Hermes is set up on the machine.
+    tests:
+      python:
+      - tests/test_init.py::test_init_sets_up_an_empty_repository
+      - tests/test_init.py::test_older_per_repository_installs_move_to_the_machine
+      - tests/test_init.py::test_skills_and_agents_of_your_own_are_left_alone
+      - tests/test_init.py::test_hermes_gets_its_link_and_the_note_that_no_hooks_run
+- op: modify
+  id: AGENT-V8
+  at: 2026-10-18T09:07-07:00
+  reason: a test was renamed in round 17.
+  before:
+    tests:
+      python:
+      - tests/test_init.py::test_hermes_gets_the_one_copy_and_the_note_that_no_hooks_run
+      - tests/test_init.py::test_the_instructions_say_what_each_harness_hooks_do
+      - tests/test_skill.py::test_the_skill_is_installed_as_is
+  after:
+    tests:
+      python:
+      - tests/test_init.py::test_hermes_gets_its_link_and_the_note_that_no_hooks_run
+      - tests/test_init.py::test_the_instructions_say_what_each_harness_hooks_do
+      - tests/test_skill.py::test_the_skill_is_installed_as_is
+decisions: []
+friction: []
+closed: '2026-10-18'

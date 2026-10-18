@@ -37,7 +37,8 @@ def test_a_host_repository_sees_no_toolkit_requirement_ids(spec, tmp_path, monke
     result = edit.run(root, {"edits": [{"modify": "CORE-1", "set": {"text": "The core shall stamp it."},
                                         "reason": "shorter"}]})
     seen += "\n".join(result.context)
-    for path in [*root.rglob("*.md"), *(root.parent / ".claude").rglob("*.md")]:
+    for path in [*root.rglob("*.md"), root.parent / "AGENTS.md", *init.SKILL.rglob("*.md"),
+                 *init.AGENT_DEFINITIONS.glob("*.md")]:
         seen += path.read_text()
     for sub in ("edit", "init", "approve", "propose", "status"):
         try:
