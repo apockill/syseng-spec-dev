@@ -2,7 +2,7 @@ request: |-
   Review page nits: clicking an item's text opens and highlights it too, the wording box keeps focus while typing, and Copy feedback copies at once; and apply the engineer's review 0547dce3ed
 mode: code-first
 target: python
-status: open
+status: closed
 opened: '2026-10-21'
 entries:
 - op: modify
@@ -105,3 +105,4 @@ entries:
 decisions: []
 friction: []
 feedback: []
+closed: '2026-10-21'
