@@ -129,6 +129,7 @@ class Diff:
     older: Version
     newer: Version
     items: list[ItemDiff]
+    inspected: dict | None = None  # what a caller measured on the older side while it was loaded (REVIEW-32)
 
     def counts(self) -> dict[str, int]:
         out = {c: 0 for c in CLASS_WORDS}
@@ -137,8 +138,16 @@ class Diff:
                 out[c] += 1
         return {c: n for c, n in out.items() if n}
 
+    def by_kind(self) -> dict[str, dict[str, int]]:
+        out: dict[str, dict[str, int]] = {}
+        for d in self.items:
+            for c in d.classes:
+                out.setdefault(d.kind, {}).setdefault(c, 0)
+                out[d.kind][c] += 1
+        return out
+
     def to_data(self) -> dict:
-        return {"older": asdict(self.older), "newer": asdict(self.newer), "counts": self.counts(),
+        return {"older": asdict(self.older), "newer": asdict(self.newer), "counts": self.counts(), "by_kind": self.by_kind(),
                 "items": [{k: v for k, v in asdict(d).items() if v not in (None, [], {})} for d in self.items]}
 
 
@@ -233,7 +242,7 @@ def _order(spec: Spec, d: ItemDiff):
     return (elements.index(d.element) if d.element in elements else -1, rank.get(d.kind, 9))
 
 
-def between(spec: Spec, older: str, newer: str | None = None) -> Diff:
+def between(spec: Spec, older: str, newer: str | None = None, inspect=None) -> Diff:
     """The differences from `older` (a revision or branch) to `newer` (a revision, or the working tree)."""
     repo = spec.repo_root()
     newer_v = resolve(repo, newer) if newer else Version("working tree", None)
@@ -241,7 +250,10 @@ def between(spec: Spec, older: str, newer: str | None = None) -> Diff:
     with tempfile.TemporaryDirectory() as tmp:
         old = load_at(spec.root, older_v.revision, Path(tmp) / "old")
         new = load_at(spec.root, newer_v.revision, Path(tmp) / "new") if newer_v.revision else spec
-        return compare(old, new, older_v, newer_v)
+        d = compare(old, new, older_v, newer_v)
+        if inspect is not None:
+            d.inspected = inspect(old)
+        return d
 
 
 def last_review(spec: Spec, person: str) -> dict | None:
@@ -252,12 +264,12 @@ def last_review(spec: Spec, person: str) -> dict | None:
     return max(reviews, key=lambda r: str(r.get("at", ""))) if reviews else None
 
 
-def since_review(spec: Spec, person: str) -> Diff:
+def since_review(spec: Spec, person: str, inspect=None) -> Diff:
     """What changed since the person's last review: from the revision the page was made from to the working tree."""
     r = last_review(spec, person)
     if r is None:
         raise DiffError(f"{person} hasn't sent back a review yet; compare against a revision instead, such as main")
-    d = between(spec, str(r["revision"]))
+    d = between(spec, str(r["revision"]), inspect=inspect)
     note = str(r.get("at", ""))
     if r.get("dirty"):  # the page showed uncommitted work: keep only what differs from what it showed (DR-59)
         shown = _shown(spec, r)

@@ -41,6 +41,7 @@ Derived and added items are yours to reshape. Explicit and stated items are a pe
 8. **Hand over the review page.** Run `spec review` (add `--against main` on a branch) and give the person the page's location. It shows, in order: the conflicts and decisions awaiting them, your responses to their last feedback, what changed since their last review, the intent you captured, the items most worth locking, the system as a graph, and the full spec.
 9. **Report** in a few lines, beside the page:
    - what changed;
+   - each measure the overview marks worse (`spec review --section overview`), such as verification coverage, with why, and what you'd do about it;
    - each conflict, with its options, the recommended one first;
    - each alteration to an item a person locked, stated or guided, which they keep on the page (or with `lock <ID>`) or ask you to roll back;
    - the items you propose for locking;

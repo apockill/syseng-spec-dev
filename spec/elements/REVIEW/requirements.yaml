@@ -277,3 +277,13 @@
     said: Wants each tab to be a list of things they can triage.
     basis: stated
     fingerprint: c9f91b54ced0
+- id: REVIEW-32
+  text: The review page shall open on an overview of the spec, giving the items added, changed and removed since the person's last review and each measure of the spec's health with its change since then, and marking each measure that got worse.
+  traces_to: SYS-45
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 16:20
+    context: Hearing that 128 requirements have no verification item, while deciding whether the toolkit is ready for another project.
+    said: Finds statistics like that really helpful. Wants the dashboard's landing page to open with a high-level overview, such as the numbers of changed, edited, new and deleted items, items without verification items, connections between things and tests written, presented cleanly without too much noise. Also wants measures of the project's health that degraded called out visually, for example when a change lowers verification coverage.
+    basis: stated
+    fingerprint: fe62d522f563

@@ -313,6 +313,7 @@
   function renderForYou() {
     const el = block("awaiting", "For you", "sparkles",
       "What the agent recommends you look at, then the decisions waiting for you, then its answers to your feedback. Each one shows as answered once you act on it; what you leave stays.");
+    renderOverview(el);
     // the agent's judgment leads (AGENT-51)
     const all = DATA.proposals.filter((p) => p.from !== "computed");
     const latest = all.length ? all[all.length - 1].change : null;
@@ -410,6 +411,49 @@
         h("div", { class: "reason" }, h("b", {}, "Answer: "), r.response ? linkify(r.response) : h("span", { class: "status warning" }, icon("alert", "sm"), "not answered yet"))));
     }
   }
+  // the overview the page opens on: what changed, the health measures, the intent mix (REVIEW-32, DR-69)
+  function renderOverview(el) {
+    const o = DATA.overview;
+    if (!o) return;
+    const fmt = (m, v) => (v === null || v === undefined ? "–" : (m.percent ? v.toFixed(1) + "%" : Number(v).toLocaleString()));
+    const signed = (m) => (m.delta > 0 ? "+" : "") + (m.percent ? m.delta.toFixed(1) + " pts" : m.delta.toLocaleString());
+    const box = h("div", { class: "overview" });
+    // what changed since the last review, by kind
+    const words = { added: "added", removed: "removed", meaning: "changed", reworded: "reworded", moved: "moved", intent: "intent only", details: "details only" };
+    const kinds = { need: "needs", system: "system requirements", constraint: "constraints", requirement: "requirements", vi: "verification items", decision: "decisions", element: "elements" };
+    const counts = Object.entries(o.changes || {});
+    box.append(h("div", { class: "since" }, h("span", { class: "small" }, `Since ${o.since || "the last commit"}`),
+      counts.length ? counts.map(([c, n]) => h("span", { class: "cls cls-" + c }, `${n} ${words[c] || c}`)) : h("span", { class: "small" }, "nothing changed"),
+      Object.keys(o.by_kind || {}).length ? h("span", { class: "small muted kinds" }, Object.entries(o.by_kind).map(([k, cs]) =>
+        `${kinds[k] || k}: ${Object.entries(cs).map(([c, n]) => `${n} ${words[c] || c}`).join(", ")}`).join(" · ")) : null));
+    // tiles: what got worse first, then the few that matter most (no more than six)
+    const tiles = o.measures.filter((m) => m.worse || m.tile).slice(0, 6);
+    box.append(h("div", { class: "tiles" }, tiles.map((m) => h("div", { class: "tile" + (m.worse ? " worse" : "") },
+      h("div", { class: "tile-label" }, m.label),
+      h("div", { class: "tile-value" }, fmt(m, m.now)),
+      h("div", { class: "tile-delta" }, m.delta === null ? h("span", { class: "muted" }, "no baseline")
+        : m.delta === 0 ? h("span", { class: "muted" }, "no change")
+        : m.worse ? h("span", { class: "status critical" }, icon("alert", "sm"), `${signed(m)} · worse`)
+        : m.improved ? h("span", { class: "status good" }, icon("check", "sm"), `${signed(m)} · better`)
+        : h("span", { class: "muted" }, signed(m)))))));
+    // the intent mix: how the needs and requirements split across the levels (one ordinal ramp)
+    const mix = o.now.mix, total = Object.values(mix).reduce((a, b) => a + b, 0) || 1;
+    const before = (o.was || {}).mix || {};
+    box.append(h("div", { class: "mix" }, h("div", { class: "small" }, "Intent mix of needs and requirements"),
+      h("div", { class: "mixbar", role: "img", "aria-label": LEVELS.map((l) => `${mix[l]} ${l}`).join(", ") },
+        LEVELS.filter((l) => mix[l]).map((l) => h("span", { class: `seg lv-${l}`, style: `flex:${mix[l]}`,
+          title: `${mix[l]} ${LEVEL_WORDS[l]} (${Math.round((100 * mix[l]) / total)}%)` }))),
+      h("div", { class: "legend" }, LEVELS.map((l) => h("span", { class: "lv" }, h("span", { class: `sw lv-${l} ${l}` }),
+        `${LEVEL_WORDS[l]} ${mix[l]}`, before[l] !== undefined && before[l] !== mix[l]
+          ? h("span", { class: "muted" }, ` (${mix[l] - before[l] > 0 ? "+" : ""}${mix[l] - before[l]})`) : null)))));
+    // every measure, as a table (the accessible view)
+    box.append(h("details", { class: "allmeasures" }, h("summary", { class: "small" }, `All measures, compared with ${o.against || "nothing"}`),
+      h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Measure"), h("th", {}, "Then"), h("th", {}, "Now"), h("th", {}, "Change"))),
+        h("tbody", {}, o.measures.map((m) => h("tr", { class: m.worse ? "worse" : "" }, h("td", {}, m.label), h("td", { class: "num" }, fmt(m, m.was)),
+          h("td", { class: "num" }, fmt(m, m.now)), h("td", { class: "num" }, m.delta ? signed(m) + (m.worse ? " worse" : m.improved ? " better" : "") : "–")))))));
+    el.append(box);
+  }
+
   // one involved or recommended item, with its own answers
   function subItem(id, opts, onchange) {
     const it = ITEMS[id];

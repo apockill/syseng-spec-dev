@@ -18,10 +18,10 @@ import hashlib
 import subprocess
 from pathlib import Path
 
-from syseng import changes, diff, levels, review
+from syseng import changes, diff, health, levels, review
 from syseng.model import Spec
 
-SECTIONS = ("awaiting", "responses", "changes", "captured", "proposals", "graph", "items")
+SECTIONS = ("overview", "awaiting", "responses", "changes", "captured", "proposals", "graph", "items")
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -139,17 +139,36 @@ def responses(spec: Spec, person: str) -> list[dict]:
 def change_sets(spec: Spec, person: str, against: list[str]) -> list[dict]:
     out = []
     try:
-        first = diff.since_review(spec, person)
+        first = diff.since_review(spec, person, inspect=health.metrics)
     except diff.DiffError:
         try:
-            first = diff.between(spec, "HEAD")
+            first = diff.between(spec, "HEAD", inspect=health.metrics)
             first.older.note = (first.older.note + "; " if first.older.note else "") + "no review sent back yet"
         except diff.DiffError:
             first = None
     for d in [first] + [_safe_between(spec, a) for a in against]:
         if d is not None:
-            out.append(d.to_data())
+            out.append({**d.to_data(), "measured": d.inspected})
     return out
+
+
+def overview(spec: Spec, person: str, sets: list[dict]) -> dict:
+    """The spec's numbers now and at the person's last review, with what changed between (REVIEW-32)."""
+    now = health.metrics(spec)
+    first = sets[0] if sets else None
+    was, source = None, None
+    last = diff.last_review(spec, person)
+    if last:  # what the person's last page showed, when this machine kept it
+        import json
+        snap = spec.repo_root() / ".syseng" / "reviews" / f"{last.get('review')}.json"
+        if snap.exists():
+            was = (json.loads(snap.read_text()).get("overview") or {}).get("now")
+            source = "what your last review page showed"
+    if was is None and first:
+        was, source = first.get("measured"), f"the spec at {first['older']['label']}"
+    return {"now": now, "was": was, "against": source, "measures": health.compare(now, was),
+            "changes": first["counts"] if first else {}, "by_kind": first.get("by_kind", {}) if first else {},
+            "since": first["older"]["label"] if first else None}
 
 
 def _safe_between(spec: Spec, label: str):
@@ -233,6 +252,7 @@ def build(spec: Spec, person: str, against: list[str] | None = None) -> dict:
                  "generated": now, "revision": revision, "dirty": dirty, "repository": repo.name,
                  "levels": list(levels.ORDER),
                  "applied": [r.get("review") for r in levels.reviews(spec) if r.get("by") == person]},
+        "overview": overview(spec, person, sets),
         "awaiting": awaiting(spec),
         "responses": responses(spec, person),
         "changes": sets,
@@ -254,7 +274,17 @@ def _label(data: dict, iid: str) -> str:
 
 def section_text(data: dict, name: str) -> str:
     lines: list[str] = []
-    if name == "awaiting":
+    if name == "overview":
+        o = data["overview"]
+        if o["since"]:
+            lines.append(f"since {o['since']}: " + (", ".join(f"{n} {diff.CLASS_WORDS.get(c, c)}" for c, n in o["changes"].items())
+                                                     or "no differences"))
+        for m in o["measures"]:
+            delta = "" if m["delta"] in (None, 0) else f" ({'+' if m['delta'] > 0 else ''}{m['delta']}{'%' if m['percent'] else ''})"
+            mark = " WORSE" if m["worse"] else " better" if m["improved"] else ""
+            lines.append(f"  {m['label']}: {m['now']}{'%' if m['percent'] else ''}{delta}{mark}")
+        lines.append("  intent mix: " + ", ".join(f"{n} {k}" for k, n in o["now"]["mix"].items()))
+    elif name == "awaiting":
         for d in data["awaiting"]["decisions"]:
             lines.append(f"{'CONFLICT ' if d.get('kind') == 'conflict' else ''}{d['change']} {d['id']}: {d['question']}")
             if d.get("involves"):

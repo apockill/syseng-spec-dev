@@ -1,0 +1,66 @@
+request: |-
+  Review page overview: open on the spec's numbers (items added, changed and removed since the last review, verification coverage, tests, links, levels of intent) and call out each measure that got worse
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-21'
+entries:
+- op: add
+  id: REVIEW-32
+  at: 2026-10-21T16:05-07:00
+  reason: the engineer's request.
+  requested: true
+  after:
+    text: The review page shall open on an overview of the spec, giving the items added, changed and removed since the person's last review and each measure of the spec's health with its change since then, and marking each measure that got worse.
+    traces_to: SYS-45
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 16:20
+      context: Hearing that 128 requirements have no verification item, while deciding whether the toolkit is ready for another project.
+      said: Finds statistics like that really helpful. Wants the dashboard's landing page to open with a high-level overview, such as the numbers of changed, edited, new and deleted items, items without verification items, connections between things and tests written, presented cleanly without too much noise. Also wants measures of the project's health that degraded called out visually, for example when a change lowers verification coverage.
+      basis: stated
+      fingerprint: fe62d522f563
+- op: add
+  id: DR-69
+  at: 2026-10-21T16:05-07:00
+  reason: records the overview's design.
+  after:
+    title: The overview leads For you with the changes since the last review, a few health measures and the intent mix
+    decided_by: agent
+    basis: derived
+    elements:
+    - REVIEW
+    requirements: REVIEW-32, SYS-47
+    recorded: round 28
+    context: The engineer asked for the spec's numbers up front, with degraded health called out, and without noise.
+    decision: |-
+      - The top of For you shows, against the person's last review: the items added, changed, removed and reworded, by kind; a row of stat tiles; and the intent mix, a bar of how the needs and requirements split across the five levels.
+      - The tiles show the measures that got worse first, marked in the critical color with an icon and the word worse, then a few that matter most whatever they did. Every measure, with its value then and now, is in a table under a toggle.
+      - The baseline is what the person's last page showed, from its local snapshot; without one, the spec at the revision that review was made from, or the last commit.
+      - The same numbers print for agents with .
+    alternatives: A separate overview tab, which the person would have to open. Every measure as a tile, which is the noise the engineer asked to avoid.
+    consequences: A change that lowers verification coverage, adds checker errors or leaves locks on earlier versions is the first thing the person sees.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 16:20
+      context: The same request.
+      said: Asked for the overview to be clean, without too much noise.
+      basis: guided
+      fingerprint: d0e6ae33bf34
+- op: add
+  id: REVIEW-V14
+  at: 2026-10-21T16:07-07:00
+  reason: verifies the overview.
+  after:
+    verifies:
+    - REVIEW-32
+    method: test
+    technique: unit test
+    description: The spec is measured (requirements, verification items, requirements without verification, coverage, linked tests, the intent mix and more); compared with an earlier measurement, each measure says whether it got better or worse, the worse ones first. The page's data and the overview section for agents carry the same numbers, and the page opens For you with the overview. Demonstrated in round 28 in a browser at desktop and phone widths.
+    tests:
+      python:
+      - tests/test_review_page.py::test_the_overview_measures_the_spec_and_marks_what_got_worse
+      - tests/test_review_page.py::test_the_page_opens_on_the_overview_and_agents_can_read_it
+decisions: []
+friction: []
+closed: '2026-10-21'

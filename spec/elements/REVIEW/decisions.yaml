@@ -66,3 +66,26 @@
     said: Suggested tabs, or the graph on the right, so that hovering over or clicking an item highlights it in the graph; and a side panel for opening an item without losing their place.
     basis: guided
     fingerprint: 86783872b2e5
+- id: DR-69
+  title: The overview leads For you with the changes since the last review, a few health measures and the intent mix
+  decided_by: agent
+  basis: derived
+  elements:
+  - REVIEW
+  requirements: REVIEW-32, SYS-47
+  recorded: round 28
+  context: The engineer asked for the spec's numbers up front, with degraded health called out, and without noise.
+  decision: |-
+    - The top of For you shows, against the person's last review: the items added, changed, removed and reworded, by kind; a row of stat tiles; and the intent mix, a bar of how the needs and requirements split across the five levels.
+    - The tiles show the measures that got worse first, marked in the critical color with an icon and the word worse, then a few that matter most whatever they did. Every measure, with its value then and now, is in a table under a toggle.
+    - The baseline is what the person's last page showed, from its local snapshot; without one, the spec at the revision that review was made from, or the last commit.
+    - The same numbers print for agents with .
+  alternatives: A separate overview tab, which the person would have to open. Every measure as a tile, which is the noise the engineer asked to avoid.
+  consequences: A change that lowers verification coverage, adds checker errors or leaves locks on earlier versions is the first thing the person sees.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 16:20
+    context: The same request.
+    said: Asked for the overview to be clean, without too much noise.
+    basis: guided
+    fingerprint: d0e6ae33bf34

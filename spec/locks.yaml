@@ -413,6 +413,15 @@
   text: |-
     Record chat locks from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
   note: kept an alteration
+- id: DR-62
+  fingerprint: 7592f405900b
+  locked_at: 2026-10-21T16:16-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: d8f8cc4091
+  text: |-
+    What a person says becomes intent without an approval step, and locks stay a person's own act: - When a person says what they want, in conversation or in a page comment, the agent adds an intent record to each item the words directly express: stated when the words alone say what the item requires, guided when the person's choice or constraint fixed it. When unsure, the lower level (AGENT-63). A restatement of an existing item is a stated intent record, not an approval. - The review page shows what was captured since the person's last review, to correct or remove. - A lock (the explicit level) is a person's own act: a page control, the terminal, or a lock line in chat, which the prompt hook still reads as a shortcut. - Records made mechanically, by the prompt hook or from a feedback block, hold no words: the person, the channel, the IDs and the fingerprints. - A feedback block names its reviewer, carries fingerprints, and reads on its own as review notes (SYS-53). The person pastes it to the agent, or posts it on a pull request as their review, and the agent applies it with the CLI (D2). The block, not the machine applying it, names who gave each lock; where the block was posted is the evidence of who wrote it.
 - id: DR-7
   fingerprint: 0a155d6d4c67
   locked_at: '2026-10-11'
@@ -1001,6 +1010,14 @@
   text: When a person says what they want, in conversation or in a comment on the review page, the toolkit shall record it as intent on the items it directly expresses, without an approval step.
   note: |-
     Recorded by the agent: the prompt hook couldn't run because the toolkit isn't on the PATH here.
+- id: SYS-49
+  fingerprint: 8c5b7e273353
+  locked_at: 2026-10-21T16:16-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: d8f8cc4091
+  text: When a request conflicts with an item at the explicit or stated level, the toolkit shall bring the conflict to a person with the conflicting items and options to resolve it, before building in spec-first mode and once built in code-first mode.
 - id: SYS-5
   fingerprint: 59043e2721cb
   locked_at: '2026-10-11'
@@ -1009,6 +1026,14 @@
   text: The toolkit shall set up a host repository for use in one step.
   migrated_from: 1e779de31649
   note: given via chat (round 5); approver not recorded; the migration filled in the person running it
+- id: SYS-50
+  fingerprint: ea6dc0e6b5bc
+  locked_at: 2026-10-21T16:16-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: d8f8cc4091
+  text: The spec shall trace each requirement on a system element to a requirement of that element's parent.
 - id: SYS-6
   fingerprint: dd3ce1d1acac
   locked_at: '2026-10-11'

@@ -253,3 +253,23 @@ def test_feedback_sent_again_is_not_recorded_twice(repo):
     again = feedback.apply(model.load(repo), feedback.parse(_block(repo, review="r2", items=[{"id": "CORE-1", "lock": True,
                                                                                          "comment": "Why stamp?"}])))
     assert again.locked == [] and again.to_answer == [] and "CORE-1 locked" in again.already
+
+
+# ---------------------------------------------------------------- round 28: the overview
+def test_the_overview_measures_the_spec_and_marks_what_got_worse(repo):
+    from syseng import health
+    now = health.metrics(model.load(repo))
+    assert (now["requirements"], now["vis"], now["unverified"], now["tests"]) == (2, 1, 1, 1)
+    assert now["coverage"] == 50.0 and sum(now["mix"].values()) == 3
+    measures = {m["key"]: m for m in health.compare(now, {**now, "unverified": 0, "coverage": 100.0, "tests": 0})}
+    assert measures["unverified"]["worse"] and measures["coverage"]["worse"] and measures["tests"]["improved"]
+    assert health.compare(now, {**now, "unverified": 0})[0]["key"] == "unverified"        # what got worse comes first
+
+
+def test_the_page_opens_on_the_overview_and_agents_can_read_it(repo, capsys):
+    data = pagedata.build(model.load(repo), ADA)
+    o = data["overview"]
+    assert list(data)[1] == "overview" and o["measures"] and o["now"]["mix"]
+    assert "renderOverview(el);" in JS and "· worse" in JS and "All measures" in JS     # REVIEW-32
+    assert cli.main(["--spec", str(repo), "review", "--section", "overview"]) == 0
+    assert "Verification coverage: 50.0%" in capsys.readouterr().out

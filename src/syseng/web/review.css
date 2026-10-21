@@ -195,6 +195,24 @@ select.cmp { background: var(--surface-1); border: 1px solid var(--border); bord
 .card.done > .item-head::after, .sub.done > .item-head::after { content: "answered"; margin-left: auto; font-size: 11px;
   color: var(--st-good); font-weight: 600; }
 .lv.stale { color: var(--st-warning); }
+.overview { border: 1px solid var(--border); border-radius: 14px; background: linear-gradient(180deg, var(--surface-3), var(--surface-2));
+  padding: 14px; margin: 6px 0 4px; display: grid; gap: 14px; }
+.since { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.since .kinds { flex-basis: 100%; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 10px; }
+.tile { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--surface-1); min-width: 0; }
+.tile.worse { border-color: color-mix(in srgb, var(--st-critical) 65%, transparent);
+  box-shadow: inset 3px 0 0 var(--st-critical); }
+.tile-label { font-size: 12px; color: var(--text-secondary); }
+.tile-value { font-size: 24px; font-weight: 600; line-height: 1.25; margin-top: 2px; }
+.tile-delta { font-size: 12px; margin-top: 2px; }
+.mixbar { display: flex; gap: 2px; height: 14px; border-radius: 4px; overflow: hidden; margin: 6px 0 8px; }
+.mixbar .seg { min-width: 3px; }
+.mix .legend { margin: 0; }
+.allmeasures table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 8px; }
+.allmeasures th, .allmeasures td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+.allmeasures td.num, .allmeasures th:not(:first-child) { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.allmeasures tr.worse td { color: var(--st-critical); }
 .subhead { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 22px 0 8px; color: var(--text-primary); }
 .why-agent { border-left: 2px solid var(--accent); padding-left: 10px; }
 details.counted { margin-top: 18px; }
@@ -276,6 +294,8 @@ dialog pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--
 
 @media (max-width: 520px) {
   #when { display: none; }
+  .tile { padding: 8px 10px; }
+  .tile-value { font-size: 20px; }
   .top-inner { padding: 8px 12px; gap: 8px; }
   .erow { grid-template-columns: 1fr; gap: 6px; }
   .brand .repo { display: none; }

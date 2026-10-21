@@ -147,3 +147,13 @@
     - tests/test_review_page.py::test_typing_a_wording_never_rebuilds_the_list_it_is_typed_in
     - tests/test_review_page.py::test_copy_feedback_copies_at_once
     - tests/test_review_page.py::test_feedback_sent_again_is_not_recorded_twice
+- id: REVIEW-V14
+  verifies:
+  - REVIEW-32
+  method: test
+  technique: unit test
+  description: The spec is measured (requirements, verification items, requirements without verification, coverage, linked tests, the intent mix and more); compared with an earlier measurement, each measure says whether it got better or worse, the worse ones first. The page's data and the overview section for agents carry the same numbers, and the page opens For you with the overview. Demonstrated in round 28 in a browser at desktop and phone widths.
+  tests:
+    python:
+    - tests/test_review_page.py::test_the_overview_measures_the_spec_and_marks_what_got_worse
+    - tests/test_review_page.py::test_the_page_opens_on_the_overview_and_agents_can_read_it
