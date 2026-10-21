@@ -126,7 +126,7 @@ def test_hermes_gets_its_link_and_the_note_that_no_hooks_run(repo, machine):
 def test_the_instructions_say_what_each_harness_hooks_do(repo, machine):
     init.run(repo, ["claude-code", "hermes"])
     text = (repo / "AGENTS.md").read_text()
-    for hook in ("Spec guard", "Done gate", "Approval reader"):
+    for hook in ("Spec guard", "Done gate", "Lock reader"):
         assert hook in text
     assert "In other harnesses no toolkit hooks run" in text
 

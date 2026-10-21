@@ -34,8 +34,10 @@ def test_check_exit_code_reflects_errors(spec):
     assert cli.main(["--spec", str(root), "check"]) == 1
 
 
-def test_todo_lists_unapproved_items(spec, capsys):
+def test_todo_lists_items_changed_since_a_person_gave_them(spec, capsys):
+    spec.files["approvals.yaml"] = [{"id": "CORE-1", "fingerprint": "000000000000", "by": "Ada",
+                                     "approved_at": "2026-10-21T10:00-07:00"}]
     root = spec.write()
     cli.main(["--spec", str(root), "check", "--todo"])
     out = capsys.readouterr().out
-    assert "todo[A003] CORE-1 is unreviewed" in out
+    assert "todo[A003] CORE-1 changed since Ada locked it" in out

@@ -2,7 +2,7 @@
 
 Layout (DR-28):
   spec/toolkit.yaml                      project settings: implementations, element order
-  spec/approvals.yaml                    the engineer's approvals, one per spec item
+  spec/locks.yaml                        each lock a person put on an item (approvals.yaml before spec_version 2)
   spec/retired.yaml                      IDs that were removed and may never be reused
   spec/questions.yaml                    open and resolved questions
   spec/elements/<ID>/element.yaml        a system element's definition
@@ -93,6 +93,16 @@ class Spec:
         listed = [e for e in (self.config.get("element_order") or []) if e in self.elements]
         return listed + sorted(e for e in self.elements if e not in listed)
 
+    @property
+    def version(self) -> int:
+        return int(self.config.get("spec_version") or 1)
+
+    def locks_path(self) -> Path:
+        """Where locks live: locks.yaml, or approvals.yaml in a spec not yet migrated (DR-61)."""
+        if not (self.root / "locks.yaml").exists() and (self.root / "approvals.yaml").exists():
+            return self.root / "approvals.yaml"
+        return self.root / "locks.yaml"
+
     def approval_for(self, item_id: str) -> dict | None:
         for a in self.approvals:
             if a.get("id") == item_id:
@@ -127,7 +137,8 @@ def find_spec_root(start: Path) -> Path | None:
 def load(root: Path) -> Spec:
     spec = Spec(root=root)
     spec.config = _read(spec, root / "toolkit.yaml") or {}
-    for name, attr in (("approvals.yaml", "approvals"), ("retired.yaml", "retired"), ("questions.yaml", "questions")):
+    locks = "locks.yaml" if (root / "locks.yaml").exists() else "approvals.yaml"
+    for name, attr in ((locks, "approvals"), ("retired.yaml", "retired"), ("questions.yaml", "questions")):
         path = root / name
         if path.exists():
             data = _read(spec, path)

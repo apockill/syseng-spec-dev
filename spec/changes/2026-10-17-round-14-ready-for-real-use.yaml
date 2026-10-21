@@ -10,10 +10,8 @@ entries:
   at: 2026-10-17T23:26-07:00
   reason: the engineer scoped this requirement for round 14.
   after:
-    quotes:
-    - said: 2026-10-17 23:07
-      words: while we don't need to be a test running framework, we probably should have some simple verifictation the tests exist. We could start simple, and add requirements later (like maybe even just verifying the file / test name exists is good enough to start with, everything else is 'to be decided/scoped' later)
-      context: Deciding what the toolkit needs before a first real project.
+    quotes: |-
+      [verbatim words removed when this spec moved to intent records]
 - op: add
   id: CHECK-V7
   at: 2026-10-17T23:26-07:00

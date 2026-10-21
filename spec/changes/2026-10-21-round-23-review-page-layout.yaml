@@ -1,0 +1,309 @@
+request: |-
+  Review page UI feedback: open items beside the reader instead of scrolling away, keep the graph in view and highlight whatever item the person points at, and answer each item in a decision on its own (keep, roll back, tweak wording) instead of one broad choice
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-21'
+entries:
+- op: modify
+  id: AGENT-51
+  at: 2026-10-21T15:08-07:00
+  reason: round 13 D1, resolved on the review page, with the engineer's comment (F1).
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 068ad274ff69
+  fingerprint_after: b1de32cabce7
+  requested: true
+  before:
+    text: The agent shall propose for locking each item that records a choice between alternatives, and each item that other items depend on.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-17 20:01
+      context: Discussing whether approval could pass down the requirement tree.
+      said: |-
+        Explained the idea: LLMs can fish for approval on key requirements, so people don't have to read every requirement. For example, business logic about what happens when a button is clicked is less interesting than a requirement two or three layers up the tree saying an interface lets the user do something.
+      basis: guided
+      fingerprint: 068ad274ff69
+  after:
+    text: The agent shall propose for locking each item whose consequences reach the engineer, judging from what it knows the engineer cares about.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-17 20:01
+      context: Discussing whether approval could pass down the requirement tree.
+      said: |-
+        Explained the idea: LLMs can fish for approval on key requirements, so people don't have to read every requirement. For example, business logic about what happens when a button is clicked is less interesting than a requirement two or three layers up the tree saying an interface lets the user do something.
+      basis: guided
+      fingerprint: 068ad274ff69
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:04
+      context: Answering round 13's open decision on which of an agent's decision records to propose, on the review page.
+      said: Chose to have an agent's items proposed only when their consequences reach them, such as what they see, lock or do; the rest stay recorded and the agent's to revise.
+      basis: stated
+      fingerprint: b1de32cabce7
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:04
+      context: Commenting on the same decision on the review page.
+      said: Also wants LLMs kept in the loop on what gets proposed. An LLM has context about what they care about, so a mechanical, code-based ranking of decisions will never be enough; meant as a clarification.
+      basis: stated
+      fingerprint: b1de32cabce7
+  acks:
+    AGENT-51: rewritten to the engineer's own choice and comment, recorded as stated intent
+    AGENT-V10: its skill check is updated with the skill's wording in this change
+- op: add
+  id: REVIEW-28
+  at: 2026-10-21T15:08-07:00
+  reason: the engineer's first review of the page.
+  requested: true
+  after:
+    text: When a person opens an item from anywhere on the review page, the page shall show the item beside what the person is reading, without moving their place.
+    traces_to: SYS-45
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Using the review page for the first time, after clicking Show in the spec on an item.
+      said: Wants Show in the spec to open the item in a new window or a side panel, not scroll all the way down so they lose their place.
+      basis: stated
+      fingerprint: cb3177c27bc4
+- op: add
+  id: REVIEW-29
+  at: 2026-10-21T15:08-07:00
+  reason: the engineer's first review of the page.
+  requested: true
+  after:
+    text: The review page shall keep the graph available beside every section, and highlight in it each item the person points at or selects.
+    traces_to: SYS-45
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Using the review page for the first time, which placed the graph near the bottom.
+      said: Found the graph too far down. Suggested tabs, or the graph on the right, so that whenever they interact with an item (naming DR-31, SYS-14, CHANGE-1 and NEED-10), whether by hovering or clicking, the graph highlights that spot.
+      basis: stated
+      fingerprint: d701cd236ab9
+- op: add
+  id: REVIEW-30
+  at: 2026-10-21T15:08-07:00
+  reason: the engineer's first review of the page.
+  requested: true
+  after:
+    text: The review page shall let a person answer each item a decision involves on its own, by keeping it, rolling it back or suggesting its wording, and leave the others unanswered.
+    traces_to: SYS-46
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Reading the conflict over ten rewritten items on the review page, whose only choices were keep all ten, keep some, or roll back all ten.
+      said: Wants to check and uncheck items one at a time. Keeping all as written is too broad, makes them read all of them at once, and makes commentary hard. Wants to read some, lock those, and move on when short of time, with the rest neither locked nor rejected; even better a checkmark, or a way to submit feedback with a text box to tweak the wording as they read.
+      basis: stated
+      fingerprint: 80cf81ba0cbb
+- op: add
+  id: DR-66
+  at: 2026-10-21T15:08-07:00
+  reason: records the layout.
+  after:
+    title: The review page has two panes, sections as tabs beside the system graph and the item in focus
+    decided_by: agent
+    elements:
+    - REVIEW
+    requirements: REVIEW-20, REVIEW-28, REVIEW-29, REVIEW-30
+    recorded: round 23
+    context: On a single long page, the graph sat below hundreds of changes, opening an item scrolled the reader away, and a decision about ten items could only be answered all at once.
+    decision: |-
+      - The sections become tabs, in REVIEW-20's order, opening on the first one with anything in it.
+      - On a wide screen, the right pane always holds the item in focus and, below it, the system graph. Pointing at an item anywhere highlights it in the graph; clicking it opens it in the pane. On a narrow screen the pane is a drawer that opens when an item is clicked.
+      - A decision lists each item it involves in full, each with its own answers (keep, or lock; roll back; suggest wording; comment), and counts how many are answered. The decision's own options stay for answering everything at once.
+      - A suggested wording goes back as feedback for the agent, which applies it as the person's stated intent.
+      - Items agents proposed for locking come first, apart from the mechanical list of what the most of the tree hangs from (AGENT-51).
+    alternatives: Keeping one long page and moving the graph up, which still loses the reader's place. A separate graph page, which loses the link between what's being read and where it sits.
+    consequences: Every section is one click away and the graph is always in sight. Answers given item by item can be sent at any time; what's left unanswered stays waiting.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Using the review page for the first time.
+      said: Suggested tabs, or the graph on the right, so that hovering over or clicking an item highlights it in the graph; and a side panel for opening an item without losing their place.
+      basis: guided
+      fingerprint: 86783872b2e5
+- op: modify
+  id: CHANGE-1
+  at: 2026-10-21T15:09-07:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the workflow in which the spec is settled before the code.
+      said: Described a workflow in which the engineer wants to know, before the code is written, how the specs will be built; they examine the diff and agree with an lgtm, and then the implementation is created.
+      basis: stated
+      fingerprint: f46076df6dc2
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the workflow in which the spec is settled before the code.
+      said: Described a workflow in which the engineer wants to know, before the code is written, how the specs will be built; they examine the diff and agree with an lgtm, and then the implementation is created.
+      basis: stated
+      fingerprint: f46076df6dc2
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:09
+      context: Reviewing an alteration on the review page (review d64ac586c7).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 9f0e1577674e
+- op: modify
+  id: AGENT-10
+  at: 2026-10-21T15:09-07:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Round 1, date approximate. Describing the spec-first workflow.
+      said: Described the next step as creating the implementation, checking off the requirements and verification items one by one.
+      basis: stated
+      fingerprint: 890efb3c6d90
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Round 1, date approximate. Describing the spec-first workflow.
+      said: Described the next step as creating the implementation, checking off the requirements and verification items one by one.
+      basis: stated
+      fingerprint: 890efb3c6d90
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:09
+      context: Reviewing an alteration on the review page (review d64ac586c7).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: a3797e3e6d03
+- op: modify
+  id: AGENT-11
+  at: 2026-10-21T15:09-07:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Round 1, date approximate. Describing how a spec-first change should be reported when it finishes.
+      said: Wants the agent to report at the end either that it is done and had to change a few things for them to review, or that it is done and everything could be made to spec.
+      basis: stated
+      fingerprint: d4d92cba6cf9
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Round 1, date approximate. Describing how a spec-first change should be reported when it finishes.
+      said: Wants the agent to report at the end either that it is done and had to change a few things for them to review, or that it is done and everything could be made to spec.
+      basis: stated
+      fingerprint: d4d92cba6cf9
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:09
+      context: Reviewing an alteration on the review page (review d64ac586c7).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 000e67c1acc6
+- op: modify
+  id: CLI-13
+  at: 2026-10-21T15:09-07:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-17 22:12
+      context: Commenting on SYS-40, which rules out a stored importance score, while approving it.
+      said: Said what better reflects their intent is that metrics that can represent importance, such as the last edit, the number of discussions, the kinds of approval and the number of context links, are surfaced to the agent in interfaces where they would be useful, with no classification or scoring of items as important or not important.
+      basis: guided
+      fingerprint: eaffddce674c
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-17 22:12
+      context: Commenting on SYS-40, which rules out a stored importance score, while approving it.
+      said: Said what better reflects their intent is that metrics that can represent importance, such as the last edit, the number of discussions, the kinds of approval and the number of context links, are surfaced to the agent in interfaces where they would be useful, with no classification or scoring of items as important or not important.
+      basis: guided
+      fingerprint: eaffddce674c
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:09
+      context: Reviewing an alteration on the review page (review d64ac586c7).
+      said: Kept the item as it now reads.
+      basis: guided
+      fingerprint: 86b0e5957927
+- op: add
+  id: REVIEW-V9
+  at: 2026-10-21T15:15-07:00
+  reason: verifies the two-pane layout (DR-66).
+  after:
+    verifies:
+    - REVIEW-28
+    - REVIEW-29
+    method: test
+    technique: unit test
+    description: Clicking an ID opens the item in the side pane and selects it in the graph; pointing at an ID or an item's card highlights it in the graph; nothing scrolls the reader's place; the page holds a pane for the item in focus and one for the graph. Demonstrated in round 23 in a browser at 1440 and 360 pixels wide, where the pane is a drawer.
+    tests:
+      python:
+      - tests/test_review_page.py::test_items_open_beside_the_reader_and_light_up_in_the_graph
+- op: add
+  id: REVIEW-V10
+  at: 2026-10-21T15:15-07:00
+  reason: verifies answering item by item.
+  after:
+    verifies:
+    - REVIEW-30
+    method: test
+    technique: unit test
+    description: A decision lists each item it involves with its own answers and a count of how many are answered; a suggested wording travels in the block and becomes a feedback item for the agent; choosing a conflict's option keeps the items it names, re-recording each at its earlier level, and turns the ones it rolls back into feedback items; an option can't name an item the decision doesn't involve.
+    tests:
+      python:
+      - tests/test_review_page.py::test_each_item_in_a_decision_is_answered_on_its_own
+      - tests/test_review_page.py::test_a_suggested_wording_goes_to_the_agent_as_feedback
+      - tests/test_review_page.py::test_choosing_a_conflict_option_keeps_and_rolls_back_the_items_it_names
+- op: add
+  id: DIFF-V3
+  at: 2026-10-21T15:15-07:00
+  reason: built in round 23; the first real review showed every item changed since the last commit.
+  after:
+    verifies:
+    - MODEL-39
+    - SYS-48
+    method: test
+    technique: unit test
+    description: After a review of a page made from uncommitted work, the comparison since that review lists only the items that changed after it, using the page's local snapshot, and says so.
+    tests:
+      python:
+      - tests/test_review_page.py::test_since_a_review_of_uncommitted_work_shows_only_what_changed_after_it
+- op: add
+  id: DR-67
+  at: 2026-10-21T15:15-07:00
+  reason: records the fix.
+  after:
+    title: A conflict's options name the items each keeps and rolls back, so a choice is applied as chosen
+    decided_by: agent
+    basis: derived
+    elements:
+    - CHANGE
+    - CLI
+    requirements: CHANGE-17, CHANGE-18, CLI-23, REVIEW-30
+    recorded: round 23
+    context: The engineer resolved round 20's conflict over ten items by choosing to keep all ten. The choice was recorded, but nothing said which items it kept, so none was re-recorded at its earlier level and five still showed as changed since locked.
+    decision: |-
+      - Each option of a conflict may list `keeps:` and `rolls_back:`, naming only items the decision involves.
+      - When a person chooses an option on the review page, the items it keeps are re-recorded at their earlier level in the person's name (a lock if they were locked, else a fresh intent record), and the ones it rolls back become feedback items for the agent.
+      - Round 20's D1, resolved before this existed, was finished the same way by hand, with a note on each lock naming the decision.
+    alternatives: Reading what an option does from its label, which breaks on the first unusual wording. Leaving keeps to the person item by item, which REVIEW-30 offers too but which makes a one-line answer impossible.
+    consequences: Agents fill in the lists when they raise a conflict (the skill says so). An option without them still resolves the decision, and its items stay waiting.
+decisions: []
+friction: []
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-21T15:07-07:00
+  review: d64ac586c7
+  decision: 2026-10-17-round-13-review-readability D1
+  kind: comment
+  comment: |
+    Only those whose consequences reach me, however, I also want to keep LLMs in the loop. An LLM has context about what I care about, and so a mechanical code based 'decision ranking system' will never be enough- I just want to clarify.
+  response: |-
+    Agreed, and recorded as your stated intent on AGENT-51, which now reads: the agent proposes for locking each item whose consequences reach you, judging from what it knows you care about. The skill tells agents the same, and that the counted list is no substitute for their judgment. On the review page, Worth locking now shows the agents' proposals first; the mechanical list of what the most of the tree hangs from sits apart, labeled as counted, not judged.
+  responded: 2026-10-21T15:15-07:00
+closed: '2026-10-21'

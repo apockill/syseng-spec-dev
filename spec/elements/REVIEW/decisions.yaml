@@ -8,6 +8,61 @@
   recorded: round 13
   context: In round 12's record the engineer had to search for each proposed item's full text and scroll back. They read change records as raw Markdown in the editor, where links show no preview on hover.
   decision: |-
-    Wherever the change record asks the engineer to approve or answer for an item, it repeats what's needed to judge it right there: the full text, what it sits under, its rationale and the engineer's words; for a decision record, its reasoning and the full text of the requirements it decides. The other IDs the shown text mentions are listed with their titles.
+    Wherever the change record asks the engineer to lock or answer for an item, it repeats what's needed to judge it right there: the full text, what it sits under, its rationale and the engineer's words; for a decision record, its reasoning and the full text of the requirements it decides. The other IDs the shown text mentions are listed with their titles.
   alternatives: Linking each ID to its item with the text on hover, which only works in a Markdown preview. A glossary at the end of the record, which still means scrolling.
   consequences: Change records get longer, and the same text can appear in two sections. Each review section can be read on its own.
+  basis: derived
+  status: superseded in round 20 by DR-65. Change records are YAML only, read with `spec change show --full`, and from Phase 4 on the review page (DR-60).
+- id: DR-60
+  title: One self-contained review page replaces the Markdown views, and feedback comes back as a pasted block
+  decided_by: engineer
+  elements:
+  - REVIEW
+  - CLI
+  - CHANGE
+  - CHECK
+  requirements: SYS-45, SYS-46, REVIEW-20, REVIEW-21, REVIEW-22, REVIEW-23, REVIEW-25, CLI-23, CLI-25, AGENT-62, CHANGE-19, CHECK-23
+  recorded: round 18
+  context: The engineer reviewed the spec in generated Markdown and change records, and wants a more powerful dashboard that can be iterated on, with the Markdown removed.
+  decision: |-
+    - One command writes a single HTML file, ignored by version control, with its data embedded and its scripts included. It loads nothing from the network.
+    - Its sections follow REVIEW-20. The graph lays out the element tree with requirements nested inside, colored by level of intent.
+    - Its controls lock, comment, request a change, keep or roll back an alteration, and choose an option in a decision. Unsent feedback stays in the browser.
+    - Copying the feedback produces a block of text carrying the review's ID and the fingerprint of each item acted on. Pasted into the conversation, it's applied by the CLI, which records locks and choices mechanically, refuses stale ones, and records comments in the open change for the agent to answer. A block with nothing in it means reviewed, with nothing to add.
+    - The requirements, decisions and change-record Markdown files are no longer generated.
+  alternatives: A local server that receives feedback directly, which removes the paste step but needs a running process; it stays open as a later option. Keeping the Markdown alongside, which doubles what has to be maintained.
+  consequences: Apart from the YAML, nothing in the repository reads well on a code host without running the toolkit. DR-28's generated views are superseded. The chat lock lines the prompt hook reads stay as a shortcut.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: |-
+      Round 18: discussing how the engineer reviews the spec, in generated Markdown views and change records, while setting out the review journey the toolkit should support.
+    said: Wants the Markdown views removed in favor of a more powerful dashboard that can be iterated on. Suggested that a static page could offer a button that copies the feedback for the person to paste back to the agent.
+    basis: guided
+    fingerprint: fcf55fd9e7db
+  status: built in round 22. The Markdown views are removed by `spec render`, which now writes the page.
+- id: DR-66
+  title: The review page has two panes, sections as tabs beside the system graph and the item in focus
+  decided_by: agent
+  elements:
+  - REVIEW
+  requirements: REVIEW-20, REVIEW-28, REVIEW-29, REVIEW-30
+  recorded: round 23
+  context: On a single long page, the graph sat below hundreds of changes, opening an item scrolled the reader away, and a decision about ten items could only be answered all at once.
+  decision: |-
+    - The sections become tabs, in REVIEW-20's order, opening on the first one with anything in it.
+    - On a wide screen, the right pane always holds the item in focus and, below it, the system graph. Pointing at an item anywhere highlights it in the graph; clicking it opens it in the pane. On a narrow screen the pane is a drawer that opens when an item is clicked.
+    - A decision lists each item it involves in full, each with its own answers (keep, or lock; roll back; suggest wording; comment), and counts how many are answered. The decision's own options stay for answering everything at once.
+    - A suggested wording goes back as feedback for the agent, which applies it as the person's stated intent.
+    - Items agents proposed for locking come first, apart from the mechanical list of what the most of the tree hangs from (AGENT-51).
+  alternatives: Keeping one long page and moving the graph up, which still loses the reader's place. A separate graph page, which loses the link between what's being read and where it sits.
+  consequences: |-
+    Every section is one click away and the graph is always in sight. Answers given item by item can be sent at any time; what's left unanswered stays waiting.
+    - Round 24: the first tab, For you, holds what awaits the person and then the agents' recommendations, so the high-signal part of the page is one place. The item in focus takes most of the pane by default, and a handle between it and the graph sets the split, remembered in the browser.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 14:06
+    context: Using the review page for the first time.
+    said: Suggested tabs, or the graph on the right, so that hovering over or clicking an item highlights it in the graph; and a side panel for opening an item without losing their place.
+    basis: guided
+    fingerprint: 86783872b2e5

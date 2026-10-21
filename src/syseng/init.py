@@ -42,8 +42,8 @@ OLD_AGENTS = (".claude/agents/spec-auditor.md", ".claude/agents/spec-reasoning-c
 CLAUDE_NOTES = ADAPTERS / "claude_code" / "instructions.md"
 GENERIC_NOTES = ADAPTERS / "generic" / "instructions.md"
 HOOK_MARK = ".syseng/hook"
-# Toolkit commands agents may run without asking (CLI-20). `approve` and `resolve` record the engineer's
-# words, so they stay with the harness's permission prompt: the engineer sees and confirms each one.
+# Toolkit commands agents may run without asking (CLI-20). `lock` and `resolve` record a person's locks and
+# decisions, and `migrate` rewrites records, so they stay with the harness's permission prompt.
 _EVERYDAY = ("status", "check", "show", "render", "edit", "change", "decide", "propose", "friction")
 ALLOWED = [f"Bash(spec {cmd} *)" for cmd in _EVERYDAY]
 _OURS = set(ALLOWED) | {f"Bash(.syseng/spec {cmd} *)" for cmd in _EVERYDAY}  # this and earlier setups' rules
@@ -259,14 +259,15 @@ def _skeleton(repo: Path) -> Step:
         return Step("kept", "spec/", "already set up")
     language, how = _guess_language(repo)
     yamlio.write(root / "toolkit.yaml", {
-        "spec_version": 1,
+        "spec_version": 2,  # intent records and locks from the start (DR-63)
         "implementations": [{"name": language, "language": language, "root": ".", "primary": True}],
-        "element_order": ["SYS"]})
+        "element_order": ["SYS"],
+        "flow_down": "enforced"})  # requirements flow down the system breakdown from the start (DR-58)
     yamlio.write(root / "elements" / "SYS" / "element.yaml", {
         "id": "SYS", "title": repo.name, "parent": None, "depends_on": [], "purpose": "The whole system."})
     for name in ("needs.yaml", "requirements.yaml"):
         yamlio.write(root / "elements" / "SYS" / name, [])
-    for name in ("approvals.yaml", "retired.yaml"):
+    for name in ("locks.yaml", "retired.yaml"):
         yamlio.write(root / name, [])
     return Step("created", "spec/", f"root system element SYS; implementation {language!r}, {how}")
 

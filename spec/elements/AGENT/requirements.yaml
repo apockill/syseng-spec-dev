@@ -1,305 +1,541 @@
 - id: AGENT-1
   text: In code-first mode, the skill shall let the main agent edit code without first reading the spec.
-  origin: engineer
   traces_to: SYS-17
-  source: |-
-    "it spends time looking at code, and WHEN IT ADDS VALUE also reading the current REQs and V&V, but otherwise … it probably doesn't need to"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 1, date approximate. Describing how they want an agent to work on a change in code-first mode.
+    said: Described the agent spending its time looking at the code, and also reading the current requirements and verification items when that adds value; otherwise it probably doesn't need to.
+    basis: stated
+    fingerprint: dc06a62d42ad
 - id: AGENT-2
   text: The skill shall direct the main agent to update the requirements and verification items a change affects, as part of that change.
-  origin: engineer
   traces_to: SYS-7
-  source: |-
-    "It makes all the changes and tries its best to update V&V along the way."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 1, date approximate. Describing how they want an agent to carry out a change in code-first mode.
+    said: Described the agent making all the changes and trying its best to update the verification and validation items along the way.
+    basis: stated
+    fingerprint: 133b7616a159
 - id: AGENT-3
   text: The main agent shall report a change as done only after the checker reports no findings for it.
-  origin: engineer
   traces_to: SYS-7
-  source: |-
-    "At the end, it runs the linter and is told 'hey XYZ tests have been added and are not associated with VERs …'"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 1, date approximate. Describing the end of a code-first change.
+    said: Described the agent running the linter at the end and being told, for example, that some tests were added without being associated with verification items.
+    basis: guided
+    fingerprint: e06b8b4cbded
 - id: AGENT-4
   text: Skeptical auditor subagents shall review each change's spec updates before the engineer reviews the change.
-  origin: engineer
   traces_to: SYS-11
-  source: |-
-    "have skeptical subagents run audits too, to ensure everything is up to date. Then I go in, read the specs" · Q3: "Before review sounds fine."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 1, date approximate. Describing how a code-first change gets checked before they review it.
+    said: Wants skeptical subagents to run audits too, to make sure everything is up to date; then they go in and read the specs.
+    basis: stated
+    fingerprint: 6e191be58976
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Answering Q3, which asked whether the auditors should run before or after the engineer's review.
+    said: Agreed that running the audits before their review is fine.
+    basis: guided
+    fingerprint: 6e191be58976
 - id: AGENT-7
   text: When the engineer asks why a requirement changed or disappeared, the agent shall answer with the reason recorded for that change.
-  origin: engineer
   traces_to: SYS-19
-  source: |-
-    "say 'hey why does this component no longer have a requirement to do x or y' and the agent is able to explain"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 1, date approximate. Describing how they want to ask about the history of the spec.
+    said: Wants to be able to ask why a component no longer has a requirement to do something, and have the agent able to explain.
+    basis: stated
+    fingerprint: c3e5c0dcc1d1
 - id: AGENT-8
   text: When the engineer asks for stronger verification of a requirement, the agent shall add verification items for it.
-  origin: engineer
   traces_to: SYS-24
-  source: |-
-    "I want more robust test coverage on this important invariant"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 1, date approximate. Giving an example of what they might ask an agent for.
+    said: Gave as an example asking for more robust test coverage on an important invariant.
+    basis: guided
+    fingerprint: 7cf6cfb0430c
 - id: AGENT-9
   text: When the engineer accepts a flagged failure, the agent shall update that verification item's expected result to the accepted behavior.
-  origin: engineer
   traces_to: SYS-10
-  source: |-
-    "If the user says lgtm, then the doc expectations must be updated."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 1, date approximate. Describing what happens after an agent flags a verification failure to them.
+    said: Said that if they answer lgtm, the documented expectations must be updated.
+    basis: stated
+    fingerprint: 4540aa29c8f1
 - id: AGENT-10
-  text: In spec-first mode, the agent shall implement the approved spec by working through the to-do list for the target implementation.
-  origin: engineer
+  text: In spec-first mode, the agent shall implement the spec as agreed before building by working through the to-do list for the target implementation.
   traces_to: SYS-17
-  source: |-
-    "then the implementation is created, the REQs and VIs checked off one by one"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 1, date approximate. Describing the spec-first workflow.
+    said: Described the next step as creating the implementation, checking off the requirements and verification items one by one.
+    basis: stated
+    fingerprint: 890efb3c6d90
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:09
+    context: Reviewing an alteration on the review page (review d64ac586c7).
+    said: Kept the item as it now reads.
+    basis: stated
+    fingerprint: a3797e3e6d03
 - id: AGENT-11
-  text: When a spec-first change is complete, the agent shall list each difference between the approved spec and the final spec, or state that there are none.
-  origin: engineer
+  text: When a spec-first change is complete, the agent shall list each difference between the spec as agreed before building and the final spec, or state that there are none.
   traces_to: SYS-17
-  source: |-
-    "'done, and I had to change a few things for you to review' or 'done, and everything was able to be made to spec'"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 1, date approximate. Describing how a spec-first change should be reported when it finishes.
+    said: Wants the agent to report at the end either that it is done and had to change a few things for them to review, or that it is done and everything could be made to spec.
+    basis: stated
+    fingerprint: d4d92cba6cf9
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:09
+    context: Reviewing an alteration on the review page (review d64ac586c7).
+    said: Kept the item as it now reads.
+    basis: stated
+    fingerprint: 000e67c1acc6
 - id: AGENT-18
   text: In spec-first mode, when a contradiction is one the engineer would likely want to decide before more work is done, the agent shall stop and ask before continuing.
-  origin: engineer
   traces_to: SYS-16
-  source: |-
-    "Only in cases where the user is trying to plan a change should we have things that halt the flow and come back and ask the user what to do." See DR-15.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Clarifying their answer to Q4, which asked whether an agent should stop and ask when a request contradicts the spec.
+    said: Said that only when the person is planning a change should anything halt the flow and come back to ask them what to do.
+    basis: guided
+    fingerprint: 5d84028adee5
 - id: AGENT-19
   text: When accepting a flagged failure requires changing a requirement, the agent shall change it and add an open decision listing the alternatives.
-  origin: engineer
   traces_to: SYS-16
-  source: |-
-    "I think yes, and with a flag to the user for these cases- like, 'hey, because of X or Y we needed to change the REQ. The alternatives are A B or C'"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 2, date approximate. Answering Q6, which asked what to do when accepting a flagged failure means contradicting a requirement.
+    said: Thinks yes, the requirement changes, with a flag to them in these cases saying that it had to change because of some reason, and listing the alternatives.
+    basis: stated
+    fingerprint: efc79480c88a
 - id: AGENT-21
   text: |-
-    Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, an explicit approval in chat, or a restatement in chat of what an item already says.
-  origin: engineer
+    Only the engineer's own actions shall create locks: the review page, the engineer's terminal, or an explicit lock in chat.
   traces_to: SYS-14
-  source: |-
-    "Yeah I think LGTM in chat is fine, with the caveat that there can be no ambiguity to what I mean"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Answering Q13, which asked whether they could approve items from chat.
+    said: Thinks an LGTM in chat is fine, with the caveat that there can be no ambiguity about what they mean.
+    basis: guided
+    fingerprint: a45494765007
 - id: AGENT-22
   text: During a full run, agents shall attempt to fix each failure, by changing code, requirements or verification items.
-  origin: engineer
   traces_to: SYS-13
-  source: |-
-    "come back with maybe some code changed, some reworded reqs, some updated / new VIs". Their changes stay unapproved until you approve them.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 2, date approximate. Answering Q9, about what makes a check expensive and when full runs happen, and describing what an unattended full run should come back with.
+    said: Expects a full run to come back with maybe some code changed, some reworded requirements, and some updated or new verification items.
+    basis: guided
+    fingerprint: bf46a4691938
 - id: AGENT-24
   text: The agent shall write a decision record for each decision made while building, attached to each system element the decision affects and linked to its sources.
-  origin: engineer
   traces_to: SYS-19
-  source: |-
-    "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time." · "if I'm designing and debating with an agent, and an Artifact is made with some visualizations, and I say 'yeah that looks cool lets do that' … I'd like the agent to persist that"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 2, date approximate. A note on persisting the context behind decisions.
+    said: When they design and debate with an agent, an Artifact with some visualizations gets made, and they agree to go ahead with it, they would like the agent to persist that; the schema should have a way to link to such context.
+    basis: guided
+    fingerprint: 61cfd309c138
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Answering Q14, which asked whether to archive the transcripts of conversations that change the spec.
+    said: Said these are more like architecture decision records, attached to components to show historical reasoning and changes over time.
+    basis: guided
+    fingerprint: 61cfd309c138
 - id: AGENT-25
-  text: Before modifying or removing an approved requirement, the agent shall read its rationale and linked context.
-  origin: engineer
+  text: Before modifying or removing a locked requirement, the agent shall read its rationale and linked context.
   traces_to: SYS-19
-  source: |-
-    "an implementing agent might say 'hmm, can I change this REQ? Let me read up on why they made it the way they made it...'"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 2, date approximate. A note on persisting the context behind decisions.
+    said: Imagined an implementing agent wondering whether it can change a requirement, and first reading up on why it was made the way it was.
+    basis: guided
+    fingerprint: 113e139c47a6
 - id: AGENT-29
   text: When the engineer asks for a quick change, the agent shall tell the engineer as soon as the change is usable, before finishing its tests and spec updates.
-  origin: engineer
   traces_to: SYS-18
-  source: |-
-    "sometimes I just want an agent to make a damn change quick, so I can run my binary and play with it while other changes get done"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Answering Q11, which asked where a full run should put its changes.
+    said: Sometimes just wants an agent to make a change quickly, so they can run the binary and play with it while other changes get done.
+    basis: guided
+    fingerprint: 08eeefef4bcc
 - id: AGENT-30
   text: The agent shall run every cheap-tier item before reporting a change as done.
-  origin: engineer
   traces_to: SYS-7
-  source: |-
-    "I fully expect the agent to run all unit tests after changes anyways- its a single command."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Answering Q2, about when expensive and cheap checks run.
+    said: Fully expects the agent to run all unit tests after changes anyway, since it is a single command.
+    basis: guided
+    fingerprint: 767a9e18c1f3
 - id: AGENT-32
   text: The skills shall leave the choice of where agents make changes (working tree, branch or worktree) to the engineer and the agent harness.
-  origin: engineer
   traces_to: SYS-29
-  source: |-
-    "Let's not encode this in the skill. Agent harnesses are getting better and better, I don't want to be overly prescriptive."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Answering Q11, which asked where a full run should put its changes.
+    said: |-
+      Doesn't want this encoded in the skill: agent harnesses keep getting better, and they don't want to be overly prescriptive.
+    basis: stated
+    fingerprint: 7b12e6e39000
 - id: AGENT-33
-  text: A chat message shall count as an explicit approval only when it states unambiguously which items it approves.
-  origin: engineer
+  text: A chat message shall count as an explicit lock only when it states unambiguously which items it locks.
   traces_to: SYS-14
-  source: |-
-    "agents say 1000 things in one chat, if I say lgtm I might mean 'yeah sure' to some of them, not 'yes, and also approve every req'"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Answering Q13, which asked whether they could approve items from chat.
+    said: Pointed out that agents say many things in one chat, so an lgtm from them might mean yes to some of those things, not approval of every requirement.
+    basis: guided
+    fingerprint: f743d9460eb3
 - id: AGENT-35
   text: A decision record shall present the engineer's reasoning as paraphrase, never as a direct quote.
-  origin: engineer
   traces_to: SYS-19
-  source: |-
-    "Don't directly quote, maybe clean it up a bit. Be careful not to imply its a direct quote."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Answering Q14, about how decisions made in conversation are kept.
+    said: Asked that their words not be quoted directly but cleaned up a little, taking care not to imply that a paraphrase is a direct quote.
+    basis: stated
+    fingerprint: 1ca674b651bd
 - id: AGENT-36
   text: The agent shall turn the engineer's conversational statements of intent into needs, requirements and verification items.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    Q8: "as long as it can be easily done conversationally- the idea being I state what I want and some reasoning why, and the agent converts that to needs/reqs/vis/etc."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 4, date approximate. Answering Q8, which asked who writes the needs.
+    said: |-
+      Fine as long as it can be done easily in conversation: they state what they want and some reasoning why, and the agent converts that into needs, requirements, verification items and so on.
+    basis: stated
+    fingerprint: 1532d205d02a
 - id: AGENT-37
   text: The agent shall base each need only on what the engineer has stated.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    Q8: "That sounds good" (my lean was that agents may draft needs only from your words) · "Of course I will have to approve the needs down the line."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 4, date approximate. Answering Q8, which asked who writes the needs; the agent leaned toward agents drafting needs only from the engineer's words.
+    said: Agreed that agents may draft needs only from their words.
+    basis: guided
+    fingerprint: 300841cb0e3d
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 4, date approximate. Answering Q8, which asked who writes the needs.
+    said: Added that of course they will have to approve the needs later on.
+    basis: guided
+    fingerprint: 300841cb0e3d
 - id: AGENT-40
   text: Whenever the toolkit acts on an importance judgment, it shall state the judgment's reasons.
-  origin: engineer
   traces_to: SYS-26
-  source: |-
-    on a ranked list in which "each item says why it ranks where it does": "This was really helpful."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 8, date approximate. Reacting to a ranked list in which each item said why it ranked where it did.
+    said: Found the list with its reasons really helpful.
+    basis: guided
+    fingerprint: 2f0e09c5443c
 - id: AGENT-41
   text: The skill shall direct agents to use their harness's own features, such as question menus, wherever those let the engineer answer or review in fewer steps.
-  origin: engineer
   traces_to: SYS-29
-  source: |-
-    "try to use the harness you're running in to make the UX good for the user. If asking questions, consider using the harness to ask the question in a menu, whatever. Use the tools available to achieve the goal."
   reworded: |-
     round 9: "easier" became "in fewer steps", because "easier" is vague (INCOSE R7).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 8, date approximate. Giving directions on how the skill should work.
+    said: Wants the agent to use the harness it runs in to make the experience good for the person, for example asking questions in a menu, and in general to use the tools available to achieve the goal.
+    basis: stated
+    fingerprint: 954364bd196e
 - id: AGENT-42
   text: The skill's instructions shall work in every agent harness that can start subagents.
-  origin: engineer
   traces_to: SYS-27
-  source: |-
-    "The language of the skill can be generic enough to work for antigravity / claude code / maybe codex (?) or other things in the future."
   reworded: |-
     round 9: "any" became "every" (INCOSE R32).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 5 to 8, date approximate. Discussing which agent harnesses the skill should work in.
+    said: Said the skill's language can be generic enough to work for Antigravity, Claude Code, maybe Codex, or other harnesses in the future.
+    basis: guided
+    fingerprint: f00c1813dded
 - id: AGENT-44
   text: Whenever an agent mentions a spec item to the engineer, it shall give the item's title with its ID, linked to the item where the medium allows.
-  origin: engineer
   traces_to: SYS-30
-  source: |-
-    "If you must use IDs, then they should link to a LOC or the spec … Or just use the title, or say DR-8 (some description) etc."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 8, date approximate. Discussing how agents refer to spec items in messages.
+    said: If IDs must be used, they should link to a location or to the spec; or agents can just use the title, or give the ID with a short description.
+    basis: guided
+    fingerprint: 7fe7a8f199b1
 - id: AGENT-45
   text: The skill shall invite agents to change the skill whenever they find friction in it or a new way the engineer uses it.
-  origin: engineer
   traces_to: SYS-31
-  source: |-
-    "Agents should be encouraged to modify this skill if the UX can be improved, or if the user is trying to use them in a new way. So keep the option open in the wording."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 9, date approximate. A direction added while slice 1 was being built.
+    said: Wants agents encouraged to modify the skill if the experience can be improved, or if the person is using it in a new way, and the wording to keep that option open.
+    basis: stated
+    fingerprint: 12c8c954af5c
 - id: AGENT-46
   text: When an agent works around friction in the toolkit, the agent shall report the workaround to the engineer with a proposed improvement.
-  origin: engineer
   traces_to: SYS-31
-  source: |-
-    "Agents need to be comfortable bringing those issues up too."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 9, date approximate. A direction added while slice 1 was being built, about friction agents meet in the toolkit.
+    said: Said agents need to be comfortable bringing those issues up too.
+    basis: guided
+    fingerprint: 42713d18db16
 - id: AGENT-12
   text: When the main agent tries to finish, the toolkit shall run the checker and return each finding to the agent.
-  origin: agent
   traces_to: SYS-7
   why: keeps AGENT-3 true even when the agent forgets or doesn't have the skill loaded. In Claude Code this is DR-4. In a harness without that hook, it's an instruction.
   reworded: |-
     round 9: "any findings" became "each finding" (INCOSE R32).
+  basis: derived
 - id: AGENT-13
   text: Each auditor shall be a fresh-context subagent that did not author the change it audits.
-  origin: agent
   traces_to: SYS-11
-  refines: |-
-    "it's important that the system engineers who make the requirements are not also the same ones that make the verification items"
   why: see DR-17. In code-first mode one agent writes the code, tests and spec, so independence has to come from review.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 2, date approximate. Discussing who writes the requirements and who writes the verification items.
+    said: Said it is important that the system engineers who write the requirements are not the same ones who write the verification items.
+    basis: guided
+    fingerprint: 763a1b45083c
 - id: AGENT-14
   text: One auditor shall examine only the pre-existing tests and verification items that the change modified or deleted.
-  origin: agent
   traces_to: SYS-11
   why: new tests mostly add coverage. Edited and deleted tests are where weakening happens.
+  basis: derived
 - id: AGENT-15
   text: An auditor shall probe each new or changed requirement it judges important for ambiguity, by comparing how isolated agents read it.
-  origin: agent
   traces_to: SYS-21
   why: this is the scenario probe from our earlier discussion, used only where it pays off. In round 5 the trigger changed from a critical flag to an importance judgment.
+  basis: derived
 - id: AGENT-16
   text: For each requirement in a change that it judges important, an auditor shall try to describe an implementation that passes the requirement's verification items yet violates it.
-  origin: agent
   traces_to: SYS-24
   why: if it succeeds, the verification is too weak. This is a cheap, reasoning-based cousin of mutation testing.
+  basis: derived
 - id: AGENT-20
   text: The toolkit shall refuse agents' direct edits to spec files, naming the CLI command to use instead.
-  origin: agent
   traces_to: SYS-25
   why: agents default to editing files, and a refusal that names the alternative redirects them reliably. In Claude Code this is DR-3.
+  basis: derived
 - id: AGENT-31
   text: An auditor shall compare each changed verification item's tests against its description.
-  origin: agent
   traces_to: SYS-11
   why: this catches a test that never matched its description. It runs with the pre-review audits you accepted in Q3.
+  basis: derived
 - id: AGENT-34
-  text: A chat approval shall apply only to the items as they were last shown to the engineer.
-  origin: agent
+  text: A chat lock shall apply only to the items as they were last shown to the engineer.
   traces_to: SYS-14
-  why: an approval can't cover anything that changed after you looked. In Claude Code it's recorded by DR-6.
+  why: a lock can't cover anything that changed after you looked. In Claude Code it's recorded by DR-6.
+  basis: derived
 - id: AGENT-43
-  text: When an approval names its exceptions by description instead of by ID, the toolkit shall leave unapproved every item the description could refer to.
-  origin: agent
+  text: When a lock names its exceptions by description instead of by ID, the toolkit shall lock none of the items the description could refer to.
   traces_to: SYS-14
-  refines: |-
-    "I'll more likely just say 'approve everything except {description}, lets workshop that- {feedback}'"
-  why: a described exception has to be interpreted. Resolving every doubt toward "not approved" means a misreading can only hold an item back. It can never approve something you meant to exclude.
+  why: a described exception has to be interpreted. Resolving every doubt toward not locking means a misreading can only hold an item back. It can never lock something you meant to exclude.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 8, date approximate. Answering Q23, which asked how approvals in chat should be phrased.
+    said: Said they will more likely approve everything except something they describe, and then workshop that with feedback.
+    basis: guided
+    fingerprint: d7395ded9bc5
 - id: AGENT-47
   text: Each step of the method shall be achievable in a harness that runs none of the toolkit's hooks.
   traces_to: SYS-27
-  origin: engineer
-  source: |-
-    "the framework must still work without the hooks, the hooks are convenience and guardrails to improve experience, but should not be core. I'm using hermes agent for some coding, and other times it defers to claude code. When hermes uses the system it should still work, but obviously the claude code one will be less likely to make mistakes due to the harnesses, etc." (2026-10-17, deciding to keep the Claude Code hooks)
-- id: AGENT-48
-  text: When an agent asks the engineer to approve items, the agent shall give the exact line that records the approval of those items.
-  traces_to: SYS-14
-  origin: engineer
-  source: |-
-    "Those sessions are okay, as long as the agent knows about them and can tell me things like "please state Approve" and "LGTM" for the specific items. That way I know what to do and can be trained into it." (2026-10-17; "those sessions" are the Claude Code session hooks)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Deciding to keep the Claude Code hooks.
+    said: |-
+      The framework must still work without the hooks: they are convenience and guardrails that improve the experience, but should not be core. They use the Hermes agent for some coding, and at other times it defers to Claude Code; when Hermes uses the system it should still work, though Claude Code will be less likely to make mistakes thanks to its harness.
+    basis: stated
+    fingerprint: 3ef1b7f85baa
 - id: AGENT-49
   text: In a repository whose harness runs the toolkit's hooks, the repository's instruction file shall tell the agent what each hook does.
   traces_to: SYS-29
-  origin: engineer
-  source: |-
-    "Those sessions are okay, as long as the agent knows about them" (2026-10-17; "those sessions" are the Claude Code session hooks)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Discussing the Claude Code session hooks.
+    said: Those hooks are okay, as long as the agent knows about them.
+    basis: guided
+    fingerprint: 7e3a4f60d9a0
 - id: AGENT-50
-  text: When the engineer restates what an existing item already says, the agent shall record the restatement as the engineer's approval of that item, marked as given by restatement.
+  text: When the engineer restates what an existing item already says, the agent shall add the restatement to that item as an intent record with the basis stated.
   traces_to: SYS-41
-  origin: engineer
-  source: |-
-    "Since I mentioend "I would like XYZ" and you said "ah that's accounted for in ABC", thats a case where I think "ABC" could be coutned as 'approved' for future notice." (2026-10-17)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: The engineer had asked for something, and the agent answered that an existing item already accounted for it.
+    said: Thinks that in such a case the existing item could be counted as approved by them, for future notice.
+    basis: guided
+    fingerprint: c957de9ec3c4
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Revising the chat-approval rules (AGENT-33, AGENT-48, DR-41).
+    said: Finds the approval process too prescriptive, and wants requirements a person mentions in conversation locked in automatically, without a separate approval step.
+    basis: guided
+    fingerprint: c957de9ec3c4
 - id: AGENT-51
-  text: The agent shall propose for explicit approval each item that records a choice between alternatives, and each item that other items depend on.
+  text: The agent shall propose for locking each item whose consequences reach the engineer, judging from what it knows the engineer cares about.
   traces_to: SYS-38
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 20:01
-    words: Then the idea here being that LLMs can fish for approval on key requirements, but humans don't _have_ to read all the requiremnets for everything (for example, business logic around 'when this button is clicked, X shall occur' is less interesting than two or three layers up the tree 'the X interface shall enable user to do Y'.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 20:01
     context: Discussing whether approval could pass down the requirement tree.
+    said: |-
+      Explained the idea: LLMs can fish for approval on key requirements, so people don't have to read every requirement. For example, business logic about what happens when a button is clicked is less interesting than a requirement two or three layers up the tree saying an interface lets the user do something.
+    basis: guided
+    fingerprint: 068ad274ff69
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 14:04
+    context: Answering round 13's open decision on which of an agent's decision records to propose, on the review page.
+    said: Chose to have an agent's items proposed only when their consequences reach them, such as what they see, lock or do; the rest stay recorded and the agent's to revise.
+    basis: stated
+    fingerprint: b1de32cabce7
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 14:04
+    context: Commenting on the same decision on the review page.
+    said: Also wants LLMs kept in the loop on what gets proposed. An LLM has context about what they care about, so a mechanical, code-based ranking of decisions will never be enough; meant as a clarification.
+    basis: stated
+    fingerprint: b1de32cabce7
 - id: AGENT-52
-  text: Once a change is built and tested, the agent shall ask the engineer whether to keep each alteration the change record lists, giving the line that keeps it.
+  text: Once a change is built and tested, the agent shall ask the engineer, on the review page, whether to keep each alteration the change record lists.
   traces_to: SYS-37
-  origin: agent
-  why: the change record lists the alterations (CHANGE-14), and the agent's report is where the engineer answers them.
+  why: the change record lists the alterations (CHANGE-14), and the review page is where the engineer answers them (SYS-46).
+  basis: derived
 - id: AGENT-53
-  text: The agent shall quote the engineer's reasoning wherever the engineer gave it, not only the engineer's assent.
+  text: The agent shall summarize the engineer's reasoning wherever the engineer gave it, not only the engineer's assent.
   traces_to: SYS-35
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 20:31
-    words: The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things. But for example, in the above paragraph I gave a lot of reasoning. That could go somewhere, and the context summary would provide more info.
-    context: Discussing where the engineer's words should be kept on the requirements.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 20:31
+    context: Discussing where the engineer's words should be kept on the requirements, just after giving a long piece of reasoning.
+    said: Said a record of their words shouldn't be just a yes, do this; the reasoning they had just given could go somewhere, with the context summary adding more information.
+    basis: guided
+    fingerprint: 002c10337f21
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Revising round 12's choice to keep the engineer's words verbatim (DR-46), while planning the review page.
+    said: Concerned about committing unreviewed verbatim quotes to a public repository; wants a summary close to what was said, lightly cleaned up, with its author and the context of the discussion, instead of the words.
+    basis: guided
+    fingerprint: 002c10337f21
 - id: AGENT-54
-  text: A quote's summary shall say only what was being discussed.
+  text: An intent record's context shall describe the discussion and what prompted the statement, and add no claim the person did not make.
   traces_to: SYS-35
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 20:31
-    words: The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 20:31
     context: Discussing where the engineer's words should be kept on the requirements.
+    said: Said the context beside their words shouldn't be LLM-written text that asserts a lot of things.
+    basis: guided
+    fingerprint: f835b62f0ea6
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Revising round 12's choice to keep the engineer's words verbatim (DR-46), while planning the review page.
+    said: Wants each summary to carry the AI's account of what was being discussed at the time, so that a reader can tell how far the person specified the thing and what they left unspecified.
+    basis: guided
+    fingerprint: f835b62f0ea6
 - id: AGENT-55
   text: The agent shall place each requirement the engineer states in detail under the system element it constrains, however high in the tree the engineer's request began.
   traces_to: SYS-36
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 21:26
-    words: |-
-      Like, the "players feet must be purple" shouldn't be close to the top of the tree. It would be like, 'game world' -> 'game characters' -> 'player' -> 'player model' -> 'textures' -> 'req: purple feet, approved by human, quotes'.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 21:26
     context: Clarifying which requirements carry the engineer's words, and where in the tree they belong.
+    said: |-
+      Gave an example: a requirement that the player's feet must be purple shouldn't sit near the top of the tree, but under game world, game characters, player, player model and textures, where the requirement sits, approved by a person and carrying their words.
+    basis: stated
+    fingerprint: 893d7ebff485
 - id: AGENT-56
-  text: When the engineer asks for something that existing items already account for, the agent shall add the engineer's words to those items.
+  text: When the engineer asks for something that existing items already account for, the agent shall add an intent record summarizing the request to each of those items.
   traces_to: SYS-41
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 21:58
-    words: |-
-      This was helpful: surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework. It's helpful because it can help us weave the graph tighter through conversation, help find conenctions, etc.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 21:58
     context: Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.
+    said: Found it helpful that the agent surfaced requirements, connected the dots and said an existing item accounts for the request. Wants more of that in the framework, because it helps weave the requirement graph tighter through conversation and find connections.
+    basis: guided
+    fingerprint: 25f14dbbd5b9
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Revising round 12's choice to keep the engineer's words verbatim (DR-46).
+    said: Wants a summary close to what was said, with its author and context, kept on the items instead of the words.
+    basis: guided
+    fingerprint: 25f14dbbd5b9
 - id: AGENT-57
-  text: The approval reader shall read an ID written as a word and a number, such as "Change 13", when the word names a system element, needs or decision records.
+  text: The lock reader shall read an ID written as a word and a number, such as "Change 13", when the word names a system element, needs or decision records.
   traces_to: SYS-14
-  origin: agent
-  why: the engineer writes approvals that way ("Change 13 LGTM.", "need 16 LGTM"). Without this, the reader would tell the agent such a message approves nothing.
+  why: the engineer writes lock lines that way, such as Change 13 LGTM or need 16 LGTM. Without this, the reader would tell the agent such a message locks nothing.
+  basis: derived
 - id: AGENT-58
   text: The messages and pages the toolkit shows or installs in a host repository shall cite none of the toolkit's own requirement IDs.
   traces_to: SYS-30
-  origin: agent
   why: a host repository has its own SYS-6 or CHECK-15, so a citation of the toolkit's would point a reader at the wrong item, or at nothing.
+  basis: derived
+- id: AGENT-60
+  text: The agent shall record a requirement, with the basis added, for each feature a user would notice that the agent adds unasked.
+  traces_to: SYS-42
+  why: features an agent adds unasked are what the engineer can't see in a large build. Recorded, they show on the review page to be locked or cut.
+  basis: derived
+- id: AGENT-61
+  text: For each request, the agent shall compare it with the items at the explicit or stated level in the system elements the request affects, in the elements that depend on those, and above them in the trace.
+  traces_to: SYS-49
+  why: conflicts with what a person asked for have to surface before the code exists (SYS-49). Drafting the request's spec edits first is the usual way, since the edit shows each affected item's level.
+  basis: derived
+- id: AGENT-62
+  text: At the end of each change, the agent shall generate the review page and give the person its location.
+  traces_to: SYS-45
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Setting out the user journey the toolkit should support (NEED-23).
+    said: In the journey they described, the agent finishes the work and then offers them a page to check.
+    basis: stated
+    fingerprint: e805022831ec
+- id: AGENT-63
+  text: When it is unclear whether a person's statement directly expresses an item, the agent shall record the item at the lower level.
+  traces_to: SYS-44
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Discussing how what a person says becomes intent on the items it expresses (SYS-44), and setting a condition on it.
+    said: |-
+      Gave the example of requiring a self-driving car, which may have a hundred thousand requirements, needs and verification items under it: the requirement that the car drives itself can be marked as theirs, but a detail such as a module producing the next stretch of driving trajectories is not. The agent has to judge, but should keep it tight rather than loose.
+    basis: guided
+    fingerprint: 5bb3ce09bf33

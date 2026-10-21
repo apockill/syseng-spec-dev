@@ -1,0 +1,36 @@
+- id: DIFF-V1
+  verifies:
+  - DIFF-3
+  - DIFF-4
+  - DIFF-5
+  - SYS-48
+  method: test
+  technique: unit test
+  description: Against the last commit, a locked requirement changed in meaning is reported with its reason, its level on both sides and a flag that it alters what a person locked; a declared rewording is reported as reworded; an item that only gained intent is changed in intent only; a new item is added with its level. An item that moved and changed gets both classes. A verification item changed while what it verifies didn't is flagged.
+  tests:
+    python:
+    - tests/test_diff.py::test_each_differing_item_gets_its_classes_reasons_and_levels
+    - tests/test_diff.py::test_a_move_and_a_change_are_both_reported
+    - tests/test_diff.py::test_a_verification_item_changed_on_its_own_is_flagged
+- id: DIFF-V2
+  verifies:
+  - DIFF-1
+  - DIFF-2
+  method: test
+  technique: unit test
+  description: Comparing a feature branch with main uses their merge base, so newer work on main doesn't appear; comparing leaves the working tree's status unchanged; an unknown name is an error.
+  tests:
+    python:
+    - tests/test_diff.py::test_a_branch_is_compared_at_its_merge_base
+    - tests/test_diff.py::test_comparing_leaves_the_working_tree_alone
+    - tests/test_diff.py::test_an_unknown_name_is_an_error
+- id: DIFF-V3
+  verifies:
+  - MODEL-39
+  - SYS-48
+  method: test
+  technique: unit test
+  description: After a review of a page made from uncommitted work, the comparison since that review lists only the items that changed after it, using the page's local snapshot, and says so.
+  tests:
+    python:
+    - tests/test_review_page.py::test_since_a_review_of_uncommitted_work_shows_only_what_changed_after_it

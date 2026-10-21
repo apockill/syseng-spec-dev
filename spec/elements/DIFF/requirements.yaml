@@ -1,0 +1,26 @@
+- id: DIFF-1
+  text: The comparison shall read the spec at a version-control revision without changing the working tree.
+  traces_to: SYS-48
+  why: comparing must never disturb uncommitted work.
+  basis: derived
+- id: DIFF-2
+  text: When the older version is a branch, the comparison shall compare against the merge base of that branch and the newer version.
+  traces_to: SYS-48
+  why: otherwise newer work on that branch shows up as the current branch's changes, in reverse.
+  basis: derived
+- id: DIFF-3
+  text: |-
+    The comparison shall report, for each differing item, each of these that applies: added, removed, moved to another parent, changed in meaning, reworded, changed in intent only, or changed in details only.
+  traces_to: SYS-48
+  why: An item can move and change at once, so several apply. A parent is the requirement an item traces to, or an element's parent element. Reworded means a text change its change record declared a rewording; any other change to fingerprinted content is a change in meaning. Changed in intent only means only its locks, intent records or basis changed; changed in details only means only fields that carry no meaning changed, such as a rationale or a test link.
+  basis: derived
+- id: DIFF-4
+  text: The comparison shall give, for each differing item, the reasons recorded in the change records that the newer version adds.
+  traces_to: SYS-48
+  why: answers most questions about why something changed before they're asked (REVIEW-10).
+  basis: derived
+- id: DIFF-5
+  text: The comparison shall give each differing item's level of intent in each version.
+  traces_to: SYS-48
+  why: a change to a stated or locked item matters more than a change to an added one, and the reader needs to see which it is.
+  basis: derived

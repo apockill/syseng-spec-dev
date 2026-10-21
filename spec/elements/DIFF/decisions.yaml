@@ -1,0 +1,32 @@
+- id: DR-59
+  title: One library builds the comparison and every page section, for the CLI and the review page alike
+  decided_by: engineer
+  elements:
+  - DIFF
+  - CLI
+  - REVIEW
+  - MODEL
+  requirements: SYS-47, SYS-48, DIFF-1, DIFF-2, DIFF-3, DIFF-4, DIFF-5, CLI-24, MODEL-39, REVIEW-24
+  recorded: round 18
+  context: The engineer wants a spec diff that agents can read, built so that the review page reuses it, and everything the page shows available to agents so that the conversation and the page can be used interchangeably.
+  decision: |-
+    - One library builds each section of the review page as data: decisions and alterations awaiting a person, responses to feedback, differences, captured intent, proposals, the graph, and the items. The page embeds that data, and CLI commands print it as text or YAML.
+    - The comparison reads the older spec at a version-control revision without touching the working tree, and the newer side defaults to the working tree. Against a branch, it compares with the merge base of that branch and the newer side. A branch that exists only as a remote-tracking branch resolves to it, with a note; an unknown name is an error.
+    - Items are compared by ID, and each differing item gets every class that applies (DIFF-3), the reasons from the change records the newer side adds, and its level on both sides.
+    - A review sent back is recorded in the spec with its person, time, the revision the page was generated from, whether the working tree differed, and the fingerprints shown. The page's embedded data, kept locally, gives the exact content shown. Without it, as on another machine, the comparison uses the recorded revision and marks the items whose fingerprints differ. A review never sent back records nothing; sending an empty block is how a person marks a review done.
+  alternatives: Rebuilding differences from the change logs alone, which misses anything not made through the edit command and can't compare against an arbitrary revision. Separate code for the page and the CLI, which would drift apart.
+  consequences: The toolkit now reads version control, which DR-48 avoided. A repository without version control can compare only against a review snapshot.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18, planning the review page that replaces the Markdown views.
+    said: Wants everything on the review page also available to agents, so the conversation flows freely while they ask questions and request changes, and, since the page has a readable diff view, spec diff commands that let agents read differences in a form that suits them.
+    basis: guided
+    fingerprint: f676f637edd5
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18, on what the spec diff compares.
+    said: |-
+      Asked whether the diff could compare against main or another commit, and agreed to the proposed design: load the spec at a revision, compare items by ID, and join in the recorded reasons.
+    basis: guided
+    fingerprint: f676f637edd5

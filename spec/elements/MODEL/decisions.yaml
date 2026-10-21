@@ -10,17 +10,19 @@
   decision: spec files are YAML. To make several edits, an agent writes them as one small YAML document and pipes it into a single CLI command, usually as a heredoc. That avoids passing each field as a command-line argument.
   alternatives: JSON edited only through the CLI, which was the engineer's first idea but produces noisy diffs. Markdown with embedded metadata, which is fragile to parse.
   consequences: raw git diffs stay readable, prose never fights shell quoting, and a large update is one call.
+  basis: derived
 - id: DR-5
-  title: Approval records store a fingerprint and the approved content
+  title: Lock records store a fingerprint and the locked content
   decided_by: agent
   elements:
   - MODEL
   requirements: MODEL-24, MODEL-25, REVIEW-11
   recorded: round 4 (the fingerprint idea is the engineer's, from round 2; storing the content was MODEL-26)
-  context: the engineer proposed recording approvals with a hash or git state, so the toolkit can tell when approved content has changed.
-  decision: each approval stores the item's fingerprint and the approved text itself.
-  alternatives: a fingerprint alone, which shows *that* something changed but not *what*. A git revision, which fails for approvals given before a commit.
-  consequences: the review page can always show what changed since approval. [approvals.md](approvals.md) already follows this format by hand.
+  context: the engineer proposed recording locks (then called approvals) with a hash or git state, so the toolkit can tell when locked content has changed.
+  decision: each lock stores the item's fingerprint and the locked text itself.
+  alternatives: a fingerprint alone, which shows *that* something changed but not *what*. A git revision, which fails for locks given before a commit.
+  consequences: the review page can always show what changed since the lock. [approvals.md](approvals.md) already follows this format by hand.
+  basis: derived
 - id: DR-8
   title: A decomposition tree plus a separate dependency graph
   decided_by: agent
@@ -34,6 +36,7 @@
   alternatives: one combined graph, which mixes requirement flow-down with change impact. Several parents per element.
   consequences: |-
     requirements flow down the tree, and change impact follows the dependency graph. A shared element, such as a general utility, has one parent: usually the lowest element whose parts all use it, or the system itself. Every element that relies on it lists it as a dependency. Q24 confirmed this and added one rule: verifying a change also covers every element that depends on what it touched (VERIFY-14).
+  basis: derived
 - id: DR-9
   title: Wording rules from INCOSE plus EARS patterns
   decided_by: agent
@@ -51,6 +54,7 @@
     - Findings link to the skill's own rules page, which cites INCOSE's rule numbers, because the INCOSE guide isn't freely available.
     - To save tokens, a rule is explained in full only once per run (CHECK-17).
     - The aim is the Rust compiler's style: errors that teach a fresh agent this repo's expectations. Quality that needs judgment is left to the auditors (SYS-21).
+  basis: derived
 - id: DR-10
   title: Related code is a loose link, not file ownership
   decided_by: engineer
@@ -63,6 +67,13 @@
   decision: each system element lists related code by path or pattern, and a file may relate to any number of elements. Tests are the firm link.
   alternatives: exactly-one ownership. Deriving the mapping from per-test coverage, which may come later as an upgrade.
   consequences: some code may relate to no system element. CHECK-8 flags such code when it changes.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 2). The agent had proposed that each code file belong to exactly one system element.
+    said: Was not sure about one file to one element, worried it would make refactoring costly and tie the spec to one language's file layout, and asked whether to decouple them so that elements call out their related code files.
+    basis: stated
+    fingerprint: ad10adf7bf72
 - id: DR-12
   title: Scenarios of use are context on needs, not an item type
   decided_by: engineer
@@ -75,6 +86,13 @@
     each need records its context in paraphrase: the reasoning and the scenarios behind it.
   alternatives: a scenario item type with its own IDs and approvals.
   consequences: this matches SE practice, which keeps operational scenarios in a narrative concept-of-operations document rather than as baselined line items.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 4). Answering Q17, which proposed a separate item type for the engineer's CUJs (critical user journeys).
+    said: Preferred that the CUJs they state, and their reasons or what they are doing, be annotated somewhere as context for future agents, rather than made a separate item type.
+    basis: guided
+    fingerprint: 495b40506ad0
 - id: DR-13
   title: No transcript archive; decision records carry the reasoning
   decided_by: engineer
@@ -87,6 +105,13 @@
   decision: keep no transcript links and no archive. Each decision becomes a dated, paraphrased decision record on the system elements it affects.
   alternatives: archive transcripts outside the repository, or raise the retention period.
   consequences: reasoning has to be captured when the decision is made. This file does that for rounds 1–5.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 3). Answering Q14, which asked whether to archive conversation transcripts, which Claude Code deletes after 30 days by default, after the engineer had first suggested linking them.
+    said: Chose to keep no transcript archive, with decisions kept as decision records on the elements they affect.
+    basis: guided
+    fingerprint: 991262901a9b
 - id: DR-20
   title: Importance is judged from history, not stored as a flag
   decided_by: engineer
@@ -94,13 +119,20 @@
   - MODEL
   - AGENT
   - REASON
-  requirements: SYS-24, SYS-26, MODEL-14, REASON-4, AGENT-15, AGENT-16, AGENT-40
+  requirements: SYS-24, SYS-26, MODEL-38, REASON-4, AGENT-15, AGENT-16, AGENT-40
   recorded: round 5
   context: I proposed a "critical" flag on requirements, which would trigger extra verification. The engineer worried that such a flag inflates over time until it means nothing. The engineer preferred that agents judge importance from each item's recorded history, for deciding both how much to verify and what to ask about first.
   decision: |-
     there is no criticality flag. Agents judge importance each time from an item's history: whether the engineer stated it, its decision records, how often it changed, and what depends on it. They state their reasons whenever they act on a judgment (AGENT-40).
   alternatives: a stored critical flag (MODEL-19 and MODEL-20, now removed).
   consequences: judgments can differ between runs. Stated reasons make that visible and correctable.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 5). The agent had proposed a critical flag on requirements that would trigger extra verification.
+    said: Worried that such a flag inflates over time until it means nothing, and preferred that agents judge importance from each item's recorded history, both for how much to verify and for what to ask about first.
+    basis: stated
+    fingerprint: 9762ee4a7ccb
 - id: DR-23
   title: System requirements are verified at the system level
   decided_by: engineer
@@ -113,6 +145,13 @@
   decision: each system requirement gets its own verification, such as an end-to-end run or a demonstration, in addition to its children's verification.
   alternatives: treat a system requirement as verified when all its children pass.
   consequences: the VI round will write system-level checks, for example running a code-first change end to end and confirming that it never stopped to ask.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 5). Answering Q19, which asked whether system requirements should get their own verification items.
+    said: Agreed that it makes sense for system requirements to get their own verification.
+    basis: guided
+    fingerprint: a905f02e55d8
 - id: DR-28
   title: The spec lives in YAML files per system element, and the Markdown views are generated
   decided_by: agent
@@ -126,18 +165,20 @@
     Each system element is a directory under spec/elements/. It holds element.yaml, plus requirements.yaml, verification.yaml and decisions.yaml as needed.
     - Needs live with the system element.
     - A decision record sits with the first element it names.
-    - Approvals, retired IDs, questions and project settings are single files at the top of spec/.
+    - Locks, retired IDs, questions and project settings are single files at the top of spec/.
     - requirements.md and decisions.md are generated by `spec render`, and the checker reports them when they're stale.
   alternatives: One big YAML file, which becomes a merge-conflict hotspot. One file per item, which means hundreds of tiny files. Hand-written Markdown as the source, which can't be parsed reliably and drifts.
   consequences: A change to one element touches one directory, and readers keep the same Markdown view. Hand edits to a view are overwritten, and the checker flags them first.
+  status: its generated Markdown views are superseded in round 18 by DR-60. The YAML storage holds.
+  basis: derived
 - id: DR-29
-  title: Fingerprints cover an item's meaning, and migration carried approvals over
+  title: Fingerprints cover an item's meaning, and migration carried locks over
   decided_by: agent
   elements:
   - MODEL
   requirements: MODEL-24, MODEL-25, MODEL-31
   recorded: round 9 (slice 1)
-  context: Approvals were fingerprints of Markdown text. Moving to YAML would have broken every one of them, even though no meaning changed.
+  context: Locks (then called approvals) were fingerprints of Markdown text. Moving to YAML would have broken every one of them, even though no meaning changed.
   decision: |-
     A fingerprint is a hash of an item's meaning fields, which vary by kind:
     - requirement: its text;
@@ -145,9 +186,10 @@
     - decision record: its title, status, context, decision, alternatives and consequences;
     - verification item: its description, method, technique and the requirements it verifies;
     - system element: its title, purpose, parent and dependencies.
-    Before migrating, every old fingerprint was checked against the Markdown, and all 69 matched. The approvals were then re-fingerprinted, with each old value kept as `migrated_from`.
-  alternatives: Asking the engineer to re-approve 69 unchanged items. Fingerprinting the raw YAML, which would let a formatting change un-approve an item.
-  consequences: Re-formatting or re-linking an item never un-approves it, and rewording it always does. One old fingerprint, NEED-12's, had also covered the heading of the next section, because of a parsing bug in my interim scripts. Its new fingerprint covers just the need and its context.
+    Before migrating, every old fingerprint was checked against the Markdown, and all 69 matched. The locks were then re-fingerprinted, with each old value kept as `migrated_from`.
+  alternatives: Asking the engineer to lock 69 unchanged items again. Fingerprinting the raw YAML, which would let a formatting change make an item's lock stop matching.
+  consequences: Re-formatting or re-linking an item never makes its lock stop matching, and rewording it always does. One old fingerprint, NEED-12's, had also covered the heading of the next section, because of a parsing bug in my interim scripts. Its new fingerprint covers just the need and its context.
+  basis: derived
 - id: DR-45
   title: Approvals are kept as a history, each with who and how
   decided_by: agent
@@ -160,6 +202,8 @@
   decision: Every approval is appended, never replaced, and each records the approver, the channel (terminal, chat, menu, page or restated), the date and time, how many items were approved together, the engineer's words, an optional note, and the resolved decisions that involved the item. An item's current approval is any record whose fingerprint matches its content, the latest one first.
   alternatives: One record per item with a list of past approvals inside it, which makes the file harder to read in a diff. A separate history file, which splits what one approval means across two places.
   consequences: The approvals file grows with every approval. Records from before round 12 lack the new fields, and the toolkit treats the missing fields as unknown.
+  basis: derived
+  status: amended in round 18 by DR-55 and DR-62. A lock holds a summary only when an agent records one, and a restatement is intent, not a lock.
 - id: DR-46
   title: The engineer's words go in a quotes list beside the older source field
   decided_by: agent
@@ -173,3 +217,59 @@
   decision: Items take a `quotes` list, each with `said`, `words` and `context`, and the checker requires all three. Existing `source` fields stay as they are. They aren't migrated, because their dates and contexts were never recorded and filling them in would mean inventing them.
   alternatives: Migrating every `source` field with guessed dates, which would put invented metadata next to the engineer's words.
   consequences: Two places hold the engineer's words until older items are revisited. The requirements view shows both, and its legend explains the difference.
+  status: superseded in round 18 by DR-55. Intent records summarize, never quote.
+  basis: derived
+- id: DR-55
+  title: Intent records summarize what a person said, with author and context, and never quote it
+  decided_by: engineer
+  elements:
+  - MODEL
+  - CHECK
+  - REVIEW
+  - AGENT
+  requirements: SYS-35, MODEL-34, MODEL-36, MODEL-37, CHECK-20, REVIEW-17, AGENT-53, AGENT-54
+  recorded: round 18
+  context: Items kept the engineer's words verbatim, in quotes lists (DR-46) and in older source fields, and approval records kept their words too. The engineer doesn't want unreviewed conversation committed word for word to a public repository, but does want a reader to see how far a person specified something and what they left open.
+  decision: |-
+    Each item takes an intent list. Each record holds:
+    - **by:** the person's name and email address (DR-56);
+    - **when:** the date and time of the statement;
+    - **context:** the agent's account of what was being discussed and what prompted the statement;
+    - **said:** a close summary of what the person said, lightly cleaned up and in the third person. It keeps their hedges and strength, such as probably or must, adds no number or mechanism they didn't give, and says what they left open when they said so;
+    - **basis:** stated or guided (DR-54);
+    - a fingerprint of the item as it was, filled in by the CLI.
+
+    Quotation marks aren't allowed in these fields. Lock records and change-log reasons summarize in the same way. The migration summarizes the existing verbatim text (DR-61).
+  alternatives: Keeping the verbatim words (DR-46), which publishes conversation. Keeping verbatim words outside the repository with a summary inside, which needs storage every machine and person shares.
+  consequences: A summary is the agent's reading, so its fidelity is checked by auditors and by the person on the review page, not by the checker. Version-control history still holds the verbatim text committed before the migration. Removing it means rewriting history, which is the engineer's call.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Revising round 12's choice to keep the engineer's words verbatim (DR-46), while planning round 18's levels of intent and review page.
+    said: Likes that the reasoning behind decisions is recorded, but is concerned about committing unreviewed verbatim quotes to a public repository. Wants instead a summary close to what was said, lightly cleaned up, with its author and the context of the discussion, so a reader can tell how far the person specified something and what they left unspecified, keeping the conversation separate from what is published.
+    basis: stated
+    fingerprint: bf89efae2cf4
+- id: DR-64
+  title: Intent records and locks are validated against pydantic schemas
+  decided_by: agent
+  elements:
+  - MODEL
+  - CHECK
+  - CLI
+  requirements: MODEL-34, MODEL-36, MODEL-37, CHECK-20
+  recorded: round 20
+  context: The engineer's words had lived in free text, and intent records and locks were checked field by field in hand-written code. The engineer suggested schemas.
+  decision: |-
+    - Intent records (a draft as an agent writes it, and the stored record) and locks are pydantic models with fixed fields and no others.
+    - Formats are validated: a person is `Name <email>`, a statement's time is a date with the time when known, a lock's time is an ISO date and time, a fingerprint is twelve hex characters, the basis and the channel come from fixed lists.
+    - The checker turns each validation error into a finding (A006, A010), so a malformed record is reported with everything else in one run; `spec edit` refuses a malformed draft before writing.
+    - Items themselves stay plain mappings for now; moving every kind of item to a schema is a larger change for a later round.
+  alternatives: Hand-written field checks, which drift from the format and don't check values. JSON Schema, which needs a second file to keep in step with the code.
+  consequences: The toolkit depends on pydantic as well as PyYAML. Free-text summaries inside other fields are no longer an accepted way to record a person's words.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Reviewing a transitional source field written in round 18, in which the author, date and summary sat in one free-text string, while round 20's migration was under way.
+    said: Suggested using pydantic to enforce the metadata and validate it, and found one free-text field carrying a summary, author and date brittle; it should be several metadata fields. Left the implementation to the agent, wanting only to nudge it toward best practice.
+    basis: guided
+    fingerprint: 844ef68db123

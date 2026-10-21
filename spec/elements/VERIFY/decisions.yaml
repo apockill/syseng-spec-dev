@@ -11,3 +11,10 @@
     expensive items run only when the engineer asks: for a full run, a single change, or onboarding (ONBOARD-3). Agents always run every cheap item before reporting a change as done.
   alternatives: running expensive items automatically at merge, which was my first proposal.
   consequences: regressions that only expensive checks would catch wait for the next requested run.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 2 and 3). Answering Q2, on when expensive verification runs; the agent had first proposed running expensive items automatically at merge.
+    said: Wants to move fast and to decide when expensive checks run, so they run only on request, while cheap checks run after every change.
+    basis: stated
+    fingerprint: 2f9c3f82b590

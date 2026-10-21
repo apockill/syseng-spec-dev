@@ -1,6 +1,10 @@
 - id: UNIT-1
   text: The unit-test technique shall run a verification item's linked tests through the language adapter of each implementation that has them.
-  origin: engineer
-  traces_to: SYS-10
-  source: |-
-    "one modality might be 'software unit test', and can be written in [supported languages]"
+  traces_to: VERIFY-2
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+    said: Described one modality as software unit tests, which can be written in the supported languages.
+    basis: guided
+    fingerprint: f1a4fe48a702

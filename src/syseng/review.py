@@ -94,13 +94,13 @@ def engineer_marks(spec: Spec, iid: str) -> list[str]:
     """Why an item counts as approved, written or decided by the engineer (CHANGE-13)."""
     out = []
     if history(spec, iid):
-        out.append("you approved it")
+        out.append("a person locked it")
     kd = kind_and_data(spec, iid)
     data = kd[1] if kd else {}
-    if data.get("origin") == "engineer" or data.get("quotes"):
-        out.append("it carries your words")
+    if data.get("origin") == "engineer" or data.get("quotes") or data.get("intent"):
+        out.append("a person stated or guided it")
     if kd and kd[0] == "decision" and data.get("decided_by") == "engineer":
-        out.append("you decided it")
+        out.append("a person decided it")
     return out
 
 
@@ -131,26 +131,30 @@ def describe(spec: Spec, iid: str) -> str:
     parts = []
     if s.state in (APPROVED, CHANGED):
         a = s.approval or {}
-        when = a.get("approved_at") or a.get("approved_on") or "an unknown date"
+        when = a.get("locked_at") or a.get("approved_at") or a.get("approved_on") or "an unknown date"
         how = a.get("via") or "an unrecorded channel"
         batch = a.get("batch")
         alone = "alone" if batch == 1 else f"with {batch - 1} other items" if batch else ""
-        approved = f"approved {when} via {how}" + (f", {alone}" if alone else "")
+        locked = f"locked {when} via {how}" + (f", {alone}" if alone else "")
         n = len(history(spec, iid))
         if n > 1:
-            approved += f" ({n} approvals in all)"
-        parts.append(approved if s.state == APPROVED else f"changed since it was {approved}")
-    elif s.state == DELEGATED:
-        parts.append(f"delegated under {s.under}" + (f", {s.levels} levels up" if s.levels > 1 else ""))
+            locked += f" ({n} locks in all)"
+        parts.append(locked if s.state == APPROVED else f"changed since it was {locked}")
     else:
-        parts.append("unreviewed: nothing above it is approved")
+        from syseng import levels
+        parts.append(f"level of intent: {levels.describe(spec, iid)}")
     kd = kind_and_data(spec, iid)
     data = kd[1] if kd else {}
-    words = len(data.get("quotes") or []) or (1 if data.get("origin") == "engineer" and data.get("source") else 0)
-    if words:
-        parts.append("carries your words")
+    from syseng import levels
+    intents = levels.intent_records(data)
+    if intents:
+        newest = intents[-1]
+        parts.append(f"{len(intents)} intent record{'s' if len(intents) != 1 else ''}, newest {newest.get('basis')} "
+                     f"by {newest.get('by')} on {newest.get('when')}")
+    elif data.get("quotes") or (data.get("origin") == "engineer" and data.get("source")):
+        parts.append("carries a person's words")
     if kd and kd[0] == "decision" and data.get("decided_by") == "engineer":
-        parts.append("your decision")
+        parts.append("a person's decision")
     edits = _edits(spec, iid)
     if edits:
         cid, entry = edits[-1]
@@ -172,22 +176,41 @@ def alterations(spec: Spec, change) -> list[dict]:
 
     An alteration is answered once the engineer approves the item as it now is (kept), or once the
     item is back to what it was before the change (rolled back) (CHANGE-14)."""
+    from syseng import levels
+    all_entries = change.data.get("entries") or []
+    added_here = {e.get("id") for e in all_entries if e.get("op") == "add"}
     by_item: dict[str, list[dict]] = {}
-    for e in change.data.get("entries") or []:
-        if e.get("raised"):
+    for e in all_entries:
+        if e.get("raised") and (e["id"] not in added_here or _locked_before(spec, e["id"], e.get("at"))):
             by_item.setdefault(e["id"], []).append(e)
     out = []
     for iid, entries in by_item.items():
         exists = kind_and_data(spec, iid) is not None
         rolled_back = exists and current_fingerprint(spec, iid) == entries[0].get("fingerprint_before")
-        kept = exists and state_of(spec, iid).state == APPROVED
+        kept = exists and levels.kept(spec, iid)
+        seen = levels.seen_since(spec, max(str(e.get("at") or "") for e in entries))  # shown on a review, let be
         out.append({"id": iid, "reasons": entries[0]["raised"], "entries": entries, "removed": not exists,
-                    "answered": kept or rolled_back, "rolled_back": rolled_back})
+                    "answered": kept or rolled_back or seen, "rolled_back": rolled_back, "seen": seen})
     return out
+
+
+def _locked_before(spec: Spec, iid: str, at) -> bool:
+    """Whether a person locked an item before an edit to it. An item an agent added in the same change is
+    the agent's own draft until then, so editing it alters nothing a person gave."""
+    from syseng import levels
+    stamp = levels.when({"when": at}) if at else ""
+    return any(levels.when(a) < stamp for a in history(spec, iid)) if stamp else False
 
 
 def unanswered(spec: Spec) -> list[tuple[str, dict]]:
     """Every alteration, in every change, that still awaits the engineer's answer (CHECK-21)."""
     from syseng import changes
-    return [(c.id, a) for c in changes.all_changes(spec) for a in alterations(spec, c)
-            if not a["answered"] and not a["removed"]]
+    latest: dict[str, tuple[str, dict]] = {}  # one per item: the newest change that altered it, with every entry
+    for c in changes.all_changes(spec):
+        for a in alterations(spec, c):
+            if a["answered"] or a["removed"]:
+                continue
+            if a["id"] in latest:
+                a = {**a, "entries": latest[a["id"]][1]["entries"] + a["entries"]}
+            latest[a["id"]] = (c.id, a)
+    return list(latest.values())

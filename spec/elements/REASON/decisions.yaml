@@ -11,6 +11,7 @@
   decision: use a custom, non-fork subagent. Its definition sets `omitClaudeMd`, so CLAUDE.md and AGENTS.md don't load. It has no shell tool. It carries its own hook that refuses reads under the spec directory and drops spec hits from search results.
   alternatives: a fork, which inherits the conversation and which the engineer ruled out. An instruction alone. A direct model-API call, which Q22 ruled out (DR-25).
   consequences: if the read-blocking hook proves fiddly, drop it and keep the instruction (the engineer's call).
+  basis: derived
 - id: DR-42
   title: The reasoning check's read guard refuses every read or search that could reach the spec
   decided_by: agent
@@ -26,3 +27,4 @@
     - The hook is registered in the project's settings for every agent's reads, and acts only when the agent is the reasoning check. Claude Code skips hooks written in a subagent's own definition when the folder isn't trusted, which a live run showed.
   alternatives: Filtering spec hits out of search results afterwards, which Claude Code allows but which means rewriting each tool's output format. The instruction alone.
   consequences: The guard covers every tool the subagent has. A subagent that searches the whole repository without a filter is refused once, and narrows its search.
+  basis: derived

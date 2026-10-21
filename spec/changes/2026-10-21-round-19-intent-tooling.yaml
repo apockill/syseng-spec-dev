@@ -1,0 +1,255 @@
+request: |-
+  Phase 1 of round 18's plan: build the tooling for intent records, levels of intent, person identity, the flow-down rule and the conflict guardrails, reading the old fields beside the new ones (DR-61)
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-21'
+entries:
+- op: modify
+  id: CHECK-V5
+  at: 2026-10-21T13:16-07:00
+  reason: Phase 1 computes levels of intent; the old delegation test was replaced.
+  before:
+    verifies:
+    - CHECK-18
+    - CHECK-19
+    description: After the engineer approves a system requirement, its element requirement is delegated one level under it and that requirement's verification item two levels under it, and neither is a to-do. A need with nothing approved above it is unreviewed and a to-do. An item reworded after its own approval is changed, not delegated, and is a to-do.
+    tests:
+      python:
+      - tests/test_review.py::test_items_under_an_approved_item_are_delegated
+      - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
+  after:
+    verifies:
+    - CHECK-18
+    - CHECK-19
+    - SYS-42
+    - MODEL-40
+    description: A need and a requirement in the engineer's words are stated, an agent's requirement under them is derived and names the stated item above, and verification items and element definitions count as derived. Locking an item makes it explicit, and the highest level that applies wins. An item changed after its lock keeps its level, is reported as a to-do naming who locked it, and stops being one when a newer lock matches it.
+    tests:
+      python:
+      - tests/test_levels.py::test_each_item_gets_the_level_its_records_give_it
+      - tests/test_levels.py::test_the_highest_level_applies
+      - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
+      - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
+- op: add
+  id: CHECK-V8
+  at: 2026-10-21T13:16-07:00
+  reason: CHECK-24 is built in Phase 1.
+  after:
+    verifies:
+    - CHECK-24
+    method: test
+    technique: unit test
+    origin: agent
+    description: An item stated, then changed in the same edit that records the person's newer request, isn't marked changed; the older record is superseded.
+    tests:
+      python:
+      - tests/test_levels.py::test_changed_is_judged_against_the_newest_record
+- op: modify
+  id: CHECK-V6
+  at: 2026-10-21T13:16-07:00
+  reason: MODEL-36 and CHECK-20 now describe intent records.
+  before:
+    description: A quote without the summary of what was being discussed is reported.
+    tests:
+      python:
+      - tests/test_review.py::test_quotes_need_words_a_date_and_context
+  after:
+    description: An intent record added through an edit gets its person, its date and time and the item's fingerprint filled in. One that lacks any field is reported, naming each missing field. Older quotes without a summary of what was being discussed are still reported.
+    tests:
+      python:
+      - tests/test_levels.py::test_intent_added_through_an_edit_is_filled_in
+      - tests/test_levels.py::test_an_intent_record_needs_every_field
+      - tests/test_review.py::test_quotes_need_words_a_date_and_context
+- op: add
+  id: CHECK-V9
+  at: 2026-10-21T13:16-07:00
+  reason: CHECK-25 is built in Phase 1.
+  after:
+    verifies:
+    - CHECK-25
+    method: test
+    technique: unit test
+    origin: agent
+    description: An intent record whose summary has a double quotation mark is reported; single quotes and apostrophes pass.
+    tests:
+      python:
+      - tests/test_levels.py::test_an_intent_record_never_quotes
+- op: add
+  id: MODEL-V13
+  at: 2026-10-21T13:16-07:00
+  reason: MODEL-37 and MODEL-38 are built in Phase 1.
+  after:
+    verifies:
+    - MODEL-37
+    - MODEL-38
+    method: test
+    technique: unit test
+    origin: agent
+    description: An edit refuses an intent record without a basis of stated or guided. A record with the basis guided makes the item guided. An item with the basis added is added, and what derives from it counts as added too. A basis other than derived or added is reported.
+    tests:
+      python:
+      - tests/test_levels.py::test_an_edit_refuses_an_intent_record_without_a_basis
+      - tests/test_levels.py::test_the_highest_level_applies
+      - tests/test_levels.py::test_an_added_item_and_what_derives_from_it_count_as_added
+      - tests/test_levels.py::test_an_invalid_basis_is_reported
+- op: modify
+  id: MODEL-V12
+  at: 2026-10-21T13:16-07:00
+  reason: CLI-11 and MODEL-34 changed in round 18; the old approver test was replaced.
+  before:
+    verifies:
+    - MODEL-34
+    - MODEL-35
+    - CLI-11
+    description: Approving two items together, then one of them again by restatement, keeps both approvals of it, oldest first, each with the approver, the channel, the date and time, the number of items approved together, the engineer's words and any note. Showing the item lists every approval. With no approver named, the version-control user name is recorded.
+    tests:
+      python:
+      - tests/test_review.py::test_every_approval_is_kept_with_who_and_how
+      - tests/test_review.py::test_the_approver_defaults_to_the_version_control_user
+  after:
+    verifies:
+    - MODEL-34
+    - MODEL-35
+    - CLI-11
+    - SYS-43
+    description: Approving two items together, then one of them again by restatement, keeps both approvals of it, oldest first, each with the approver, the channel, the date and time, and the batch size. An approval needs no words. The person recorded comes from the toolkit's own setting first, then the environment, then version control's user name and email address.
+    tests:
+      python:
+      - tests/test_review.py::test_every_approval_is_kept_with_who_and_how
+      - tests/test_levels.py::test_an_approval_needs_no_words
+      - tests/test_levels.py::test_the_person_comes_from_the_toolkit_setting_first
+- op: modify
+  id: SYS-V4
+  at: 2026-10-21T13:16-07:00
+  reason: with levels of intent, what awaits a person is a change to what a person gave (CHECK-19).
+  before:
+    verifies:
+    - SYS-14
+    description: Listing the checker's to-dos names every unapproved item.
+    tests:
+      python:
+      - tests/test_repo_spec.py::test_todo_lists_unapproved_items
+  after:
+    verifies:
+    - SYS-14
+    - CHECK-19
+    description: Listing the checker's to-dos names each item that changed since a person locked it, with who locked it.
+    tests:
+      python:
+      - tests/test_repo_spec.py::test_todo_lists_items_changed_since_a_person_gave_them
+- op: modify
+  id: AGENT-V4
+  at: 2026-10-21T13:16-07:00
+  reason: the hook records no words (DR-62).
+  before:
+    description: A line that approves items by ID records each item's approval, with the whole message as the engineer's words, marked as given in chat, and the agent is told what was recorded. Such a line either starts with "approve" or is only IDs followed by "LGTM", and it may be any line of a longer message. Lines that approve "everything", give an exception by description, or mix IDs with other words record nothing, and the agent is told to confirm the exact list. "lgtm" without IDs, quoted lines, pasted text, capitalized words that aren't elements, and unknown IDs record nothing.
+    tests:
+      python:
+      - tests/test_hooks.py::test_approvals_that_name_items_by_id_are_read
+      - tests/test_hooks.py::test_approvals_that_need_interpreting_are_not_read
+      - tests/test_hooks.py::test_lines_that_approve_no_items_are_ignored
+      - tests/test_hooks.py::test_chat_approval_is_recorded_with_the_engineers_words
+      - tests/test_hooks.py::test_approval_on_any_line_of_a_longer_message
+      - tests/test_hooks.py::test_quoted_lines_are_not_approvals
+      - tests/test_hooks.py::test_described_exceptions_record_nothing
+      - tests/test_hooks.py::test_lgtm_is_not_an_approval
+      - tests/test_hooks.py::test_pasted_text_is_not_the_engineers_approval
+      - tests/test_hooks.py::test_unknown_ids_record_nothing
+  after:
+    description: A line that approves items by ID records each item's approval, with no words but a note that the prompt hook recorded it, marked as given in chat, and the agent is told what was recorded. Such a line either starts with "approve" or is only IDs followed by "LGTM", and it may be any line of a longer message. Lines that approve "everything", give an exception by description, or mix IDs with other words record nothing, and the agent is told to confirm the exact list. "lgtm" without IDs, quoted lines, pasted text, capitalized words that aren't elements, and unknown IDs record nothing.
+    tests:
+      python:
+      - tests/test_hooks.py::test_approvals_that_name_items_by_id_are_read
+      - tests/test_hooks.py::test_approvals_that_need_interpreting_are_not_read
+      - tests/test_hooks.py::test_lines_that_approve_no_items_are_ignored
+      - tests/test_hooks.py::test_chat_approval_is_recorded_without_the_engineers_words
+      - tests/test_hooks.py::test_approval_on_any_line_of_a_longer_message
+      - tests/test_hooks.py::test_quoted_lines_are_not_approvals
+      - tests/test_hooks.py::test_described_exceptions_record_nothing
+      - tests/test_hooks.py::test_lgtm_is_not_an_approval
+      - tests/test_hooks.py::test_pasted_text_is_not_the_engineers_approval
+- op: add
+  id: CHECK-V10
+  at: 2026-10-21T13:16-07:00
+  reason: CHECK-22 is built in Phase 1.
+  after:
+    verifies:
+    - CHECK-22
+    - SYS-50
+    method: test
+    technique: unit test
+    origin: agent
+    description: A requirement on an element whose parent isn't the system, tracing to a system requirement, is a to-do; with flow-down enforced in the repository's settings it's an error; tracing to a requirement of its parent element clears it. New repositories start with flow-down enforced.
+    tests:
+      python:
+      - tests/test_levels.py::test_a_requirement_refines_one_of_its_parent_elements_requirements
+      - tests/test_levels.py::test_new_repositories_enforce_flow_down
+- op: add
+  id: CLI-V13
+  at: 2026-10-21T13:16-07:00
+  reason: CLI-22 is built in Phase 1.
+  after:
+    verifies:
+    - CLI-22
+    method: test
+    technique: unit test
+    origin: agent
+    description: In a spec-first change, an edit that changes the text of a stated item is refused, naming how to raise the conflict. It passes when marked a rewording, when it carries the person's request as stated intent, or when it names a resolved conflict that involves the item, but not an unresolved one.
+    tests:
+      python:
+      - tests/test_levels.py::test_spec_first_refuses_to_change_what_a_person_stated
+      - tests/test_levels.py::test_spec_first_allows_a_rewording_or_the_persons_own_request
+      - tests/test_levels.py::test_spec_first_allows_a_change_under_a_resolved_conflict_that_names_the_item
+- op: add
+  id: CHECK-V11
+  at: 2026-10-21T13:16-07:00
+  reason: CHECK-26 and CHANGE-17 are built in Phase 1.
+  after:
+    verifies:
+    - CHECK-26
+    - CHANGE-17
+    method: test
+    technique: unit test
+    origin: agent
+    description: In a code-first change, an edit to a stated item goes through, and the check reports it until a conflict in the change names the item. A conflict must name the items it involves.
+    tests:
+      python:
+      - tests/test_levels.py::test_code_first_goes_ahead_and_the_done_check_asks_for_the_conflict
+      - tests/test_levels.py::test_a_conflict_names_what_it_involves
+- op: add
+  id: CHANGE-V9
+  at: 2026-10-21T13:16-07:00
+  reason: fixes two frictions logged in round 18.
+  after:
+    verifies:
+    - CHANGE-14
+    - CLI-6
+    method: test
+    technique: unit test
+    origin: agent
+    description: Editing an item an agent added earlier in the same change, with no lock since, asks for no acknowledgment and isn't listed as an alteration. An element that only gains a dependency asks for no acknowledgments from the decisions about it.
+    tests:
+      python:
+      - tests/test_levels.py::test_editing_an_item_added_earlier_in_the_same_change_alters_nothing_a_person_gave
+      - tests/test_levels.py::test_an_element_gaining_a_dependency_needs_no_acknowledgments
+- op: modify
+  id: REVIEW-V5
+  at: 2026-10-21T13:16-07:00
+  reason: the views show levels of intent (SYS-34).
+  before:
+    description: The requirements view marks an approved item, an item changed since approval, and a delegated item with the item it sits under. It shows a quote with its date and time and its context.
+    tests:
+      python:
+      - tests/test_review.py::test_views_mark_approved_changed_and_delegated_items
+      - tests/test_review.py::test_quotes_are_shown_with_when_and_what_was_discussed
+  after:
+    description: The requirements view marks a locked item, an item changed since it was locked, a stated item, an added item, and a derived item with the item it sits under. It shows a quote with its date and time and its context.
+    tests:
+      python:
+      - tests/test_review.py::test_views_mark_approved_changed_and_delegated_items
+      - tests/test_levels.py::test_the_requirements_view_marks_each_level
+      - tests/test_review.py::test_quotes_are_shown_with_when_and_what_was_discussed
+decisions: []
+friction: []
+closed: '2026-10-21'

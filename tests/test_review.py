@@ -18,19 +18,6 @@ def _restamp(root, acks=None):
     return edit.run(root, batch)
 
 
-def test_items_under_an_approved_item_are_delegated(spec):
-    root = spec.write()
-    _approve(spec, root, "SYS-1", "--words", "approve SYS-1")
-    s = spec.load()
-    assert review.state_of(s, "SYS-1").state == review.APPROVED
-    core, vi = review.state_of(s, "CORE-1"), review.state_of(s, "CORE-V1")
-    assert (core.state, core.under, core.levels) == (review.DELEGATED, "SYS-1", 1)
-    assert (vi.state, vi.under, vi.levels) == (review.DELEGATED, "SYS-1", 2)
-    assert review.state_of(s, "NEED-1").state == review.UNREVIEWED
-    unreviewed = {f.item for f in check.check(s) if f.code == "A003"}
-    assert "NEED-1" in unreviewed and not unreviewed & {"CORE-1", "CORE-V1"}
-
-
 def test_a_changed_item_is_neither_approved_nor_delegated(spec):
     root = spec.write()
     _approve(spec, root, "SYS-1", "CORE-1", "--words", "approve SYS-1, CORE-1")
@@ -44,14 +31,14 @@ def test_a_changed_item_is_neither_approved_nor_delegated(spec):
 def test_every_approval_is_kept_with_who_and_how(spec, capsys):
     root = spec.write()
     _approve(spec, root, "CORE-1", "SYS-1", "--words", "approve CORE-1, SYS-1", "--via", "chat")
-    _approve(spec, root, "CORE-1", "--words", "that's what I want", "--via", "restated", "--note", "said again")
+    _approve(spec, root, "CORE-1", "--words", "Ada (summary): confirmed it again", "--via", "menu", "--note", "said again")
     records = [a for a in yamlio.read(root / "approvals.yaml") if a["id"] == "CORE-1"]
-    assert [(a["via"], a["batch"], a["by"]) for a in records] == [("chat", 2, "Ada"), ("restated", 1, "Ada")]
-    assert records[0]["approved_at"].startswith(datetime.date.today().isoformat())
+    assert [(a["via"], a["batch"], a["by"]) for a in records] == [("chat", 2, "Ada"), ("menu", 1, "Ada")]
+    assert records[0]["locked_at"].startswith(datetime.date.today().isoformat())
     assert records[1]["note"] == "said again"
     cli.main(["--spec", str(root), "show", "CORE-1"])
     out = capsys.readouterr().out
-    assert "2 approvals in all" in out and "via restated" in out
+    assert "2 locks in all" in out and "via menu" in out
 
 
 def test_an_approval_lists_the_decisions_settled_before_it(spec):
@@ -70,7 +57,7 @@ def test_an_edit_shows_what_the_agent_should_weigh(spec):
     changes.start(spec.load(), "widgets", None, None, None)
     result = edit.run(root, {"edits": [{"modify": "CORE-1", "set": {"why": "stamps sell."}, "reason": "clearer"}]},
                       dry_run=True)
-    assert any("attention: delegated under SYS-1" in line for line in result.context)
+    assert any("attention: level of intent: derived, under SYS-1" in line for line in result.context)
 
 
 def _worded_core(spec):
@@ -150,34 +137,9 @@ def test_quotes_need_words_a_date_and_context(spec):
     assert any(f.code == "S007" and "context" in f.message for f in spec.findings())
 
 
-def test_quotes_are_shown_with_when_and_what_was_discussed(spec):
-    spec.files["elements/CORE/requirements.yaml"][0]["quotes"] = [
-        {"words": "stamp them all", "said": "2026-10-17 09:30", "context": "talking about widget branding"}]
-    root = spec.write()
-    text = (root / "requirements.md").read_text()
-    assert '"stamp them all"' in text and "2026-10-17 09:30" in text and "talking about widget branding" in text
-
-
-def test_views_mark_approved_changed_and_delegated_items(spec):
-    root = spec.write()
-    _approve(spec, root, "SYS-1", "CORE-1", "--words", "approve SYS-1, CORE-1")
-    reqs = spec.files["elements/CORE/requirements.yaml"]
-    reqs[0]["text"] = "The core shall stamp each widget twice."
-    reqs.append({"id": "CORE-2", "text": "The core shall count each widget.", "origin": "agent",
-                 "traces_to": "SYS-1", "why": "inventory."})
-    root = spec.write()
-    text = (root / "requirements.md").read_text()
-    assert "🔒 **SYS-1**" in text and "🔓 **CORE-1**" in text and "⤷SYS-1 **CORE-2**" in text
-
-
 def test_no_importance_score_is_stored():
     for fields in edit.FIELDS.values():
         assert not fields & {"importance", "priority", "score", "criticality"}
-
-
-def test_the_approver_defaults_to_the_version_control_user(spec, tmp_path, monkeypatch):
-    monkeypatch.setattr(cli.subprocess, "run", lambda *a, **k: cli.subprocess.CompletedProcess(a, 0, "Grace\n", ""))
-    assert cli._approver(tmp_path) == "Grace"
 
 
 def test_each_logged_edit_records_when_it_happened(spec):

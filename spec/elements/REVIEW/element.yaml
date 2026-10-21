@@ -1,9 +1,11 @@
 id: REVIEW
-title: Review pages
+title: The review page
 parent: SYS
 depends_on:
 - MODEL
 - CHANGE
+- CHECK
 - VERIFY
-purpose: Web pages that show the engineer the spec as a whole, and how a change alters it.
+- DIFF
+purpose: One generated, interactive page that shows people the spec, how it changed since they last looked, and what awaits them, and gathers their feedback for the agent.
 related_code: {}

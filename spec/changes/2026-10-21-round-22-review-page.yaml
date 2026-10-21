@@ -1,0 +1,188 @@
+request: |-
+  Phases 4 and 5 of round 18's plan: the review page that replaces the Markdown views, its feedback block, and applying and answering that feedback
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-21'
+entries:
+- op: modify
+  id: MODEL-39
+  at: 2026-10-21T14:03-07:00
+  reason: built in round 22; the fingerprints are needed only for a page made from uncommitted work.
+  before:
+    text: The spec shall record each review a person sends back, with the person, the date and time, the version-control revision the page was generated from, whether the working tree differed from that revision, and the fingerprint of each item the page showed.
+    why: a comparison since a person's last review needs a fixed point to compare against, per person (DR-59).
+  after:
+    text: The spec shall record each review a person sends back, with the person, the date and time, the version-control revision the page was generated from, whether the working tree differed from that revision, and, when it did, the fingerprint of each item the page showed.
+    why: a comparison since a person's last review needs a fixed point per person (DR-59). A revision fixes the content exactly when the page was made from committed work, so the fingerprints are kept only when it wasn't, which keeps the record small.
+  acks:
+    DR-59: still holds; a revision fixes committed content, so fingerprints are kept only for uncommitted work
+- op: modify
+  id: REVIEW-V1
+  at: 2026-10-21T14:03-07:00
+  reason: the review page replaced the Markdown view (DR-60).
+  before:
+    description: The rendered view lists needs, then system requirements, then constraints, then each system element; each system requirement lists what refines it.
+    tests:
+      python:
+      - tests/test_render.py::test_view_reads_top_down
+      - tests/test_render.py::test_system_requirement_lists_what_refines_it
+  after:
+    description: The review page's sections come in order, what awaits the person first; its graph lists the system before its parts and needs before system requirements; each item carries what it traces to, which the page inverts to show what refines it.
+    tests:
+      python:
+      - tests/test_render.py::test_the_page_reads_top_down
+      - tests/test_render.py::test_the_page_knows_what_refines_each_item
+- op: modify
+  id: REVIEW-V2
+  at: 2026-10-21T14:03-07:00
+  reason: the review page replaced the Markdown view (DR-60).
+  before:
+    description: The rendered requirements view contains no verification items.
+    tests:
+      python:
+      - tests/test_render.py::test_view_hides_verification_items
+  after:
+    description: The page's graph and full spec hide verification items until the person turns them on.
+    tests:
+      python:
+      - tests/test_render.py::test_verification_items_are_hidden_until_asked_for
+- op: modify
+  id: REVIEW-V5
+  at: 2026-10-21T14:03-07:00
+  reason: the review page replaced the Markdown view (DR-60).
+  before:
+    description: The requirements view marks a locked item, an item changed since it was locked, a stated item, an added item, and a derived item with the item it sits under. It shows a quote with its date and time and its context.
+    tests:
+      python:
+      - tests/test_review.py::test_views_mark_approved_changed_and_delegated_items
+      - tests/test_levels.py::test_the_requirements_view_marks_each_level
+      - tests/test_review.py::test_quotes_are_shown_with_when_and_what_was_discussed
+  after:
+    description: The page shows a locked item that changed since as explicit and changed, an agent's item as derived under the stated item above it, and an added item as added; it shows each intent record with its person, its date and time and its context.
+    tests:
+      python:
+      - tests/test_render.py::test_the_page_marks_each_items_level_and_what_its_under
+      - tests/test_render.py::test_intent_reaches_the_page_with_who_when_and_context
+- op: add
+  id: REVIEW-V7
+  at: 2026-10-21T14:03-07:00
+  reason: verifies the review page (round 22).
+  after:
+    verifies:
+    - SYS-45
+    - REVIEW-1
+    - REVIEW-20
+    - REVIEW-22
+    - REVIEW-24
+    - CLI-25
+    method: test
+    technique: unit test
+    description: The review command writes one HTML file beside the toolkit's hook, ignored by version control, with a local snapshot of what it showed. The file loads nothing from the network and embeds every section in order, conflicts before other decisions, with a comparison against each version named. Rendering removes the Markdown views from earlier versions.
+    tests:
+      python:
+      - tests/test_review_page.py::test_the_page_is_one_offline_file_with_every_section_in_order
+      - tests/test_review_page.py::test_the_review_command_writes_the_page_beside_the_hook_ignored_by_version_control
+      - tests/test_review_page.py::test_the_page_lists_conflicts_first_and_proposes_items_to_lock_with_reasons
+      - tests/test_render.py::test_render_removes_the_markdown_views_and_writes_the_page
+- op: add
+  id: CLI-V16
+  at: 2026-10-21T14:03-07:00
+  reason: verifies agent access to the page's information.
+  after:
+    verifies:
+    - SYS-47
+    - CLI-24
+    method: test
+    technique: unit test
+    description: Every section of the review page prints as text, and as YAML, from the same data the page embeds.
+    tests:
+      python:
+      - tests/test_review_page.py::test_every_section_is_available_to_agents_as_text_and_yaml
+- op: add
+  id: CLI-V17
+  at: 2026-10-21T14:03-07:00
+  reason: verifies applying feedback.
+  after:
+    verifies:
+    - CLI-23
+    - CLI-27
+    - SYS-51
+    - MODEL-39
+    method: test
+    technique: unit test
+    description: A feedback block, found inside surrounding text, records a lock in its reviewer's name via the page and refuses a lock on an item that changed since; an unlock takes the lock off and keeps the history; a choice resolves its decision unless the options changed; an intent record the person disowns is removed through a logged edit; the review is recorded so the next comparison starts there; a block that names no person as name and email address is refused.
+    tests:
+      python:
+      - tests/test_review_page.py::test_a_lock_is_recorded_in_the_reviewers_name_and_a_stale_one_is_refused
+      - tests/test_review_page.py::test_an_unlock_takes_the_lock_off_and_keeps_the_history
+      - tests/test_review_page.py::test_a_choice_resolves_the_decision_unless_its_options_changed
+      - tests/test_review_page.py::test_an_intent_record_the_person_disowns_is_removed_through_an_edit
+      - tests/test_review_page.py::test_the_review_is_recorded_so_the_next_comparison_starts_there
+      - tests/test_review_page.py::test_a_block_must_name_a_person
+- op: add
+  id: CHECK-V12
+  at: 2026-10-21T14:03-07:00
+  reason: verifies the comment loop.
+  after:
+    verifies:
+    - SYS-52
+    - CHECK-23
+    - CHANGE-19
+    method: test
+    technique: unit test
+    description: Comments and general notes from a feedback block become numbered feedback items; the check reports each one until the agent records a response, and the person's next page shows the responses.
+    tests:
+      python:
+      - tests/test_review_page.py::test_comments_wait_for_a_response_and_the_next_page_shows_it
+- op: add
+  id: REVIEW-V8
+  at: 2026-10-21T14:03-07:00
+  reason: the page's interactions are checked in a browser.
+  after:
+    verifies:
+    - SYS-46
+    - SYS-53
+    - REVIEW-4
+    - REVIEW-6
+    - REVIEW-13
+    - REVIEW-15
+    - REVIEW-21
+    - REVIEW-23
+    - REVIEW-25
+    - REVIEW-26
+    - REVIEW-27
+    method: demonstration
+    technique: manual
+    description: In a browser, at desktop width and at 320 pixels wide, the person locks and unlocks items, comments, keeps or rolls back an alteration, disowns or corrects an intent record, chooses an option in a decision, and changes who they're reviewing as; a reload keeps their unsent feedback; Copy feedback gives a summary that reads on its own followed by the block. Clicking an ID shows the item's text. The graph indents each element under its parent with its items as marks by level, highlights elements whose requirements changed, and, for a selected item, draws what it traces to and what refines it. Demonstrated in round 22 with a headless browser driven over its debugging protocol.
+- op: add
+  id: AGENT-V13
+  at: 2026-10-21T14:03-07:00
+  reason: verifies AGENT-62.
+  after:
+    verifies:
+    - AGENT-62
+    method: inspection
+    technique: unit test
+    description: The skill tells agents to hand over the review page at the end of each change, to apply a pasted feedback block as it is, and to answer each feedback item.
+    tests:
+      python:
+      - tests/test_skill.py::test_skill_teaches_the_approval_model
+- op: modify
+  id: DR-60
+  at: 2026-10-21T14:03-07:00
+  reason: built.
+  raised:
+  - a person stated or guided it
+  - a person decided it
+  level: guided
+  fingerprint_before: fcf55fd9e7db
+  fingerprint_after: 46a3976422cb
+  after:
+    status: built in round 22. The Markdown views are removed by `spec render`, which now writes the page.
+  acks:
+    DR-60: |-
+      status note: built
+decisions: []
+friction: []
+closed: '2026-10-21'

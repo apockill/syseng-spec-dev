@@ -137,8 +137,9 @@ def test_edits_are_logged_with_reasons_in_the_change_record(open_spec):
     assert entry["op"] == "modify" and entry["id"] == "CORE-1" and entry["reason"] == "double stamps"
     assert entry["before"]["text"] == "The core shall stamp each widget."
     assert entry["after"]["text"] == "The core shall stamp each widget twice."
-    view = (open_spec.root / "changes").glob("*.md")
-    assert any("double stamps" in p.read_text() for p in view)
+    spec = open_spec.load()
+    assert "double stamps" in changes.view(spec, changes.current(spec))
+    assert not list((open_spec.root / "changes").glob("*.md"))           # change records are YAML only
 
 
 def test_change_defaults_to_code_first_and_the_primary_target(open_spec):

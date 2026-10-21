@@ -6,9 +6,10 @@
   requirements: CLI-6
   recorded: round 4 (decided in round 2)
   context: the engineer wanted the CLI to show context before an edit and ask for confirmation. Models rubber-stamp generic confirmations.
-  decision: an edit that touches approved or depended-upon items needs an acknowledgment of each affected item, by name, with a one-line note. Other edits apply at once.
+  decision: an edit that touches locked or depended-upon items needs an acknowledgment of each affected item, by name, with a one-line note. Other edits apply at once.
   alternatives: a generic confirmation on every edit, or no confirmation.
   consequences: friction appears only where there's something to weigh, and the notes become reasons the engineer can read.
+  basis: derived
 - id: DR-34
   title: An edit runs on a scratch copy first, and only the errors it introduces block it
   decided_by: agent
@@ -22,6 +23,7 @@
     `spec edit` copies the spec, applies the whole batch there, and runs the checker on the result. An error that wasn't there before rejects the batch, with the usual teaching messages, and nothing is written. Otherwise the batch is applied for real, logged and re-rendered. `--dry-run` stops after the checks.
   alternatives: Validating each operation on its own, which misses problems that only appear once the whole batch is applied. Rejecting any batch while any error exists, which blocks repairs.
   consequences: A batch is all or nothing. Copying the spec costs a fraction of a second at this size.
+  basis: derived
 - id: DR-35
   title: Acknowledgments are needed only when an item's meaning changes
   decided_by: agent
@@ -29,10 +31,10 @@
   - CLI
   requirements: CLI-6
   recorded: round 10 (slice 2)
-  context: DR-19 asked for named acknowledgments when an edit touches approved or depended-on items. Building it showed that a rationale-only edit, or a re-pointed test link, would have demanded acknowledgments for nothing.
+  context: DR-19 asked for named acknowledgments when an edit touches locked or depended-on items. Building it showed that a rationale-only edit, or a re-pointed test link, would have demanded acknowledgments for nothing.
   decision: |-
     An edit needs an acknowledgment only when it changes an item's meaning, which its fingerprint detects, or removes the item. The items that need one are:
-    - the item itself, if approved;
+    - the item itself, if locked;
     - the requirements that refine it;
     - requirements serving it, if it's a need;
     - the verification items that verify it;
@@ -41,6 +43,7 @@
     The CLI prints a ready-to-fill `acks:` block, and exits with code 2.
   alternatives: Acknowledging every touched item, which is pure friction for wording and link edits. No acknowledgments at all, which the engineer ruled out.
   consequences: The acknowledgment notes land in the change record, as reasons the engineer can read.
+  basis: derived
 - id: DR-36
   title: Removing an item retires its ID, and new IDs are allocated automatically
   decided_by: agent
@@ -50,9 +53,10 @@
   requirements: MODEL-15, CLI-7
   recorded: round 10 (slice 2)
   context: IDs must never be reused (MODEL-15). Agents picking numbers by hand would collide or reuse.
-  decision: A removal moves the ID into retired.yaml with its reason, and drops the item's approval. A new item gets the next number after the highest live or retired ID with its prefix. An explicit `id` is still accepted, unless it's taken or retired.
+  decision: A removal moves the ID into retired.yaml with its reason, and drops the item's lock. A new item gets the next number after the highest live or retired ID with its prefix. An explicit `id` is still accepted, unless it's taken or retired.
   alternatives: Leaving tombstones in place in the element files, which clutters the files every agent reads.
   consequences: Agents never choose numbers, and a retired ID can't come back by accident.
+  basis: derived
 - id: DR-39
   title: Two launchers, one committed with the repository and one per machine
   decided_by: agent
@@ -70,6 +74,7 @@
   consequences: |-
     `spec init` writes one file outside the repository. A machine with two toolkit installs uses whichever one `spec init --launcher` named last.
   status: superseded in round 15 by DR-52, which runs the toolkit as `spec` from the PATH.
+  basis: derived
 - id: DR-51
   title: Setup points sessions at the skill and lets agents run everyday commands
   decided_by: agent
@@ -81,8 +86,10 @@
   context: The engineer put the agent in charge of agent experience. In a live run, every toolkit command waited for permission, and nothing told a new session the method existed.
   decision: |-
     `spec init` writes a short section between markers into AGENTS.md, or CLAUDE.md when that's the file the repository has, and rewrites only that section on later runs. It adds Claude Code allow rules for status, check, show, render, edit, change, decide, propose and friction. Approve and resolve stay with the permission prompt, so the engineer confirms each command that records their words.
-  alternatives: Relying on the skill's description to trigger, which a quick request may not do. Allowing every toolkit command, which would let an approval be recorded without the engineer seeing it.
+  alternatives: Relying on the skill's description to trigger, which a quick request may not do. Allowing every toolkit command, which would let a lock be recorded without the engineer seeing it.
   consequences: Claude Code ignores a project's allow rules until the engineer has trusted the folder once, interactively. `--no-instructions` leaves the instruction files alone.
+  basis: derived
+  status: amended in round 18. The commands that still ask are those that record a person's locks or decisions (CLI-20); no command records a person's words.
 - id: DR-52
   title: Agents and hooks run the toolkit as `spec` from the PATH
   decided_by: agent
@@ -98,6 +105,7 @@
     - `.syseng/hook` stays in the repository, using only the standard library, so the guards keep working on a clone whose machine lacks the toolkit.
   alternatives: The two launchers (DR-39), which solved the same problem the standard tools solve, at the cost of a longer command, a file outside the repository and extra code. Installing into a project's virtual environment, which agents' shells often don't activate.
   consequences: Each machine needs the toolkit on its PATH, and the setup notice says how. One toolkit version serves every repository on a machine. A different program named `spec` earlier on the PATH would shadow the toolkit.
+  basis: derived
 - id: DR-53
   title: The skill and subagents are installed once per machine, as links to the installed toolkit
   decided_by: agent
@@ -115,3 +123,35 @@
     - Antigravity, with no user-level folder known, still gets a copy in the repository.
   alternatives: A copy per repository, refreshed by setup and flagged when stale, which keeps each repository self-contained at the cost of a commit per update per repository. A Claude Code plugin, which DR-1 ruled out.
   consequences: The skill an agent follows always matches the `spec` command it describes. A machine needs the toolkit installed and setup run once before its sessions get the skill. Claude Code's cloud sessions don't read user-level skills.
+  basis: derived
+- id: DR-56
+  title: A person's identity comes from a toolkit setting, then from version control's user
+  decided_by: agent
+  elements:
+  - CLI
+  - MODEL
+  requirements: SYS-43, CLI-11
+  recorded: round 18
+  context: Every intent record and lock names its person (SYS-43). On the engineer's machine, version control's user is the agent's own account, while the engineer's commits carry their name.
+  decision: The CLI reads the person from a toolkit setting in version control's configuration, set per machine and per person and never committed, then from an environment variable, then from version control's user name and email address. Setup asks for the setting when it's missing, and the status command shows who is recorded.
+  alternatives: Version control's user only, which credits the agent on machines where the agent commits. A list of people kept in the spec, which every person would have to maintain.
+  consequences: On a machine where an agent commits under its own account, a missing setting attributes intent to the agent. Setup's question and the status line are what prevent that.
+  basis: derived
+- id: DR-63
+  title: |-
+    Migration is two steps: agents summarize what needs judgment, then one command does the rest
+  decided_by: agent
+  basis: derived
+  elements:
+  - CLI
+  - MODEL
+  - CHECK
+  requirements: CLI-28, CHECK-27, SYS-35
+  recorded: round 20
+  context: Round 18 (D1) asked for a complete move to the new model, with nothing verbatim left in current files. Summarizing a person's words needs judgment; moving locks, cleaning change records and marking the format don't. Other repositories set up with the toolkit will need the same move.
+  decision: |-
+    - Agents first convert each item through `spec edit`: a person's words become intent records, an agent's items get a basis, and the older fields are unset. Rewordings of the vocabulary are declared as rewordings.
+    - Then `spec migrate`, in the same open change, refuses while any older field remains; carries each lock over an item the change only reworded, keeping the old fingerprint as `migrated_from`, as DR-29 did; moves approvals.yaml to locks.yaml in the lock schema without words, filling in the person running it where a record named no one and noting so; replaces verbatim values in change records with a marker, keeping values written as summaries; removes hand-written change records from before records were YAML (DR-65); and sets spec_version 2, enforcing flow-down when nothing violates it.
+    - It runs once. After it, the checker reports any older field as an error.
+  alternatives: A migration script outside the toolkit, as round 9 used, which other repositories couldn't reuse. Asking the engineer to re-lock every reworded item, which DR-29 already chose against.
+  consequences: Carrying locks over rewordings is possible only during this one migration, so an agent can't use it to keep a lock across a later edit. Records from before round 12 name the person who ran the migration, with a note, because no approver was recorded then.

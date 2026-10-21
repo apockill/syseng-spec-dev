@@ -1,0 +1,107 @@
+request: |-
+  Review page nits: clicking an item's text opens and highlights it too, the wording box keeps focus while typing, and Copy feedback copies at once; and apply the engineer's review 0547dce3ed
+mode: code-first
+target: python
+status: open
+opened: '2026-10-21'
+entries:
+- op: modify
+  id: REVIEW-29
+  at: 2026-10-21T15:51-07:00
+  reason: the engineer's review-page nit.
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Using the review page for the first time, which placed the graph near the bottom.
+      said: Found the graph too far down. Suggested tabs, or the graph on the right, so that whenever they interact with an item (naming DR-31, SYS-14, CHANGE-1 and NEED-10), whether by hovering or clicking, the graph highlights that spot.
+      basis: stated
+      fingerprint: d701cd236ab9
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Using the review page for the first time, which placed the graph near the bottom.
+      said: Found the graph too far down. Suggested tabs, or the graph on the right, so that whenever they interact with an item (naming DR-31, SYS-14, CHANGE-1 and NEED-10), whether by hovering or clicking, the graph highlights that spot.
+      basis: stated
+      fingerprint: d701cd236ab9
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:55
+      context: Using the review page's For you tab.
+      said: Wants clicking an item's title, such as DR-62's, to highlight it in the side pane the way clicking its ID does.
+      basis: guided
+      fingerprint: d701cd236ab9
+- op: modify
+  id: REVIEW-30
+  at: 2026-10-21T15:51-07:00
+  reason: the engineer's review-page nit.
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Reading the conflict over ten rewritten items on the review page, whose only choices were keep all ten, keep some, or roll back all ten.
+      said: Wants to check and uncheck items one at a time. Keeping all as written is too broad, makes them read all of them at once, and makes commentary hard. Wants to read some, lock those, and move on when short of time, with the rest neither locked nor rejected; even better a checkmark, or a way to submit feedback with a text box to tweak the wording as they read.
+      basis: stated
+      fingerprint: 80cf81ba0cbb
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Reading the conflict over ten rewritten items on the review page, whose only choices were keep all ten, keep some, or roll back all ten.
+      said: Wants to check and uncheck items one at a time. Keeping all as written is too broad, makes them read all of them at once, and makes commentary hard. Wants to read some, lock those, and move on when short of time, with the rest neither locked nor rejected; even better a checkmark, or a way to submit feedback with a text box to tweak the wording as they read.
+      basis: stated
+      fingerprint: 80cf81ba0cbb
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:55
+      context: Trying Suggest wording on the review page.
+      said: Reported that the wording box lost focus after one typed character.
+      basis: guided
+      fingerprint: 80cf81ba0cbb
+- op: modify
+  id: SYS-51
+  at: 2026-10-21T15:51-07:00
+  reason: the engineer's review-page nit.
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: Round 18. Discussing how feedback gets from the review page back to the agent.
+      said: Suggested that if the page is static, it could offer a copy-feedback button that gathers the feedback for the person to paste back to the agent.
+      basis: guided
+      fingerprint: 5b6ca14e6172
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: Round 18. Discussing how feedback gets from the review page back to the agent.
+      said: Suggested that if the page is static, it could offer a copy-feedback button that gathers the feedback for the person to paste back to the agent.
+      basis: guided
+      fingerprint: 5b6ca14e6172
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:55
+      context: Using Copy feedback on the review page, which opened a dialog first.
+      said: Wants Copy feedback to copy the feedback at once instead of opening another menu.
+      basis: guided
+      fingerprint: 5b6ca14e6172
+- op: add
+  id: REVIEW-V13
+  at: 2026-10-21T15:52-07:00
+  reason: verifies round 27's fixes.
+  after:
+    verifies:
+    - REVIEW-29
+    - REVIEW-30
+    - SYS-51
+    - CLI-23
+    method: test
+    technique: unit test
+    description: Clicking anywhere on an item's card, other than a control, opens it like clicking its ID; typing a suggested wording refreshes marks without rebuilding the list it's typed in, so the box keeps focus; Copy feedback copies at once and shows the block only when the browser won't copy; a lock, keep or comment sent again is skipped as already on record. Demonstrated in round 27 in a browser with a real click.
+    tests:
+      python:
+      - tests/test_review_page.py::test_clicking_an_items_card_opens_it_like_its_id
+      - tests/test_review_page.py::test_typing_a_wording_never_rebuilds_the_list_it_is_typed_in
+      - tests/test_review_page.py::test_copy_feedback_copies_at_once
+      - tests/test_review_page.py::test_feedback_sent_again_is_not_recorded_twice
+decisions: []
+friction: []
+feedback: []

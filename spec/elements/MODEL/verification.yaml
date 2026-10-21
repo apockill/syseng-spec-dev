@@ -3,7 +3,6 @@
   - MODEL-1
   method: test
   technique: unit test
-  origin: agent
   description: Given a system element directory nested inside another element's directory, the checker reports it.
   tests:
     python:
@@ -14,7 +13,6 @@
   - MODEL-11
   method: test
   technique: unit test
-  origin: agent
   description: Given an element whose parent doesn't exist, or parents that loop back on themselves, the checker reports a broken tree.
   tests:
     python:
@@ -26,7 +24,6 @@
   - MODEL-4
   method: test
   technique: unit test
-  origin: agent
   description: Given a dependency on an unknown element, or a dependency cycle, the checker reports it and names every element in the cycle.
   tests:
     python:
@@ -37,7 +34,6 @@
   - MODEL-12
   method: test
   technique: unit test
-  origin: agent
   description: Given a need that no requirement serves, the checker reports the need.
   tests:
     python:
@@ -47,27 +43,25 @@
   - MODEL-13
   method: test
   technique: unit test
-  origin: agent
-  description: Given a requirement with neither a rationale nor a source, the checker reports it.
+  description: Given a requirement with neither a rationale nor intent, the checker reports it.
   tests:
     python:
     - tests/test_check_structure.py::test_requirement_without_rationale_is_reported
 - id: MODEL-V6
   verifies:
-  - MODEL-14
+  - MODEL-38
   method: test
   technique: unit test
-  origin: agent
-  description: Given an item whose origin is neither the engineer nor an agent, the checker reports it.
+  description: An item whose origin is neither the engineer nor an agent is reported, and so is an item with no intent, no lock and no basis.
   tests:
     python:
     - tests/test_check_structure.py::test_missing_origin_is_reported
+    - tests/test_check_structure.py::test_an_item_with_no_intent_and_no_basis_is_reported
 - id: MODEL-V7
   verifies:
   - MODEL-15
   method: test
   technique: unit test
-  origin: agent
   description: Given an item that reuses a retired ID, or two items sharing one ID, the checker reports each.
   tests:
     python:
@@ -80,7 +74,6 @@
   - MODEL-16
   method: test
   technique: unit test
-  origin: agent
   description: Each wording rule fires on a sentence that breaks it, and none fires on well-formed requirements, including the calibrated exemptions (a quoted 'shall', 'how many', proper names, 'both … and').
   tests:
     python:
@@ -93,7 +86,6 @@
   - MODEL-17
   method: test
   technique: unit test
-  origin: agent
   description: Requirement text containing a code span, a file name, a snake_case or camelCase identifier, or call syntax is reported.
   tests:
     python:
@@ -105,8 +97,7 @@
   - MODEL-31
   method: test
   technique: unit test
-  origin: agent
-  description: An approval records the item's fingerprint. Rewording the item makes it unapproved; re-pointing its test links does not.
+  description: A lock records the item's fingerprint. Rewording the item makes the lock no longer match it; re-pointing its test links does not.
   tests:
     python:
     - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
@@ -116,7 +107,6 @@
   - MODEL-30
   method: test
   technique: unit test
-  origin: agent
   description: A verification item whose method isn't test, analysis, demonstration or inspection, or whose technique is unknown, is reported.
   tests:
     python:
@@ -126,11 +116,25 @@
   - MODEL-34
   - MODEL-35
   - CLI-11
+  - SYS-43
   method: test
   technique: unit test
-  origin: agent
-  description: Approving two items together, then one of them again by restatement, keeps both approvals of it, oldest first, each with the approver, the channel, the date and time, the number of items approved together, the engineer's words and any note. Showing the item lists every approval. With no approver named, the version-control user name is recorded.
+  description: Locking two items together, then one of them again, keeps both locks of it, oldest first, each with the person, the channel, the date and time, and the batch size. A lock needs no words. The person recorded comes from the toolkit's own setting first, then the environment, then version control's user name and email address.
   tests:
     python:
     - tests/test_review.py::test_every_approval_is_kept_with_who_and_how
-    - tests/test_review.py::test_the_approver_defaults_to_the_version_control_user
+    - tests/test_levels.py::test_an_approval_needs_no_words
+    - tests/test_levels.py::test_the_person_comes_from_the_toolkit_setting_first
+- id: MODEL-V13
+  verifies:
+  - MODEL-37
+  - MODEL-38
+  method: test
+  technique: unit test
+  description: An edit refuses an intent record without a basis of stated or guided. A record with the basis guided makes the item guided. An item with the basis added is added, and what derives from it counts as added too. A basis other than derived or added is reported.
+  tests:
+    python:
+    - tests/test_levels.py::test_an_edit_refuses_an_intent_record_without_a_basis
+    - tests/test_levels.py::test_the_highest_level_applies
+    - tests/test_levels.py::test_an_added_item_and_what_derives_from_it_count_as_added
+    - tests/test_levels.py::test_an_invalid_basis_is_reported

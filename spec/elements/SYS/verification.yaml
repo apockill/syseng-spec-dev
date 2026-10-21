@@ -3,7 +3,6 @@
   - SYS-2
   method: test
   technique: unit test
-  origin: agent
   description: Running the checker on this repository's own spec reports no errors.
   tests:
     python:
@@ -13,8 +12,7 @@
   - SYS-6
   method: test
   technique: unit test
-  origin: agent
-  description: A requirement that traces to nothing is reported, unless it's marked derived with a reason; this repository's spec traces completely.
+  description: A requirement that traces to nothing is reported; this repository's spec traces completely.
   tests:
     python:
     - tests/test_check_structure.py::test_untraced_requirement_is_reported
@@ -25,24 +23,22 @@
   - SYS-3
   method: inspection
   technique: manual
-  origin: agent
   description: The toolkit's source and packaging (pyproject.toml, src/) are Python.
 - id: SYS-V4
   verifies:
   - SYS-14
+  - CHECK-19
   method: test
   technique: unit test
-  origin: agent
-  description: Listing the checker's to-dos names every unapproved item.
+  description: Listing the checker's to-dos names each item that changed since a person locked it, with who locked it.
   tests:
     python:
-    - tests/test_repo_spec.py::test_todo_lists_unapproved_items
+    - tests/test_repo_spec.py::test_todo_lists_items_changed_since_a_person_gave_them
 - id: SYS-V5
   verifies:
   - SYS-15
   method: test
   technique: unit test
-  origin: agent
   description: A change's record lists every spec item it added, modified or removed, with the old and new wording and the reason.
   tests:
     python:
@@ -53,14 +49,12 @@
   - SYS-32
   method: demonstration
   technique: manual
-  origin: agent
   description: On a machine with Python but without Nix tooling, install the toolkit with pip or pipx into its own environment, run setup in a scratch repository, then run `spec check` there. Each step succeeds, and the checker reports no errors.
 - id: SYS-V7
   verifies:
   - SYS-40
   method: inspection
   technique: unit test
-  origin: agent
   description: No kind of spec item has a field for importance, priority, score or criticality.
   tests:
     python:

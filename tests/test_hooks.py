@@ -46,9 +46,10 @@ def _approvals(repo):
 @pytest.mark.parametrize("rel, names", [
     ("spec/elements/CORE/requirements.yaml", "`spec edit`"),
     ("spec/elements/NEW/element.yaml", "`spec edit`"),
-    ("spec/approvals.yaml", "`spec approve"),
+    ("spec/approvals.yaml", "`spec lock"),
+    ("spec/locks.yaml", "`spec lock"),
     ("spec/changes/2026-01-01-round-1.yaml", "`spec decide`"),
-    ("spec/requirements.md", "`spec render`"),
+    ("spec/requirements.md", "`spec review`"),
     ("spec/retired.yaml", "`spec edit`"),
 ])
 def test_agents_cannot_edit_files_the_toolkit_manages(repo, capsys, rel, names):
@@ -154,6 +155,9 @@ def test_stop_tells_the_engineer_when_the_toolkit_is_missing(repo, tmp_path):
     ("SYS-32 LGTM", ["SYS-32"]),
     ("CORE-1, CORE-V1: looks good!", ["CORE-1", "CORE-V1"]),
     ("approve CORE-1 lgtm", ["CORE-1"]),
+    ("lock CORE-1, SYS-1", ["CORE-1", "SYS-1"]),
+    ("Lock in NEED-1..3", ["NEED-1..3"]),
+    ("CORE-1 locked.", ["CORE-1"]),
 ])
 def test_approvals_that_name_items_by_id_are_read(message, ids):
     assert hook.parse_approval(message) == (ids, None)
@@ -190,10 +194,10 @@ def test_lines_that_approve_no_items_are_ignored(line):
     assert hook.parse_approval(line, elements={"SYS", "CORE"}) == (None, None)
 
 
-def test_chat_approval_is_recorded_with_the_engineers_words(repo):
+def test_chat_approval_is_recorded_without_the_engineers_words(repo):
     out = _run(repo, "prompt", {"prompt": "approve CORE-1. Nice work"})
     record = _approvals(repo)["CORE-1"]
-    assert record["via"] == "chat" and record["words"] == "approve CORE-1. Nice work"
+    assert record["via"] == "chat" and "words" not in record and "prompt hook" in record["note"]
     assert "CORE-1 (The core shall stamp each widget.)" in out and "don't record it again" in out
 
 
@@ -215,7 +219,7 @@ def test_quoted_lines_are_not_approvals(repo):
 
 def test_lgtm_is_not_an_approval(repo):
     out = _run(repo, "prompt", {"prompt": "lgtm, ship it"})
-    assert _approvals(repo) == {} and "approves no spec items" in out
+    assert _approvals(repo) == {} and "locks no spec items" in out and "record that as intent" in out
 
 
 def test_pasted_text_is_not_the_engineers_approval(repo):

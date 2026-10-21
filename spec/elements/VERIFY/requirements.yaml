@@ -1,49 +1,88 @@
 - id: VERIFY-2
   text: |-
     The runner shall support three techniques in its first release: unit test, integration test and reasoning check.
-  origin: engineer
   traces_to: SYS-10
-  source: |-
-    "'software unit test'" · "'REASONING TEST'" · "'INTEGRATION TEST'"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+    said: Named software unit tests, reasoning tests and integration tests.
+    basis: guided
+    fingerprint: 5f78246dc555
 - id: VERIFY-3
   text: The runner shall run independent verification items in parallel.
-  origin: engineer
   traces_to: SYS-10
-  source: |-
-    "the skill has a tool for running these in parallel and reporting back"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how verification items are run.
+    said: Described the skill as having a tool for running them in parallel and reporting back.
+    basis: stated
+    fingerprint: 60235cdf8dcf
 - id: VERIFY-4
   text: After each run, the runner shall report each verification item's result.
-  origin: engineer
   traces_to: SYS-10
-  source: as VERIFY-3.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how verification items are run.
+    said: Described the skill as having a tool for running them in parallel and reporting back.
+    basis: stated
+    fingerprint: 31720a5893b1
 - id: VERIFY-5
   text: |-
     The runner shall derive each verification item's status in each implementation: not implemented, not yet run, passing or failing.
-  origin: engineer
   traces_to: SYS-9
-  source: |-
-    "the specs should mark in some way what has been implemented yet, and what has not (e.g. don't expect tests to pass, perhaps VIs have been specced but not implemented)"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how the spec relates to what has been built.
+    said: Wants the specs to mark in some way what has been implemented yet and what has not, for example so tests aren't expected to pass where verification items have perhaps been specified but not implemented.
+    basis: guided
+    fingerprint: 27d7dbc97fb4
 - id: VERIFY-8
   text: When an expensive-tier item fails, the runner shall add the failure to the change's open decisions.
-  origin: engineer
   traces_to: SYS-16
-  source: |-
-    "If reasoning or integration+reasoning tests fail, the LLM should add it to a list of things to flag to the user."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing what happens when verification fails.
+    said: Wants the model, when reasoning tests or integration tests with reasoning fail, to add the failure to a list of things to flag to the user.
+    basis: guided
+    fingerprint: bf6a1576db57
 - id: VERIFY-12
   text: At the end of a full run, the toolkit shall produce a summary of the product's health.
-  origin: engineer
   traces_to: SYS-13
-  source: |-
-    "come back with … an AI summary of the health of the code"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 2). Answering Q9, about expensive verification and full runs requested occasionally and left to run unsupervised.
+    said: Wants the run to come back with, among other things, an AI summary of the health of the code.
+    basis: stated
+    fingerprint: 8b2e7df2aefb
 - id: VERIFY-14
   text: When the engineer requests verification of a change, the runner shall include the verification items of every system element that depends, directly or indirectly, on an element the change touched.
-  origin: engineer
   traces_to: SYS-10
-  source: |-
-    Q24: "if the general utility changes, and I ask for a comprehensive verification, it triggers VI's on RENDER and PHYSICS"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 8). Answering Q24, about a shared system element, such as a general utility, that RENDER and PHYSICS both depend on; see DR-8.
+    said: Wants a change to the general utility, when they ask for a comprehensive verification, to trigger the verification items of RENDER and PHYSICS.
+    basis: guided
+    fingerprint: 3489ec816f40
 - id: VERIFY-13
-  text: The health summary shall list each system element's verification status, each change the run made with its reason, each unapproved item, and each requirement without verification.
-  origin: agent
+  text: The health summary shall list each system element's verification status, each change the run made with its reason, each item changed since a person gave it, and each requirement without verification.
   traces_to: SYS-13
   why: |-
     what you'd want to know on returning: what's broken, what agents changed while you were away, and what's waiting for you.
+  basis: derived
+- id: VERIFY-15
+  text: The runner shall run each model-judged verification item without the conversation or the spec that produced the work it checks.
+  traces_to: SYS-11
+  basis: derived
+  why: the reasoning check's isolation (REASON-2, REASON-5) is the runner's independence requirement for any technique a model judges, so it belongs at the runner's level for the techniques to refine.
+- id: VERIFY-16
+  text: For a requirement the toolkit judges important, the runner shall judge each model-judged verification item more than once.
+  traces_to: SYS-24
+  basis: derived
+  why: one sample from a nondeterministic judge tells little; how many runs, and how they combine, is the technique's (REASON-4).

@@ -3,7 +3,7 @@ name = "syseng"
 version = "0.1.0"
 description = "A systems-engineering spec toolkit: needs, requirements, verification and decisions, kept honest by a CLI."
 requires-python = ">=3.11"
-dependencies = ["pyyaml>=6"]
+dependencies = ["pyyaml>=6", "pydantic>=2.6"]
 
 [project.scripts]
 spec = "syseng.cli:main"

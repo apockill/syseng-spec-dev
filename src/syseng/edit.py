@@ -15,6 +15,19 @@ An edit is a batch of operations, sent as one YAML document:
     acks:                           # one note per affected item, when the CLI asks for them
       CLI-V1: still verifies the new wording
 
+What a person asked for goes on the item as intent, summarized, never quoted. On an add or a
+modify, `intent:` appends records; `by`, `when` and the fingerprint are filled in:
+
+      - modify: CLI-3
+        set: {text: …}
+        intent: {basis: stated, context: what was being discussed, said: what they asked for, in summary}
+        reason: …
+
+An item no person asked for says where it came from instead: `basis: derived` (something above
+needs it) or `basis: added` (an agent's own idea). Two more keys answer for a change to an item a
+person locked or stated: `rewording: true` when the meaning stays, or `conflict: D2`, the
+resolved conflict that allows it.
+
 The batch runs against a scratch copy first. The CLI shows each operation's context,
 asks for acknowledgments only where an approved or depended-on item is affected, and
 rejects the batch if it would introduce checker errors. Only then does it write the spec and
@@ -31,21 +44,21 @@ import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from syseng import changes, check, fingerprint, model, render, review, yamlio
+from syseng import changes, check, fingerprint, levels, model, people, records, render, review, yamlio
 from syseng.model import Spec
 
 KIND_FILES = {"need": "needs.yaml", "requirement": "requirements.yaml", "system": "requirements.yaml",
               "constraint": "requirements.yaml", "vi": "verification.yaml", "decision": "decisions.yaml"}
 FIELDS = {
-    "need": {"text", "origin", "source", "quotes", "context"},
+    "need": {"text", "origin", "source", "quotes", "context", "intent"},
     "requirement": {"text", "origin", "traces_to", "derived", "why", "source", "quotes", "refines", "reworded",
-                    "allocation_note", "verification_deferred"},
+                    "allocation_note", "verification_deferred", "intent", "basis"},
     "system": {"kind", "text", "origin", "serves", "why", "source", "quotes", "refines", "reworded",
-               "allocation_note", "verification_deferred"},
-    "vi": {"verifies", "method", "technique", "description", "origin", "tests"},
+               "allocation_note", "verification_deferred", "intent", "basis"},
+    "vi": {"verifies", "method", "technique", "description", "origin", "tests", "intent"},
     "decision": {"title", "decided_by", "elements", "requirements", "recorded", "status", "context",
-                 "decision", "alternatives", "consequences"},
-    "element": {"title", "parent", "depends_on", "purpose", "related_code", "note"},
+                 "decision", "alternatives", "consequences", "intent", "basis"},
+    "element": {"title", "parent", "depends_on", "purpose", "related_code", "note", "intent"},
 }
 FIELDS["constraint"] = FIELDS["system"]
 
@@ -63,6 +76,14 @@ class Op:
     fields: dict
     unset: list
     reason: str
+    intent: list = field(default_factory=list)  # records to append, before `by`, `when` and fingerprint are filled
+    rewording: bool = False                     # the text changes, the meaning doesn't (DR-57)
+    conflict: str | None = None                 # the conflict that allows changing a locked or stated item
+
+    @property
+    def requested(self) -> bool:
+        """Carries a person's request for the change itself (CLI-22)."""
+        return any(r.get("basis") == "stated" for r in self.intent)
 
 
 @dataclass
@@ -93,6 +114,9 @@ def parse(doc) -> tuple[list[Op], dict]:
             raise EditError(f"operation {n} needs exactly one of `add`, `modify` or `remove`")
         verb = verbs[0]
         reason = raw.get("reason")
+        intent = _intent_list(raw.get("intent"), n) if verb != "remove" else []
+        extra = {"intent": intent, "rewording": bool(raw.get("rewording")),
+                 "conflict": str(raw["conflict"]) if raw.get("conflict") else None}
         if not reason:  # CLI-8, CHANGE-5
             target = raw.get(verb)
             raise EditError(f"operation {n} ({verb} {target}) has no `reason`. Every change to the spec records "
@@ -101,15 +125,30 @@ def parse(doc) -> tuple[list[Op], dict]:
             kind = raw["add"]
             if kind not in FIELDS:
                 raise EditError(f"operation {n}: can't add {kind!r}; use one of {', '.join(FIELDS)}")
-            fields = {k: v for k, v in raw.items() if k not in ("add", "element", "reason", "id")}
-            ops.append(Op("add", kind, raw.get("id"), raw.get("element"), fields, [], reason))
+            fields = {k: v for k, v in raw.items()
+                      if k not in ("add", "element", "reason", "id", "intent", "rewording", "conflict")}
+            ops.append(Op("add", kind, raw.get("id"), raw.get("element"), fields, [], reason, **extra))
         else:
             fields = raw.get("set") or {}
             unset = raw.get("unset") or []
-            if verb == "modify" and not fields and not unset:
-                raise EditError(f"operation {n} (modify {raw['modify']}) sets nothing; use `set:` or `unset:`")
-            ops.append(Op(verb, "", str(raw[verb]), None, fields, unset, reason))
+            if verb == "modify" and not fields and not unset and not intent:
+                raise EditError(f"operation {n} (modify {raw['modify']}) sets nothing; use `set:`, `unset:` or "
+                                "`intent:`")
+            ops.append(Op(verb, "", str(raw[verb]), None, fields, unset, reason, **extra))
     return ops, {str(k): str(v) for k, v in acks.items()}
+
+
+def _intent_list(value, n: int) -> list[dict]:
+    if value is None:
+        return []
+    recs = value if isinstance(value, list) else [value]
+    for r in recs:
+        wrong = records.problems(records.IntentDraft, r) if isinstance(r, dict) else ["isn't a mapping"]
+        if wrong:
+            raise EditError(f"operation {n}: intent record: {'; '.join(wrong)}. A record has basis (stated: what the "
+                            "person said, taken alone, says what the item requires; guided: their choice or "
+                            "constraint fixed it), context, said, and optionally by and when.")
+    return [dict(r) for r in recs]
 
 
 # ---------------------------------------------------------------- applying to a directory
@@ -134,7 +173,7 @@ def _check_fields(kind: str, keys, where: str) -> None:
             raise EditError(f"{where}: unknown field `{k}` for a {kind}.{hint}")
 
 
-def apply_ops(root: Path, ops: list[Op], change_id: str) -> list[str]:
+def apply_ops(root: Path, ops: list[Op], change_id: str, person: str = "", now: str = "") -> list[str]:
     """Applies operations to the spec files under `root`. Returns the IDs touched, in order."""
     ids = []
     for op in ops:
@@ -145,7 +184,33 @@ def apply_ops(root: Path, ops: list[Op], change_id: str) -> list[str]:
             ids.append(_modify(spec, op))
         else:
             ids.append(_remove(spec, root, op, change_id))
+    pending = {i: op.intent for op, i in zip(ops, ids) if op.intent}
+    if pending:  # each record is stamped with the item as it stands after the whole batch
+        spec = model.load(root)
+        for iid, recs in pending.items():
+            full = [{"by": r.get("by") or person, "when": r.get("when") or now, "context": r.get("context"),
+                     "said": r.get("said"), "basis": r.get("basis"), "fingerprint": _fingerprint(spec, iid)}
+                    for r in recs]
+            for rec in full:
+                wrong = records.problems(records.IntentRecord, rec)
+                if wrong:
+                    raise EditError(f"intent on {iid}: {'; '.join(wrong)}. The person comes from "
+                                    f"`git config {people.SETTING} \"Name <email>\"` unless the record names one.")
+            _append_intent(spec, iid, full)
     return ids
+
+
+def _append_intent(spec: Spec, iid: str, recs: list[dict]) -> None:
+    if iid in spec.elements:
+        element = spec.elements[iid]
+        yamlio.write(element.file, {**element.data, "intent": [*(element.data.get("intent") or []), *recs]})
+        return
+    item = spec.items[iid]
+    entries = yamlio.read(item.file)
+    for e in entries:
+        if str(e.get("id")) == iid:
+            e["intent"] = [*(e.get("intent") or []), *recs]
+    yamlio.write(item.file, entries)
 
 
 def _add(spec: Spec, root: Path, op: Op) -> str:
@@ -225,8 +290,9 @@ def _remove(spec: Spec, root: Path, op: Op, change_id: str) -> str:
     retired = yamlio.read(root / "retired.yaml") if (root / "retired.yaml").exists() else []
     retired.append({"element": item.element, "ids": [op.id], "note": f"{op.id}, in {change_id}: {op.reason}"})
     yamlio.write(root / "retired.yaml", retired)
-    approvals = yamlio.read(root / "approvals.yaml") if (root / "approvals.yaml").exists() else []
-    yamlio.write(root / "approvals.yaml", [a for a in approvals if a.get("id") != op.id])
+    path = spec.locks_path()
+    if path.exists():
+        yamlio.write(path, [a for a in yamlio.read(path) or [] if a.get("id") != op.id])
     return op.id
 
 
@@ -235,16 +301,21 @@ def _retired_hint(spec: Spec, item_id: str) -> str:
 
 
 # ---------------------------------------------------------------- impact (CLI-5, CLI-6)
-def affected(spec: Spec, touched: list[str], adding: set[str]) -> dict[str, str]:
-    """Approved or depended-on items an edit affects, each with the reason it's affected."""
+def affected(spec: Spec, touched: list[str], adding: set[str], drafts: set[str] = frozenset(),
+             approved: set[str] | None = None) -> dict[str, str]:
+    """Approved or depended-on items an edit affects, each with the reason it's affected.
+
+    `drafts` are items an agent added earlier in the open change and no person has locked since: they're the
+    agent's own work, so editing them alters nothing a person gave."""
     out: dict[str, str] = {}
-    approved = {s["id"] for s in check.approval_status(spec) if s["state"] == "approved"}
-    raised = {t: review.engineer_marks(spec, t) for t in touched if t not in adding}
+    if approved is None:
+        approved = approved_ids(spec)
+    raised = {t: review.engineer_marks(spec, t) for t in touched if t not in adding and t not in drafts}
     for t in touched:
         if t in adding:
             continue
         if t in approved:
-            out[t] = "you approved it; this edit makes it unapproved again"
+            out[t] = "a person locked it; this edit changes what they locked"
         elif raised.get(t):  # SYS-37: the engineer will be asked about this alteration
             out[t] = f"{' and '.join(raised[t])}; the change record will ask whether to keep this alteration"
         for r in spec.of_kind("requirement"):
@@ -268,6 +339,25 @@ def affected(spec: Spec, touched: list[str], adding: set[str]) -> dict[str, str]
         if t not in approved and not raised.get(t):
             out.pop(t, None)
     return {k: v for k, v in out.items() if k not in touched or k in approved or raised.get(k)}
+
+
+def approved_ids(spec: Spec) -> set[str]:
+    return {s["id"] for s in check.approval_status(spec) if s["state"] == "approved"}
+
+
+def _drafts(spec: Spec, change) -> set[str]:
+    """Items the open change added that no person has locked since (see `affected`)."""
+    added = {e.get("id") for e in change.data.get("entries") or [] if e.get("op") == "add"}
+    return {i for i in added if not review.history(spec, i)}
+
+
+def _only_gains_dependencies(before: Spec, after: Spec, iid: str) -> bool:
+    """An element that only gains dependencies means nothing new to what's recorded about it, or to its dependents."""
+    if iid not in before.elements or iid not in after.elements:
+        return False
+    b, a = before.elements[iid].data, after.elements[iid].data
+    same = all(b.get(k) == a.get(k) for k in ("title", "purpose", "parent"))
+    return same and set(b.get("depends_on") or []) <= set(a.get("depends_on") or [])
 
 
 def _fingerprint(spec: Spec, item_id: str) -> str | None:
@@ -362,6 +452,44 @@ def _context_lines(before: Spec, after: Spec, ops: list[Op], ids: list[str]) -> 
     return lines
 
 
+# ---------------------------------------------------------------- conflicts (CLI-22, DR-57)
+def _conflict_named(spec: Spec, change, ref: str) -> dict:
+    """The decision an edit's `conflict:` names: `D2` in the open change, or `<change> D2` in another."""
+    parts = ref.split()
+    wanted = parts[-1]
+    pool = [change] if len(parts) == 1 else [c for c in changes.all_changes(spec) if c.id == parts[0]]
+    for c in pool:
+        for d in c.data.get("decisions") or []:
+            if d.get("id") == wanted:
+                return d
+    raise EditError(f"conflict {ref!r} names no decision; raise it first with `spec decide` (kind: conflict)")
+
+
+def _guard_intent(spec: Spec, change, ops: list[Op], ids: list[str], meaningful: list[str]) -> None:
+    """In spec-first mode, a change of meaning to an item a person locked or stated waits for that person (CLI-22)."""
+    refused = []
+    for op, iid in zip(ops, ids):
+        if iid not in meaningful or op.op == "add":
+            continue
+        if levels.level_of(spec, iid).level not in (levels.EXPLICIT, levels.STATED):
+            continue
+        if op.rewording or op.requested:
+            continue
+        if op.conflict:
+            d = _conflict_named(spec, change, op.conflict)
+            if d.get("status") == "resolved" and iid in (d.get("involves") or []):
+                continue
+        refused.append(iid)
+    if refused:
+        raise EditError(
+            f"{', '.join(changes._label(spec, i) for i in refused)}: a person locked or stated "
+            f"{'these' if len(refused) > 1 else 'this'}, and this is a spec-first change, so changing the meaning "
+            "waits for them. Raise the conflict with `spec decide` (kind: conflict, involves: the items, options "
+            "with the new text each would give), and once they've chosen, send the edit again with `conflict: D<n>`. "
+            "If the meaning doesn't change, mark the edit `rewording: true`; if the person asked for this very "
+            "change, add their request as `intent:` with basis stated.")
+
+
 # ---------------------------------------------------------------- entry point
 def run(root: Path, doc, dry_run: bool = False) -> Result:
     ops, acks = parse(doc)
@@ -371,26 +499,38 @@ def run(root: Path, doc, dry_run: bool = False) -> Result:
         raise EditError("no change is open. Start one with `spec change start \"<what the engineer asked for>\"`; "
                         "every edit is logged in it with its reason.")
     result = Result()
+    person = people.person(spec.repo_root())[0]
+    now = datetime.datetime.now().astimezone().isoformat(timespec="minutes")
+    stamp = now.replace("T", " ")[:16]
+    for op in ops:
+        if op.conflict:
+            _conflict_named(spec, change, op.conflict)
     with tempfile.TemporaryDirectory() as tmp:
         scratch = Path(tmp) / "spec"
         shutil.copytree(root, scratch)
-        ids = apply_ops(scratch, ops, change.id)
+        ids = apply_ops(scratch, ops, change.id, person, stamp)
         after = model.load(scratch)
         after.repo = spec.repo_root()  # test links resolve in the real repository (CHECK-4)
         result.ids = ids
         result.context = _context_lines(spec, after, ops, ids)
         adding = {i for op, i in zip(ops, ids) if op.op == "add"}
         meaningful = [i for op, i in zip(ops, ids) if op.op == "remove" or (
-            op.op == "modify" and _fingerprint(spec, i) != _fingerprint(after, i))]
-        needed = affected(spec, meaningful, adding)
+            op.op == "modify" and _fingerprint(spec, i) != _fingerprint(after, i)
+            and not _only_gains_dependencies(spec, after, i))]
+        if change.data.get("mode") == "spec-first":
+            _guard_intent(spec, change, ops, ids, meaningful)
+        drafts = _drafts(spec, change)
+        approved = approved_ids(spec)
+        needed = affected(spec, meaningful, adding, drafts, approved)
         missing = {k: v for k, v in needed.items() if k not in acks}
         if missing:
             result.needs_acks = missing
             return result
         render.write_views(after)
         old_errors = {(f.code, f.item, f.message) for f in check.check(spec) if f.severity == "error"}
-        new = [f for f in check.check(after)
-               if f.severity == "error" and f.code != "R001" and (f.code, f.item, f.message) not in old_errors]
+        new = [f for f in check.check(after)  # a conflict is raised once the change is done, not per edit (C001)
+               if f.severity == "error" and f.code not in ("R001", "C001", "F001")
+               and (f.code, f.item, f.message) not in old_errors]
         if new:
             for f in new:  # point at the real files, not the scratch copy
                 if f.file is not None and f.file.is_relative_to(scratch):
@@ -399,22 +539,26 @@ def run(root: Path, doc, dry_run: bool = False) -> Result:
             return result
     if dry_run:
         return result
-    apply_ops(root, ops, change.id)
+    apply_ops(root, ops, change.id, person, stamp)
     after = model.load(root)
-    now = datetime.datetime.now().astimezone().isoformat(timespec="minutes")
     for op, iid in zip(ops, ids):
         entry = {"op": op.op, "id": iid, "at": now, "reason": op.reason}  # CHANGE-16
-        marks = review.engineer_marks(spec, iid) if iid in meaningful else []
+        marks = review.engineer_marks(spec, iid) if iid in meaningful and iid not in drafts else []
         if marks:  # CHANGE-14: listed in the change record until the engineer answers
             entry["raised"] = marks
+            entry["level"] = levels.level_of(spec, iid).level  # the level the item had when it was altered
             entry["fingerprint_before"] = _fingerprint(spec, iid)
             entry["fingerprint_after"] = _fingerprint(after, iid)
+        for key, value in (("rewording", op.rewording), ("conflict", op.conflict), ("requested", op.requested)):
+            if value:  # how an alteration answers for itself (CHECK-26), and what the diff calls it (DIFF-3)
+                entry[key] = value
         b, a = _diff(_data(spec, iid), _data(after, iid))
         if b:
             entry["before"] = b
         if a:
             entry["after"] = a
-        own = {k: v for k, v in acks.items() if iid in meaningful and k in affected(spec, [iid], adding)}
+        own = {k: v for k, v in acks.items()
+               if iid in meaningful and k in affected(spec, [iid], adding, drafts, approved)}
         if own:
             entry["acks"] = own
         change.data.setdefault("entries", []).append(entry)

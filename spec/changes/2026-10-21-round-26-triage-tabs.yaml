@@ -1,0 +1,203 @@
+request: |-
+  Review page as triage: tabs ordered by signal with the agent's recommendations first, each tab a list to work through; locks on changed items decay one step (locked to an earlier version) instead of nagging; sent feedback clears from the page
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-21'
+entries:
+- op: modify
+  id: REVIEW-20
+  at: 2026-10-21T15:37-07:00
+  reason: the engineer missed the recommendations.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 1b8153ee1486
+  fingerprint_after: 8547216f2e5b
+  requested: true
+  before:
+    text: |-
+      The review page shall show, in this order: what is for the person, meaning the decisions and alterations awaiting them and then the items agents recommend they lock, each with its reason; the responses to their last feedback; the differences since their last review; the intent captured since then; and the full spec.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: |-
+        Round 18: setting out the review journey the toolkit should support, and the page that replaces the generated Markdown views.
+      said: Described a page that highlights what a person specified directly, shows a graph of the requirement tree and a list of the items most useful to lock in, and, once later features are built, also shows the differences.
+      basis: guided
+      fingerprint: 4e4417d9ee88
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:25
+      context: Using the review page, which had what awaited them under Your decision and the agents' recommendations under Worth locking.
+      said: Found the page unclear about which section is the high-signal one, the items to lock or look at and give feedback on, and asked which section holds what the agent recommends they look at.
+      basis: stated
+      fingerprint: 1b8153ee1486
+  after:
+    text: |-
+      The review page shall show tabs ordered from most to least signal: the items agents recommend, each with its reason, together with the decisions awaiting the person and the responses to their feedback; the alterations to items they gave; the intent captured since their last review; the differences since then; and the full spec.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: |-
+        Round 18: setting out the review journey the toolkit should support, and the page that replaces the generated Markdown views.
+      said: Described a page that highlights what a person specified directly, shows a graph of the requirement tree and a list of the items most useful to lock in, and, once later features are built, also shows the differences.
+      basis: guided
+      fingerprint: 4e4417d9ee88
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:25
+      context: Using the review page, which had what awaited them under Your decision and the agents' recommendations under Worth locking.
+      said: Found the page unclear about which section is the high-signal one, the items to lock or look at and give feedback on, and asked which section holds what the agent recommends they look at.
+      basis: stated
+      fingerprint: 1b8153ee1486
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:45
+      context: Using the review page, whose For you tab put the agent's recommendations below nine items awaiting an answer.
+      said: Didn't see the Recommended by the agent section at all, and wants it at the top. Wants tabs instead of one giant page, with the leftmost tab the most important, expecting to rarely visit the second or third tabs, which get more mechanical and carry less signal.
+      basis: stated
+      fingerprint: 8547216f2e5b
+  acks:
+    REVIEW-20: rewritten at the engineer's request, recorded as their stated intent
+    REVIEW-V7: still verifies the page file and its data
+    REVIEW-V11: updated with this round's tests
+    DR-60: still holds
+    DR-66: still holds; DR-68 and round 26 refine the tabs
+- op: add
+  id: REVIEW-31
+  at: 2026-10-21T15:37-07:00
+  reason: the engineer's request.
+  requested: true
+  after:
+    text: Each tab of the review page shall list its items for the person to triage one at a time, marking each item answered once the person acts on it.
+    traces_to: SYS-45
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:45
+      context: The same message about the review page's tabs.
+      said: Wants each tab to be a list of things they can triage.
+      basis: stated
+      fingerprint: c9f91b54ced0
+- op: add
+  id: CHECK-28
+  at: 2026-10-21T15:37-07:00
+  reason: the engineer's request for decay.
+  requested: true
+  after:
+    text: When an item changes after its newest lock or intent record and no person has kept it, the checker shall count that record one level lower and mark the item as given for an earlier version.
+    traces_to: SYS-42
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:35
+      context: Asking what happens when they don't mark Kept on a locked item that changed since.
+      said: Not keeping such an item should be fine, but its lock should decay a bit, so it's clear the wording changed and wasn't explicitly agreed to since.
+      basis: stated
+      fingerprint: 40356cdaf36f
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:45
+      context: Agreeing to the agent's proposal that a stale lock counts one level lower and is shown, not nagged about.
+      said: Agreed, finding locked to an earlier version as descriptive a label as needed.
+      basis: guided
+      fingerprint: 40356cdaf36f
+- op: modify
+  id: CHECK-19
+  at: 2026-10-21T15:37-07:00
+  reason: DR-68.
+  before:
+    text: The checker shall report as a to-do each item at the explicit, stated or guided level that is marked as changed.
+    why: with five levels nothing is unreviewed; what awaits a person is a change to something a person asked for (DR-54).
+  after:
+    text: The checker shall report as a to-do each item a person locked, stated or guided that changed since, until a review the person sent back has shown the change.
+    why: not answering is an answer of its own; once the person has seen the change on a review page and let it be, it stays marked as given for an earlier version (CHECK-28) instead of nagging (DR-68).
+  acks:
+    CHECK-V5: updated with this round's tests
+    SYS-V4: updated with this round's tests
+    DR-47: unaffected
+- op: modify
+  id: CHANGE-14
+  at: 2026-10-21T15:37-07:00
+  reason: DR-68; an alteration the engineer saw and let be no longer waits for them.
+  before:
+    text: Each change record shall list each alteration the change made to an item the engineer locked, wrote or decided, until the engineer keeps it or it is rolled back.
+  after:
+    text: Each change record shall list each alteration the change made to an item the engineer locked, wrote or decided, until the engineer keeps it, it is rolled back, or a review the engineer sent back has shown it.
+  acks:
+    CHANGE-V7: unaffected
+    CHANGE-V9: unaffected
+    DR-48: amended in effect by DR-68; a seen alteration counts as answered
+- op: modify
+  id: REVIEW-23
+  at: 2026-10-21T15:37-07:00
+  reason: the engineer's second block repeated the first one's answers.
+  before:
+    text: The review page shall keep a person's unsent feedback when the page is reloaded.
+    why: a review can take a while, and a reload shouldn't lose it.
+  after:
+    text: The review page shall keep a person's unsent feedback when the page is reloaded, and drop each piece once it has been applied.
+    why: a review can take a while and a reload shouldn't lose it, but feedback already applied would otherwise be sent again with the next block.
+  acks:
+    DR-60: still holds
+    REVIEW-V8: the browser demonstration covers clearing applied feedback in round 26
+- op: add
+  id: DR-68
+  at: 2026-10-21T15:37-07:00
+  reason: records the decay the engineer agreed to.
+  after:
+    title: A lock or intent record on a changed item decays one level, and seeing the change counts as an answer
+    decided_by: engineer
+    elements:
+    - CHECK
+    - REVIEW
+    requirements: CHECK-28, CHECK-19, CHANGE-14, REVIEW-20
+    recorded: round 26
+    context: An item locked and then changed stayed explicit forever, asked about on every review page and reported as a to-do every run, until the person pressed Keep. The engineer wanted not answering to be acceptable, with the lock decaying a bit so it's clear the wording moved without their agreement.
+    decision: |-
+      - When an item changes after its newest lock or intent record and nobody keeps it, that record counts one level lower: a lock as stated, stated as guided, guided as derived. The page marks the item as locked to (or stated or guided for) an earlier version.
+      - Once a review the person sent back has shown the change, it leaves what awaits them and stops being a to-do. The mark stays.
+      - Keeping it restores the full level; rolling it back makes the record match again. A further change while already decayed doesn't decay it further.
+    alternatives: Keeping the full level until answered, which nags forever. Dropping the lock entirely, which loses that the person once locked it. Decaying with time, which says nothing about whether they saw the change.
+    consequences: A stale lock still protects the item as stated intent, so a conflicting change still comes back to the person. The review page shows each changed item once, however many rounds changed it.
+- op: add
+  id: CHECK-V13
+  at: 2026-10-21T15:42-07:00
+  reason: verifies the decay (DR-68).
+  after:
+    verifies:
+    - CHECK-28
+    - CHECK-19
+    - CHANGE-14
+    method: test
+    technique: unit test
+    description: A locked item changed since counts one level lower and is labeled locked to an earlier version; it's a to-do and an alteration awaiting an answer until a review sent back afterwards has shown it, after which it stops asking and stays decayed. A guided item changed since counts as derived.
+    tests:
+      python:
+      - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
+      - tests/test_levels.py::test_a_change_the_person_has_seen_on_a_review_stops_asking_but_stays_decayed
+      - tests/test_review_page.py::test_an_unlock_takes_the_lock_off_and_keeps_the_history
+- op: modify
+  id: REVIEW-V11
+  at: 2026-10-21T15:42-07:00
+  reason: round 26 reordered the tabs and made each a triage list.
+  before:
+    verifies:
+    - REVIEW-20
+    description: The page's first tab, For you, shows what needs the person's answer and then what agents recommend they lock, each recommendation's reason once with a way to lock all it names; the newest round's recommendations lead, earlier ones still unlocked are set apart, and the counted list adds at most five.
+  after:
+    verifies:
+    - REVIEW-20
+    - REVIEW-31
+    description: The tabs run from most to least signal, For you first; For you shows the agent's recommendations, then the decisions waiting, then the answers to the person's feedback; a recommendation's reason shows once, with a way to lock all it names; earlier recommendations and the counted list are set apart; each card shows as answered once the person acts on it.
+- op: add
+  id: REVIEW-V12
+  at: 2026-10-21T15:42-07:00
+  reason: the engineer's second block repeated the first one's answers.
+  after:
+    verifies:
+    - REVIEW-23
+    method: test
+    technique: unit test
+    description: The page knows which of the person's reviews were applied, and drops feedback it copied for one of them.
+    tests:
+      python:
+      - tests/test_review_page.py::test_feedback_already_applied_is_dropped_from_the_page
+decisions: []
+friction: []
+closed: '2026-10-21'

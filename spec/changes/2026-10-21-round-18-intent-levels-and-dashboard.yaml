@@ -1,0 +1,2186 @@
+request: Record how directly people asked for each item (lock levels, attributed intent summaries instead of verbatim quotes), raise conflicts with locked intent before building, flow requirements down the system breakdown, and replace the Markdown views with a review dashboard and a spec diff that agents can query too
+mode: spec-first
+target: python
+status: closed
+opened: '2026-10-21'
+entries:
+- op: modify
+  id: NEED-16
+  at: 2026-10-21T12:14-07:00
+  reason: the engineer asked for summaries instead of verbatim quotes, attributed to their author.
+  raised:
+  - you approved it
+  - it carries your words
+  fingerprint_before: 46ebdf0af466
+  fingerprint_after: 77395f576516
+  before:
+    text: The engineer needs their statements kept word for word on the requirements those statements directly express.
+    source: |-
+      [verbatim words removed when this spec moved to intent records]
+    context: Discussing delegated requirements and where the engineer's words should be kept, then clarifying that not every requirement needs a quote.
+  after:
+    text: The engineer needs what people say about the product kept on the items it shapes as an attributed summary close to their words, never word for word.
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): likes that the reasoning behind decisions is recorded, but is concerned about committing unreviewed verbatim quotes to a public repository. Wants instead an AI summary close to what was said, lightly cleaned up, with its author and the context of the discussion, so that a reader of the context and the summary can tell how far the person specified the thing and what they left unspecified. Wants a separation between the conversation and what is published.
+    context: Revising round 12's choice to keep the engineer's words verbatim (DR-46), while planning the review page.
+  acks:
+    NEED-16: the engineer revised this need in this round; it awaits their answer on the review.
+    SYS-35: rewritten to NEED-16's new wording; awaits the engineer's answer.
+- op: add
+  id: NEED-22
+  at: 2026-10-21T12:14-07:00
+  reason: the engineer's statement of the problem this round addresses.
+  after:
+    text: |-
+      The engineer needs agents to build fast while recording how directly a person asked for each item: by name, in conversation, indirectly, or not at all.
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): agents can build whole applications with many features in one pass, adding hundreds of thousands of lines, but nothing records which parts a person intended, which follow from the request, and which the agent added to be helpful. Code is a poor record of intent. Wants it recorded, with agent judgment on how directly each item was asked for, so that a large refactor reshapes what nobody asked for and brings what was asked for back to a person. Wants fast development that leaves concrete breadcrumbs of what was specified directly, less directly, or not at all, and agreed to five levels: explicit, stated, guided, derived, added.
+    context: Describing the problem the toolkit solves, then settling the levels of intent.
+- op: add
+  id: NEED-23
+  at: 2026-10-21T12:14-07:00
+  reason: the engineer's journey for reviewing agent work.
+  after:
+    text: The engineer needs to review each round of agent work on one page that shows what people intended, what changed since their last review and which items most deserve locking in, and to send feedback from that page to the agent.
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): describes the journey. They ask for an app in free form, with a few high-level needs and a few detailed requirements. The agent builds it and its spec, then offers a page to check. The page highlights what a person specified directly, shows an interactive graph of the requirement tree, and lists the items most useful to lock in. They comment on a few items and lock a few, copy the feedback back to the agent, and the agent adjusts the spec or code and regenerates the page. After the next feature the page also shows, readably, what changed. Wants the Markdown views removed in favor of this page.
+    context: Setting out the user journey the toolkit should support.
+- op: add
+  id: NEED-24
+  at: 2026-10-21T12:14-07:00
+  reason: the engineer asked that agents and the page share the same information.
+  after:
+    text: The engineer needs agents to have everything the review page shows, so the conversation and the page can be used interchangeably.
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): everything shown on the review page should also be available to agents, so the conversation flows freely while they ask questions and ask for changes. Wants a spec diff command so agents can read differences in a form that suits them, built on the same library as the page.
+    context: Agreeing to how the spec diff would work.
+- op: add
+  id: NEED-25
+  at: 2026-10-21T12:14-07:00
+  reason: the engineer's flow for conflicting requests.
+  after:
+    text: The engineer needs each request that conflicts with what a person stated or locked raised with options before it is built, and every other request built without interruption.
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): wants the flow to be: build feature X, done; build feature Y, done; build feature Z, and the agent answers that it conflicts with X in specific ways, lists the requirements involved, and offers ways to reword, edit, add or change items. Prefers that such conflicts be shown to the person on the review page, and is indifferent about the agent-side tooling.
+    context: Discussing how large changes should treat locked items, which amends DR-15.
+- op: add
+  id: NEED-26
+  at: 2026-10-21T12:14-07:00
+  reason: the engineer requires attribution for several people.
+  after:
+    text: Several engineers need to direct one product, with every statement and lock attributed to the person who made it.
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): this has to be a multi-user system to work. Record each author's username or email address, whatever they commit with.
+    context: Agreeing that intent records carry their author.
+- op: add
+  id: NEED-27
+  at: 2026-10-21T12:14-07:00
+  reason: the engineer asked for conversational locking.
+  after:
+    text: The engineer needs what they ask for in conversation locked in without a separate approval step, with the review page used for confirming.
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): the approval process is too prescriptive. Wants a free-form conversational flow, more use of displays for confirming, and requirements a person mentions in conversation locked in automatically. The approval vocabulary can go.
+    context: Revising the chat-approval rules (AGENT-33, AGENT-48, DR-41).
+- op: add
+  id: SYS-42
+  at: 2026-10-21T12:14-07:00
+  reason: the levels of intent the engineer agreed to.
+  after:
+    kind: system
+    text: |-
+      The toolkit shall derive each item's level of intent from its records: explicit when a person locked it, stated when a person asked for it, guided when a person shaped it without asking for it, derived when an item above it needs it, and added when an agent added it unasked.
+    serves:
+    - NEED-22
+    - NEED-19
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): wants agent judgment, but anything they say they want locked at some level: explicit, in conversation, or lower, with derived lowest, meaning needed to build something but with lower confidence that a person needed it. Agreed to the five levels as proposed.
+- op: add
+  id: SYS-43
+  at: 2026-10-21T12:14-07:00
+  reason: NEED-26.
+  after:
+    kind: system
+    text: The toolkit shall attribute each intent record and each lock to a person by name and email address.
+    serves:
+    - NEED-26
+    - NEED-14
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): record the author's username or email address, whatever they commit with.
+- op: add
+  id: SYS-44
+  at: 2026-10-21T12:14-07:00
+  reason: NEED-27.
+  after:
+    kind: system
+    text: When a person says what they want in conversation, the toolkit shall record it as intent on the items it shapes, without an approval step.
+    serves:
+    - NEED-27
+    - NEED-22
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): requirements a person mentions in conversation should be locked in automatically.
+- op: add
+  id: SYS-45
+  at: 2026-10-21T12:14-07:00
+  reason: NEED-23.
+  after:
+    kind: system
+    text: The toolkit shall present the spec to people as one generated, interactive review page.
+    serves:
+    - NEED-23
+    - NEED-1
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): the Markdown views should be removed in favor of a more powerful dashboard that can be iterated on.
+- op: add
+  id: SYS-46
+  at: 2026-10-21T12:14-07:00
+  reason: NEED-23, step 5 of the journey.
+  after:
+    kind: system
+    text: The review page shall let a person lock items, comment on items and choose options in open decisions, then copy the result as one block of text for the agent.
+    serves:
+    - NEED-23
+    - NEED-27
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): if the page is static, it could offer a copy-feedback button that gathers the feedback for the person to paste back to the agent.
+- op: add
+  id: SYS-47
+  at: 2026-10-21T12:14-07:00
+  reason: NEED-24.
+  after:
+    kind: system
+    text: The toolkit shall give agents every piece of information the review page shows.
+    serves:
+    - NEED-24
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): everything on the dashboard should also be available to agents.
+- op: add
+  id: SYS-48
+  at: 2026-10-21T12:14-07:00
+  reason: NEED-23 (what changed since the last review) and NEED-24 (a diff agents can read).
+  after:
+    kind: system
+    text: The toolkit shall report the spec differences between two versions of the spec, each of them the working tree, a version-control revision or a person's last review.
+    serves:
+    - NEED-23
+    - NEED-24
+    - NEED-1
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): asked whether the diff could compare against main or another commit, and agreed to the design: load the spec at a revision, compare items by ID, and join in the recorded reasons.
+- op: add
+  id: SYS-49
+  at: 2026-10-21T12:14-07:00
+  reason: NEED-25.
+  after:
+    kind: system
+    text: When a request conflicts with an item at the explicit or stated level, the toolkit shall bring the conflict to a person before the request is built, naming the conflicting items and offering options to resolve it.
+    serves:
+    - NEED-25
+    - NEED-17
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): the agent says the new feature conflicts with an earlier one in specific ways, lists the requirements, and offers ways to reword, edit, add or change items.
+- op: add
+  id: SYS-50
+  at: 2026-10-21T12:14-07:00
+  reason: today every element requirement traces straight to a system requirement, so the requirement tree is one level deep and crosses the element tree.
+  after:
+    kind: system
+    text: The spec shall trace each requirement on a system element to a requirement of that element's parent.
+    serves:
+    - NEED-20
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): flow-down along the system breakdown was their original intent for the requirement tree, and should be made so.
+- op: modify
+  id: SYS-35
+  at: 2026-10-21T12:14-07:00
+  reason: NEED-16 now asks for attributed summaries instead of verbatim words.
+  raised:
+  - you approved it
+  - it carries your words
+  fingerprint_before: bc517ab91d0e
+  fingerprint_after: 640091ca1b0a
+  before:
+    text: The toolkit shall keep each statement of the engineer word for word on the requirements that directly express it, with the date and time of the statement and a summary of what was being discussed.
+  after:
+    text: The toolkit shall keep each statement a person makes about the product on the items it directly expresses, as a summary close to their words but not verbatim, with its author, the date and time, and the context of the discussion.
+  acks:
+    SYS-35: rewritten to NEED-16's new wording; awaits the engineer's answer.
+    AGENT-53: rewritten in this round to summarize reasoning instead of quoting it.
+    AGENT-54: rewritten in this round so the context describes the discussion without adding claims.
+    CHECK-20: rewritten in this round to check intent records.
+    MODEL-36: rewritten in this round as the intent record's fields.
+    REVIEW-17: rewritten in this round for the review page and intent records.
+    DR-44: still holds; DR-54 extends its two states into five levels.
+- op: modify
+  id: SYS-18
+  at: 2026-10-21T12:14-07:00
+  reason: SYS-49 brings conflicts with stated or locked items to a person before building, in either mode.
+  raised:
+  - you approved it
+  - it carries your words
+  fingerprint_before: 7fffec004b8c
+  fingerprint_after: 40ee97ba7c38
+  before:
+    text: In code-first mode, the toolkit shall let a change complete without the engineer's involvement.
+  after:
+    text: In code-first mode, the toolkit shall let a change that conflicts with no item at the explicit or stated level complete without the engineer's involvement.
+  acks:
+    SYS-18: narrowed so conflicts with stated or locked items stop first (SYS-49); awaits the engineer's answer.
+    AGENT-29: unaffected; a quick change with no conflict still reports as soon as it's usable.
+    DR-15: amended in this round by DR-57; its status says so.
+- op: add
+  id: DIFF
+  at: 2026-10-21T12:14-07:00
+  reason: SYS-48 needs one comparison that the CLI and the review page share (NEED-24).
+  after:
+    title: Spec comparison
+    parent: SYS
+    depends_on:
+    - MODEL
+    - CHANGE
+    purpose: Compares two versions of the spec item by item, for agents and for the review page alike.
+- op: modify
+  id: REVIEW
+  at: 2026-10-21T12:14-07:00
+  reason: SYS-45 replaces the Markdown views with one review page.
+  before:
+    title: Review pages
+    depends_on:
+    - MODEL
+    - CHANGE
+    - VERIFY
+    purpose: Web pages that show the engineer the spec as a whole, and how a change alters it.
+  after:
+    title: The review page
+    depends_on:
+    - MODEL
+    - CHANGE
+    - VERIFY
+    - DIFF
+    purpose: One generated, interactive page that shows people the spec, how it changed since they last looked, and what awaits them, and gathers their feedback for the agent.
+  acks:
+    DR-27: unaffected; the review page gives IDs with titles too.
+    DR-37: unaffected.
+    DR-5: unaffected; locks keep the fingerprint and content.
+    DR-28: its Markdown views are superseded by DR-60; its status says so.
+    DR-46: superseded by DR-55; its status says so.
+    DR-49: still holds for the review page's decision sections.
+- op: modify
+  id: CLI
+  at: 2026-10-21T12:14-07:00
+  reason: the CLI reports differences through DIFF (SYS-48).
+  before:
+    depends_on:
+    - MODEL
+    - CHECK
+    - VERIFY
+    - REVIEW
+  after:
+    depends_on:
+    - MODEL
+    - CHECK
+    - VERIFY
+    - REVIEW
+    - DIFF
+  acks:
+    DR-38: unaffected by a new dependency.
+    DR-19: unaffected by a new dependency.
+    DR-34: unaffected by a new dependency.
+    DR-35: unaffected by a new dependency.
+    DR-36: unaffected by a new dependency.
+    DR-39: unaffected by a new dependency.
+    DR-51: unaffected by a new dependency.
+    DR-52: unaffected by a new dependency.
+    DR-53: unaffected by a new dependency.
+    DR-2: unaffected by a new dependency.
+    DR-45: unaffected here; DR-55 changes what a lock's words hold.
+    DR-1: unaffected; the diff is one more CLI command.
+    AGENT: unaffected by the CLI gaining a dependency.
+    ONBOARD: unaffected by the CLI gaining a dependency.
+- op: modify
+  id: MODEL-36
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-35 now keeps attributed summaries instead of verbatim words. Its verbatim quote is removed under NEED-16; DR-55 records the change.
+  raised:
+  - it carries your words
+  fingerprint_before: 5bb9c1200ab0
+  fingerprint_after: f793f5232680
+  before:
+    text: A quote shall hold the engineer's exact words, the date and time the engineer said them, and a summary of what was being discussed.
+    quotes: |-
+      [verbatim words removed when this spec moved to intent records]
+  after:
+    text: An intent record shall hold its author, the date and time of the statement, the context of the discussion, and a summary of what the person said.
+    source: |-
+      Alex Thiele, 2026-10-17 (summary): imagined each record of their words living on the requirement with its date and time and some background on the context, the context never asserting much on its own. Revised 2026-10-21: a summary close to what was said, with its author, instead of the exact words.
+  acks:
+    MODEL-36: rewritten to SYS-35's new wording; the engineer answers it on review.
+    CHECK-V6: verifies the old quote fields; rewritten with its tests when Phase 1 builds intent records.
+    DR-46: superseded by DR-55 in this round.
+- op: add
+  id: MODEL-37
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-42.
+  after:
+    text: |-
+      Each intent record shall state its basis: stated when the person asked for the item, or guided when the person shaped the item without asking for it.
+    traces_to: SYS-42
+    origin: agent
+    why: the two levels an intent record can give an item. Which one applies is the agent's judgment when it records the statement (DR-54).
+- op: add
+  id: MODEL-38
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-42.
+  after:
+    text: |-
+      Each requirement and decision record without an intent record shall state its basis: derived when an item above it needs it, or added when an agent added it unasked.
+    traces_to: SYS-42
+    origin: agent
+    why: separates what a request needed from what the agent added on its own initiative, which a refactor can reshape or drop most freely (DR-54).
+- op: add
+  id: MODEL-39
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-48.
+  after:
+    text: The spec shall record each review a person sends back, with the person, the date and time, the version-control revision, and the fingerprint of each item the page showed.
+    traces_to: SYS-48
+    origin: agent
+    why: a comparison since a person's last review needs a fixed point to compare against, per person (DR-59).
+- op: modify
+  id: MODEL-34
+  at: 2026-10-21T12:19-07:00
+  reason: under NEED-16 an approval keeps a summary of the engineer's words, not the words themselves.
+  before:
+    text: Each approval record shall hold the approver, the channel, the date and time, the number of items approved in the same action, the engineer's words, and the fingerprint of the content approved.
+  after:
+    text: Each approval record shall hold the approver, the channel, the date and time, the number of items approved in the same action, a summary of what the engineer said, and the fingerprint of the content approved.
+  acks:
+    MODEL-V12: still verifies the approval history; its words check is rewritten in Phase 1.
+    DR-45: still holds; a record keeps a summary of the words instead (DR-55).
+- op: modify
+  id: CHECK-20
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-35 now keeps attributed summaries; the check follows MODEL-36 and MODEL-37.
+  before:
+    text: The checker shall report each quote that lacks the engineer's words, the date and time they were said, or a summary of what was being discussed.
+    why: a quote without its date or its context loses what makes it signal (MODEL-36).
+  after:
+    text: The checker shall report each intent record that lacks its author, date and time, context, summary or basis, and each that contains quotation marks.
+    why: an intent record without its author, date or context loses what makes it signal (MODEL-36), and quotation marks are the sign of a verbatim quote (NEED-16).
+  acks:
+    CHECK-V6: verifies the old quote fields; rewritten with its tests when Phase 1 builds intent records.
+    DR-46: superseded by DR-55 in this round.
+- op: modify
+  id: CHECK-18
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-42 replaces the four review states with five levels of intent.
+  before:
+    text: The checker shall classify each item as approved, changed since approval, delegated under its nearest approved ancestor, or unreviewed, from the approvals and the trace graph each time it runs.
+    traces_to: SYS-34
+    why: the classification is computed and never stored (SYS-40). DR-47 says which items count as an item's ancestors.
+  after:
+    text: The checker shall derive each item's level of intent from its locks, intent records and basis each time it runs, and mark as changed each item whose content differs from the content its lock or intent record was given for.
+    traces_to: SYS-42
+    why: the level is computed and never stored, and a stated or locked item that has changed since is what a person needs to see (DR-54).
+  acks:
+    CHECK-V5: verifies the old states; rewritten in Phase 1 for levels.
+    DR-47: still holds; ancestors are how a derived item names the intent above it.
+- op: add
+  id: CHECK-22
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-50.
+  after:
+    text: The checker shall report each requirement on a system element that traces to no requirement of the element's parent.
+    traces_to: SYS-50
+    origin: agent
+    why: this is SYS-50's rule made checkable. It's a to-do until this repository's tree is migrated, then an error (DR-58).
+- op: add
+  id: CHECK-23
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-46.
+  after:
+    text: The checker shall report each comment from a person's feedback in the open change that has no recorded response.
+    traces_to: SYS-46
+    origin: agent
+    why: the done gate then keeps a change open until every comment is answered.
+- op: modify
+  id: CHANGE-13
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-42.
+  raised:
+  - you approved it
+  fingerprint_before: d0754061b7ad
+  fingerprint_after: b89783efd8f4
+  before:
+    text: An item shall count as approved, written or decided by the engineer when it has an approval record, when its origin is the engineer or it quotes the engineer, or when it is a decision record the engineer made.
+    why: |-
+      the engineer, approving SYS-37: found the phrase approved, wrote or decided vague, and suggested child requirements specify it further (summary) This pins it down.
+  after:
+    text: An item shall count as approved, written or decided by the engineer when its level of intent is explicit, stated or guided.
+    why: the levels of intent (SYS-42) now say how directly a person asked for an item, so they define this too.
+  acks:
+    CHANGE-13: redefined by levels; the engineer answers it on review.
+    CHANGE-V7: still holds; stated items are the engineer's words.
+    DR-48: still holds; alterations are kept on the page instead of by a typed line.
+- op: modify
+  id: CHANGE-14
+  at: 2026-10-21T12:19-07:00
+  reason: the engineer keeps alterations on the review page now, so no line has to be typed (NEED-27).
+  before:
+    text: Each change record shall list each alteration the change made to an item the engineer approved, wrote or decided, with the line that keeps it, until the engineer keeps it or it is rolled back.
+  after:
+    text: Each change record shall list each alteration the change made to an item the engineer approved, wrote or decided, until the engineer keeps it or it is rolled back.
+  acks:
+    CHANGE-V7: still holds; stated items are the engineer's words.
+    DR-48: still holds; alterations are kept on the page instead of by a typed line.
+- op: modify
+  id: CHANGE-15
+  at: 2026-10-21T12:19-07:00
+  reason: proposals are locked on the review page now, so no line has to be typed (NEED-27).
+  before:
+    text: Each change record shall list the items proposed for the engineer's explicit approval, in the order proposed, each with its reason, followed by one line that approves those still waiting.
+  after:
+    text: Each change record shall list the items proposed for the engineer's explicit approval, in the order proposed, each with its reason.
+  acks:
+    CHANGE-V8: still holds; only the trailing line goes.
+- op: add
+  id: CHANGE-17
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-49.
+  after:
+    text: Each change record shall keep each conflict between the request and an item at the explicit or stated level as an open decision that names the conflicting items.
+    traces_to: SYS-49
+    origin: agent
+    why: a conflict raised only in chat is lost with the conversation. As an open decision it shows at the top of the review page, with options and one recommended (CHANGE-10).
+- op: add
+  id: CHANGE-18
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-49.
+  after:
+    text: Each alteration made under the option a person chose for a conflict shall count as kept.
+    traces_to: SYS-49
+    origin: agent
+    why: the person has already decided it, and asking again once it's built would repeat the question (NEED-11).
+- op: add
+  id: CHANGE-19
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-46.
+  after:
+    text: Each change record shall keep each comment from a person's feedback with the agent's response to it.
+    traces_to: SYS-46
+    origin: agent
+    why: the next review page shows each comment and what was done about it.
+- op: modify
+  id: CLI-11
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-43.
+  before:
+    text: When no approver is named, the CLI shall record as approver the user name configured for the repository's version control.
+    traces_to: SYS-33
+    why: who approved is part of SYS-33, and the version-control user name is one the engineer has already set.
+  after:
+    text: When recording an intent record or a lock, the CLI shall record as the person the name and email address set for the toolkit in version control's configuration, or version control's own user name and email address when none is set.
+    traces_to: SYS-43
+    why: on a machine where an agent commits, version control's user is the agent, so the person needs a setting of their own (DR-56).
+  acks:
+    MODEL-V12: still verifies the approval history; its words check is rewritten in Phase 1.
+    DR-45: still holds; a record keeps a summary of the words instead (DR-55).
+- op: add
+  id: CLI-22
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-49; without it, stopping to ask depends on the agent remembering to.
+  after:
+    text: The CLI shall refuse an edit that changes the meaning of an item at the explicit or stated level unless the edit names the resolved conflict that allows it.
+    traces_to: SYS-49
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): agreed that such an edit should be refused rather than only warned about.
+- op: add
+  id: CLI-23
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-46.
+  after:
+    text: The CLI shall apply a block of feedback from the review page, recording its locks and decision choices only for items whose content still matches what the page showed.
+    traces_to: SYS-46
+    origin: agent
+    why: an agent never interprets a lock, and a lock can't cover content the person didn't see.
+- op: add
+  id: CLI-24
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-47.
+  after:
+    text: For each section of the review page, the CLI shall print the same information as text and as structured data.
+    traces_to: SYS-47
+    origin: agent
+    why: the page and the commands draw on one library, so an agent can answer from what the person is looking at (DR-59).
+- op: add
+  id: CLI-25
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-45.
+  after:
+    text: The CLI shall generate the review page in one command and print the page's location.
+    traces_to: SYS-45
+    origin: agent
+    why: the agent hands the person a path or link at the end of each change.
+- op: add
+  id: DIFF-1
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-48.
+  after:
+    text: The comparison shall read the spec at a version-control revision without changing the working tree.
+    traces_to: SYS-48
+    origin: agent
+    why: comparing must never disturb uncommitted work.
+- op: add
+  id: DIFF-2
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-48.
+  after:
+    text: When the older version is a branch, the comparison shall compare against the revision where the current branch left that branch.
+    traces_to: SYS-48
+    origin: agent
+    why: otherwise newer work on that branch shows up as the current branch's changes, in reverse.
+- op: add
+  id: DIFF-3
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-48.
+  after:
+    text: The comparison shall classify each differing item as added, removed, moved to another parent, changed in meaning, or changed in wording only.
+    traces_to: SYS-48
+    origin: agent
+    why: IDs are never reused, so a re-traced item reads as a move, not as a removal and an addition. Meaning and wording are told apart by fingerprint.
+- op: add
+  id: DIFF-4
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-48.
+  after:
+    text: The comparison shall give, for each differing item, the reasons recorded in the change records that the newer version adds.
+    traces_to: SYS-48
+    origin: agent
+    why: answers most questions about why something changed before they're asked (REVIEW-10).
+- op: add
+  id: DIFF-5
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-48.
+  after:
+    text: The comparison shall give each differing item's level of intent in each version.
+    traces_to: SYS-48
+    origin: agent
+    why: a change to a stated or locked item matters more than a change to an added one, and the reader needs to see which it is.
+- op: add
+  id: REVIEW-20
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-45; the order puts what needs the person first (SYS-26).
+  after:
+    text: |-
+      The review page shall show, in this order: the decisions awaiting the person, the differences since the person's last review, the intent captured since then, the items proposed for locking with the reason for each, a graph of the spec, and the full spec.
+    traces_to: SYS-45
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): the page highlights what a person specified directly, shows a graph of the requirement tree and a list of the items most useful to lock in, and after later features also shows the differences.
+- op: add
+  id: REVIEW-21
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-45; with flow-down (SYS-50) the element tree and the requirement tree have the same shape.
+  after:
+    text: The graph shall lay out the system elements as a tree with their requirements inside them, and show the selected item's trace and dependency links.
+    traces_to: SYS-45
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): the graph should be intelligently structured, following systems-engineering principles at every step, not a tangle.
+- op: add
+  id: REVIEW-22
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-45.
+  after:
+    text: The review page shall load nothing from the network.
+    traces_to: SYS-45
+    origin: agent
+    why: specs can be private, and the page has to work offline and from a plain file.
+- op: add
+  id: REVIEW-23
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-46.
+  after:
+    text: The review page shall keep a person's unsent feedback when the page is reloaded.
+    traces_to: SYS-46
+    origin: agent
+    why: a review can take a while, and a reload shouldn't lose it.
+- op: add
+  id: REVIEW-24
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-48.
+  after:
+    text: The review page shall show the differences against the person's last review, and against each other version named when the page was generated.
+    traces_to: SYS-48
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): asked whether the diff could compare against main or another commit.
+- op: add
+  id: REVIEW-25
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-44.
+  after:
+    text: The review page shall show each intent record captured since the person's last review, with a control to correct or remove it.
+    traces_to: SYS-44
+    origin: agent
+    why: intent is captured without an approval step (SYS-44), so the page is where a misreading gets caught.
+- op: modify
+  id: REVIEW-16
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-42 replaces the approval states.
+  before:
+    text: The requirements view shall mark each item that is approved, changed since approval or delegated, naming for each delegated item the approved item above it.
+    traces_to: SYS-34
+    why: SYS-34 asks every view to show the state. Naming the approved item tells the reader which approval covers it.
+  after:
+    text: The review page shall mark each item with its level of intent, naming for each derived or added item the nearest item above it that a person locked, stated or guided.
+    traces_to: SYS-42
+    why: SYS-42's levels are what the page shows, and naming the item above tells the reader which intent covers it.
+  acks:
+    REVIEW-V5: verifies the Markdown view; rewritten for the review page in Phase 4.
+- op: modify
+  id: REVIEW-17
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-35 now keeps attributed summaries; the page replaces the Markdown views (SYS-45).
+  before:
+    text: The requirements view shall show each quote with the date and time it was said and the summary of what was being discussed.
+    why: SYS-35 keeps the date and the context so readers can see them.
+  after:
+    text: The review page shall show each intent record with its author, date and time, context and basis.
+    why: SYS-35 keeps the author, date and context so readers can see them.
+  acks:
+    DR-46: superseded by DR-55 in this round.
+    REVIEW-V5: verifies the Markdown view; rewritten for the review page in Phase 4.
+- op: modify
+  id: AGENT-53
+  at: 2026-10-21T12:19-07:00
+  reason: under NEED-16 the engineer's words are summarized, never quoted verbatim.
+  raised:
+  - it carries your words
+  fingerprint_before: 2b31b3d01fee
+  fingerprint_after: 002c10337f21
+  before:
+    text: The agent shall quote the engineer's reasoning wherever the engineer gave it, not only the engineer's assent.
+    quotes: |-
+      [verbatim words removed when this spec moved to intent records]
+  after:
+    text: The agent shall summarize the engineer's reasoning wherever the engineer gave it, not only the engineer's assent.
+    source: |-
+      Alex Thiele, 2026-10-17 (summary): a record of their words shouldn't be just their yes; where they gave reasoning, that reasoning belongs on the items. Revised 2026-10-21: summarized, not quoted.
+  acks:
+    AGENT-53: rewritten to summarize; the engineer answers it on review.
+    AGENT-V10: still holds for proposals; its quoting check is rewritten in Phase 1.
+- op: modify
+  id: AGENT-54
+  at: 2026-10-21T12:19-07:00
+  reason: the engineer asked for AI context around what was being discussed (NEED-16). The original concern, a context that asserts things, still holds.
+  raised:
+  - it carries your words
+  fingerprint_before: 130ddbfc70ad
+  fingerprint_after: f835b62f0ea6
+  before:
+    text: A quote's summary shall say only what was being discussed.
+    quotes: |-
+      [verbatim words removed when this spec moved to intent records]
+  after:
+    text: An intent record's context shall describe the discussion and what prompted the statement, and add no claim the person did not make.
+    source: |-
+      Alex Thiele, 2026-10-17 (summary): the context shouldn't be agent-written text that asserts a lot. Revised 2026-10-21: the context is the AI's account of what was being discussed at the time.
+  acks:
+    AGENT-V10: still holds for proposals; its quoting check is rewritten in Phase 1.
+    AGENT-54: rewritten for richer context; the engineer answers it on review.
+- op: remove
+  id: AGENT-V9
+  at: 2026-10-21T12:19-07:00
+  reason: it verifies only AGENT-48, removed in this batch; its test goes with the skill rewrite in Phase 2.
+  before:
+    verifies:
+    - AGENT-48
+    method: inspection
+    technique: unit test
+    origin: agent
+    description: The skill tells agents to give the engineer the exact line that records an approval.
+    tests:
+      python:
+      - tests/test_skill.py::test_skill_tells_agents_to_give_the_exact_approval_line
+- op: remove
+  id: AGENT-48
+  at: 2026-10-21T12:19-07:00
+  reason: the engineer finds typed approval lines too prescriptive (NEED-27). The review page is where items are locked and alterations kept.
+  raised:
+  - it carries your words
+  fingerprint_before: 0b8519426842
+  fingerprint_after: null
+  before:
+    text: When an agent asks the engineer to approve items, the agent shall give the exact line that records the approval of those items.
+    traces_to: SYS-14
+    origin: engineer
+    source: |-
+      [verbatim words removed when this spec moved to intent records]
+  acks:
+    AGENT-48: removed at the engineer's request (NEED-27).
+    AGENT-V9: verifies the removed AGENT-48; removed with it in Phase 2's skill rewrite.
+- op: modify
+  id: AGENT-52
+  at: 2026-10-21T12:19-07:00
+  reason: NEED-27.
+  before:
+    text: Once a change is built and tested, the agent shall ask the engineer whether to keep each alteration the change record lists, giving the line that keeps it.
+    why: the change record lists the alterations (CHANGE-14), and the agent's report is where the engineer answers them.
+  after:
+    text: Once a change is built and tested, the agent shall ask the engineer, on the review page, whether to keep each alteration the change record lists.
+    why: the change record lists the alterations (CHANGE-14), and the review page is where the engineer answers them (SYS-46).
+  acks:
+    AGENT-V10: still holds for proposals; its quoting check is rewritten in Phase 1.
+- op: add
+  id: AGENT-59
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-44.
+  after:
+    text: When a person says what they want, the agent shall add an intent record to each item the statement shapes, with the basis stated where the person asked for the item and guided where the person only shaped it.
+    traces_to: SYS-44
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): when they say they want something, as in this conversation, it should be locked at some level, with agent judgment on which.
+- op: add
+  id: AGENT-60
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-42.
+  after:
+    text: The agent shall record a requirement, with the basis added, for each feature a user would notice that the agent adds unasked.
+    traces_to: SYS-42
+    origin: agent
+    why: features an agent adds unasked are what the engineer can't see in a large build. Recorded, they show on the review page to be locked or cut.
+- op: add
+  id: AGENT-61
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-49.
+  after:
+    text: Before building a request, the agent shall compare it with the items at the explicit or stated level in the system elements the request affects.
+    traces_to: SYS-49
+    origin: agent
+    why: conflicts with what a person asked for have to surface before the code exists (SYS-49). Drafting the request's spec edits first is the usual way, since the edit shows each affected item's level.
+- op: add
+  id: AGENT-62
+  at: 2026-10-21T12:19-07:00
+  reason: SYS-45.
+  after:
+    text: At the end of each change, the agent shall generate the review page and give the person its location.
+    traces_to: SYS-45
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): the agent finishes the work and prompts the person with a page to check.
+- op: add
+  id: DR-54
+  at: 2026-10-21T12:22-07:00
+  reason: records the levels the engineer agreed to.
+  after:
+    title: Five levels of intent, computed from locks, intent records and a recorded basis
+    decided_by: engineer
+    elements:
+    - SYS
+    - MODEL
+    - CHECK
+    - REVIEW
+    - AGENT
+    requirements: SYS-42, MODEL-37, MODEL-38, CHECK-18, REVIEW-16, AGENT-60
+    recorded: round 18
+    context: Approval gave items two states that matter, approved or delegated, and an item the engineer stated in conversation showed as unreviewed unless they approved it by ID. The engineer wants agents to build fast while recording how directly a person asked for each item, using agent judgment, with anything they say they want locked at some level.
+    decision: |-
+      Five levels, highest first:
+      - **explicit:** a person locked it by name, on the review page, in chat or in the terminal. A lock record, as approvals are today.
+      - **stated:** a person asked for this item. An intent record with the basis stated.
+      - **guided:** a person shaped it without asking for it, for example by choosing an option, reacting to a demo, or giving a constraint it follows from. An intent record with the basis guided.
+      - **derived:** something above it needs it, and no person addressed it. The basis derived.
+      - **added:** an agent's own idea, which nothing a person asked for needs. The basis added.
+
+      An item takes its highest level. An explicit, stated or guided item shows as changed once its content differs from what its lock or intent record was given for. Levels are computed each time and never stored. Choosing stated or guided, and derived or added, is the agent's judgment when it records the item, and the review page shows each one for correction.
+
+      The basis records how an item came about, not how much it matters, so SYS-40 holds: agents still weigh dates, edit counts and discussions for themselves.
+
+      What each level means for a later change: a conflict with an explicit or stated item is raised before building (DR-57); an alteration to a guided item is asked about once built (SYS-37); derived and added items are changed freely, and the change is logged.
+    alternatives: Two states, approved and delegated (DR-44 alone), which can't tell what a request needed from what an agent added. A stored level field, which says nothing about who or when. A numeric score, which the engineer ruled out (SYS-40).
+    consequences: Every requirement and decision record carries a basis or an intent record; for this repository the migration supplies them (DR-61). Verification items count as derived and carry no basis. DR-44's delegation remains, as the item a derived or added item names above it.
+- op: add
+  id: DR-55
+  at: 2026-10-21T12:22-07:00
+  reason: records how the engineer asked for their words to be kept.
+  after:
+    title: Intent records summarize what a person said, with author and context, and never quote it
+    decided_by: engineer
+    elements:
+    - MODEL
+    - CHECK
+    - REVIEW
+    - AGENT
+    requirements: SYS-35, MODEL-34, MODEL-36, MODEL-37, CHECK-20, REVIEW-17, AGENT-53, AGENT-54
+    recorded: round 18
+    context: Items kept the engineer's words verbatim, in quotes lists (DR-46) and in older source fields, and approval records kept their words too. The engineer doesn't want unreviewed conversation committed word for word to a public repository, but does want a reader to see how far a person specified something and what they left open.
+    decision: |-
+      Each item takes an intent list. Each record holds:
+      - **by:** the person's name and email address (DR-56);
+      - **when:** the date and time of the statement;
+      - **context:** the agent's account of what was being discussed and what prompted the statement;
+      - **said:** a close summary of what the person said, lightly cleaned up and in the third person. It keeps their hedges and strength, such as probably or must, adds no number or mechanism they didn't give, and says what they left open when they said so;
+      - **basis:** stated or guided (DR-54);
+      - a fingerprint of the item as it was, filled in by the CLI.
+
+      Quotation marks aren't allowed in these fields. Lock records and change-log reasons summarize in the same way. The migration summarizes the existing verbatim text (DR-61).
+    alternatives: Keeping the verbatim words (DR-46), which publishes conversation. Keeping verbatim words outside the repository with a summary inside, which needs storage every machine and person shares.
+    consequences: A summary is the agent's reading, so its fidelity is checked by auditors and by the person on the review page, not by the checker. Version-control history still holds the verbatim text committed before the migration. Removing it means rewriting history, which is the engineer's call.
+- op: add
+  id: DR-56
+  at: 2026-10-21T12:22-07:00
+  reason: SYS-43 on a machine where an agent commits.
+  after:
+    title: A person's identity comes from a toolkit setting, then from version control's user
+    decided_by: agent
+    elements:
+    - CLI
+    - MODEL
+    requirements: SYS-43, CLI-11
+    recorded: round 18
+    context: Every intent record and lock names its person (SYS-43). On the engineer's machine, version control's user is the agent's own account, while the engineer's commits carry their name.
+    decision: The CLI reads the person from a toolkit setting in version control's configuration, set per machine and per person and never committed, then from an environment variable, then from version control's user name and email address. Setup asks for the setting when it's missing, and the status command shows who is recorded.
+    alternatives: Version control's user only, which credits the agent on machines where the agent commits. A list of people kept in the spec, which every person would have to maintain.
+    consequences: On a machine where an agent commits under its own account, a missing setting attributes intent to the agent. Setup's question and the status line are what prevent that.
+- op: add
+  id: DR-57
+  at: 2026-10-21T12:22-07:00
+  reason: records the conflict flow the engineer described.
+  after:
+    title: A conflict with an explicit or stated item is raised before building, and the edit is refused until it's resolved
+    decided_by: engineer
+    elements:
+    - AGENT
+    - CHANGE
+    - CLI
+    requirements: SYS-49, SYS-18, CHANGE-17, CHANGE-18, CLI-22, AGENT-61
+    recorded: round 18
+    context: Under DR-15 a code-first change finishes and reports, and SYS-37 asks about alterations once they're built. The engineer wants requests that conflict with nothing built without interruption, and a request that conflicts with earlier intent answered with the conflict, the requirements involved, and ways to reword, edit, add or change items. They prefer conflicts shown on the review page, and left the agent-side tooling to the agent.
+    decision: |-
+      - Before building, the agent compares the request with the explicit and stated items in the elements it affects. The usual way is to draft the request's spec edits first, because the edit's context shows each affected item's level.
+      - A conflict becomes an open decision that names the conflicting items and offers options (reword, edit, add, change, or drop part of the request), one of them recommended. It heads the review page, and the agent says in chat that it's there, with enough to answer in chat.
+      - The CLI refuses an edit that changes the meaning of an explicit or stated item unless the edit names a resolved conflict. Edits that change only wording pass.
+      - The alterations the chosen option makes count as kept, and the answer is itself stated intent on the items it produces.
+      - A request without conflicts is built without stopping, in code-first mode as before. Alterations to guided items are still asked about once built.
+    alternatives: Asking after building, as DR-15 and SYS-37 do, which builds on a reading the engineer may reject. A separate impact command listing the locked items in scope before any edit, which was dropped because the edit context already shows them and only the edit says what the request changes.
+    consequences: DR-15 is amended. An agent that skips the comparison is still stopped by the refusal when it edits the item, though possibly after writing code.
+- op: add
+  id: DR-58
+  at: 2026-10-21T12:22-07:00
+  reason: records the engineer's choice of flow-down.
+  after:
+    title: Requirements flow down the system breakdown
+    decided_by: engineer
+    elements:
+    - SYS
+    - MODEL
+    - CHECK
+    requirements: SYS-50, CHECK-22
+    recorded: round 18
+    context: All 181 element requirements traced straight to a system requirement, including those of VERIFY's children, so the requirement tree was one level deep and crossed the element tree. DR-22 allowed a system requirement to be allocated directly to any element. The engineer said flow-down along the system breakdown was their original intent.
+    decision: A requirement on an element refines a requirement of the element's parent, and an element directly under the system refines a system requirement. Intermediate elements get requirements of their own for their children to refine, and MODEL-33 still forbids restating. The checker reports violations as to-dos until the migration (DR-61) has re-traced this repository, and as errors after it.
+    alternatives: Direct allocation (DR-22), which keeps the requirement tree shallow and the graph tangled.
+    consequences: DR-22 is superseded on allocation, and its rule against restating holds. The review page's graph can draw one tree.
+- op: add
+  id: DR-59
+  at: 2026-10-21T12:22-07:00
+  reason: records the diff design the engineer agreed to.
+  after:
+    title: One library builds the comparison and every page section, for the CLI and the review page alike
+    decided_by: engineer
+    elements:
+    - DIFF
+    - CLI
+    - REVIEW
+    - MODEL
+    requirements: SYS-47, SYS-48, DIFF-1, DIFF-2, DIFF-3, DIFF-4, DIFF-5, CLI-24, MODEL-39, REVIEW-24
+    recorded: round 18
+    context: The engineer wants a spec diff that agents can read, built so that the review page reuses it, and everything the page shows available to agents so that the conversation and the page can be used interchangeably.
+    decision: |-
+      - One library builds each section of the review page as data: decisions awaiting a person, differences, captured intent, proposals, the graph, and the items. The page embeds that data, and CLI commands print it as text or YAML.
+      - The comparison reads the older spec at a version-control revision without touching the working tree. The newer side defaults to the working tree. Against a branch, it compares with the merge base.
+      - Items are compared by ID: added, removed, moved, changed in meaning (by fingerprint) or in wording only. Each comes with the reasons from the change records the newer side adds, and its level on both sides.
+      - A review sent back is recorded in the spec with its person, time, revision and the fingerprints shown. The page's embedded data, kept locally, gives the exact content shown. The comparison since a person's last review uses both.
+    alternatives: Rebuilding differences from the change logs alone, which misses anything not made through the edit command and can't compare against an arbitrary revision. Separate code for the page and the CLI, which would drift apart.
+    consequences: The toolkit now reads version control, which DR-48 avoided. A repository without version control can compare only against a review snapshot.
+- op: add
+  id: DR-60
+  at: 2026-10-21T12:22-07:00
+  reason: records the review page design the engineer agreed to.
+  after:
+    title: One self-contained review page replaces the Markdown views, and feedback comes back as a pasted block
+    decided_by: engineer
+    elements:
+    - REVIEW
+    - CLI
+    - CHANGE
+    - CHECK
+    requirements: SYS-45, SYS-46, REVIEW-20, REVIEW-21, REVIEW-22, REVIEW-23, REVIEW-25, CLI-23, CLI-25, AGENT-62, CHANGE-19, CHECK-23
+    recorded: round 18
+    context: The engineer reviewed the spec in generated Markdown and change records, and wants a more powerful dashboard that can be iterated on, with the Markdown removed.
+    decision: |-
+      - One command writes a single HTML file, ignored by version control, with its data embedded and its scripts included. It loads nothing from the network.
+      - Its sections follow REVIEW-20. The graph lays out the element tree with requirements nested inside, colored by level of intent.
+      - Its controls lock, comment, request a change, keep or roll back an alteration, and choose an option in a decision. Unsent feedback stays in the browser.
+      - Copying the feedback produces a block of text carrying the review's ID and the fingerprint of each item acted on. Pasted into the conversation, it's applied by the CLI, which records locks and choices mechanically, refuses stale ones, and records comments in the open change for the agent to answer. A block with nothing in it means reviewed, with nothing to add.
+      - The requirements, decisions and change-record Markdown files are no longer generated.
+    alternatives: A local server that receives feedback directly, which removes the paste step but needs a running process; it stays open as a later option. Keeping the Markdown alongside, which doubles what has to be maintained.
+    consequences: Apart from the YAML, nothing in the repository reads well on a code host without running the toolkit. DR-28's generated views are superseded. The chat lock lines the prompt hook reads stay as a shortcut.
+- op: add
+  id: DR-61
+  at: 2026-10-21T12:22-07:00
+  reason: records the engineer's choice of one combined migration.
+  after:
+    title: Change meaning first, then migrate structure, intent and vocabulary in one pass
+    decided_by: engineer
+    elements:
+    - SYS
+    - MODEL
+    - CHECK
+    - AGENT
+    requirements: SYS-35, SYS-42, SYS-50
+    recorded: round 18
+    context: The engineer asked for a migration away from the approval vocabulary, either first or as part of the flow-down migration.
+    decision: |-
+      - This round changes meaning only.
+      - Phase 1 builds the tooling, reading old and new fields side by side.
+      - Phase 2 migrates this repository element by element, touching each item once: re-trace it for flow-down, summarize its verbatim words into intent records with person and basis, turn its approvals into explicit locks, and rename the approval vocabulary to locks, and the engineer to a person where several people apply. The old fields and commands then go, and the checker rejects them.
+      - Phases 3 to 5 build the comparison, the review page and the feedback loop.
+    alternatives: A separate migration per concern, which touches each item two or three times and asks for a review each time.
+    consequences: Until Phase 2 the spec mixes vocabularies, and this round's statements sit as summaries in the old source field.
+- op: modify
+  id: DR-15
+  at: 2026-10-21T12:22-07:00
+  reason: DR-57.
+  raised:
+  - you approved it
+  - you decided it
+  fingerprint_before: dd98d7e03706
+  fingerprint_after: e8abc8b595ea
+  after:
+    status: amended in round 18 by DR-57. A conflict with an explicit or stated item is raised before building, in either mode.
+  acks:
+    DR-15: status note only; DR-57 amends it, and the engineer answers on review
+- op: modify
+  id: DR-22
+  at: 2026-10-21T12:22-07:00
+  reason: DR-58.
+  raised:
+  - you approved it
+  - you decided it
+  fingerprint_before: 9d51045c58e6
+  fingerprint_after: 72ecbb74fe1d
+  after:
+    status: superseded in round 18 by DR-58 on allocation. Element requirements flow down through their parent; its rule against restating holds.
+  acks:
+    DR-22: status note only; DR-58 supersedes its allocation rule
+- op: modify
+  id: DR-28
+  at: 2026-10-21T12:22-07:00
+  reason: DR-60.
+  raised:
+  - you approved it
+  fingerprint_before: b247d6825348
+  fingerprint_after: 132727b29b29
+  after:
+    status: its generated Markdown views are superseded in round 18 by DR-60. The YAML storage holds.
+  acks:
+    DR-28: status note only; DR-60 supersedes its generated views
+- op: modify
+  id: DR-46
+  at: 2026-10-21T12:22-07:00
+  reason: DR-55.
+  after:
+    status: superseded in round 18 by DR-55. Intent records summarize, never quote.
+- op: modify
+  id: DR-44
+  at: 2026-10-21T12:22-07:00
+  reason: DR-54.
+  raised:
+  - you approved it
+  fingerprint_before: 1cdaa2bb7b02
+  fingerprint_after: 2a58655c60ad
+  before:
+    status: built in round 12.
+  after:
+    status: built in round 12. Extended in round 18 by DR-54, whose five levels of intent replace its two states.
+  acks:
+    DR-44: status note only; DR-54 extends it
+- op: modify
+  id: SYS-44
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: "shapes" would put intent records on every item a remark touched, inflating levels; NEED-16's history asks for the items the words directly express. Comments on the page are named as a channel too.
+  raised:
+  - it carries your words
+  fingerprint_before: eec26e952e04
+  fingerprint_after: 4fe343af57dd
+  before:
+    text: When a person says what they want in conversation, the toolkit shall record it as intent on the items it shapes, without an approval step.
+  after:
+    text: When a person says what they want, in conversation or in a comment on the review page, the toolkit shall record it as intent on the items it directly expresses, without an approval step.
+  acks:
+    SYS-44: added or revised earlier in this round; revised again per the audits.
+    AGENT-59: added or revised earlier in this round; revised again per the audits.
+    REVIEW-25: added or revised earlier in this round; revised again per the audits.
+- op: remove
+  id: AGENT-59
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: it restated SYS-44, and its one addition, choosing stated or guided, is MODEL-37's.
+  raised:
+  - it carries your words
+  fingerprint_before: 33811e1ace69
+  fingerprint_after: null
+  before:
+    text: When a person says what they want, the agent shall add an intent record to each item the statement shapes, with the basis stated where the person asked for the item and guided where the person only shaped it.
+    traces_to: SYS-44
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): when they say they want something, as in this conversation, it should be locked at some level, with agent judgment on which.
+  acks:
+    AGENT-59: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: MODEL-37
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: the boundary between stated and guided was left to unaided judgment.
+  before:
+    text: |-
+      Each intent record shall state its basis: stated when the person asked for the item, or guided when the person shaped the item without asking for it.
+    why: the two levels an intent record can give an item. Which one applies is the agent's judgment when it records the statement (DR-54).
+  after:
+    text: |-
+      Each intent record shall state its basis: stated when what the person said, taken alone, says what the item requires, or guided when the person's choice or constraint fixed the item without saying it.
+    why: CLI-22's refusal depends on this boundary, so it needs a test two agents apply alike (DR-54).
+  acks:
+    DR-55: added or revised earlier in this round; revised again per the audits.
+    DR-54: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: AGENT-50
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: a restatement recorded as an approval made an existing item explicit while the same remark made a new item only stated (DR-62).
+  raised:
+  - it carries your words
+  fingerprint_before: cb65187bc1c7
+  fingerprint_after: c957de9ec3c4
+  before:
+    text: When the engineer restates what an existing item already says, the agent shall record the restatement as the engineer's approval of that item, marked as given by restatement.
+    source: |-
+      [verbatim words removed when this spec moved to intent records]
+  after:
+    text: When the engineer restates what an existing item already says, the agent shall add the restatement to that item as an intent record with the basis stated.
+    source: |-
+      Alex Thiele, 2026-10-17 (summary): when they asked for something and the agent answered that an existing item already accounts for it, that item could count as theirs for future notice. Revised 2026-10-21: what a person says becomes intent without an approval step.
+  acks:
+    AGENT-50: |-
+      rewritten per DR-62: a restatement becomes stated intent; the engineer answers it on review.
+    AGENT-V10: rewritten in Phase 1 for intent records.
+- op: modify
+  id: AGENT-21
+  at: 2026-10-21T12:41-07:00
+  reason: restatements now become intent records (AGENT-50), not approvals (DR-62).
+  raised:
+  - it carries your words
+  fingerprint_before: 9fadfde3e3c8
+  fingerprint_after: fb930b590943
+  before:
+    text: |-
+      Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, an explicit approval in chat, or a restatement in chat of what an item already says.
+  after:
+    text: |-
+      Only the engineer's own actions shall create approvals: the review page, the engineer's terminal, or an explicit approval in chat.
+  acks:
+    AGENT-21: restatement dropped from the list per DR-62; the engineer answers it on review.
+    AGENT-V4: still verifies the ID-line reader; the restatement path moves to AGENT-50.
+    AGENT-V12: still holds for chat lock lines.
+    DR-6: |-
+      status note: amended by DR-62.
+- op: modify
+  id: AGENT-56
+  at: 2026-10-21T12:41-07:00
+  reason: under NEED-16 the request is summarized, not quoted.
+  raised:
+  - it carries your words
+  fingerprint_before: 231833e2e560
+  fingerprint_after: 25f14dbbd5b9
+  before:
+    text: When the engineer asks for something that existing items already account for, the agent shall add the engineer's words to those items.
+    quotes: |-
+      [verbatim words removed when this spec moved to intent records]
+  after:
+    text: When the engineer asks for something that existing items already account for, the agent shall add an intent record summarizing the request to each of those items.
+    source: |-
+      Alex Thiele, 2026-10-17 (summary): found it helpful when the agent surfaced existing requirements and connected the dots, and wanted more of that, to weave the requirement graph tighter through conversation. Revised 2026-10-21: summarized intent instead of the words.
+  acks:
+    AGENT-V10: rewritten in Phase 1 for intent records.
+    AGENT-56: summarizes instead of quoting (NEED-16); the engineer answers it on review.
+- op: modify
+  id: SYS-33
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: approvals recorded by the hook or from a feedback block are mechanical and can't summarize, so the engineer's words come off the required list (NEED-16). An agent may still add a summary (MODEL-34).
+  raised:
+  - you approved it
+  - it carries your words
+  fingerprint_before: 379f8dd483d6
+  fingerprint_after: 97fc06ed0a3d
+  before:
+    text: The toolkit shall record with each approval the approver, the channel, the number of items approved together, the engineer's words, and the decisions the engineer resolved about the item beforehand.
+    source: |-
+      [verbatim words removed when this spec moved to intent records]
+  after:
+    text: The toolkit shall record with each approval the approver, the channel, the number of items approved together, and the decisions the engineer resolved about the item beforehand.
+    source: |-
+      Alex Thiele, 2026-10-17 (summary): what matters is being able to see later who approved an item and how. An approval given in conversation after many questions, recorded with the reasoning, carries more signal than a batch approval. Revised 2026-10-21: no words are kept verbatim.
+  acks:
+    SYS-33: words removed because mechanical records can't summarize; the engineer answers it on review.
+    CLI-12: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-44: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+- op: modify
+  id: MODEL-34
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: mechanical records can't summarize.
+  before:
+    text: Each approval record shall hold the approver, the channel, the date and time, the number of items approved in the same action, a summary of what the engineer said, and the fingerprint of the content approved.
+    why: SYS-33 lists what an approval must show. The channel is the review page, the terminal, chat, a harness menu or a restatement (AGENT-50).
+  after:
+    text: Each approval record shall hold the approver, the channel, the date and time, the number of items approved in the same action, and the fingerprint of the content approved, plus a summary of what the engineer said when an agent records the approval.
+    why: SYS-33 lists what an approval must show. A record the hook or the feedback block makes is mechanical, so it holds no words; an agent recording one adds a summary.
+  acks:
+    DR-55: added or revised earlier in this round; revised again per the audits.
+    MODEL-V12: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-45: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+- op: modify
+  id: CLI-22
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: a fingerprint can't tell meaning from wording, so a rewording is declared (and shown to the person as one); a person asking for the change directly is not a conflict; and only a conflict about that very item allows its edit.
+  raised:
+  - it carries your words
+  fingerprint_before: 495170fe750d
+  fingerprint_after: 03b61750a2aa
+  before:
+    text: The CLI shall refuse an edit that changes the meaning of an item at the explicit or stated level unless the edit names the resolved conflict that allows it.
+  after:
+    text: The CLI shall refuse an edit that changes the text of an item at the explicit or stated level unless the edit names a conflict a person resolved for that item, adds that person's request for the change as an intent record, or is declared a rewording.
+  acks:
+    CLI-22: added or revised earlier in this round; revised again per the audits.
+    DR-57: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: DIFF-3
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: the classes weren't exclusive, parent was undefined, and meaning and wording can't be told apart by fingerprint.
+  before:
+    text: The comparison shall classify each differing item as added, removed, moved to another parent, changed in meaning, or changed in wording only.
+    why: IDs are never reused, so a re-traced item reads as a move, not as a removal and an addition. Meaning and wording are told apart by fingerprint.
+  after:
+    text: |-
+      The comparison shall report, for each differing item, each of these that applies: added, removed, moved to another parent, changed in meaning, reworded, or changed in intent only.
+    why: An item can move and change at once, so several apply. A parent is the requirement an item traces to, or an element's parent element. Reworded means a text change its change record declared a rewording; any other change to fingerprinted content is a change in meaning. Changed in intent only means only its locks or intent records changed.
+  acks:
+    DR-59: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: CHECK-18
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: it stated two things, and precedence was only in DR-54.
+  before:
+    text: The checker shall derive each item's level of intent from its locks, intent records and basis each time it runs, and mark as changed each item whose content differs from the content its lock or intent record was given for.
+    why: the level is computed and never stored, and a stated or locked item that has changed since is what a person needs to see (DR-54).
+  after:
+    text: The checker shall derive each item's level of intent from its locks, intent records and basis each time it runs, taking the highest level that applies.
+    why: the level is computed and never stored (DR-54). A lock or intent record keeps its level after the item changes, until a person answers the change.
+  acks:
+    DR-54: added or revised earlier in this round; revised again per the audits.
+    CHECK-V5: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-47: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+- op: add
+  id: CHECK-24
+  at: 2026-10-21T12:41-07:00
+  reason: split from CHECK-18; the audit found the old wording marked an item changed forever once it had an older record.
+  after:
+    text: The checker shall mark as changed each item whose content differs from the content its newest lock or intent record was given for.
+    traces_to: SYS-42
+    origin: agent
+    why: comparing with the newest record means a statement superseded by a later lock doesn't leave the item marked changed forever.
+- op: modify
+  id: CHECK-19
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: it still reported the old unreviewed state.
+  before:
+    text: The checker shall report as a to-do each item that is unreviewed or changed since approval.
+    why: delegated items are the agent's to decide (DR-44), so they aren't the engineer's to-dos. This turned 228 to-dos in this repository into 20.
+  after:
+    text: The checker shall report as a to-do each item at the explicit, stated or guided level that is marked as changed.
+    why: with five levels nothing is unreviewed; what awaits a person is a change to something a person asked for (DR-54).
+  acks:
+    CHECK-V5: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-47: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+- op: modify
+  id: SYS-34
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: it still required the two-state model; DR-54's levels replace it.
+  raised:
+  - you approved it
+  - it carries your words
+  fingerprint_before: 38b3c18a29da
+  fingerprint_after: 26af487f3d10
+  before:
+    text: Each view of an item shall show whether the engineer approved the item explicitly or the item is delegated under an item the engineer approved.
+  after:
+    text: Each view of an item shall show the item's level of intent and, for a derived or added item, the nearest item above it that a person locked, stated or guided.
+  acks:
+    DR-44: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    SYS-34: rewritten to the levels (DR-54); the engineer answers it on review.
+- op: modify
+  id: REVIEW-V5
+  at: 2026-10-21T12:41-07:00
+  reason: REVIEW-16 is removed as a restatement of SYS-34.
+  before:
+    verifies:
+    - REVIEW-16
+    - REVIEW-17
+  after:
+    verifies:
+    - SYS-34
+    - REVIEW-17
+- op: remove
+  id: REVIEW-16
+  at: 2026-10-21T12:41-07:00
+  reason: restates SYS-34 as rewritten in this batch.
+  before:
+    text: The review page shall mark each item with its level of intent, naming for each derived or added item the nearest item above it that a person locked, stated or guided.
+    traces_to: SYS-42
+    origin: agent
+    why: SYS-42's levels are what the page shows, and naming the item above tells the reader which intent covers it.
+  acks:
+    DR-54: added or revised earlier in this round; revised again per the audits.
+    REVIEW-V5: verifies the removed REVIEW-16; rewritten for SYS-34 on the review page in Phase 4.
+- op: modify
+  id: MODEL-36
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: CHECK-24 needs the fingerprint, which only DR-55 listed.
+  raised:
+  - it carries your words
+  fingerprint_before: f793f5232680
+  fingerprint_after: 46ba0776eb1c
+  before:
+    text: An intent record shall hold its author, the date and time of the statement, the context of the discussion, and a summary of what the person said.
+  after:
+    text: An intent record shall hold its author, the date and time of the statement, the context of the discussion, a summary of what the person said, and the fingerprint of the item it was recorded for.
+  acks:
+    DR-55: added or revised earlier in this round; revised again per the audits.
+    MODEL-36: added or revised earlier in this round; revised again per the audits.
+    CHECK-V6: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-46: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+- op: modify
+  id: MODEL-38
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: lock-only items needed no basis, and added overlapped derived.
+  before:
+    text: |-
+      Each requirement and decision record without an intent record shall state its basis: derived when an item above it needs it, or added when an agent added it unasked.
+  after:
+    text: |-
+      Each requirement and decision record with neither an intent record nor a lock shall state its basis: derived when an item above it needs it, or added when nothing a person locked, stated or guided needs it.
+  acks:
+    DR-54: added or revised earlier in this round; revised again per the audits.
+- op: add
+  id: MODEL-40
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: levels were undefined for these kinds.
+  after:
+    text: A verification item or system element definition with neither an intent record nor a lock shall count as derived.
+    traces_to: SYS-42
+    origin: agent
+    why: these follow from the requirements they serve, and asking agents to label each one would be bookkeeping with no signal. Needs always carry an intent record (AGENT-37).
+- op: modify
+  id: CHECK-20
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: it stated two things; the quotation-mark check is CHECK-25.
+  before:
+    text: The checker shall report each intent record that lacks its author, date and time, context, summary or basis, and each that contains quotation marks.
+    why: an intent record without its author, date or context loses what makes it signal (MODEL-36), and quotation marks are the sign of a verbatim quote (NEED-16).
+  after:
+    text: The checker shall report each intent record that lacks its author, date and time, context, summary, basis or fingerprint.
+    why: an intent record without its author, date or context loses what makes it signal (MODEL-36).
+  acks:
+    DR-55: added or revised earlier in this round; revised again per the audits.
+    CHECK-V6: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-46: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+- op: add
+  id: CHECK-25
+  at: 2026-10-21T12:41-07:00
+  reason: split from CHECK-20, with the marks defined.
+  after:
+    text: The checker shall report each intent record whose summary or context contains a double quotation mark.
+    traces_to: SYS-35
+    origin: agent
+    why: double quotation marks are the sign of a verbatim quote (NEED-16). Apostrophes and single quotes pass, so summaries can still name a term.
+- op: modify
+  id: SYS-6
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: its derived mark, for a requirement that traces to nothing, collides with the derived level (SYS-42) and with flow-down (SYS-50). Under flow-down every requirement traces; a design choice is a requirement with the basis added or derived (DR-58).
+  raised:
+  - you approved it
+  - it carries your words
+  fingerprint_before: dd3ce1d1acac
+  fingerprint_after: 896b26388a43
+  before:
+    text: The spec shall trace each requirement to the need or requirement it serves, or mark it as derived.
+  after:
+    text: The spec shall trace each requirement other than a constraint to the need or requirement it serves.
+  acks:
+    SYS-6: derived mark retired under flow-down (DR-58); the engineer answers it on review.
+    AGENT-36: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    AGENT-37: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    MODEL-1: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    MODEL-2: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    MODEL-3: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    MODEL-4: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    MODEL-12: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    MODEL-33: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    MODEL-11: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    REVIEW-1: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    REVIEW-3: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    REVIEW-14: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    SYS-V2: its derived-mark test is rewritten in Phase 1 for SYS-6"s new text.
+    DR-18: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+- op: modify
+  id: AGENT-61
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: a request can break a stated item in a dependent element or higher in the trace.
+  before:
+    text: Before building a request, the agent shall compare it with the items at the explicit or stated level in the system elements the request affects.
+  after:
+    text: Before building a request, the agent shall compare it with the items at the explicit or stated level in the system elements the request affects, in the elements that depend on those, and above them in the trace.
+  acks:
+    DR-57: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: CHANGE-18
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: kept content has to be content the person saw (as CLI-23 requires of locks).
+  before:
+    text: Each alteration made under the option a person chose for a conflict shall count as kept.
+    why: the person has already decided it, and asking again once it's built would repeat the question (NEED-11).
+  after:
+    text: An alteration to an item a conflict names shall count as kept when its new content matches what the option the person chose showed for it.
+    why: the person has already decided it, and asking again would repeat the question (NEED-11). Anything the option didn't show is still asked about once built.
+  acks:
+    DR-57: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: SYS-49
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: NEED-17 is about asking after building; this is before.
+  before:
+    serves:
+    - NEED-25
+    - NEED-17
+  after:
+    serves:
+    - NEED-25
+- op: modify
+  id: SYS-48
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: a person's last review makes no sense as the newer side.
+  raised:
+  - it carries your words
+  fingerprint_before: 37ee9ca84711
+  fingerprint_after: f3962feab456
+  before:
+    text: The toolkit shall report the spec differences between two versions of the spec, each of them the working tree, a version-control revision or a person's last review.
+  after:
+    text: The toolkit shall report the spec differences from an older version, either a version-control revision or a person's last review, to a newer version, either the working tree or a later revision.
+  acks:
+    DR-59: added or revised earlier in this round; revised again per the audits.
+    SYS-48: added or revised earlier in this round; revised again per the audits.
+    DIFF-1: added or revised earlier in this round; revised again per the audits.
+    DIFF-4: added or revised earlier in this round; revised again per the audits.
+    DIFF-5: added or revised earlier in this round; revised again per the audits.
+    REVIEW-24: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: DIFF-2
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: the base must be computed against the newer side, which needn't be the current branch.
+  before:
+    text: When the older version is a branch, the comparison shall compare against the revision where the current branch left that branch.
+  after:
+    text: When the older version is a branch, the comparison shall compare against the merge base of that branch and the newer version.
+  acks:
+    DR-59: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: MODEL-39
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: which revision was ambiguous, and a page made from uncommitted work matches no revision.
+  before:
+    text: The spec shall record each review a person sends back, with the person, the date and time, the version-control revision, and the fingerprint of each item the page showed.
+  after:
+    text: The spec shall record each review a person sends back, with the person, the date and time, the version-control revision the page was generated from, whether the working tree differed from that revision, and the fingerprint of each item the page showed.
+  acks:
+    DR-59: added or revised earlier in this round; revised again per the audits.
+- op: add
+  id: CLI-26
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: no requirement covered the diff command itself.
+  after:
+    text: The CLI shall print the spec differences between two versions as text or as structured data, comparing the working tree by default.
+    traces_to: SYS-48
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): if the dashboard has a readable diff view, there should also be spec diff commands so agents can read differences in a form that suits them.
+- op: modify
+  id: DIFF
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: DIFF-5 gives levels, which CHECK derives.
+  before:
+    depends_on:
+    - MODEL
+    - CHANGE
+  after:
+    depends_on:
+    - MODEL
+    - CHANGE
+    - CHECK
+  acks:
+    DR-59: added or revised earlier in this round; revised again per the audits.
+    CLI: unaffected; DIFF gains a dependency on CHECK.
+- op: modify
+  id: REVIEW
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: the page shows levels, which CHECK derives.
+  before:
+    depends_on:
+    - MODEL
+    - CHANGE
+    - VERIFY
+    - DIFF
+  after:
+    depends_on:
+    - MODEL
+    - CHANGE
+    - CHECK
+    - VERIFY
+    - DIFF
+  acks:
+    DR-55: added or revised earlier in this round; revised again per the audits.
+    DR-54: added or revised earlier in this round; revised again per the audits.
+    DR-59: added or revised earlier in this round; revised again per the audits.
+    DR-46: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    CLI: unaffected; DIFF gains a dependency on CHECK.
+    DR-27: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-37: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-5: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-28: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-49: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-60: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: SYS-46
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: the controls didn't match DR-60 and REVIEW-25, and there was no unlock. Copying moves to SYS-51.
+  raised:
+  - it carries your words
+  fingerprint_before: c62bc4b07b91
+  fingerprint_after: 43c1b0c5edfc
+  before:
+    text: The review page shall let a person lock items, comment on items and choose options in open decisions, then copy the result as one block of text for the agent.
+  after:
+    text: The review page shall let a person lock and unlock items, comment on items, keep or roll back alterations, correct or remove intent records, and choose options in open decisions.
+  acks:
+    DR-60: added or revised earlier in this round; revised again per the audits.
+    SYS-46: added or revised earlier in this round; revised again per the audits.
+    CHANGE-19: added or revised earlier in this round; revised again per the audits.
+    CHECK-23: added or revised earlier in this round; revised again per the audits.
+    REVIEW-23: added or revised earlier in this round; revised again per the audits.
+- op: add
+  id: SYS-51
+  at: 2026-10-21T12:41-07:00
+  reason: split from SYS-46; the audit found a pasted block would credit one person's locks to whoever's machine applied it.
+  after:
+    kind: system
+    text: The review page shall copy a person's feedback as one block of text that names the person and carries the fingerprint of each item and decision it acts on.
+    serves:
+    - NEED-23
+    - NEED-26
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): if the page is static, it could offer a copy-feedback button that gathers the feedback for the person to paste back to the agent.
+- op: add
+  id: SYS-52
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: CHECK-23 and CHANGE-19 traced to the page controls, though no system requirement asked for comments to be answered.
+  after:
+    kind: system
+    text: The toolkit shall keep each comment a person sends from the review page until the agent records a response, and show the response on that person's next review page.
+    serves:
+    - NEED-23
+    origin: agent
+    why: a comment that's never answered is steering lost; the done gate (CHECK-23) and the next page close the loop.
+- op: modify
+  id: CHECK-23
+  at: 2026-10-21T12:41-07:00
+  reason: SYS-52.
+  before:
+    traces_to: SYS-46
+  after:
+    traces_to: SYS-52
+- op: modify
+  id: CHANGE-19
+  at: 2026-10-21T12:41-07:00
+  reason: SYS-52.
+  before:
+    traces_to: SYS-46
+  after:
+    traces_to: SYS-52
+- op: modify
+  id: CLI-23
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: other controls had no path, staleness for decisions was undefined, and attribution came from the wrong machine.
+  before:
+    text: The CLI shall apply a block of feedback from the review page, recording its locks and decision choices only for items whose content still matches what the page showed.
+    traces_to: SYS-46
+    why: an agent never interprets a lock, and a lock can't cover content the person didn't see.
+  after:
+    text: The CLI shall apply a block of feedback in the name of the person it names, recording each lock, unlock, choice, answer on an alteration and intent correction only where the item or decision still matches what the page showed, and reporting each entry it refuses.
+    traces_to: SYS-51
+    why: the CLI never interprets feedback, credits it to the person who gave it, and records nothing for content the person didn't see. Comments and change requests go into the open change for the agent (CHANGE-19).
+  acks:
+    DR-60: added or revised earlier in this round; revised again per the audits.
+- op: add
+  id: REVIEW-26
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: attribution of feedback.
+  after:
+    text: The review page shall show the person it was generated for and let that person be changed before feedback is copied.
+    traces_to: SYS-51
+    origin: agent
+    why: several people review one product (NEED-26), and the block must name who gave the feedback.
+- op: modify
+  id: REVIEW-20
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: alterations awaiting an answer and responses to comments had no section.
+  raised:
+  - it carries your words
+  fingerprint_before: 101cb3f7071f
+  fingerprint_after: 4e4417d9ee88
+  before:
+    text: |-
+      The review page shall show, in this order: the decisions awaiting the person, the differences since the person's last review, the intent captured since then, the items proposed for locking with the reason for each, a graph of the spec, and the full spec.
+  after:
+    text: |-
+      The review page shall show, in this order: the decisions and alterations awaiting the person, the responses to the person's last feedback, the differences since the person's last review, the intent captured since then, the items proposed for locking with the reason for each, a graph of the spec, and the full spec.
+  acks:
+    DR-60: added or revised earlier in this round; revised again per the audits.
+    REVIEW-20: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: REVIEW-21
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: it stated two things; the links are REVIEW-27.
+  raised:
+  - it carries your words
+  fingerprint_before: 39e8c2625319
+  fingerprint_after: 1c4786c27365
+  before:
+    text: The graph shall lay out the system elements as a tree with their requirements inside them, and show the selected item's trace and dependency links.
+  after:
+    text: The graph shall lay out the system elements as a tree with their requirements inside them.
+  acks:
+    DR-60: added or revised earlier in this round; revised again per the audits.
+    REVIEW-21: added or revised earlier in this round; revised again per the audits.
+- op: add
+  id: REVIEW-27
+  at: 2026-10-21T12:41-07:00
+  reason: split from REVIEW-21.
+  after:
+    text: When a person selects an item in the graph, the graph shall show the item's trace and dependency links.
+    traces_to: SYS-45
+    origin: agent
+    why: drawing every link at once is what makes a graph a tangle; drawing them for the selected item shows what it connects to.
+- op: modify
+  id: REVIEW-18
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: the change-record Markdown is no longer generated (DR-60); the page is where the engineer answers.
+  raised:
+  - it carries your words
+  fingerprint_before: 8c9213e4fa24
+  fingerprint_after: bf592d2e6e06
+  before:
+    text: Each item the change record asks the engineer to approve or answer for shall be shown in full, with its parent and rationale for a requirement, and with its context, decision, alternatives, consequences and the requirements it decides for a decision record.
+  after:
+    text: Each item the review page asks the engineer to approve or answer for shall be shown in full, with its parent and rationale for a requirement, and with its context, decision, alternatives, consequences and the requirements it decides for a decision record.
+  acks:
+    DR-49: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    REVIEW-18: retargeted from the change record to the review page (DR-60).
+    REVIEW-V6: rewritten for the review page in Phase 4.
+- op: modify
+  id: REVIEW-19
+  at: 2026-10-21T12:41-07:00
+  reason: as REVIEW-18.
+  raised:
+  - it carries your words
+  fingerprint_before: 7f28e662e3cb
+  fingerprint_after: 7d2bfc34a482
+  before:
+    text: Wherever the change record shows an item for the engineer to approve or answer for, it shall list with their titles the other items that the shown text mentions.
+  after:
+    text: Wherever the review page shows an item for the engineer to approve or answer for, it shall list with their titles the other items that the shown text mentions.
+  acks:
+    DR-49: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    REVIEW-V6: rewritten for the review page in Phase 4.
+    REVIEW-19: retargeted from the change record to the review page (DR-60).
+- op: modify
+  id: CHANGE-14
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: stale rationale.
+  before:
+    why: the change record is where the engineer reviews a change, so the alterations to answer belong at its top, right after open decisions.
+  after:
+    why: the change record keeps the alterations to answer, and the review page shows them first (REVIEW-20).
+- op: modify
+  id: CHANGE-15
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: stale rationale.
+  before:
+    why: a proposal made mid-change survives the conversation, and the engineer can approve every waiting item at once.
+  after:
+    why: a proposal made mid-change survives the conversation, and the review page lists the ones still waiting (REVIEW-20).
+- op: modify
+  id: SYS-43
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: the person chooses the address, which needn't be the one on their commits.
+  raised:
+  - it carries your words
+  fingerprint_before: 37bcafe87b2e
+  fingerprint_after: c54efb85e23d
+  before:
+    text: The toolkit shall attribute each intent record and each lock to a person by name and email address.
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): record the author's username or email address, whatever they commit with.
+  after:
+    text: The toolkit shall attribute each intent record and each lock to a person, by the name and email address that person has set for the toolkit.
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): record the author's username or email address, whatever they commit with; then gave the email address to record for themselves, which differs from the one on their commits.
+  acks:
+    SYS-43: added or revised earlier in this round; revised again per the audits.
+    DR-56: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: CLI-11
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: DR-56 names an environment variable that CLI-11 left out.
+  before:
+    text: When recording an intent record or a lock, the CLI shall record as the person the name and email address set for the toolkit in version control's configuration, or version control's own user name and email address when none is set.
+  after:
+    text: When recording an intent record or a lock, the CLI shall record as the person the name and email address set for the toolkit in version control's configuration or the environment, or version control's own user name and email address when neither is set.
+  acks:
+    MODEL-V12: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-45: unaffected in meaning by this batch; Phase 1 or 2 updates it where needed.
+    DR-56: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: SYS-35
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: its own source was still verbatim.
+  before:
+    source: |-
+      [verbatim words removed when this spec moved to intent records]
+  after:
+    source: |-
+      Alex Thiele, 2026-10-17 (summary): imagined their words living on the requirements with some metadata (the date and time, the words, background on the context), the context never asserting much on its own; not every requirement needs their words. Revised 2026-10-21: a summary close to what was said, with its author, never verbatim.
+- op: add
+  id: DR-62
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: the central decision of this round had no decision record.
+  after:
+    title: What a person says becomes intent without an approval step, and locks stay a person's own act
+    decided_by: engineer
+    elements:
+    - AGENT
+    - MODEL
+    - REVIEW
+    - CLI
+    requirements: SYS-44, MODEL-37, AGENT-21, AGENT-50, AGENT-56, REVIEW-25, SYS-51, CLI-23
+    recorded: round 18
+    context: The engineer found approvals too prescriptive (typed lines, IDs, confirmations) and wants what they say in conversation locked in automatically, with the review page used for confirming. AGENT-48's typed line is removed in this round.
+    decision: |-
+      - When a person says what they want, in conversation or in a page comment, the agent adds an intent record to each item the words directly express: stated when the words alone say what the item requires, guided when the person's choice or constraint fixed it. A restatement of an existing item is a stated intent record, not an approval.
+      - The review page shows what was captured since the person's last review, to correct or remove.
+      - A lock (the explicit level) is a person's own act: a page control, the terminal, or a lock line in chat, which the prompt hook still reads as a shortcut.
+      - Records made mechanically, by the prompt hook or from a feedback block, hold no words: the person, the channel, the IDs and the fingerprints.
+      - A feedback block names its person and carries fingerprints. In a harness with the prompt hook, the hook applies a block the person pastes, as it does lock lines, so no agent interprets it; elsewhere the agent applies it with the CLI.
+    alternatives: Keeping approval in chat by ID only (DR-41), which is the ritual the engineer wants gone. Letting the agent lock what a person says, which would make every captured remark explicit and leave the explicit level meaning nothing.
+    consequences: A misreading by the agent becomes intent until the person corrects it on the page, so the captured-intent section matters. DR-6 and DR-41 are amended, and pasted text counts when it's a feedback block.
+- op: modify
+  id: DR-6
+  at: 2026-10-21T12:41-07:00
+  reason: DR-62.
+  raised:
+  - you approved it
+  fingerprint_before: 23e3ed82d274
+  fingerprint_after: 3038cd124d00
+  before:
+    status: |-
+      part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it. Narrowed in round 11 by DR-41: the hook records only approvals that name items by ID, and anything else is confirmed with the engineer first.
+  after:
+    status: amended in round 18 by DR-62. Records the hook makes hold no words, and restatements become intent records, not approvals.
+  acks:
+    DR-6: |-
+      status note: amended by DR-62.
+- op: modify
+  id: DR-41
+  at: 2026-10-21T12:41-07:00
+  reason: DR-62.
+  after:
+    status: amended in round 18 by DR-62. The hook records no message text, and a pasted feedback block from the review page counts.
+- op: modify
+  id: DR-48
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audit: CHANGE-18 contradicted its 'only by approval or rollback'.
+  after:
+    status: amended in round 18. An alteration is also kept under a conflict option the person chose (CHANGE-18), and answers come from the review page (CLI-23).
+- op: modify
+  id: DR-54
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: staleness, keeping an alteration, and levels for every kind of item.
+  raised:
+  - you decided it
+  fingerprint_before: d6811a221d33
+  fingerprint_after: 6ad267ea1e41
+  before:
+    requirements: SYS-42, MODEL-37, MODEL-38, CHECK-18, REVIEW-16, AGENT-60
+    consequences: Every requirement and decision record carries a basis or an intent record; for this repository the migration supplies them (DR-61). Verification items count as derived and carry no basis. DR-44's delegation remains, as the item a derived or added item names above it.
+  after:
+    requirements: SYS-42, SYS-34, MODEL-37, MODEL-38, MODEL-40, CHECK-18, CHECK-24, AGENT-60
+    consequences: |-
+      Every requirement and decision record carries a basis, an intent record or a lock; for this repository the migration supplies them (DR-61). Verification items and element definitions count as derived unless a person said or locked something about them (MODEL-40). A derived item under an added item counts as added.
+      - A lock or intent record keeps its level after the item changes, until a person answers the change; changed is judged against the newest record (CHECK-24).
+      - Keeping an alteration re-records the item at its earlier level; it becomes explicit only if the person locks it.
+      - DR-44's delegation remains, as the item a derived or added item names above it (SYS-34).
+  acks:
+    DR-54: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: DR-57
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: conflict defined, scope widened, rewordings and direct requests allowed, resolution attributed.
+  raised:
+  - you decided it
+  fingerprint_before: 06c36cabcf32
+  fingerprint_after: ee90b0b01a61
+  before:
+    decision: |-
+      - Before building, the agent compares the request with the explicit and stated items in the elements it affects. The usual way is to draft the request's spec edits first, because the edit's context shows each affected item's level.
+      - A conflict becomes an open decision that names the conflicting items and offers options (reword, edit, add, change, or drop part of the request), one of them recommended. It heads the review page, and the agent says in chat that it's there, with enough to answer in chat.
+      - The CLI refuses an edit that changes the meaning of an explicit or stated item unless the edit names a resolved conflict. Edits that change only wording pass.
+      - The alterations the chosen option makes count as kept, and the answer is itself stated intent on the items it produces.
+      - A request without conflicts is built without stopping, in code-first mode as before. Alterations to guided items are still asked about once built.
+  after:
+    decision: |-
+      - A request conflicts with an item when it can't be met without changing that item's meaning, or when it makes the item impossible to meet.
+      - Before building, the agent compares the request with the explicit and stated items in the elements it affects, in the elements that depend on those, and above them in the trace (AGENT-61). The usual way is to draft the request's spec edits first, because the edit's context shows each affected item's level. A conflict found mid-build is raised then, before more is built.
+      - A conflict becomes an open decision that names the conflicting items and offers options (reword, edit, add, change, or drop part of the request), one recommended, each showing the new text it would give the items. It heads the review page, and the agent says in chat that it's there, with enough to answer in chat.
+      - The CLI refuses an edit that changes the text of an explicit or stated item unless the edit names a conflict a person resolved for that item, adds the person's own request for the change as an intent record, or is declared a rewording. A declared rewording is shown on the review page as one, for the person to check. It's a guardrail against forgetting, not a security boundary.
+      - Alterations that match what the chosen option showed count as kept, and the choice is recorded as stated intent on those items, with the person's identity.
+      - A request without conflicts is built without stopping, in code-first mode as before. Alterations to guided items are still asked about once built.
+  acks:
+    DR-57: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: DR-58
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: one trace or several, the old derived mark, and what turns the to-do into an error.
+  raised:
+  - you decided it
+  fingerprint_before: 4c73783682b0
+  fingerprint_after: 29264623e0c7
+  before:
+    decision: A requirement on an element refines a requirement of the element's parent, and an element directly under the system refines a system requirement. Intermediate elements get requirements of their own for their children to refine, and MODEL-33 still forbids restating. The checker reports violations as to-dos until the migration (DR-61) has re-traced this repository, and as errors after it.
+  after:
+    decision: A requirement on an element traces to exactly one requirement of the element's parent, and an element directly under the system traces to a system requirement. Intermediate elements get requirements of their own for their children to refine, and MODEL-33 still forbids restating. The derived mark for requirements that trace to nothing is retired (SYS-6). The checker reports violations as to-dos where the repository's settings don't enforce flow-down, and as errors where they do. New repositories enforce it from the start; this repository switches after the migration (DR-61).
+  acks:
+    DR-58: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: DR-59
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: branch edge cases, dirty working trees, missing local data, and unsent reviews.
+  raised:
+  - you decided it
+  fingerprint_before: 8228065ba00b
+  fingerprint_after: f676f637edd5
+  before:
+    decision: |-
+      - One library builds each section of the review page as data: decisions awaiting a person, differences, captured intent, proposals, the graph, and the items. The page embeds that data, and CLI commands print it as text or YAML.
+      - The comparison reads the older spec at a version-control revision without touching the working tree. The newer side defaults to the working tree. Against a branch, it compares with the merge base.
+      - Items are compared by ID: added, removed, moved, changed in meaning (by fingerprint) or in wording only. Each comes with the reasons from the change records the newer side adds, and its level on both sides.
+      - A review sent back is recorded in the spec with its person, time, revision and the fingerprints shown. The page's embedded data, kept locally, gives the exact content shown. The comparison since a person's last review uses both.
+  after:
+    decision: |-
+      - One library builds each section of the review page as data: decisions and alterations awaiting a person, responses to feedback, differences, captured intent, proposals, the graph, and the items. The page embeds that data, and CLI commands print it as text or YAML.
+      - The comparison reads the older spec at a version-control revision without touching the working tree, and the newer side defaults to the working tree. Against a branch, it compares with the merge base of that branch and the newer side. A branch that exists only as a remote-tracking branch resolves to it, with a note; an unknown name is an error.
+      - Items are compared by ID, and each differing item gets every class that applies (DIFF-3), the reasons from the change records the newer side adds, and its level on both sides.
+      - A review sent back is recorded in the spec with its person, time, the revision the page was generated from, whether the working tree differed, and the fingerprints shown. The page's embedded data, kept locally, gives the exact content shown. Without it, as on another machine, the comparison uses the recorded revision and marks the items whose fingerprints differ. A review never sent back records nothing; sending an empty block is how a person marks a review done.
+  acks:
+    DR-59: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: DR-61
+  at: 2026-10-21T12:41-07:00
+  reason: |-
+    audits: when CLI-22 is built, the transitional mapping, and how the migration passes CLI-22.
+  raised:
+  - you decided it
+  fingerprint_before: 4de9ef79961e
+  fingerprint_after: c3f3153a5a50
+  before:
+    decision: |-
+      - This round changes meaning only.
+      - Phase 1 builds the tooling, reading old and new fields side by side.
+      - Phase 2 migrates this repository element by element, touching each item once: re-trace it for flow-down, summarize its verbatim words into intent records with person and basis, turn its approvals into explicit locks, and rename the approval vocabulary to locks, and the engineer to a person where several people apply. The old fields and commands then go, and the checker rejects them.
+      - Phases 3 to 5 build the comparison, the review page and the feedback loop.
+  after:
+    decision: |-
+      - This round changes meaning only.
+      - Phase 1 builds the tooling, including the CLI's refusal (CLI-22), reading old and new fields side by side. Until the migration, old fields map to levels: an approval is a lock; an engineer origin, a source or quotes field, or a decision the engineer made, is stated intent; an agent origin is derived.
+      - Phase 2 migrates this repository element by element, touching each item once: re-trace it for flow-down, summarize its verbatim words into intent records with person and basis, turn its approvals into explicit locks, retire the origin field and the derived mark, and rename the approval vocabulary to locks and the engineer to a person where several people apply. Its rewordings are declared as rewordings. The old fields and commands then go, and the checker rejects them.
+      - Phases 3 to 5 build the comparison, the review page and the feedback loop.
+  acks:
+    DR-61: added or revised earlier in this round; revised again per the audits.
+- op: modify
+  id: NEED-25
+  at: 2026-10-21T13:06-07:00
+  reason: the engineer's correction on review; conflicts follow the change's mode (NEED-6).
+  raised:
+  - it carries your words
+  fingerprint_before: fef4e6207050
+  fingerprint_after: c7553c88c466
+  before:
+    text: The engineer needs each request that conflicts with what a person stated or locked raised with options before it is built, and every other request built without interruption.
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): wants the flow to be: build feature X, done; build feature Y, done; build feature Z, and the agent answers that it conflicts with X in specific ways, lists the requirements involved, and offers ways to reword, edit, add or change items. Prefers that such conflicts be shown to the person on the review page, and is indifferent about the agent-side tooling.
+    context: Discussing how large changes should treat locked items, which amends DR-15.
+  after:
+    text: The engineer needs each request that conflicts with what a person stated or locked raised with options, before it is built or once it is built, whichever way the engineer works on that change.
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): wants the flow: build feature X, done; build feature Y, done; build feature Z, and the agent answers that it conflicts with X in specific ways, lists the requirements involved, and offers ways to reword, edit, add or change items. Then corrected that raising it before building isn't always wanted: the spec is committed with the code, so a build-first, confirm-after approach must be supported too. Both workflows, spec first then build and build first then spec, are first class.
+    context: Discussing how changes should treat locked items, then reviewing this need in round 18.
+  acks:
+    NEED-25: the engineer's correction on review.
+    SYS-49: follows NEED-25 as corrected.
+- op: modify
+  id: SYS-49
+  at: 2026-10-21T13:06-07:00
+  reason: NEED-25 as corrected by the engineer.
+  raised:
+  - it carries your words
+  fingerprint_before: 418b8a6ebe4a
+  fingerprint_after: 8c5b7e273353
+  before:
+    text: When a request conflicts with an item at the explicit or stated level, the toolkit shall bring the conflict to a person before the request is built, naming the conflicting items and offering options to resolve it.
+  after:
+    text: When a request conflicts with an item at the explicit or stated level, the toolkit shall bring the conflict to a person with the conflicting items and options to resolve it, before building in spec-first mode and once built in code-first mode.
+  acks:
+    SYS-49: follows NEED-25 as corrected.
+    CHANGE-17: unaffected; conflicts are still kept as open decisions in both modes.
+    CHANGE-18: unaffected; a chosen option's alterations count as kept in both modes.
+    CLI-22: narrowed to spec-first mode per the correction.
+    DR-57: rewritten to the correction.
+- op: modify
+  id: SYS-18
+  at: 2026-10-21T13:06-07:00
+  reason: back to its approved text; conflicts in code-first mode are raised once built (SYS-49), so nothing stops the change.
+  raised:
+  - you approved it
+  - it carries your words
+  fingerprint_before: 40ee97ba7c38
+  fingerprint_after: 7fffec004b8c
+  before:
+    text: In code-first mode, the toolkit shall let a change that conflicts with no item at the explicit or stated level complete without the engineer's involvement.
+  after:
+    text: In code-first mode, the toolkit shall let a change complete without the engineer's involvement.
+  acks:
+    DR-57: rewritten to the correction.
+    SYS-18: restored to its approved text, so its approval holds again.
+    AGENT-29: unaffected; quick changes report as soon as usable.
+    DR-15: status note; DR-57 now confirms it.
+- op: modify
+  id: AGENT-61
+  at: 2026-10-21T13:06-07:00
+  reason: the comparison happens in both modes; its timing follows the mode (SYS-49).
+  before:
+    text: Before building a request, the agent shall compare it with the items at the explicit or stated level in the system elements the request affects, in the elements that depend on those, and above them in the trace.
+  after:
+    text: For each request, the agent shall compare it with the items at the explicit or stated level in the system elements the request affects, in the elements that depend on those, and above them in the trace.
+  acks:
+    DR-57: rewritten to the correction.
+- op: modify
+  id: CLI-22
+  at: 2026-10-21T13:06-07:00
+  reason: in code-first mode the change is built first and its conflicts raised afterwards (SYS-49), so the refusal applies to spec-first only. CHECK-26 covers code-first.
+  raised:
+  - it carries your words
+  fingerprint_before: 03b61750a2aa
+  fingerprint_after: b48f2b0be44b
+  before:
+    text: The CLI shall refuse an edit that changes the text of an item at the explicit or stated level unless the edit names a conflict a person resolved for that item, adds that person's request for the change as an intent record, or is declared a rewording.
+  after:
+    text: In spec-first mode, the CLI shall refuse an edit that changes the text of an item at the explicit or stated level unless the edit names a conflict a person resolved for that item, adds that person's request for the change as an intent record, or is declared a rewording.
+  acks:
+    CLI-22: narrowed to spec-first mode per the correction.
+    DR-57: rewritten to the correction.
+- op: add
+  id: CHECK-26
+  at: 2026-10-21T13:06-07:00
+  reason: SYS-49 in code-first mode.
+  after:
+    text: When an agent marks a change done, the checker shall report each alteration to an item at the explicit or stated level that no conflict in the change names.
+    traces_to: SYS-49
+    origin: agent
+    why: in code-first mode the edit goes through, so the done gate is where an altered stated or locked item must become a conflict with options for the person.
+- op: add
+  id: AGENT-63
+  at: 2026-10-21T13:06-07:00
+  reason: the engineer's condition on SYS-44.
+  after:
+    text: When it is unclear whether a person's statement directly expresses an item, the agent shall record the item at the lower level.
+    traces_to: SYS-44
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): a statement such as requiring a self-driving car may have a hundred thousand requirements, needs and verification items under it. The requirement that the car drives itself can be marked as theirs, but a detail such as a module producing the next stretch of driving trajectories is not. The agent has to judge, but should keep it tight rather than loose.
+- op: add
+  id: NEED-28
+  at: 2026-10-21T13:06-07:00
+  reason: the engineer's answer to D2.
+  after:
+    text: The engineer needs each change reviewed at the level of its spec rather than its code, by its author or by another reviewer, with the review kept where the change is reviewed.
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): the person pastes the feedback block, so it can travel. A pull-request reviewer can open the review page, then post the block on the pull request as their review notes; an author can review their own change and paste the block to the agent. Part of the design is to allow system-level review in place of code review, since code will soon be too large for people to review.
+    context: Answering who applies a feedback block from the review page (round 18, D2).
+- op: add
+  id: SYS-53
+  at: 2026-10-21T13:06-07:00
+  reason: NEED-28.
+  after:
+    kind: system
+    text: The feedback block shall read on its own as review notes on the change it reviews.
+    serves:
+    - NEED-28
+    - NEED-23
+    origin: engineer
+    source: |-
+      Alex Thiele, 2026-10-21 (summary): a pull-request reviewer could put the block on the pull request as their review notes.
+- op: add
+  id: CLI-27
+  at: 2026-10-21T13:06-07:00
+  reason: D2.
+  after:
+    text: The CLI shall apply a feedback block given on standard input or in a file, whoever pasted or posted it.
+    traces_to: SYS-51
+    origin: agent
+    why: a block may arrive in the conversation or from a pull-request review, so the agent applies it; the block, not the machine, names the reviewer (CLI-23).
+- op: modify
+  id: SYS-40
+  at: 2026-10-21T13:06-07:00
+  reason: D3. The engineer asked the agent to follow their intent; naming the exception keeps future agents from reading the basis (DR-54) as the score SYS-40 rules out.
+  raised:
+  - you approved it
+  - it carries your words
+  fingerprint_before: ecc4b86f8ec3
+  fingerprint_after: 86f10ef6a3e4
+  before:
+    text: The spec shall store no measure of an item's importance.
+  after:
+    text: The spec shall store no measure of an item's importance, apart from the basis that records how each item came about.
+  acks:
+    SYS-40: amended per D3.
+    SYS-V7: still holds; no field measures importance, and the basis is provenance.
+    DR-44: unaffected.
+- op: modify
+  id: DR-57
+  at: 2026-10-21T13:06-07:00
+  reason: the engineer's correction on review; both workflows are first class.
+  raised:
+  - you decided it
+  fingerprint_before: ee90b0b01a61
+  fingerprint_after: 7d3f1afbb073
+  before:
+    title: A conflict with an explicit or stated item is raised before building, and the edit is refused until it's resolved
+    requirements: SYS-49, SYS-18, CHANGE-17, CHANGE-18, CLI-22, AGENT-61
+    decision: |-
+      - A request conflicts with an item when it can't be met without changing that item's meaning, or when it makes the item impossible to meet.
+      - Before building, the agent compares the request with the explicit and stated items in the elements it affects, in the elements that depend on those, and above them in the trace (AGENT-61). The usual way is to draft the request's spec edits first, because the edit's context shows each affected item's level. A conflict found mid-build is raised then, before more is built.
+      - A conflict becomes an open decision that names the conflicting items and offers options (reword, edit, add, change, or drop part of the request), one recommended, each showing the new text it would give the items. It heads the review page, and the agent says in chat that it's there, with enough to answer in chat.
+      - The CLI refuses an edit that changes the text of an explicit or stated item unless the edit names a conflict a person resolved for that item, adds the person's own request for the change as an intent record, or is declared a rewording. A declared rewording is shown on the review page as one, for the person to check. It's a guardrail against forgetting, not a security boundary.
+      - Alterations that match what the chosen option showed count as kept, and the choice is recorded as stated intent on those items, with the person's identity.
+      - A request without conflicts is built without stopping, in code-first mode as before. Alterations to guided items are still asked about once built.
+    consequences: DR-15 is amended. An agent that skips the comparison is still stopped by the refusal when it edits the item, though possibly after writing code.
+  after:
+    title: A conflict with an explicit or stated item is raised with options, before building in spec-first mode and once built in code-first mode
+    requirements: SYS-49, NEED-25, CHANGE-17, CHANGE-18, CLI-22, CHECK-26, AGENT-61
+    decision: |-
+      - A request conflicts with an item when it can't be met without changing that item's meaning, or when it makes the item impossible to meet.
+      - For each request, the agent compares it with the explicit and stated items in the elements it affects, in the elements that depend on those, and above them in the trace (AGENT-61).
+      - A conflict becomes an open decision that names the conflicting items and offers options (reword, edit, add, change, roll back, or drop part of the request), one recommended, each showing the new text it would give the items. It heads the review page, and the agent says in chat that it's there, with enough to answer in chat.
+      - **Spec-first mode:** the conflict is raised before building. The CLI refuses an edit that changes the text of an explicit or stated item unless the edit names a conflict a person resolved for that item, adds the person's own request for the change as an intent record, or is declared a rewording.
+      - **Code-first mode:** the change is built, and the spec, committed with the code, is updated with it. When the agent marks the change done, the checker reports each altered explicit or stated item that no conflict names, so the agent must raise each one with options, rolling back included.
+      - A declared rewording is shown on the review page as one, for the person to check. The refusal and the done check are guardrails against forgetting, not a security boundary.
+      - Alterations that match what the chosen option showed count as kept, and the choice is recorded as stated intent on those items, with the person's identity.
+    consequences: DR-15 holds. Code-first changes never stop, and spec-first changes stop for conflicts. In code-first mode a request may be built on a reading the person then rejects, and the roll-back option is the remedy.
+  acks:
+    DR-57: rewritten to the correction.
+- op: modify
+  id: DR-15
+  at: 2026-10-21T13:06-07:00
+  reason: DR-57 as corrected.
+  raised:
+  - you approved it
+  - you decided it
+  fingerprint_before: e8abc8b595ea
+  fingerprint_after: 8324de3f06bb
+  before:
+    status: amended in round 18 by DR-57. A conflict with an explicit or stated item is raised before building, in either mode.
+  after:
+    status: confirmed in round 18 by DR-57. In code-first mode, conflicts with explicit or stated items are raised once the change is built.
+  acks:
+    DR-15: status note; DR-57 now confirms it.
+- op: modify
+  id: DR-62
+  at: 2026-10-21T13:06-07:00
+  reason: D2 and the engineer's condition on SYS-44.
+  raised:
+  - you decided it
+  fingerprint_before: 3d50ac0380f5
+  fingerprint_after: 7592f405900b
+  before:
+    requirements: SYS-44, MODEL-37, AGENT-21, AGENT-50, AGENT-56, REVIEW-25, SYS-51, CLI-23
+    decision: |-
+      - When a person says what they want, in conversation or in a page comment, the agent adds an intent record to each item the words directly express: stated when the words alone say what the item requires, guided when the person's choice or constraint fixed it. A restatement of an existing item is a stated intent record, not an approval.
+      - The review page shows what was captured since the person's last review, to correct or remove.
+      - A lock (the explicit level) is a person's own act: a page control, the terminal, or a lock line in chat, which the prompt hook still reads as a shortcut.
+      - Records made mechanically, by the prompt hook or from a feedback block, hold no words: the person, the channel, the IDs and the fingerprints.
+      - A feedback block names its person and carries fingerprints. In a harness with the prompt hook, the hook applies a block the person pastes, as it does lock lines, so no agent interprets it; elsewhere the agent applies it with the CLI.
+  after:
+    requirements: SYS-44, MODEL-37, AGENT-21, AGENT-50, AGENT-56, AGENT-63, REVIEW-25, SYS-51, SYS-53, CLI-23, CLI-27
+    decision: |-
+      - When a person says what they want, in conversation or in a page comment, the agent adds an intent record to each item the words directly express: stated when the words alone say what the item requires, guided when the person's choice or constraint fixed it. When unsure, the lower level (AGENT-63). A restatement of an existing item is a stated intent record, not an approval.
+      - The review page shows what was captured since the person's last review, to correct or remove.
+      - A lock (the explicit level) is a person's own act: a page control, the terminal, or a lock line in chat, which the prompt hook still reads as a shortcut.
+      - Records made mechanically, by the prompt hook or from a feedback block, hold no words: the person, the channel, the IDs and the fingerprints.
+      - A feedback block names its reviewer, carries fingerprints, and reads on its own as review notes (SYS-53). The person pastes it to the agent, or posts it on a pull request as their review, and the agent applies it with the CLI (D2). The block, not the machine applying it, names who gave each lock; where the block was posted is the evidence of who wrote it.
+  acks:
+    DR-62: updated per D2 and AGENT-63.
+decisions:
+- id: D1
+  question: How far should the migration go in removing verbatim text already committed?
+  importance: It sets the size of Phase 2 and how much of your past conversation stays in current files. Every change record's before and after values, and the approval words in the approvals file, hold your words verbatim, and this round's own change record copies some of them again. Version-control history keeps them whatever is chosen here.
+  involves:
+  - NEED-16
+  - SYS-35
+  - DR-55
+  - DR-61
+  options:
+  - label: Summarize everywhere in current files
+    recommended: true
+    detail: Phase 2 also summarizes the verbatim text in past change records (their before and after values and reasons) and in the approval words. From then on nothing in the current tree quotes you. Removing it from history stays a separate choice of yours (rewriting history, or publishing a fresh squashed copy).
+  - label: Summarize live items only
+    detail: Items and approvals get summaries; past change records stay as written, as a historical log. Less work, but anyone reading the change records still sees your words verbatim.
+  status: resolved
+  chosen: Summarize everywhere in current files
+  words: |-
+    Alex Thiele (summary): migrate 100% to the new system; git keeps the history.
+  resolved: '2026-10-21'
+- id: D2
+  question: When you paste a feedback block from the review page, who applies it?
+  importance: It decides whether your locks from the page reach the spec without any agent interpreting them, and whether you see a permission prompt each time. It shapes DR-62 and how the prompt hook changes in Phase 5.
+  involves:
+  - SYS-51
+  - CLI-23
+  - DR-62
+  - DR-41
+  options:
+  - label: The prompt hook applies it
+    recommended: true
+    detail: As with lock lines today, the Claude Code prompt hook recognizes the block in your own message and applies it with the CLI, then tells the agent what it recorded. No prompt, and no agent in between. In harnesses without the hook, the agent runs the apply command.
+  - label: The agent applies it
+    detail: The agent runs the apply command on the block you pasted, with a permission prompt in Claude Code (as for approving today). One more click, and the agent handles text that records your locks.
+  status: resolved
+  chosen: The agent applies it
+  words: |-
+    Alex Thiele (summary): the person pastes the block, so it can travel: a pull-request reviewer can post it as review notes on the PR, or an author can review their own change and paste it to the agent. The aim is system-level review in place of code review, since code will soon be too large for people to review.
+  resolved: '2026-10-21'
+- id: D3
+  question: Does the stored basis sit within SYS-40 (no stored measure of importance), or should SYS-40 be amended?
+  importance: Low impact on the build, but it's a requirement you approved, and the audit noted the tension. Levels are ordered and gate behavior (CLI-22 refuses edits to stated items), which is close to the classification SYS-40 ruled out.
+  involves:
+  - SYS-40
+  - SYS-42
+  - DR-54
+  options:
+  - label: Keep SYS-40 as is
+    recommended: true
+    detail: The basis records how an item came about (provenance), not how much it matters. Agents still weigh dates, edit counts and discussions themselves, and DR-54 says so.
+  - label: Amend SYS-40 to name the exception
+    detail: Reword SYS-40 to forbid stored importance scores while allowing the recorded basis of each item, so the two can't be read as contradicting.
+  status: resolved
+  chosen: Amend SYS-40 to name the exception
+  words: |-
+    Alex Thiele (summary): didn't remember SYS-40 and asked the agent to follow their intent. The agent chose to amend it, so future agents don't read the recorded basis as a stored importance score.
+  resolved: '2026-10-21'
+friction:
+- workaround: Adding DIFF to the CLI element's depends_on asked for acknowledgments on 25 decision records about CLI (DR-1, DR-2, DR-19, DR-34 to DR-39, DR-51 to DR-53 and more) plus the AGENT and ONBOARD elements. None can be affected by the CLI gaining a dependency, so I wrote the same 'unaffected by a new dependency' note for each.
+  proposal: Treat adding to an element's depends_on as not changing the meaning of the decision records about it or of the elements that depend on it; ask only when a dependency is removed or the element's purpose changes.
+- workaround: Revising items I had added earlier in this same change (SYS-44, DR-54 to DR-61, CLI-22 and others) asked for acknowledgments as alterations to the engineer's words and decisions, and now lists them among the alterations awaiting the engineer's answer (35 in total, about 20 of them items new in this round). I acknowledged each one with the same note.
+  proposal: |-
+    Don't count an edit to an item added in the open change as an alteration: compare with the item as it was when the change opened, so the engineer sees one entry per item, the item's final text.
+- workaround: A 57-operation dry run of spec edit took over two minutes, against 2.3 seconds for spec check on the same spec, so I ran it in the background.
+  proposal: Profile spec edit's per-operation context and validation; it looks like the checker or the ancestor walk runs once per operation. Compute the context once per batch and validate the result once.
+closed: '2026-10-21'

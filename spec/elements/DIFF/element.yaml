@@ -1,0 +1,8 @@
+id: DIFF
+title: Spec comparison
+parent: SYS
+depends_on:
+- MODEL
+- CHANGE
+- CHECK
+purpose: Compares two versions of the spec item by item, for agents and for the review page alike.

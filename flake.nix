@@ -8,7 +8,7 @@
   outputs =
     { self, nixpkgs }:
     let
-      supportedSystems = [ "x86_64-linux" ];
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
     in
     {
@@ -18,6 +18,7 @@
           pkgs = import nixpkgs { inherit system; };
           python = pkgs.python3.withPackages (ps: [
             ps.pyyaml
+            ps.pydantic
             ps.pytest
           ]);
         in

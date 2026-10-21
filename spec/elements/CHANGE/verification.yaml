@@ -3,7 +3,6 @@
   - CHANGE-3
   method: test
   technique: unit test
-  origin: agent
   description: A change record keeps its open decisions, and its view lists them.
   tests:
     python:
@@ -15,7 +14,6 @@
   - CHANGE-9
   method: test
   technique: unit test
-  origin: agent
   description: Opening a change records a summary of the request; with no mode named the change is code-first, and its target defaults to the primary implementation.
   tests:
     python:
@@ -26,7 +24,6 @@
   - CHANGE-5
   method: test
   technique: unit test
-  origin: agent
   description: Every edit is logged in the open change record with its reason and the item's meaning before and after; an edit without a reason, or with no change open, is refused.
   tests:
     python:
@@ -38,7 +35,6 @@
   - CHANGE-10
   method: test
   technique: unit test
-  origin: agent
   description: An open decision is refused unless it offers at least two options with exactly one recommended.
   tests:
     python:
@@ -48,7 +44,6 @@
   - CHANGE-11
   method: test
   technique: unit test
-  origin: agent
   description: An open decision involving an item the engineer stated is flagged in the change record view.
   tests:
     python:
@@ -58,8 +53,7 @@
   - CHANGE-12
   method: test
   technique: unit test
-  origin: agent
-  description: One resolve command records the recommended option for every named decision, with the engineer's words.
+  description: One resolve command records the recommended option for every named decision, with a summary of the engineer's answer.
   tests:
     python:
     - tests/test_decisions.py::test_resolve_takes_the_recommended_options_for_a_set
@@ -71,8 +65,7 @@
   - CHECK-21
   method: test
   technique: integration test
-  origin: agent
-  description: Rewording a requirement in the engineer's words needs an acknowledgment first. Once applied, the change record lists it with the line that keeps it, and it's a to-do, until the engineer approves it as reworded, after which it's listed as kept. Rewording it back to its earlier text answers it as rolled back.
+  description: Rewording a requirement in the engineer's words needs an acknowledgment first. Once applied, the change record lists it with the line that keeps it, and it's a to-do, until the engineer locks it as reworded, after which it's listed as kept. Rewording it back to its earlier text answers it as rolled back.
   tests:
     python:
     - tests/test_review.py::test_altering_the_engineers_words_is_raised_until_kept
@@ -83,9 +76,19 @@
   - CLI-14
   method: test
   technique: integration test
-  origin: agent
-  description: A proposal with a reason is listed in the change record with one line approving what's still waiting, and is marked approved once the engineer approves it. A proposal without a reason is refused.
+  description: A proposal with a reason is listed in the change record with one line locking what's still waiting, and is marked locked once the engineer locks it. A proposal without a reason is refused.
   tests:
     python:
     - tests/test_review.py::test_proposals_are_listed_with_reasons_until_approved
     - tests/test_review.py::test_a_proposal_needs_a_reason
+- id: CHANGE-V9
+  verifies:
+  - CHANGE-14
+  - CLI-6
+  method: test
+  technique: unit test
+  description: Editing an item an agent added earlier in the same change, with no lock since, asks for no acknowledgment and isn't listed as an alteration. An element that only gains a dependency asks for no acknowledgments from the decisions about it.
+  tests:
+    python:
+    - tests/test_levels.py::test_editing_an_item_added_earlier_in_the_same_change_alters_nothing_a_person_gave
+    - tests/test_levels.py::test_an_element_gaining_a_dependency_needs_no_acknowledgments
