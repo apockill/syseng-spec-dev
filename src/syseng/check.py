@@ -157,9 +157,14 @@ def _traces(spec: Spec) -> list[Finding]:
                 out.append(_f("T003", f"{item.id} names unknown system element {el}", item.id, item))
     out += _flow_down(spec)
     verified = {r for vi in spec.of_kind("vi") for r in (vi.data.get("verifies") or [])}
+    refined = {str(i.data.get("traces_to")) for i in spec.of_kind("requirement") if i.data.get("traces_to")}
+    branches = {e.parent for e in spec.elements.values() if e.parent}
     for item in spec.requirements():
         if item.id not in verified and not item.data.get("verification_deferred"):
-            out.append(_f("T004", f"{item.id} has no verification item yet", item.id, item))
+            # CHECK-29: above the leaves, a requirement is met through its children or verified itself
+            bare = item.kind != "constraint" and item.element in branches and item.id not in refined
+            gap = "; nothing refines it either, so it's neither decomposed nor verified" if bare else " yet"
+            out.append(_f("T004", f"{item.id} has no verification item{gap}", item.id, item))
     return out
 
 

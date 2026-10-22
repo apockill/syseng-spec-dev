@@ -142,3 +142,12 @@
     - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
     - tests/test_levels.py::test_a_change_the_person_has_seen_on_a_review_stops_asking_but_stays_decayed
     - tests/test_review_page.py::test_an_unlock_takes_the_lock_off_and_keeps_the_history
+- id: CHECK-V14
+  verifies:
+  - CHECK-29
+  method: test
+  technique: unit test
+  description: A requirement on an element with sub-elements that nothing refines or verifies is reported as neither decomposed nor verified; a refined one and a leaf element's one get the plain to-do.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_requirement_above_the_leaves_that_nothing_refines_or_verifies_is_called_out

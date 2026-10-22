@@ -1,0 +1,38 @@
+request: |-
+  Flag cheaply what the checker can: a requirement on an element with sub-elements that's neither refined nor verified
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-22'
+entries:
+- op: add
+  id: CHECK-29
+  at: 2026-10-22T15:20-07:00
+  reason: the engineer asked for this check, subject to low noise and low cost; it reports within T004, so no item is reported twice.
+  requested: true
+  after:
+    text: The checker shall report each requirement on a system element with sub-elements that has neither a verification item nor a requirement refining it, saying that it is neither decomposed nor verified.
+    traces_to: SYS-7
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 15:20
+      context: Discussing the textbook check that a parent requirement is covered by its children, and its cheap mechanical part.
+      said: Wants everything the checker can flag cheaply flagged, opportunistically, provided it can be flagged without noisy false positives and is straightforward to add.
+      basis: stated
+      fingerprint: d1147fe87204
+- op: add
+  id: CHECK-V14
+  at: 2026-10-22T15:20-07:00
+  reason: verifies the new check.
+  after:
+    verifies:
+    - CHECK-29
+    method: test
+    technique: unit test
+    description: A requirement on an element with sub-elements that nothing refines or verifies is reported as neither decomposed nor verified; a refined one and a leaf element's one get the plain to-do.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_requirement_above_the_leaves_that_nothing_refines_or_verifies_is_called_out
+decisions: []
+friction: []
+closed: '2026-10-22'
