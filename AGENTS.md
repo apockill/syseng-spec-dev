@@ -18,7 +18,3 @@ In Claude Code, the toolkit's hooks (`.syseng/hook`) run in this repository. The
 
 In other harnesses no toolkit hooks run, so nothing stops a direct edit to the spec or a finish with errors. Record the engineer's locks yourself, edit the spec only with `spec edit`, and run `spec check` before you report.
 <!-- /syseng -->
-
-## Working on the toolkit itself
-
-This repository is the syseng toolkit. On a machine where it's installed with `nix profile install` from this checkout, run `nix profile upgrade` (see `nix profile list` for its name) after changing the toolkit, so the installed `spec`, which the hooks and agents run, matches the checkout.

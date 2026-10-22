@@ -168,7 +168,7 @@
     - When the toolkit runs from the Nix store, setup links the user-level skill and subagents through the profile (`~/.nix-profile` or its equivalents) when the same files are there, so the links follow each upgrade.
     - Machines without Nix still install with pipx or uv (SYS-32).
   alternatives: A wrapper script in the machine's Nix configuration that runs the checkout, which needs no upgrade step but isn't something other machines can install. pipx on NixOS, which depends on nix-ld for pydantic's compiled part.
-  consequences: In this repository an agent that changes the toolkit runs `nix profile upgrade` so the installed `spec` matches the checkout; the repository's AGENTS.md says so.
+  consequences: How a machine installs and updates the toolkit is that machine's business; the repository's instructions to agents say nothing about it.
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
     when: 2026-10-22 09:30
@@ -176,3 +176,9 @@
     said: Found nix profile interesting, checked that upgrading is one command that re-reads the local checkout rather than GitHub, and asked for instructions to give their Nix agent.
     basis: guided
     fingerprint: ce5da775d80d
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-22 11:12
+    context: Reviewing the AGENTS.md note on running nix profile upgrade after changing the toolkit
+    said: Wants the note removed; agents don't need to know how the package was installed or updated.
+    basis: stated
+    fingerprint: 2383f9e0cca8

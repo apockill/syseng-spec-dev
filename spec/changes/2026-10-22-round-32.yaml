@@ -1,0 +1,45 @@
+request: Remove the AGENTS.md note on updating a Nix install; agents don't need install specifics
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-22'
+entries:
+- op: modify
+  id: DR-70
+  at: 2026-10-22T11:12-07:00
+  reason: the engineer asked to drop the install-specific note from AGENTS.md.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: ce5da775d80d
+  fingerprint_after: 2383f9e0cca8
+  requested: true
+  before:
+    consequences: In this repository an agent that changes the toolkit runs `nix profile upgrade` so the installed `spec` matches the checkout; the repository's AGENTS.md says so.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 09:30
+      context: Choosing how to put `spec` on the PATH of a NixOS machine whose Nix setup another agent manages.
+      said: Found nix profile interesting, checked that upgrading is one command that re-reads the local checkout rather than GitHub, and asked for instructions to give their Nix agent.
+      basis: guided
+      fingerprint: ce5da775d80d
+  after:
+    consequences: How a machine installs and updates the toolkit is that machine's business; the repository's instructions to agents say nothing about it.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 09:30
+      context: Choosing how to put `spec` on the PATH of a NixOS machine whose Nix setup another agent manages.
+      said: Found nix profile interesting, checked that upgrading is one command that re-reads the local checkout rather than GitHub, and asked for instructions to give their Nix agent.
+      basis: guided
+      fingerprint: ce5da775d80d
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 11:12
+      context: Reviewing the AGENTS.md note on running nix profile upgrade after changing the toolkit
+      said: Wants the note removed; agents don't need to know how the package was installed or updated.
+      basis: stated
+      fingerprint: 2383f9e0cca8
+  acks:
+    DR-70: only the consequence about AGENTS.md changes, at the engineer's own request; the packaging decision stands
+decisions: []
+friction: []
+closed: '2026-10-22'
