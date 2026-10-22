@@ -9,6 +9,13 @@
   decision: every open decision offers options, with one marked as recommended, and a set can be accepted in one statement. Each one also says whether it involves an engineer-stated item or one with decision records behind it. That last part is my extension (CHANGE-11) from flagged items to all open decisions.
   alternatives: free-form questions.
   consequences: most decisions take seconds. The ones that touch your own words stand out.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Round 5, responding to SYS-21 (finding weak or ambiguous requirements and verification items) on how the issues the toolkit raises should be presented.
+    said: Wants the agent always to propose options and mark one as Recommended, so the user can give one go-ahead to a whole set. Asked that where a human had a hand in something, or there are notes of earlier decision records, this be flagged so the user knows not to skim or lgtm too early.
+    basis: stated
+    fingerprint: ab705e6d05ee
 - id: DR-26
   title: Order questions by how much their answers would change
   decided_by: engineer
@@ -21,6 +28,13 @@
   decision: order questions and flags by how likely each answer is to change the spec or the other answers, most consequential first. Each one carries its reasons and a recommended option, and a set can be accepted in one line.
   alternatives: ordering by system element or by ID.
   consequences: the engineer can stop after the top few. The rest can usually be accepted as a block.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Rounds 7 and 8, after the agent had ranked the open items by how much the engineer's answers would change, saying why each ranked where it did.
+    said: Found the ranked list, with each item saying why it ranks where it does, really helpful. Wants the skill, whenever it asks questions or flags things, to use the user's time wisely by always ordering them by what is most likely to affect the other answers, asking about the most useful ones first.
+    basis: stated
+    fingerprint: e2c3c6b0195b
 - id: DR-33
   title: Change records are YAML, one change is open at a time, and every edit needs one
   decided_by: agent
@@ -36,6 +50,7 @@
     - Rounds 2 to 9 stay as hand-written Markdown, and `spec show` still finds mentions in them.
   alternatives: Logging edits in git commit messages, which fragments the reasons across commits and the engineer owns git anyway. Several open changes, which forces every edit to name its change.
   consequences: Every edit's reason lands in one place the engineer reads. Starting a change is one extra command per change.
+  basis: derived
 - id: DR-37
   title: The change log records every changed field, not just meaning
   decided_by: agent
@@ -47,8 +62,9 @@
   decision: Each log entry records the fields that changed, before and after, test links included. Meaning-only comparison is kept for deciding when acknowledgments are needed.
   alternatives: Logging meaning only, which hides test changes from auditors.
   consequences: One entry from round 10 (MODEL-V7's new test links) was logged before this fix, so it carries a reason but no field diff.
+  basis: derived
 - id: DR-48
-  title: Alterations to the engineer's items are flagged when logged, and answered by approval or rollback
+  title: Alterations to the engineer's items are flagged when logged, and answered by a lock or rollback
   decided_by: agent
   elements:
   - CHANGE
@@ -56,7 +72,44 @@
   - CHECK
   requirements: CHANGE-13, CHANGE-14, CHECK-21
   recorded: round 12
-  context: SYS-37 asks that each alteration to what the engineer approved, wrote or decided be raised after the work is built and tested, and the engineer described rolling back what they care about.
-  decision: When an edit changes the meaning of such an item, the change log records why it counts (approved, their words, their decision) and the item's fingerprints before and after. Before applying it, the CLI asks the agent to acknowledge it. The alteration stays listed in the change record, and as a to-do, until the engineer approves the item as it now is (kept), or it's back to its earlier content (rolled back). A removed item is listed but can't be kept by approval.
+  context: SYS-37 asks that each alteration to what the engineer locked, wrote or decided be raised after the work is built and tested, and the engineer described rolling back what they care about.
+  decision: When an edit changes the meaning of such an item, the change log records why it counts (locked, their words, their decision) and the item's fingerprints before and after. Before applying it, the CLI asks the agent to acknowledge it. The alteration stays listed in the change record, and as a to-do, until the engineer locks the item as it now is (kept), or it's back to its earlier content (rolled back). A removed item is listed but can't be kept by a lock.
   alternatives: Comparing against git history, which the toolkit doesn't read and which can't tell why an item counts. An explicit "answered" flag, which an agent could set without the engineer.
   consequences: Alterations logged before round 12 carry no flag, so the mechanism starts with this round. Keeping an alteration is one line from the engineer, such as `CHECK-14 LGTM`.
+  status: amended in round 18. An alteration is also kept under a conflict option the person chose (CHANGE-18), and answers come from the review page (CLI-23).
+  basis: derived
+- id: DR-65
+  title: Change records are YAML only, and the hand-written records from before are removed
+  decided_by: agent
+  elements:
+  - CHANGE
+  - REVIEW
+  requirements: CHANGE-3, CHANGE-5, CLI-28
+  recorded: round 20
+  context: Every change record had a generated Markdown view beside its YAML, and rounds 2 to 9 were hand-written Markdown full of verbatim words. The YAML records are the change log the new system reads (reasons, conflicts, decisions, feedback).
+  decision: Keep the YAML change records. Stop generating their Markdown views, delete the stale ones, and print a record as text with `spec change show --full` (the review page shows it from Phase 4). `spec migrate` removes the hand-written records; version control keeps them.
+  alternatives: Deleting spec/changes entirely, which would lose the reasons the comparison and the review page show beside each change. Keeping the Markdown, which is the old system's reading surface.
+  consequences: Until the review page exists, a change record is read in the terminal or as YAML. The requirements and decisions views stay until the review page replaces them.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Looking at a round-13 change record in Markdown, during round 20's migration.
+    said: Asked whether spec/changes should be deleted, since all its Markdown looks like the old system, and wants the repository to reflect the new system.
+    basis: guided
+    fingerprint: 591f481b6501
+- id: DR-67
+  title: A conflict's options name the items each keeps and rolls back, so a choice is applied as chosen
+  decided_by: agent
+  basis: derived
+  elements:
+  - CHANGE
+  - CLI
+  requirements: CHANGE-17, CHANGE-18, CLI-23, REVIEW-30
+  recorded: round 23
+  context: The engineer resolved round 20's conflict over ten items by choosing to keep all ten. The choice was recorded, but nothing said which items it kept, so none was re-recorded at its earlier level and five still showed as changed since locked.
+  decision: |-
+    - Each option of a conflict may list `keeps:` and `rolls_back:`, naming only items the decision involves.
+    - When a person chooses an option on the review page, the items it keeps are re-recorded at their earlier level in the person's name (a lock if they were locked, else a fresh intent record), and the ones it rolls back become feedback items for the agent.
+    - Round 20's D1, resolved before this existed, was finished the same way by hand, with a note on each lock naming the decision.
+  alternatives: Reading what an option does from its label, which breaks on the first unusual wording. Leaving keeps to the person item by item, which REVIEW-30 offers too but which makes a one-line answer impossible.
+  consequences: Agents fill in the lists when they raise a conflict (the skill says so). An option without them still resolves the decision, and its items stay waiting.

@@ -42,8 +42,8 @@ OLD_AGENTS = (".claude/agents/spec-auditor.md", ".claude/agents/spec-reasoning-c
 CLAUDE_NOTES = ADAPTERS / "claude_code" / "instructions.md"
 GENERIC_NOTES = ADAPTERS / "generic" / "instructions.md"
 HOOK_MARK = ".syseng/hook"
-# Toolkit commands agents may run without asking (CLI-20). `approve` and `resolve` record the engineer's
-# words, so they stay with the harness's permission prompt: the engineer sees and confirms each one.
+# Toolkit commands agents may run without asking (CLI-20). `lock` and `resolve` record a person's locks and
+# decisions, and `migrate` rewrites records, so they stay with the harness's permission prompt.
 _EVERYDAY = ("status", "check", "show", "render", "edit", "change", "decide", "propose", "friction")
 ALLOWED = [f"Bash(spec {cmd} *)" for cmd in _EVERYDAY]
 _OURS = set(ALLOWED) | {f"Bash(.syseng/spec {cmd} *)" for cmd in _EVERYDAY}  # this and earlier setups' rules
@@ -114,7 +114,8 @@ def merge_instructions(text: str | None, harnesses: list[str] = ("claude-code",)
     text = text or ""
     start, end = text.find("<!-- syseng:"), text.find(INSTRUCTIONS_END)
     if start != -1 and end > start:
-        return text[:start] + block + text[end + len(INSTRUCTIONS_END):].lstrip("\n")
+        rest = text[end + len(INSTRUCTIONS_END):].lstrip("\n")  # what follows keeps one blank line before it
+        return text[:start] + block + ("\n" + rest if rest else "")
     return (text.rstrip("\n") + "\n\n" if text.strip() else "") + block
 
 
@@ -173,15 +174,42 @@ def hermes_home() -> Path:
     return Path.home() / ".hermes"
 
 
+NIX_STORE = "/nix/store/"
+
+
+def profile_roots() -> list[Path]:
+    """Where a Nix profile exposes what it installed; each survives `nix profile upgrade`."""
+    user = os.environ.get("USER") or Path.home().name
+    return [Path.home() / ".nix-profile", Path.home() / ".local/state/nix/profile",
+            Path("/etc/profiles/per-user") / user, Path("/run/current-system/sw")]
+
+
+def stable(target: Path) -> Path:
+    """A path to the installed toolkit that outlives an upgrade. A toolkit installed with Nix lives at a store path
+    that changes with every version, so the same file is reached through the profile instead, when it's there."""
+    text = str(target)
+    if not text.startswith(NIX_STORE):
+        return target
+    inside = Path(*Path(text[len(NIX_STORE):]).parts[1:])  # the path within the package's store directory
+    for root in profile_roots():
+        candidate = root / inside
+        try:
+            if candidate.exists() and candidate.resolve() == target.resolve():
+                return candidate
+        except OSError:
+            continue
+    return target
+
+
 def machine_links(harnesses: list[str]) -> dict[Path, Path]:
     """Links in this machine's user-level folders: path -> what it points at in the installed toolkit (CLI-21)."""
     links: dict[Path, Path] = {}
     if "claude-code" in harnesses:
-        links[claude_home() / "skills" / "syseng"] = SKILL
+        links[claude_home() / "skills" / "syseng"] = stable(SKILL)
         for src in sorted(AGENT_DEFINITIONS.glob("*.md")):
-            links[claude_home() / "agents" / src.name] = src
+            links[claude_home() / "agents" / src.name] = stable(src)
     if "hermes" in harnesses and hermes_home().is_dir():
-        links[hermes_home() / "skills" / "syseng"] = SKILL
+        links[hermes_home() / "skills" / "syseng"] = stable(SKILL)
     return links
 
 
@@ -259,14 +287,15 @@ def _skeleton(repo: Path) -> Step:
         return Step("kept", "spec/", "already set up")
     language, how = _guess_language(repo)
     yamlio.write(root / "toolkit.yaml", {
-        "spec_version": 1,
+        "spec_version": 2,  # intent records and locks from the start (DR-63)
         "implementations": [{"name": language, "language": language, "root": ".", "primary": True}],
-        "element_order": ["SYS"]})
+        "element_order": ["SYS"],
+        "flow_down": "enforced"})  # requirements flow down the system breakdown from the start (DR-58)
     yamlio.write(root / "elements" / "SYS" / "element.yaml", {
         "id": "SYS", "title": repo.name, "parent": None, "depends_on": [], "purpose": "The whole system."})
     for name in ("needs.yaml", "requirements.yaml"):
         yamlio.write(root / "elements" / "SYS" / name, [])
-    for name in ("approvals.yaml", "retired.yaml"):
+    for name in ("locks.yaml", "retired.yaml"):
         yamlio.write(root / name, [])
     return Step("created", "spec/", f"root system element SYS; implementation {language!r}, {how}")
 

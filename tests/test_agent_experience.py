@@ -25,7 +25,8 @@ def _run(*argv, capsys) -> str:
 def test_messages_name_the_spec_command(spec, tmp_path, monkeypatch, capsys):
     root = _set_up(spec, tmp_path, monkeypatch)
     assert "`spec check --todo`" in _run("--spec", str(root), "check", capsys=capsys)
-    assert "`spec render`" in (root / "requirements.md").read_text()
+    _run("--spec", str(root), "review", capsys=capsys)
+    assert "<code>spec feedback apply</code>" in (root.parent / ".syseng" / "review.html").read_text()
 
 
 def test_a_host_repository_sees_no_toolkit_requirement_ids(spec, tmp_path, monkeypatch, capsys):
@@ -80,7 +81,7 @@ def test_status_says_what_is_open_and_what_awaits_the_engineer(spec, capsys):
                                "reason": "twice"}], "acks": acks})
     out = _run("--spec", str(root), "status", capsys=capsys)
     assert "Open change:" in out and "asked: restamp" in out
-    assert "Keep it: `CORE-1 LGTM`" in out and "spec check:" in out
+    assert "Keep it: `lock CORE-1`" in out and "spec check:" in out
 
 
 def test_edit_context_keeps_the_lines_of_multi_line_text(spec):
@@ -91,12 +92,14 @@ def test_edit_context_keeps_the_lines_of_multi_line_text(spec):
     assert "      first line" in result.context and "      second line" in result.context
 
 
-def test_the_engineers_words_are_never_rewritten(spec, tmp_path, monkeypatch):
-    spec.files["elements/CORE/requirements.yaml"][0]["quotes"] = [
-        {"words": "just run `spec edit` for it", "said": "2026-10-17 09:00", "context": "talking about edits"}]
+def test_a_persons_recorded_intent_is_never_rewritten(spec, tmp_path, monkeypatch):
+    spec.files["elements/CORE/requirements.yaml"][0]["intent"] = [
+        {"by": "Ada <ada@example.com>", "when": "2026-10-17 09:00", "basis": "stated", "fingerprint": "0" * 12,
+         "context": "Talking about edits.", "said": "Wants agents to just run `spec edit` for it."}]
     root = _set_up(spec, tmp_path, monkeypatch)
-    text = (root / "requirements.md").read_text()
-    assert "just run `spec edit` for it" in text
+    cli.main(["--spec", str(root), "review"])
+    text = (root.parent / ".syseng" / "review.html").read_text()
+    assert "Wants agents to just run `spec edit` for it." in text
 
 
 def test_f_strings_keep_to_what_python_3_11_accepts():

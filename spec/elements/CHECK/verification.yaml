@@ -3,7 +3,6 @@
   - CHECK-1
   method: test
   technique: unit test
-  origin: agent
   description: A spec with several different problems, including an unreadable file, yields a finding for every problem in one run.
   tests:
     python:
@@ -15,7 +14,6 @@
   - CHECK-16
   method: test
   technique: unit test
-  origin: agent
   description: A wording error names its rule, the item, the file and line, marks the offending words, and says why the rule exists, how to fix it, and where the rule is explained.
   tests:
     python:
@@ -25,7 +23,6 @@
   - CHECK-17
   method: test
   technique: unit test
-  origin: agent
   description: When one rule fires twice in a run, only its first finding carries the full explanation.
   tests:
     python:
@@ -36,8 +33,7 @@
   - CHECK-15
   method: test
   technique: unit test
-  origin: agent
-  description: An item reworded after its approval is reported as changed since approval; re-linking its tests isn't a change. The merge check passes while items are unreviewed, and says whether any alteration awaits the engineer's answer. An approval for an unknown item is an error.
+  description: An item reworded after its lock is reported as changed since; re-linking its tests isn't a change. The merge check passes while items wait, and says whether any alteration awaits the engineer's answer. A lock on an unknown item is an error.
   tests:
     python:
     - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
@@ -47,13 +43,16 @@
   verifies:
   - CHECK-18
   - CHECK-19
+  - SYS-42
+  - MODEL-40
   method: test
   technique: unit test
-  origin: agent
-  description: After the engineer approves a system requirement, its element requirement is delegated one level under it and that requirement's verification item two levels under it, and neither is a to-do. A need with nothing approved above it is unreviewed and a to-do. An item reworded after its own approval is changed, not delegated, and is a to-do.
+  description: A need and a requirement in the engineer's words are stated, an agent's requirement under them is derived and names the stated item above, and verification items and element definitions count as derived. Locking an item makes it explicit, and the highest level that applies wins. An item changed after its lock keeps its level, is reported as a to-do naming who locked it, and stops being one when a newer lock matches it.
   tests:
     python:
-    - tests/test_review.py::test_items_under_an_approved_item_are_delegated
+    - tests/test_levels.py::test_each_item_gets_the_level_its_records_give_it
+    - tests/test_levels.py::test_the_highest_level_applies
+    - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
     - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
 - id: CHECK-V6
   verifies:
@@ -61,17 +60,17 @@
   - MODEL-36
   method: test
   technique: unit test
-  origin: agent
-  description: A quote without the summary of what was being discussed is reported.
+  description: An intent record added through an edit gets its person, its date and time and the item's fingerprint filled in. One that lacks any field is reported, naming each missing field. Older quotes without a summary of what was being discussed are still reported.
   tests:
     python:
+    - tests/test_levels.py::test_intent_added_through_an_edit_is_filled_in
+    - tests/test_levels.py::test_an_intent_record_needs_every_field
     - tests/test_review.py::test_quotes_need_words_a_date_and_context
 - id: CHECK-V7
   verifies:
   - CHECK-4
   method: test
   technique: unit test
-  origin: agent
   description: Links to an existing file, pytest test, class method, parametrized test, GoogleTest (TEST, TEST_F, TEST_P) or a name in another file pass. A missing file, test, class or GoogleTest, a C++ name not written as Suite.Test, and tests linked for an implementation the spec doesn't name are each reported, saying what's missing. An edit is checked against the real repository's tests, so a valid re-link is accepted and a typo rejected.
   tests:
     python:
@@ -79,3 +78,67 @@
     - tests/test_testlinks.py::test_links_to_missing_tests_say_what_is_missing
     - tests/test_testlinks.py::test_the_checker_reports_broken_links_and_unknown_implementations
     - tests/test_testlinks.py::test_edits_check_links_against_the_real_repository
+- id: CHECK-V8
+  verifies:
+  - CHECK-24
+  method: test
+  technique: unit test
+  description: An item stated, then changed in the same edit that records the person's newer request, isn't marked changed; the older record is superseded.
+  tests:
+    python:
+    - tests/test_levels.py::test_changed_is_judged_against_the_newest_record
+- id: CHECK-V9
+  verifies:
+  - CHECK-25
+  method: test
+  technique: unit test
+  description: An intent record whose summary has a double quotation mark is reported; single quotes and apostrophes pass.
+  tests:
+    python:
+    - tests/test_levels.py::test_an_intent_record_never_quotes
+- id: CHECK-V10
+  verifies:
+  - CHECK-22
+  - SYS-50
+  method: test
+  technique: unit test
+  description: A requirement on an element whose parent isn't the system, tracing to a system requirement, is a to-do; with flow-down enforced in the repository's settings it's an error; tracing to a requirement of its parent element clears it. New repositories start with flow-down enforced.
+  tests:
+    python:
+    - tests/test_levels.py::test_a_requirement_refines_one_of_its_parent_elements_requirements
+    - tests/test_levels.py::test_new_repositories_enforce_flow_down
+- id: CHECK-V11
+  verifies:
+  - CHECK-26
+  - CHANGE-17
+  method: test
+  technique: unit test
+  description: In a code-first change, an edit to a stated item goes through, and the check reports it until a conflict in the change names the item. A conflict must name the items it involves.
+  tests:
+    python:
+    - tests/test_levels.py::test_code_first_goes_ahead_and_the_done_check_asks_for_the_conflict
+    - tests/test_levels.py::test_a_conflict_names_what_it_involves
+- id: CHECK-V12
+  verifies:
+  - SYS-52
+  - CHECK-23
+  - CHANGE-19
+  method: test
+  technique: unit test
+  description: Comments and general notes from a feedback block become numbered feedback items; the check reports each one until the agent records a response, and the person's next page shows the responses.
+  tests:
+    python:
+    - tests/test_review_page.py::test_comments_wait_for_a_response_and_the_next_page_shows_it
+- id: CHECK-V13
+  verifies:
+  - CHECK-28
+  - CHECK-19
+  - CHANGE-14
+  method: test
+  technique: unit test
+  description: A locked item changed since counts one level lower and is labeled locked to an earlier version; it's a to-do and an alteration awaiting an answer until a review sent back afterwards has shown it, after which it stops asking and stays decayed. A guided item changed since counts as derived.
+  tests:
+    python:
+    - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
+    - tests/test_levels.py::test_a_change_the_person_has_seen_on_a_review_stops_asking_but_stays_decayed
+    - tests/test_review_page.py::test_an_unlock_takes_the_lock_off_and_keeps_the_history

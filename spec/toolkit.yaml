@@ -1,4 +1,4 @@
-spec_version: 1
+spec_version: 2
 implementations:
 - name: python
   language: python
@@ -21,3 +21,4 @@ element_order:
 harnesses:
 - claude-code
 - hermes
+flow_down: enforced

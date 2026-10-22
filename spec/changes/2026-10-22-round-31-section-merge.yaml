@@ -1,0 +1,32 @@
+request: Setup kept no blank line between its instruction-file section and the text after it, so text added after the section read as out of date
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-22'
+entries:
+- op: modify
+  id: CLI-V6
+  at: 2026-10-22T08:59-07:00
+  reason: a refresh dropped the blank line before text following the toolkit's section in AGENTS.md; fixed and tested.
+  before:
+    tests:
+      python:
+      - tests/test_init.py::test_init_again_changes_nothing
+      - tests/test_init.py::test_a_plain_rerun_refreshes_every_installed_harness
+      - tests/test_init.py::test_init_keeps_other_settings_and_hooks
+      - tests/test_init.py::test_init_refuses_unreadable_settings
+      - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
+      - tests/test_init.py::test_check_reports_installed_files_that_drifted
+  after:
+    tests:
+      python:
+      - tests/test_init.py::test_init_again_changes_nothing
+      - tests/test_init.py::test_a_plain_rerun_refreshes_every_installed_harness
+      - tests/test_init.py::test_init_keeps_other_settings_and_hooks
+      - tests/test_init.py::test_init_refuses_unreadable_settings
+      - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
+      - tests/test_init.py::test_check_reports_installed_files_that_drifted
+      - tests/test_init.py::test_text_after_the_section_survives_a_refresh_unchanged
+decisions: []
+friction: []
+closed: '2026-10-22'

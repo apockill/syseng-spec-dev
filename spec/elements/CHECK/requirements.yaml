@@ -1,120 +1,227 @@
 - id: CHECK-1
   text: In a single run, the checker shall report every violation of the MODEL requirements, along with every finding of the checks below.
-  origin: engineer
   traces_to: SYS-7
-  source: |-
-    "the linter will be as comprehensive as possible to flag to the AI that its job is not done yet"
-  reworded: by INCOSE's rules, "as comprehensive as possible" is an escape clause, because nothing could ever fail it. This version can fail.
+  reworded: by INCOSE's rules, asking for the most comprehensive checker possible is an escape clause, because nothing could ever fail it. This version can fail.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing what the linter is for.
+    said: Wants the linter to be as comprehensive as possible, so that it flags to the AI that its job is not done yet.
+    basis: stated
+    fingerprint: 8740cad38648
 - id: CHECK-2
   text: Each finding shall state what is wrong, where it is, and what action resolves it, in terms an agent can act on without the methodology docs in its context.
-  origin: engineer
   traces_to: SYS-20
-  source: |-
-    "a lot of the time the AI will not have the document for the system engineering documentation in its context … flag to the AI that its job is not done yet. That certain documentation needs to be updated, that certain tests need to be linked"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing what the linter is for.
+    said: |-
+      Pointed out that the AI often won't have the systems-engineering documentation in its context, so the linter should flag to it that its job is not done yet: that certain documentation needs updating, or certain tests need linking.
+    basis: stated
+    fingerprint: 83721b88556e
 - id: CHECK-3
   text: The checker shall report each test that no verification item links to.
-  origin: engineer
   traces_to: SYS-7
-  source: |-
-    "every unit test is referenced in some file" · "XYZ tests have been added and are not associated with VERs"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, listing what the method should guarantee.
+    said: Wants every unit test to be referenced in some file.
+    basis: stated
+    fingerprint: 1dda8445bab1
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the messages the linter gives an agent when it runs at the end of its work.
+    said: Gave as an example a message that some tests have been added and aren't associated with any verification item.
+    basis: stated
+    fingerprint: 1dda8445bab1
 - id: CHECK-4
   text: The checker shall report each verification-item link to a test or file that does not exist.
-  origin: engineer
   traces_to: SYS-7
-  source: |-
-    "XYZ tests are referenced in VERs but don't exist"
-  quotes:
-  - said: 2026-10-17 23:07
-    words: while we don't need to be a test running framework, we probably should have some simple verifictation the tests exist. We could start simple, and add requirements later (like maybe even just verifying the file / test name exists is good enough to start with, everything else is 'to be decided/scoped' later)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the messages the linter gives an agent when it runs at the end of its work.
+    said: Gave as an example a message that some tests are referenced in verification items but don't exist.
+    basis: stated
+    fingerprint: 303ebb1bb4e4
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 23:07
     context: Deciding what the toolkit needs before a first real project.
+    said: Said the toolkit doesn't need to be a test-running framework, but probably should have some simple verification that the tests exist. Suggested starting simple, perhaps just checking that the file or test name exists, and adding requirements later; everything else is to be decided and scoped later.
+    basis: stated
+    fingerprint: 303ebb1bb4e4
 - id: CHECK-5
   text: When a system element's related code has changed and its requirements have not, the checker shall report that system element together with its current requirements.
-  origin: engineer
   traces_to: SYS-7
-  source: |-
-    "XYZ files were edited but the REQs not updated, can you check the REQs" · "if the code is changed then the agent is notified … and dumps all the specs into context"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the messages the linter gives an agent when it runs at the end of its work.
+    said: Gave as an example a message that some files were edited but their requirements weren't updated, asking the agent to check those requirements.
+    basis: stated
+    fingerprint: d1ebbbc5253f
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing how agents stay aware of the spec while changing code.
+    said: Described the agent being notified when the code is changed, with all the specs put into its context.
+    basis: stated
+    fingerprint: d1ebbbc5253f
 - id: CHECK-6
   text: When a verification item has changed and none of the requirements it verifies has, the checker shall ask whether a requirement change was forgotten.
-  origin: engineer
   traces_to: SYS-7
-  source: |-
-    "hey, you had to change a verification item but didn't change a req - did you forget?"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the messages the linter gives an agent when it runs at the end of its work.
+    said: Gave as an example a message asking the agent whether it forgot something, because it had to change a verification item but didn't change a requirement.
+    basis: stated
+    fingerprint: b760f75749ae
 - id: CHECK-14
-  text: The checker shall report each item whose content no longer matches the fingerprint of its latest approval.
-  origin: engineer
+  text: The checker shall report each item whose content no longer matches the fingerprint of its latest lock.
   traces_to: SYS-14
-  source: |-
-    "Then the CLI can derive when the file is not approved (e.g. a subagent went and changed things, so now the hash doesn't match?)"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Rounds 1 to 11, date approximate. Answering Q7, which asked what exactly counts as approval (now called a lock): a lgtm recorded on the branch, a merge, or individual sign-off on the agent's proposals.
+    said: Suggested, as a question, that the CLI could then tell when a file is no longer approved, for example when a subagent changed things so that the hash no longer matches.
+    basis: guided
+    fingerprint: d6397a381791
 - id: CHECK-16
   text: Each wording finding shall name the rule it breaks, link to the rule's explanation, say why the rule exists, and suggest a rewrite.
-  origin: engineer
   traces_to: SYS-20
-  source: |-
-    "As long as the error messages 'hey you did this wrong. According to {link to INCOSE ruleset} this is bad practice. We recommend {recommendations}.' … Think of rust- fantastic error messages, they guide the user to best practice and explain the 'why'."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Answering Q25, which asked how strict the wording rules should be.
+    said: |-
+      Accepted strict rules as long as the error messages say what was done wrong, link to the INCOSE rule set that calls it bad practice, and recommend a fix. Pointed to Rust's error messages as the model: they guide the user to best practice and explain the why.
+    basis: stated
+    fingerprint: cd01a9ad8c81
 - id: CHECK-7
   text: The checker shall treat a CHECK-5 or CHECK-6 finding as resolved once the change record gives a reason for it.
-  origin: agent
   traces_to: SYS-7
-  refines: |-
-    "Then it should file a waiver (maybe?) or just continue"
-  why: |-
-    "just continue" leaves you nothing to read. A one-line reason costs the agent little, and it's what you'll want to see in review.
+  why: continuing without a record leaves you nothing to read. A one-line reason costs the agent little, and it's what you'll want to see in review.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, on what the agent does once the linter has asked whether it forgot to update requirements.
+    said: Suggested the agent should then file a waiver, with a maybe, or just continue.
+    basis: guided
+    fingerprint: cf0d2f43bd59
 - id: CHECK-8
   text: The checker shall report each changed code file that no system element lists as related.
-  origin: agent
   traces_to: SYS-7
-  refines: |-
-    "every header is referenced in some file"
   why: a soft version of your original guarantee. New code can't land outside every system element's view without a finding.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, listing what the method should guarantee.
+    said: Wants every header to be referenced in some file.
+    basis: guided
+    fingerprint: b54386c606c6
 - id: CHECK-9
   text: When a linked test's source or a verification item's description changes without the pair being re-confirmed, the checker shall report the pair.
-  origin: agent
   traces_to: SYS-7
   why: keeps descriptions and tests from drifting apart silently. Re-confirming means an agent has checked that they still match, and recorded that it did.
+  basis: derived
 - id: CHECK-10
   text: The checker shall report a verification item that has no tests in an implementation as a to-do for that implementation, not as a finding.
-  origin: agent
   traces_to: SYS-9
   why: in spec-first planning and in a port, unimplemented items are expected. CHECK-11 decides when they must be finished.
+  basis: derived
 - id: CHECK-11
   text: When an agent marks a change done, the checker shall report each requirement the change added or modified that neither passes in the change's target implementation nor has a recorded deferral.
-  origin: agent
   traces_to: SYS-7
   why: one completion rule covers both modes. A deferral, with its reason, covers features built across several changes, and ports.
+  basis: derived
 - id: CHECK-12
   text: The checker shall finish within 5 seconds on a 100,000-line repository on the engineer's development machine.
-  origin: agent
   traces_to: SYS-7
   why: the checker runs every time an agent tries to finish, and slow checks get skipped.
+  basis: derived
 - id: CHECK-15
-  text: When preparing a merge, the checker shall list, without failing the check, each alteration to an item the engineer approved, wrote or decided that the engineer has not yet kept or rolled back.
-  origin: agent
+  text: When preparing a merge, the checker shall list, without failing the check, each alteration to an item the engineer locked, wrote or decided that the engineer has not yet kept or rolled back.
   traces_to: SYS-14
-  why: whether a branch lands is the engineer's call (round 12, D1), so the check shows what they'd want to see first instead of blocking. Approvals that are missing don't matter here; alterations nobody has answered for do (SYS-37).
+  why: whether a branch lands is the engineer's call (round 12, D1), so the check shows what they'd want to see first instead of blocking. Missing locks don't matter here; alterations nobody has answered for do (SYS-37).
+  basis: derived
 - id: CHECK-17
   text: Within one run, the checker shall explain a rule in full only at its first finding, and refer back to that explanation for later findings of the same rule.
-  origin: agent
   traces_to: SYS-20
-  refines: |-
-    "Remember not to waste too many tokens though. Like everything, there must be balance."
   why: a spec with twenty vague words shouldn't produce twenty copies of the same lesson.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Answering Q25, on how strict the wording rules should be, after asking for error messages that teach.
+    said: |-
+      Reminded the agent not to waste too many tokens: like everything, there must be balance.
+    basis: guided
+    fingerprint: 5a1efb1ee7e2
 - id: CHECK-18
-  text: The checker shall classify each item as approved, changed since approval, delegated under its nearest approved ancestor, or unreviewed, from the approvals and the trace graph each time it runs.
-  traces_to: SYS-34
-  origin: agent
-  why: the classification is computed and never stored (SYS-40). DR-47 says which items count as an item's ancestors.
+  text: The checker shall derive each item's level of intent from its locks, intent records and basis each time it runs, taking the highest level that applies.
+  traces_to: SYS-42
+  why: the level is computed and never stored (DR-54). A lock or intent record keeps its level after the item changes, until a person answers the change.
+  basis: derived
 - id: CHECK-19
-  text: The checker shall report as a to-do each item that is unreviewed or changed since approval.
+  text: The checker shall report as a to-do each item a person locked, stated or guided that changed since, until a review the person sent back has shown the change.
   traces_to: SYS-34
-  origin: agent
-  why: delegated items are the agent's to decide (DR-44), so they aren't the engineer's to-dos. This turned 228 to-dos in this repository into 20.
+  why: not answering is an answer of its own; once the person has seen the change on a review page and let it be, it stays marked as given for an earlier version (CHECK-28) instead of nagging (DR-68).
+  basis: derived
 - id: CHECK-20
-  text: The checker shall report each quote that lacks the engineer's words, the date and time they were said, or a summary of what was being discussed.
+  text: The checker shall report each intent record that lacks its author, date and time, context, summary, basis or fingerprint.
   traces_to: SYS-35
-  origin: agent
-  why: a quote without its date or its context loses what makes it signal (MODEL-36).
+  why: an intent record without its author, date or context loses what makes it signal (MODEL-36).
+  basis: derived
 - id: CHECK-21
-  text: The checker shall report as a to-do each alteration to an item the engineer approved, wrote or decided that the engineer has not kept or had rolled back.
+  text: The checker shall report as a to-do each alteration to an item the engineer locked, wrote or decided that the engineer has not kept or had rolled back.
   traces_to: SYS-37
-  origin: agent
   why: an alteration nobody has answered is exactly what the engineer wants surfaced (NEED-17). The merge check lists these too (CHECK-15).
+  basis: derived
+- id: CHECK-22
+  text: The checker shall report each requirement on a system element that traces to no requirement of the element's parent.
+  traces_to: SYS-50
+  why: this is SYS-50's rule made checkable. It's a to-do until this repository's tree is migrated, then an error (DR-58).
+  basis: derived
+- id: CHECK-23
+  text: The checker shall report each comment from a person's feedback in the open change that has no recorded response.
+  traces_to: SYS-52
+  why: the done gate then keeps a change open until every comment is answered.
+  basis: derived
+- id: CHECK-24
+  text: The checker shall mark as changed each item whose content differs from the content its newest lock or intent record was given for.
+  traces_to: SYS-42
+  why: comparing with the newest record means a statement superseded by a later lock doesn't leave the item marked changed forever.
+  basis: derived
+- id: CHECK-25
+  text: The checker shall report each intent record whose summary or context contains a double quotation mark.
+  traces_to: SYS-35
+  why: double quotation marks are the sign of a verbatim quote (NEED-16). Apostrophes and single quotes pass, so summaries can still name a term.
+  basis: derived
+- id: CHECK-26
+  text: When an agent marks a change done, the checker shall report each alteration to an item at the explicit or stated level that no conflict in the change names.
+  traces_to: SYS-49
+  why: in code-first mode the edit goes through, so the done gate is where an altered stated or locked item must become a conflict with options for the person.
+  basis: derived
+- id: CHECK-27
+  text: In a spec of the current format, the checker shall report each field of the older format.
+  traces_to: SYS-35
+  basis: derived
+  why: once migrated, a person's words live only in summarized intent records; an older field coming back would bring verbatim words with it.
+- id: CHECK-28
+  text: When an item changes after its newest lock or intent record and no person has kept it, the checker shall count that record one level lower and mark the item as given for an earlier version.
+  traces_to: SYS-42
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:35
+    context: Asking what happens when they don't mark Kept on a locked item that changed since.
+    said: Not keeping such an item should be fine, but its lock should decay a bit, so it's clear the wording changed and wasn't explicitly agreed to since.
+    basis: stated
+    fingerprint: 40356cdaf36f
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:45
+    context: Agreeing to the agent's proposal that a stale lock counts one level lower and is shown, not nagged about.
+    said: Agreed, finding locked to an earlier version as descriptive a label as needed.
+    basis: guided
+    fingerprint: 40356cdaf36f

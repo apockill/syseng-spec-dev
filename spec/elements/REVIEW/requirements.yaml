@@ -1,105 +1,289 @@
 - id: REVIEW-1
   text: The renderer shall render the spec's system elements and requirements as a web page.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    "we'll create tools to render components on a web page"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 1: describing the toolkit they wanted, including tools for showing the spec to people.
+    said: Said tools would be created to render components on a web page.
+    basis: stated
+    fingerprint: 712e287cc188
 - id: REVIEW-2
   text: The renderer shall render the spec differences between two revisions as a web page.
-  origin: engineer
   traces_to: SYS-15
-  source: |-
-    "and also render the diffs between changes"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 1: describing the tools for rendering the spec on a web page.
+    said: Said the tools would also render the differences between changes.
+    basis: stated
+    fingerprint: 89c0608b5353
 - id: REVIEW-3
   text: The renderer shall hide verification items until the engineer asks to see them.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    "only showing the highest signal things (REQs). VERs are … for the sole engineer to read occasionally"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 1: describing how one engineer keeps control of a large product through its spec.
+    said: Said only the highest-signal things, the requirements, would be shown, and that verification items are for the sole engineer to read occasionally.
+    basis: guided
+    fingerprint: dc7bc33c93a4
 - id: REVIEW-4
   text: In a diff, the renderer shall highlight brightly each system element whose requirements changed.
-  origin: engineer
   traces_to: SYS-15
-  source: |-
-    "bright colors when a component has changed requirements"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 1: describing how the rendered differences between changes should look.
+    said: Wants bright colors when a component has changed requirements.
+    basis: stated
+    fingerprint: 3c18453b0c59
 - id: REVIEW-5
   text: In a diff, the renderer shall highlight mildly each system element whose related code changed while its requirements and verification items did not.
-  origin: engineer
   traces_to: SYS-15
-  source: |-
-    "mild color when a component's underlying file changed but the req/ver didn't"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 1: describing how the rendered differences between changes should look.
+    said: Wants a mild color when a component's underlying files changed but its requirements and verification items didn't.
+    basis: stated
+    fingerprint: a52512407f2a
 - id: REVIEW-6
   text: In a diff, the renderer shall leave unchanged system elements unhighlighted.
-  origin: engineer
   traces_to: SYS-15
-  source: |-
-    "nothing if nothing changed"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 1: describing how the rendered differences between changes should look.
+    said: Wants no color on a component when nothing changed.
+    basis: stated
+    fingerprint: fef897043274
 - id: REVIEW-7
   text: The renderer shall show each requirement's status in each implementation.
-  origin: engineer
   traces_to: SYS-9
-  source: |-
-    "the specs should mark in some way what has been implemented yet, and what has not"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 1: describing implementations of the product and the spec that covers them.
+    said: Said the spec should mark in some way what has been implemented yet and what has not.
+    basis: guided
+    fingerprint: 6059097237bb
 - id: REVIEW-13
-  text: The review page shall let the engineer approve items or give feedback on them.
-  origin: engineer
+  text: The review page shall let the engineer lock items or give feedback on them.
   traces_to: SYS-14
-  source: |-
-    "click 'approve' (or give feedback)"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 2: answering round 1's open questions; recorded under Q9, which asked whether slow tests count as expensive and led to full runs on request.
+    said: Described the engineer clicking approve, or giving feedback.
+    basis: stated
+    fingerprint: 2642e366ba20
 - id: REVIEW-15
   text: The review page shall show an item's text when the engineer hovers over or clicks its ID.
-  origin: engineer
   traces_to: SYS-30
-  source: |-
-    "it should say DR-8 and on hover or click or whatever … it should state what it means"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 8: pointing out that IDs such as DR-8 were shown without saying what they meant.
+    said: Asked that where an ID such as DR-8 is shown, hovering over it, clicking it or some similar means should state what it means; left the exact interaction open.
+    basis: stated
+    fingerprint: 953be8dc67ec
 - id: REVIEW-9
   text: In a diff, the renderer shall highlight in amber each verification item that changed while the requirements it verifies did not.
-  origin: agent
   traces_to: SYS-11
   why: that's where test weakening hides, so it gets its own color.
+  basis: derived
 - id: REVIEW-10
   text: In a diff, the renderer shall show the recorded reason beside each changed or removed requirement.
-  origin: agent
   traces_to: SYS-19
   why: this answers most "why?" questions before you need to ask them.
+  basis: derived
 - id: REVIEW-11
-  text: The renderer shall show each unapproved item's differences from its last approved content.
-  origin: agent
+  text: The renderer shall show, for each item changed since a person gave it, its differences from the content its newest lock or intent record was given for.
   traces_to: SYS-14
-  why: one mechanism covers both the spec-first "I had to change a few things" case and every other change since your last approval.
+  why: one mechanism covers both the spec-first case where the agent had to change a few things and every other change since your last lock.
+  basis: derived
 - id: REVIEW-12
   text: In a diff, the renderer shall show the open decisions above the requirement changes.
-  origin: agent
   traces_to: SYS-16
   why: those are the steering points, so they shouldn't be buried at the bottom.
+  basis: derived
 - id: REVIEW-14
   text: The renderer shall show the spec top-down, with needs and system requirements first and each system element's requirements on request.
-  origin: agent
   traces_to: SYS-6
   why: this is the reading order NEED-1 depends on, and the one this file uses.
-- id: REVIEW-16
-  text: The requirements view shall mark each item that is approved, changed since approval or delegated, naming for each delegated item the approved item above it.
-  traces_to: SYS-34
-  origin: agent
-  why: SYS-34 asks every view to show the state. Naming the approved item tells the reader which approval covers it.
+  basis: derived
 - id: REVIEW-17
-  text: The requirements view shall show each quote with the date and time it was said and the summary of what was being discussed.
+  text: The review page shall show each intent record with its author, date and time, context and basis.
   traces_to: SYS-35
-  origin: agent
-  why: SYS-35 keeps the date and the context so readers can see them.
+  why: SYS-35 keeps the author, date and context so readers can see them.
+  basis: derived
 - id: REVIEW-18
-  text: Each item the change record asks the engineer to approve or answer for shall be shown in full, with its parent and rationale for a requirement, and with its context, decision, alternatives, consequences and the requirements it decides for a decision record.
+  text: Each item the review page asks the engineer to lock or answer for shall be shown in full, with its parent and rationale for a requirement, and with its context, decision, alternatives, consequences and the requirements it decides for a decision record.
   traces_to: SYS-30
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 22:47
-    words: You state 'change-13' and give a brief truncated description, but I'm not really sure of the full context, or the full text. I then had to ctrl-f change 13, and read it, then scroll all the way back to the top to the '## Proposed for your explicit approval' section.
-    context: Reviewing round 12's change record.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 22:47
+    context: Reviewing round 12's change record, which named items such as CHANGE-13 with a short description in its section of items proposed for the engineer's explicit approval.
+    said: Said the record named CHANGE-13 with a brief, truncated description, leaving them unsure of its full context and full text; they had to search for CHANGE-13, read it, then scroll all the way back to the top to the section of items proposed for their explicit approval.
+    basis: guided
+    fingerprint: a7f609919f68
 - id: REVIEW-19
-  text: Wherever the change record shows an item for the engineer to approve or answer for, it shall list with their titles the other items that the shown text mentions.
+  text: Wherever the review page shows an item for the engineer to lock or answer for, it shall list with their titles the other items that the shown text mentions.
   traces_to: SYS-30
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 22:47
-    words: dr-47, similar to change-13, but I couldn't remember the exact context for it. CHECK-18 or CHECK-19 for example.
-    context: Reviewing round 12's change record.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 22:47
+    context: Reviewing round 12's change record, where the text shown for proposed items mentioned other IDs.
+    said: |-
+      Said DR-47 had the same problem as CHANGE-13: they couldn't remember its exact context. Gave CHECK-18 and CHECK-19 as further examples.
+    basis: guided
+    fingerprint: 39dfccf49e4d
+- id: REVIEW-20
+  text: |-
+    The review page shall show tabs ordered from most to least signal: the items agents recommend, each with its reason, together with the decisions awaiting the person and the responses to their feedback; the alterations to items they gave; the intent captured since their last review; the differences since then; and the full spec.
+  traces_to: SYS-45
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: |-
+      Round 18: setting out the review journey the toolkit should support, and the page that replaces the generated Markdown views.
+    said: Described a page that highlights what a person specified directly, shows a graph of the requirement tree and a list of the items most useful to lock in, and, once later features are built, also shows the differences.
+    basis: guided
+    fingerprint: 4e4417d9ee88
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:25
+    context: Using the review page, which had what awaited them under Your decision and the agents' recommendations under Worth locking.
+    said: Found the page unclear about which section is the high-signal one, the items to lock or look at and give feedback on, and asked which section holds what the agent recommends they look at.
+    basis: stated
+    fingerprint: 1b8153ee1486
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:45
+    context: Using the review page, whose For you tab put the agent's recommendations below nine items awaiting an answer.
+    said: Didn't see the Recommended by the agent section at all, and wants it at the top. Wants tabs instead of one giant page, with the leftmost tab the most important, expecting to rarely visit the second or third tabs, which get more mechanical and carry less signal.
+    basis: stated
+    fingerprint: 8547216f2e5b
+- id: REVIEW-21
+  text: The graph shall lay out the system elements as a tree with their requirements inside them.
+  traces_to: SYS-45
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: |-
+      Round 18: planning the review page's graph of the spec.
+    said: Wants the graph intelligently structured, following systems-engineering principles at every step, not a tangle.
+    basis: guided
+    fingerprint: 1c4786c27365
+- id: REVIEW-22
+  text: The review page shall load nothing from the network.
+  traces_to: SYS-45
+  why: specs can be private, and the page has to work offline and from a plain file.
+  basis: derived
+- id: REVIEW-23
+  text: The review page shall keep a person's unsent feedback when the page is reloaded, and drop each piece once it has been applied.
+  traces_to: SYS-46
+  why: a review can take a while and a reload shouldn't lose it, but feedback already applied would otherwise be sent again with the next block.
+  basis: derived
+- id: REVIEW-24
+  text: The review page shall show the differences against the person's last review, and against each other version named when the page was generated.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: |-
+      Round 18: planning how the review page shows the differences in the spec.
+    said: Asked whether the diff could compare against main or another commit.
+    basis: guided
+    fingerprint: 037991754455
+- id: REVIEW-25
+  text: The review page shall show each intent record captured since the person's last review, with a control to correct or remove it.
+  traces_to: SYS-44
+  why: intent is captured without an approval step (SYS-44), so the page is where a misreading gets caught.
+  basis: derived
+- id: REVIEW-26
+  text: The review page shall show the person it was generated for and let that person be changed before feedback is copied.
+  traces_to: SYS-51
+  why: several people review one product (NEED-26), and the block must name who gave the feedback.
+  basis: derived
+- id: REVIEW-27
+  text: When a person selects an item in the graph, the graph shall show the item's trace and dependency links.
+  traces_to: SYS-45
+  why: drawing every link at once is what makes a graph a tangle; drawing them for the selected item shows what it connects to.
+  basis: derived
+- id: REVIEW-28
+  text: When a person opens an item from anywhere on the review page, the page shall show the item beside what the person is reading, without moving their place.
+  traces_to: SYS-45
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 14:06
+    context: Using the review page for the first time, after clicking Show in the spec on an item.
+    said: Wants Show in the spec to open the item in a new window or a side panel, not scroll all the way down so they lose their place.
+    basis: stated
+    fingerprint: cb3177c27bc4
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:25
+    context: Looking at an element opened in the side pane, which showed only part of it above the graph, with its own scrollbar.
+    said: Found the item in focus a bit small, with the scrollbar making it awkward, and suggested making it taller.
+    basis: stated
+    fingerprint: cb3177c27bc4
+- id: REVIEW-29
+  text: The review page shall keep the graph available beside every section, and highlight in it each item the person points at or selects.
+  traces_to: SYS-45
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 14:06
+    context: Using the review page for the first time, which placed the graph near the bottom.
+    said: Found the graph too far down. Suggested tabs, or the graph on the right, so that whenever they interact with an item (naming DR-31, SYS-14, CHANGE-1 and NEED-10), whether by hovering or clicking, the graph highlights that spot.
+    basis: stated
+    fingerprint: d701cd236ab9
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:55
+    context: Using the review page's For you tab.
+    said: Wants clicking an item's title, such as DR-62's, to highlight it in the side pane the way clicking its ID does.
+    basis: guided
+    fingerprint: d701cd236ab9
+- id: REVIEW-30
+  text: The review page shall let a person answer each item a decision involves on its own, by keeping it, rolling it back or suggesting its wording, and leave the others unanswered.
+  traces_to: SYS-46
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 14:06
+    context: Reading the conflict over ten rewritten items on the review page, whose only choices were keep all ten, keep some, or roll back all ten.
+    said: Wants to check and uncheck items one at a time. Keeping all as written is too broad, makes them read all of them at once, and makes commentary hard. Wants to read some, lock those, and move on when short of time, with the rest neither locked nor rejected; even better a checkmark, or a way to submit feedback with a text box to tweak the wording as they read.
+    basis: stated
+    fingerprint: 80cf81ba0cbb
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:55
+    context: Trying Suggest wording on the review page.
+    said: Reported that the wording box lost focus after one typed character.
+    basis: guided
+    fingerprint: 80cf81ba0cbb
+- id: REVIEW-31
+  text: Each tab of the review page shall list its items for the person to triage one at a time, marking each item answered once the person acts on it.
+  traces_to: SYS-45
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:45
+    context: The same message about the review page's tabs.
+    said: Wants each tab to be a list of things they can triage.
+    basis: stated
+    fingerprint: c9f91b54ced0
+- id: REVIEW-32
+  text: The review page shall open on an overview of the spec, giving the items added, changed and removed since the person's last review and each measure of the spec's health with its change since then, and marking each measure that got worse.
+  traces_to: SYS-45
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 16:20
+    context: Hearing that 128 requirements have no verification item, while deciding whether the toolkit is ready for another project.
+    said: Finds statistics like that really helpful. Wants the dashboard's landing page to open with a high-level overview, such as the numbers of changed, edited, new and deleted items, items without verification items, connections between things and tests written, presented cleanly without too much noise. Also wants measures of the project's health that degraded called out visually, for example when a change lowers verification coverage.
+    basis: stated
+    fingerprint: fe62d522f563

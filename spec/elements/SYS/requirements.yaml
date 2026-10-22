@@ -1,355 +1,759 @@
 - id: SYS-6
-  text: The spec shall trace each requirement to the need or requirement it serves, or mark it as derived.
-  origin: engineer
+  text: The spec shall trace each requirement other than a constraint to the need or requirement it serves.
   kind: system
   serves:
   - NEED-1
   - NEED-8
   - NEED-11
-  source: |-
-    Q16: "Yep, please do this as the next round."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q16 in round 4, which proposed restructuring the spec into layers (needs, then system requirements, then element requirements, each tracing to what it serves) and moving design choices into decision records.
+    said: Agreed, and asked for it to be done as the next round.
+    basis: guided
+    fingerprint: 896b26388a43
 - id: SYS-7
   text: The toolkit shall prevent an agent from reporting a change as done until every spec update the change requires is done.
-  origin: engineer
   kind: system
   serves:
   - NEED-1
   - NEED-5
-  source: |-
-    "the linter will be as comprehensive as possible to flag to the AI that its job is not done yet"
   reworded: |-
     round 9: "while any spec update … remains undone" became "until every spec update … is done" (INCOSE R32).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing what the checker should do for agents.
+    said: Expects the linter to be as comprehensive as possible, to flag to the AI that its job is not done yet.
+    basis: stated
+    fingerprint: 17860781fc49
 - id: SYS-8
   text: The spec shall describe the product's requirements and verification independently of programming language.
-  origin: engineer
   kind: system
   serves:
   - NEED-4
-  source: NEED-4 · "if there are tests they should describe the test and link to the 'implementations'"
   reworded: |-
     round 9: "of any programming language" became "of programming language" (INCOSE R32).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how verification should be described so the product could be rebuilt in another language (NEED-4).
+    said: Said that where there are tests, the spec should describe the test and link to its implementations.
+    basis: guided
+    fingerprint: 445f824cedfd
 - id: SYS-9
   text: The toolkit shall track, for each implementation, which requirements it satisfies.
-  origin: engineer
   kind: system
   serves:
   - NEED-4
   - NEED-6
-  source: |-
-    "the specs should mark in some way what has been implemented yet, and what has not … the todo list can be regenerated but for an entire different implementation" · "'the state of a requirements implmeentation should be trackable for a given implementation' … That way you can spec things first, and the agent can spawn subagents and agentically build (it just opens doors to have this coordination scaffodling)." (2026-10-17, suggesting what DR-31 is for)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how the spec relates to what has been built.
+    said: Said the specs should mark in some way what has been implemented and what has not, so that the to-do list can be regenerated for an entirely different implementation.
+    basis: stated
+    fingerprint: c24ca1f45203
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Restating this requirement while suggesting what DR-31 (missing verification and approvals are to-dos, not errors) is for.
+    said: Said the state of a requirement's implementation should be trackable for a given implementation, so things can be specified first and the agent can start subagents and build agentically; it opens doors to that coordination scaffolding.
+    basis: stated
+    fingerprint: c24ca1f45203
 - id: SYS-10
   text: The toolkit shall verify each requirement by test, analysis, demonstration or inspection.
-  origin: engineer
   kind: system
   serves:
   - NEED-1
-  source: |-
-    "We have the concept of requirements and verification items." · Q18: "Yes let's adopt."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the method.
+    said: Said the method has the concept of requirements and verification items.
+    basis: guided
+    fingerprint: a5f7c233ac82
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q18 in round 4, which asked whether to adopt the proposed systems-engineering vocabulary, including the four verification methods.
+    said: Agreed to adopt it.
+    basis: guided
+    fingerprint: a5f7c233ac82
 - id: SYS-11
   text: The toolkit shall keep each check of an agent's work independent of that agent.
-  origin: engineer
   kind: system
   serves:
   - NEED-9
-  source: NEED-9.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). The project's first message, from which NEED-9 comes; this requirement refines that need.
+    said: Said it's important that the systems engineers who write the requirements aren't the same ones who write the verification items, because there's a perverse incentive to make verification easier.
+    basis: guided
+    fingerprint: efdc259e82cc
 - id: SYS-12
   text: The toolkit shall run expensive verification only when the engineer requests it.
-  origin: engineer
   kind: system
   serves:
   - NEED-7
-  source: |-
-    "I don't want it to spin up the reasoning agents every time automatically (a human should gate that)"
   allocation_note: VERIFY. Its restatement there, VERIFY-6, was removed under MODEL-33.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing when expensive checks run (Q2, round 3).
+    said: Doesn't want the reasoning agents started automatically every time; a person should gate that.
+    basis: stated
+    fingerprint: 5673a6ea4d7f
 - id: SYS-13
   text: When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
-  origin: engineer
   kind: system
   serves:
   - NEED-7
-  source: |-
-    "occasionally say 'hey let's run the full suite' and walk away"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how they want to work day to day and when the full verification runs.
+    said: Wants to occasionally ask for the full suite to be run and walk away.
+    basis: stated
+    fingerprint: 9afaf723ca4d
 - id: SYS-14
-  text: The toolkit shall show the engineer which spec items the engineer has not yet approved.
-  origin: engineer
+  text: The toolkit shall show the engineer each item that changed since a person locked, stated or guided it.
   kind: system
   serves:
   - NEED-1
-  source: |-
-    "Then the CLI can derive when the file is not approved (e.g. a subagent went and changed things, so now the hash doesn't match?)"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how approvals would be recorded and checked.
+    said: Suggested that the CLI could work out when an item is not approved, for example when a subagent changed it so that its hash no longer matches.
+    basis: guided
+    fingerprint: 548591ff0ebb
 - id: SYS-15
   text: The toolkit shall present each change to the engineer as the differences it makes to the spec.
-  origin: engineer
   kind: system
   serves:
   - NEED-1
-  source: |-
-    "we'll create tools to render components on a web page and also render the diffs between changes"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how the engineer would review the spec.
+    said: Said tools would be created to render components on a web page and to render the differences between changes.
+    basis: guided
+    fingerprint: 7b83674fa98a
 - id: SYS-16
   text: The toolkit shall bring to the engineer each question and contradiction that arises during a change.
-  origin: engineer
   kind: system
   serves:
   - NEED-2
-  source: NEED-2 · "always _mention_ 'hey, this breaks X, Y, changes Z'"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing contradictions found during a change, and whether they may block code-first work (Q4, rounds 2 and 3).
+    said: Wants the agent always to mention when something breaks or changes other items, naming them.
+    basis: stated
+    fingerprint: 75bc29a921bd
 - id: SYS-17
   text: The toolkit shall support both reviewing a change's spec before the change is implemented and reviewing it after.
-  origin: engineer
   kind: system
   serves:
   - NEED-6
-  source: |-
-    "the system should support two CUJs … We want to support both workflows cleanly." · "afterwards, or during implementation (however works best / is most natural for the agent) … From the user perspective, they will look at it afterwards."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Describing two ways of working: reviewing a feature's spec before it is built, or reviewing the spec after a change is built.
+    said: Said the system should support both of these critical user journeys, and support both workflows cleanly.
+    basis: stated
+    fingerprint: c713cac8b48f
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing when the agent updates the spec in the build-first workflow.
+    said: Said the spec can be updated afterwards or during implementation, however works best or is most natural for the agent; from the user's perspective, they will look at it afterwards.
+    basis: guided
+    fingerprint: c713cac8b48f
 - id: SYS-18
   text: In code-first mode, the toolkit shall let a change complete without the engineer's involvement.
-  origin: engineer
   kind: system
   serves:
   - NEED-7
-  source: |-
-    "it must remain possible to have a CUJ where the user can state what they want, say 'go for it', and come back to the changes having been made, and read the spec"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing whether contradictions may stop code-first work (round 3).
+    said: Said it must remain possible for the user to state what they want, tell the agent to go for it, and come back to the changes having been made and read the spec.
+    basis: stated
+    fingerprint: 7fffec004b8c
 - id: SYS-19
   text: The toolkit shall keep the reasoning behind each decision about a system element with that element.
-  origin: engineer
   kind: system
   serves:
   - NEED-8
-  source: |-
-    "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing where the reasoning behind design choices is kept.
+    said: Described these records as more like architecture decision records, attached to components to show historical reasoning and changes over time.
+    basis: stated
+    fingerprint: 363b477083f6
 - id: SYS-20
   text: The toolkit shall give an agent the spec context its current work needs, without the agent reading the methodology.
-  origin: engineer
   kind: system
   serves:
   - NEED-5
-  source: |-
-    "a lot of the time the AI will not have the document for the system engineering documentation in its context" · "the CLI has a chance to intercept the request and give extra context"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how agents get the spec context they need.
+    said: Pointed out that much of the time the agent won't have the systems-engineering documentation in its context.
+    basis: guided
+    fingerprint: f7f14a8c11e8
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing why agents should edit the spec through the CLI (Q1, round 2).
+    said: Said the CLI has a chance to intercept the request and give extra context.
+    basis: guided
+    fingerprint: f7f14a8c11e8
 - id: SYS-21
   text: The toolkit shall find requirements and verification items that are ambiguous, unverifiable or too weak to catch a wrong implementation.
-  origin: agent
   kind: system
   serves:
   - NEED-1
   - NEED-9
-  refines: |-
-    "How do we write some way to critique whether or not a requirement is well written or whether or not a verification item is well written"
-  why: this spells out what "well written" means, so that a critique can fail. Your round-5 additions on how flags are presented are CHANGE-10 to CHANGE-12.
+  why: this spells out what well written means, so that a critique can fail. Your round-5 additions on how flags are presented are CHANGE-10 to CHANGE-12.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how the quality of the spec would be checked.
+    said: Asked how to write some way to critique whether a requirement, or a verification item, is well written.
+    basis: guided
+    fingerprint: 9d2cd96b901c
 - id: SYS-22
   text: Adding a programming language or a verification technique shall require no change to the toolkit's existing code.
-  origin: engineer
   kind: system
   serves:
   - NEED-3
   - NEED-4
-  source: |-
-    "adding rust later is a matter of 'extending' rather than 'refactoring' the cli tool" · "make it extensible"
   allocation_note: VERIFY, for new techniques. Its restatements, VERIFY-1 and LANG-1, were removed under MODEL-33.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how the toolkit would support more languages.
+    said: Wants adding Rust later to be a matter of extending the CLI tool rather than refactoring it.
+    basis: stated
+    fingerprint: b32be7ae0003
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). The same topic.
+    said: Asked for it to be made extensible.
+    basis: guided
+    fingerprint: b32be7ae0003
 - id: SYS-23
   text: The toolkit shall be adoptable by a repository that already contains code and tests.
-  origin: agent
   kind: system
   serves:
   - NEED-3
   - NEED-10
   why: reuse mostly means existing projects. How adoption works is now ONBOARD.
+  basis: derived
 - id: SYS-24
   text: The toolkit shall scale each requirement's automated verification to its importance, judged from the requirement's recorded history.
-  origin: engineer
   kind: system
   serves:
   - NEED-9
-  source: |-
-    "Criticality should be based on the ADRs and history encoded in the item, the agent can decide criticality … Or were you referring to 'verification' in the sense of 'agentic automated verification'? In which case I think my advice also applies." See DR-20.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering, in round 5, the agent's question on how criticality would be judged, and whether that applied to verification (DR-20).
+    said: Said criticality should be based on the decision records and history encoded in the item, and the agent can decide it. Asked whether the agent meant verification in the sense of agentic automated verification, and said the same advice applies in that case too.
+    basis: guided
+    fingerprint: add63a2734e6
 - id: SYS-25
   text: The toolkit shall route agents' edits to the spec through its command-line tool.
-  origin: engineer
   kind: system
   serves:
   - NEED-2
   - NEED-5
-  source: |-
-    "I want the CLI to be the main way agents edit the spec. This is because, if an agent wants to edit the spec, the CLI has a chance to intercept the request and give extra context"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q1 (round 2), on how agents edit the spec.
+    said: Wants the CLI to be the main way agents edit the spec, because then the CLI has a chance to intercept the request and give extra context.
+    basis: stated
+    fingerprint: 523daeb0d3f9
 - id: SYS-26
   text: The toolkit shall order the questions and flags it brings to the engineer by how much each answer could change the spec or the other answers, most consequential first.
-  origin: engineer
   kind: system
   serves:
   - NEED-2
   - NEED-11
-  source: |-
-    "whenever asking questions or flagging things to the user, to use their time wisely by always ordering things by 'most likely to impact other answers'" · "clearly these 3 are most useful, I'll use the users time wisely and ask about those first"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Giving, in round 8, points on how the skill should work.
+    said: Wants the agent, whenever it asks questions or flags things to the user, to use their time wisely by always ordering them by what is most likely to impact other answers.
+    basis: stated
+    fingerprint: ca125d10b8a4
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). The same point, illustrated.
+    said: |-
+      Gave the reasoning the agent should follow: these three are clearly the most useful, so use the user's time wisely and ask about them first.
+    basis: guided
+    fingerprint: ca125d10b8a4
 - id: SYS-27
   text: Each check, verification, query and edit the toolkit offers shall work without depending on a particular agent harness.
-  origin: engineer
   kind: system
   serves:
   - NEED-12
-  source: |-
-    "I'd like to use this methodology in other agentic use cases possibly. Can't the CLI be the implementation? … I don't want to couple too closely to claude code". How: DR-1.
   reworded: |-
     round 9: "without any particular agent harness" became "without depending on a particular agent harness" (INCOSE R32).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing, in round 5, how the toolkit plugs into agent harnesses; DR-1 records how.
+    said: Would possibly like to use the methodology in other agentic use cases, asked whether the CLI couldn't be the implementation, and doesn't want it coupled too closely to Claude Code.
+    basis: stated
+    fingerprint: db32ee730d0b
 - id: SYS-29
   text: The toolkit shall state the outcomes it needs from agents, leaving the means to each agent and its harness.
-  origin: engineer
   kind: system
   serves:
   - NEED-5
   - NEED-12
-  source: |-
-    "How it does it is up to the agent. We are here to tell it the needs, and how to ideally configure the subagents." · "I don't want to be overly prescriptive."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q22 in round 8, and saying how the skill should work.
+    said: |-
+      Said how it's done is up to the agent: the toolkit's job is to tell it the needs, and how to ideally configure the subagents.
+    basis: stated
+    fingerprint: 41cf543caa1f
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). The same discussion.
+    said: Doesn't want to be overly prescriptive.
+    basis: guided
+    fingerprint: 41cf543caa1f
 - id: SYS-30
   text: The toolkit shall present each spec item to the engineer in a form the engineer can read without looking anything up.
-  origin: engineer
   kind: system
   serves:
   - NEED-11
-  source: |-
-    "IDs are really hard to remember … Otherwise, I'm left Ctrl+f'ing to figure out what the heck you're asking."
-  quotes:
-  - said: 2026-10-17 22:47
-    words: |-
-      The UX for the round 12 record isn't really useful. CUJ: In '## Proposed for your explicit approval' You state 'change-13' and give a brief truncated description, but I'm not really sure of the full context, or the full text. I then had to ctrl-f change 13, and read it, then scroll all the way back to the top to the '## Proposed for your explicit approval' section.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Giving, in round 8, points on how the skill should work.
+    said: Said IDs are really hard to remember, and that otherwise they're left searching the text to work out what they're being asked.
+    basis: stated
+    fingerprint: c149cd86e35d
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 22:47
     context: Reviewing round 12's change record, whose proposals section broke this requirement.
+    said: |-
+      Found the round 12 record's UX not very useful: its section of items proposed for their explicit approval named a change by ID with a brief, truncated description, without the full context or text, so they had to search for it, read it, and scroll all the way back to the top.
+    basis: guided
+    fingerprint: c149cd86e35d
 - id: SYS-31
   kind: system
   text: The toolkit shall invite agents to improve the toolkit wherever they meet friction or a new way of working.
-  origin: engineer
   serves:
   - NEED-13
-  source: |-
-    "So keep the option open in the wording. Otherwise, if an agent has to jump through 16 hoops to get something done, the human will never know, and therefore the skill will never be improved."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how the skill words agents' freedom to improve the toolkit.
+    said: Asked to keep the option open in the wording; otherwise, if an agent has to jump through 16 hoops to get something done, the human will never know, and the skill will never be improved.
+    basis: guided
+    fingerprint: 55df46d1b028
 - id: SYS-1
   text: The toolkit's skills, subagent definitions, code and documentation shall contain no references to a specific host project.
-  origin: engineer
   kind: constraint
   serves:
   - NEED-3
-  source: NEED-3.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how the toolkit should be built, while using it on one particular project (NEED-3).
+    said: Said the skill or set of skills must not reference the host project, because they plan to reuse it.
+    basis: stated
+    fingerprint: d9c7fec31355
 - id: SYS-2
   text: This repository shall pass the toolkit's checker against its own spec.
-  origin: engineer
   kind: constraint
   serves:
   - NEED-3
-  source: |-
-    "that repo should dogfood this methodology. We should be writing this tooling with our own system engineering tooling, and linting it"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing the toolkit's own repository.
+    said: |-
+      Wants that repository to dogfood the methodology: the tooling should be written with its own systems-engineering tooling, and linted by it.
+    basis: stated
+    fingerprint: fb2184e16954
 - id: SYS-3
   text: The toolkit shall be implemented in Python.
-  origin: engineer
   kind: constraint
-  source: |-
-    "likely the CLI would be written in python". This is your constraint, so it traces to no need.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how the toolkit would be built. This is a constraint of the engineer's, so it traces to no need.
+    said: Said the CLI would likely be written in Python.
+    basis: guided
+    fingerprint: 6ed42849e461
 - id: SYS-4
   text: The toolkit shall read every project-specific setting from the host repository.
-  origin: agent
   kind: constraint
   serves:
   - NEED-3
   why: this is the counterpart to SYS-1. Project specifics need a home outside the toolkit.
+  basis: derived
 - id: SYS-5
   text: The toolkit shall set up a host repository for use in one step.
-  origin: agent
   kind: constraint
   serves:
   - NEED-3
   - NEED-5
   why: |-
     reworded in round 5 to your meaning: setting up the spec and everything else a project needs when it joins. Bringing an existing project's content in is ONBOARD.
+  basis: derived
 - id: SYS-28
   text: The toolkit shall assume it runs in an agent harness that can start subagents.
-  origin: engineer
   kind: constraint
-  source: |-
-    Q22: "Requirement is 'there must be SOME harness involved' and that harness has to support subagents." This is your constraint, so it traces to no need.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q22 in round 8, which asked whether reasoning checks need a path that runs outside any agent harness. A constraint of the engineer's, so it traces to no need.
+    said: Said the requirement is that some harness must be involved, and that harness has to support subagents.
+    basis: stated
+    fingerprint: b3e5548c67e2
 - id: SYS-32
   kind: constraint
   text: The toolkit shall install and run on machines without Nix.
-  origin: engineer
-  source: |-
-    "Let's not overindex too much on nix. Most users of this might not use nix, after all." (round 11, replying to a friction report)
-  quotes:
-  - said: 2026-10-18 08:33
-    words: |-
-      Why do they have to do this: .syseng/spec Rather than a pip install -e . or something that puts the binary in your env? (or some more modern pip feature I don't know about)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Replying in round 11 to a friction report.
+    said: Said not to over-index on Nix, since most users of the toolkit might not use it.
+    basis: stated
+    fingerprint: 25efbb955e60
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-18 08:33
     context: Questioning the per-repository launcher, before the first real project.
+    said: Asked why users have to run the toolkit through a launcher in the repository rather than installing it with pip, editable or otherwise, or some more modern pip feature, so the command is in their environment.
+    basis: guided
+    fingerprint: 25efbb955e60
 - id: SYS-33
   kind: system
-  text: The toolkit shall record with each approval the approver, the channel, the number of items approved together, the engineer's words, and the decisions the engineer resolved about the item beforehand.
+  text: The toolkit shall record with each lock the person who gave it, the channel, the number of items locked together, and the decisions the engineer resolved about the item beforehand.
   serves:
   - NEED-14
-  origin: engineer
-  source: |-
-    "What matters is that in the future we can see WHO approved it and HOW." · "Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful." (2026-10-17)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. The agent asked who should record an approval given by picking an option in a menu.
+    said: Said what matters is being able to see later who approved an item and how. An approval given in conversation after many questions, recorded with the reasoning, carries more signal than a batch approval.
+    basis: stated
+    fingerprint: 1c21b73b55a0
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Revising round 12's choice to keep the engineer's words verbatim (NEED-16).
+    said: Asked that no one's words be kept verbatim.
+    basis: guided
+    fingerprint: 1c21b73b55a0
 - id: SYS-34
   kind: system
-  text: Each view of an item shall show whether the engineer approved the item explicitly or the item is delegated under an item the engineer approved.
+  text: Each view of an item shall show the item's level of intent and, for a derived or added item, the nearest item above it that a person locked, stated or guided.
   serves:
   - NEED-15
-  origin: engineer
-  source: |-
-    "As long as its clear what items got explicit approval, and which got approval by proxy, sure." · "Let's use delegated then. It'll imply the LLM chose it, and could be changed in the future, but at least we know where the req fits in the graph." (2026-10-17)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. The agent asked whether approving an item should delegate everything under it in the requirement tree, and what to call that.
+    said: Agreed, as long as it's clear which items got explicit approval and which got approval by proxy.
+    basis: guided
+    fingerprint: 26af487f3d10
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12, the same discussion, choosing a name for approval by proxy.
+    said: |-
+      Chose the word delegated: it implies the agent chose the item and that it could change later, while still showing where the requirement fits in the graph.
+    basis: guided
+    fingerprint: 26af487f3d10
 - id: SYS-35
   kind: system
-  text: The toolkit shall keep each statement of the engineer word for word on the requirements that directly express it, with the date and time of the statement and a summary of what was being discussed.
+  text: The toolkit shall keep each statement a person makes about the product on the items it directly expresses, as a summary close to their words but not verbatim, with its author, the date and time, and the context of the discussion.
   serves:
   - NEED-16
-  origin: engineer
-  source: |-
-    "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things." · "Just to be clear, the goal is not 'every requirement must have a quote'." (2026-10-17)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Discussing where the engineer's words should be kept on the requirements.
+    said: |-
+      Imagined their words living on the requirements with some metadata: the date and time, the words, and some background on the context. The context shouldn't be agent-written text that asserts a lot on its own, and not every requirement needs their words.
+    basis: guided
+    fingerprint: 640091ca1b0a
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Revising round 12's choice to keep the engineer's words verbatim (DR-46).
+    said: Wants a summary close to what was said, with its author, never the verbatim words.
+    basis: stated
+    fingerprint: 640091ca1b0a
 - id: SYS-36
   kind: system
   text: The toolkit shall place each requirement under the system element whose behavior the requirement constrains, whatever the order or framing of the request the requirement came from.
   serves:
   - NEED-20
-  origin: engineer
-  source: |-
-    "build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree" (2026-10-17)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Clarifying where requirements that carry the engineer's words belong in the tree (NEED-20).
+    said: Wants the requirement tree built in the way that makes most sense from a systems-engineering perspective, and doesn't want the user's framing to force the shape of the tree.
+    basis: stated
+    fingerprint: 2b87d5a9b908
 - id: SYS-37
   kind: system
-  text: Once a change is built and tested, the toolkit shall ask the engineer whether to keep each alteration the change made to an item the engineer approved, wrote or decided.
+  text: Once a change is built and tested, the toolkit shall ask the engineer whether to keep each alteration the change made to an item the engineer locked, wrote or decided.
   serves:
   - NEED-17
-  origin: engineer
-  source: |-
-    "It means: build and test the change, then say "hey, because of how I did this, XYZ had to change" and ask for permission to change them." (2026-10-17)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. The agent asked what raising a change to an approved item should mean in code-first mode, where the agent never stops to ask (DR-15).
+    said: Said it means building and testing the change, then saying which items had to change because of how it was done, and asking permission to change them.
+    basis: stated
+    fingerprint: 08f062676f55
 - id: SYS-38
   kind: system
-  text: The toolkit shall present the items agents propose for the engineer's explicit approval, each with the reason it deserves the engineer's attention, most consequential first.
+  text: The toolkit shall present the items agents propose for the engineer to lock, each with the reason it deserves the engineer's attention, most consequential first.
   serves:
   - NEED-18
-  origin: engineer
-  source: |-
-    "it should be easy to have LLM propose different nodes in the graph for approval as it works- and take that feedback and 'lock' the requirement in so that in the future its less likely to be changed in sweeping changes (without it being brought up)." (2026-10-17)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Discussing whether approval could pass down the requirement tree, and whether anything about approvals should block a merge.
+    said: Wants it easy for the agent to propose nodes in the graph for approval as it works, and to take that feedback and lock the requirement in, so that it is less likely to be changed in sweeping changes without being brought up.
+    basis: guided
+    fingerprint: f3b277538898
 - id: SYS-39
   kind: system
-  text: Before an agent changes an item, the toolkit shall show the agent whether the engineer approved, wrote or decided the item, and the discussion behind it.
+  text: Before an agent changes an item, the toolkit shall show the agent whether the engineer locked, wrote or decided the item, and the discussion behind it.
   serves:
   - NEED-19
-  origin: engineer
-  source: |-
-    "It should feel more comfortable changing things that were less reviewed by humans, and more likely to call out / chat with a human about design over more pivitol historical decisions." (2026-10-17)
-  quotes:
-  - said: 2026-10-17 22:12
-    words: Timestamps and history of changes is important, so the agent can see some decisions are old, some are newer, and will know what is more likely 'ok to change' and what is likely 'fresh, and representative of the latest direction'
-    context: Approving SYS-39.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Discussing what approval records are for.
+    said: Wants the agent to feel more comfortable changing things people reviewed less, and to be more likely to raise and discuss with a person design that touches more pivotal historical decisions.
+    basis: guided
+    fingerprint: 7229225f6bf4
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 22:12
+    context: Round 12. Reviewing SYS-39 as the agent proposed it.
+    said: Said timestamps and the history of changes are important, so the agent can see that some decisions are old and some newer, and know what is more likely fine to change and what is likely fresh and representative of the latest direction.
+    basis: guided
+    fingerprint: 7229225f6bf4
 - id: SYS-40
   kind: constraint
-  text: The spec shall store no measure of an item's importance.
+  text: The spec shall store no measure of an item's importance, apart from the basis that records how each item came about.
   serves:
   - NEED-19
-  origin: engineer
-  source: |-
-    "I don't want a 'value of decision' marker, but I want all of these to be useful for reasoning over as the LLM does large refactors." (2026-10-17)
-  quotes:
-  - said: 2026-10-17 22:12
-    words: |-
-      I'm open to this. If you think there's a way to quantify importance, sure. I think whats better reflective of what I'm trying to say is 'metrics that can represent importance are surfaced to the llm in interfaces where it would be useful (last edit, # of discussion, approval types, # of context links, etc...) but not "IMPORTANT" or "NOT IMPORTANT" classification or scoring.
-    context: Approving SYS-40.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Discussing what approval records are for.
+    said: Doesn't want a value-of-decision marker, but wants all of this to be useful for the agent to reason over during large refactors.
+    basis: stated
+    fingerprint: 86f10ef6a3e4
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 22:12
+    context: Round 12. Reviewing SYS-40 as the agent proposed it.
+    said: Open to quantifying importance if the agent sees a way, but thinks what better reflects their intent is that metrics that can represent importance (last edit, number of discussions, approval types, number of context links and the like) are surfaced to the agent where useful, with no important or not-important classification or scoring.
+    basis: stated
+    fingerprint: 86f10ef6a3e4
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18, decision D3, which asked whether the recorded basis of each item sits within SYS-40 or SYS-40 should be amended.
+    said: Didn't remember SYS-40, and asked the agent to follow their intent. The agent then amended it to name the basis as the exception.
+    basis: guided
+    fingerprint: 86f10ef6a3e4
 - id: SYS-41
   kind: system
   text: When the engineer asks for something that existing items already account for, the toolkit shall name those items to the engineer.
   serves:
   - NEED-21
-  origin: engineer
-  source: |-
-    "surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework." (2026-10-17)
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.
+    said: Found it helpful that the agent surfaced requirements, connected dots and said that an existing item already accounts for it, and wants more of that in the framework.
+    basis: stated
+    fingerprint: 767135902e7f
+- id: SYS-42
+  kind: system
+  text: |-
+    The toolkit shall derive each item's level of intent from its records: explicit when a person locked it, stated when a person asked for it, guided when a person shaped it without asking for it, derived when an item above it needs it, and added when an agent added it unasked.
+  serves:
+  - NEED-22
+  - NEED-19
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Discussing how to record how directly a person asked for each item.
+    said: |-
+      Wants agent judgment, with anything they say they want locked at some level: explicit, in conversation, or lower, with derived the lowest, meaning needed to build something but with less confidence that a person needed it.
+    basis: guided
+    fingerprint: cf8e20d9d1aa
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: |-
+      Round 18. The agent proposed five levels: explicit, stated, guided, derived and added.
+    said: Agreed to the five levels as proposed.
+    basis: guided
+    fingerprint: cf8e20d9d1aa
+- id: SYS-43
+  kind: system
+  text: The toolkit shall attribute each intent record and each lock to a person, by the name and email address that person has set for the toolkit.
+  serves:
+  - NEED-26
+  - NEED-14
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Agreeing that intent records carry their author.
+    said: Asked that each author's username or email address be recorded, whatever they commit with.
+    basis: guided
+    fingerprint: c54efb85e23d
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Setting up how the engineer is named in the records.
+    said: Gave the email address to record for themselves, which differs from the one on their commits.
+    basis: guided
+    fingerprint: c54efb85e23d
+- id: SYS-44
+  kind: system
+  text: When a person says what they want, in conversation or in a comment on the review page, the toolkit shall record it as intent on the items it directly expresses, without an approval step.
+  serves:
+  - NEED-27
+  - NEED-22
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Revising the rules for approving in chat (AGENT-33, AGENT-48, DR-41).
+    said: Finds the approval process too prescriptive, and wants requirements a person mentions in conversation locked in automatically.
+    basis: stated
+    fingerprint: 4fe343af57dd
+- id: SYS-45
+  kind: system
+  text: The toolkit shall present the spec to people as one generated, interactive review page.
+  serves:
+  - NEED-23
+  - NEED-1
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Setting out the user journey the toolkit should support.
+    said: Wants the Markdown views removed in favor of a more powerful dashboard that can be iterated on.
+    basis: stated
+    fingerprint: 2fe89d51bea0
+- id: SYS-46
+  kind: system
+  text: The review page shall let a person lock and unlock items, comment on items, keep or roll back alterations, correct or remove intent records, and choose options in open decisions.
+  serves:
+  - NEED-23
+  - NEED-27
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Discussing how feedback gets from the review page back to the agent.
+    said: Suggested that if the page is static, it could offer a copy-feedback button that gathers the feedback for the person to paste back to the agent.
+    basis: guided
+    fingerprint: 43c1b0c5edfc
+- id: SYS-47
+  kind: system
+  text: The toolkit shall give agents every piece of information the review page shows.
+  serves:
+  - NEED-24
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Agreeing to how the spec diff would work.
+    said: Wants everything on the dashboard also available to agents.
+    basis: stated
+    fingerprint: fa9312d772d3
+- id: SYS-48
+  kind: system
+  text: The toolkit shall report the spec differences from an older version, either a version-control revision or a person's last review, to a newer version, either the working tree or a later revision.
+  serves:
+  - NEED-23
+  - NEED-24
+  - NEED-1
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Discussing the spec diff command.
+    said: |-
+      Asked whether the diff could compare against main or another commit, and agreed to the agent's design: load the spec at a revision, compare items by ID, and join in the recorded reasons.
+    basis: guided
+    fingerprint: f3962feab456
+- id: SYS-49
+  kind: system
+  text: When a request conflicts with an item at the explicit or stated level, the toolkit shall bring the conflict to a person with the conflicting items and options to resolve it, before building in spec-first mode and once built in code-first mode.
+  serves:
+  - NEED-25
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Discussing how changes should treat locked items.
+    said: Wants the agent to answer that a new feature conflicts with an earlier one in specific ways, list the requirements involved, and offer ways to reword, edit, add or change items.
+    basis: stated
+    fingerprint: 8c5b7e273353
+- id: SYS-50
+  kind: system
+  text: The spec shall trace each requirement on a system element to a requirement of that element's parent.
+  serves:
+  - NEED-20
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. The agent pointed out that every element requirement traced straight to a system requirement, so the requirement tree was one level deep and crossed the element tree.
+    said: Said flow-down along the system breakdown was their original intent for the requirement tree, and that it should be made so.
+    basis: stated
+    fingerprint: ea6dc0e6b5bc
+- id: SYS-51
+  kind: system
+  text: The review page shall copy a person's feedback as one block of text that names the person and carries the fingerprint of each item and decision it acts on.
+  serves:
+  - NEED-23
+  - NEED-26
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Discussing how feedback gets from the review page back to the agent.
+    said: Suggested that if the page is static, it could offer a copy-feedback button that gathers the feedback for the person to paste back to the agent.
+    basis: guided
+    fingerprint: 5b6ca14e6172
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:55
+    context: Using Copy feedback on the review page, which opened a dialog first.
+    said: Wants Copy feedback to copy the feedback at once instead of opening another menu.
+    basis: guided
+    fingerprint: 5b6ca14e6172
+- id: SYS-52
+  kind: system
+  text: The toolkit shall keep each comment a person sends from the review page until the agent records a response, and show the response on that person's next review page.
+  serves:
+  - NEED-23
+  why: a comment that's never answered is steering lost; the done gate (CHECK-23) and the next page close the loop.
+  basis: derived
+- id: SYS-53
+  kind: system
+  text: The feedback block shall read on its own as review notes on the change it reviews.
+  serves:
+  - NEED-28
+  - NEED-23
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18, decision D2, which asked who applies a feedback block pasted from the review page.
+    said: Said a pull-request reviewer could post the block on the pull request as their review notes.
+    basis: guided
+    fingerprint: f1b0026507a2

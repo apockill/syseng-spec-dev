@@ -1,195 +1,327 @@
 - id: MODEL-1
   text: The spec shall store each system element as its own directory inside a single, flat directory of system elements.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    "We have a directory called components and inside that we have directories for each component … It's still a flat directory"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how the spec's files should be laid out, with system elements then called components.
+    said: Described a directory called components holding one directory per component, and stressed that it is still a flat directory.
+    basis: stated
+    fingerprint: d10b6445085e
 - id: MODEL-2
   text: The spec model shall support system elements at every level, from the whole system down to a single unit.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    "these range from extremely high level to extremely small level"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the components (now system elements) the spec is divided into.
+    said: Said that components range from extremely high level to extremely small level.
+    basis: stated
+    fingerprint: bbb3e5aa9ab6
 - id: MODEL-3
   text: Each system element shall list the system elements it depends on.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    "These components state their dependencies in some way … A component could be depended on by many other components."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the components (now system elements) the spec is divided into.
+    said: Said that components state their dependencies in some way, leaving the way open, and that a component could be depended on by many other components.
+    basis: stated
+    fingerprint: 25df7c69ca88
 - id: MODEL-4
   text: The dependency graph of system elements shall contain no cycles.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    "the linter should enforce that there's no loops"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the dependencies between components (now system elements).
+    said: Wants the linter to enforce that there are no loops.
+    basis: stated
+    fingerprint: ba444881b2f7
 - id: MODEL-5
   text: The spec shall hold requirements and verification items as separate kinds of item, with each verification item linked to the requirements it verifies.
-  origin: engineer
   traces_to: SYS-10
-  source: |-
-    "We have the concept of requirements and verification items."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing what the spec contains.
+    said: Said the spec has the concepts of requirements and verification items.
+    basis: guided
+    fingerprint: 5a8a6077fb25
 - id: MODEL-7
   text: The spec shall name each implementation of the product, with its language.
-  origin: engineer
   traces_to: SYS-9
-  source: |-
-    "it could be 'implemented in {Implementation name XYZ, C++} or have no implementations'"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how the spec relates to the code that realizes it.
+    said: Said a spec could be marked as implemented in a named implementation with its language, such as C++, or as having no implementations.
+    basis: stated
+    fingerprint: f93b94d95665
 - id: MODEL-8
   text: Each verification item shall link to its tests separately for each implementation.
-  origin: engineer
   traces_to: SYS-9
-  source: |-
-    "there's an implementation of this for the C++ stack, but if I remade it in rust that could also work"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how a verification item relates to the code and tests of an implementation.
+    said: Said there could be an implementation of it for the C++ stack, and that a remake in Rust could also work.
+    basis: guided
+    fingerprint: 6e4730cd21fa
 - id: MODEL-9
   text: |-
     Each verification item shall have a cost tier: cheap, or expensive when it needs model calls, subagents or a long run time.
-  origin: engineer
   traces_to: SYS-12
-  source: |-
-    "Expensive (e.g. not fully automated steps that require extra tokens/subagents spun up) should be a separate tier of tests" · "Expensive is not just a function of tokens, but time."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the kinds of verification the toolkit should run.
+    said: Wants expensive tests, such as steps that are not fully automated and need extra tokens or subagents, to be a separate tier.
+    basis: stated
+    fingerprint: d2cb392493e6
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 2). Answering Q9, about what counts as expensive verification.
+    said: Said that expensive is not just a function of tokens, but also of time.
+    basis: stated
+    fingerprint: d2cb392493e6
 - id: MODEL-10
   text: Each system element shall list its related code by path or pattern, with no limit on how many system elements a file relates to.
-  origin: engineer
   traces_to: SYS-7
-  source: |-
-    "Should we decouple it, such that components can call out related code files" · "I'm not sure about 1 file to 1 component". See DR-10.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 2). The agent had proposed that each code file belong to exactly one component (now system element); see DR-10.
+    said: Asked whether to decouple them, so that components call out their related code files.
+    basis: guided
+    fingerprint: 96d4aa74ab8e
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 2). The agent had proposed that each code file belong to exactly one component (now system element); see DR-10.
+    said: Was not sure about one file to one component.
+    basis: guided
+    fingerprint: 96d4aa74ab8e
 - id: MODEL-12
   text: The spec shall hold needs, meaning goals that can't be verified directly, as a third kind of item, each traced to the requirements that serve it.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    Q8: "That sounds good … Of course I will have to approve the needs down the line."
-- id: MODEL-14
-  text: |-
-    Each requirement shall record its origin: stated by the engineer, or proposed by an agent.
-  origin: engineer
-  traces_to: SYS-26
-  source: |-
-    "If a human had hand / there are notes of previous ADRs, then flag that so the user knows not to skim/lgtm too early." · "we may want to consider adding this functionality to the rendering UI, so I know what to read"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 4). Answering Q8, which proposed that agents draft needs from what the engineer says and the engineer approves them later.
+    said: Agreed that it sounds good, noting that they will of course have to approve the needs down the line.
+    basis: guided
+    fingerprint: e6f925a7f5b0
 - id: MODEL-24
-  text: The spec shall record each approval by the engineer together with a fingerprint of the approved content.
-  origin: engineer
+  text: The spec shall record each lock by the engineer together with a fingerprint of the locked content.
   traces_to: SYS-14
-  source: |-
-    "a list of properties stating when the file has been LGTMed by the user, including an 'approved' + some kind of git state of the file? Or like hash?" See DR-5.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 2). Answering Q7, about how to record what the engineer has signed off, so the toolkit can tell when it changes; see DR-5.
+    said: Asked whether to keep a list of properties stating when a file has been signed off by the user, including an approved mark plus some kind of git state of the file, or perhaps a hash.
+    basis: guided
+    fingerprint: 56b8516a61b4
 - id: MODEL-25
   text: |-
-    Approvals shall apply to individual spec items: needs, requirements, verification items, decision records and the definitions of system elements.
-  origin: engineer
+    Locks shall apply to individual spec items: needs, requirements, verification items, decision records and the definitions of system elements.
   traces_to: SYS-14
-  source: |-
-    Q12: "Agreed."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 4). Answering Q12, which proposed that the engineer approve each spec item's meaning, rather than whole files, and leave links to the checker.
+    said: Agreed that approvals apply to individual spec items, rather than whole files.
+    basis: guided
+    fingerprint: 798c109ec048
 - id: MODEL-27
   text: |-
     Each spec item and change record shall support links to its context: artifacts, documents, external links and build notes.
-  origin: engineer
   traces_to: SYS-19
-  source: |-
-    "in the schema, we should have a way to link to context … any documentation, links to external docs, things that came up in the building, build notes"
   reworded: |-
     round 9: "shall be able to link" became "shall support links" (INCOSE R10).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 2). A note added to the answers to round 1's questions, about persisting the context behind decisions.
+    said: Wants the schema to have a way to link to context, such as any documentation, links to external docs, things that came up while building, and build notes.
+    basis: stated
+    fingerprint: 0028325f0b59
 - id: MODEL-28
   text: |-
     Each system element shall keep its decision records: a dated history of the decisions about it, each with its reasoning and the alternatives considered.
-  origin: engineer
   traces_to: SYS-19
-  source: |-
-    "These are more like ADRs (architecture decision records) that are attached to components to show historical reasoning and changes over time."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 3). Discussing the agent's proposal to distill each decision into a note in the repository, alongside Q14 on archiving transcripts.
+    said: Said these are more like ADRs (architecture decision records), attached to components to show historical reasoning and changes over time.
+    basis: stated
+    fingerprint: 7463575bdf07
 - id: MODEL-29
   text: |-
     Each need shall record, in paraphrase, the context it came from: the engineer's reasoning and scenarios of use.
-  origin: engineer
   traces_to: SYS-19
-  source: |-
-    Q17: "if I state a CUJ or say why or what I'm doing, that should be annotated somewhere for future agents to know about / have context of". See DR-12.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 4). Answering Q17, which proposed recording the engineer's CUJs (critical user journeys) as a separate scenario item type; see DR-12.
+    said: Wants a CUJ they state, or why or what they are doing, annotated somewhere for future agents to know about and have as context. Left where open.
+    basis: guided
+    fingerprint: 54304dc57bec
 - id: MODEL-30
   text: Each verification item shall name its verification method (test, analysis, demonstration or inspection) and its technique.
-  origin: engineer
   traces_to: SYS-10
-  source: |-
-    Q18: "Yes let's adopt."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 4). Answering Q18, which proposed adopting the systems-engineering vocabulary in the glossary, with verification methods and techniques in place of modalities.
+    said: Agreed to adopt the systems-engineering vocabulary.
+    basis: guided
+    fingerprint: 4cb12f24f383
 - id: MODEL-31
-  text: Links that the checker verifies, such as test links and related-code lists, shall need no approval.
-  origin: engineer
+  text: Links that the checker verifies, such as test links and related-code lists, shall need no lock.
   traces_to: SYS-14
-  source: |-
-    Q12: "The things the checker can automate, no need to approve."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 4). Answering Q12, which proposed that the engineer approve each spec item's meaning and leave links to the checker.
+    said: Said the things the checker can automate need no approval.
+    basis: stated
+    fingerprint: 79f245711f3d
 - id: MODEL-32
   text: Each system requirement shall be verified at the system level, in addition to the verification of the requirements that refine it.
-  origin: engineer
   traces_to: SYS-10
-  source: |-
-    Q19 (should system requirements get their own verification items?): "Yes, this makes sense."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 5). Answering Q19, which asked whether system requirements should get their own verification items.
+    said: Agreed that it makes sense for system requirements to get their own verification.
+    basis: guided
+    fingerprint: 485f3eed171b
 - id: MODEL-33
   text: No requirement shall restate the requirement it refines.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    Q20: "Repetition is wasted cognitive overhead."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 5). Answering Q20, which asked whether element requirements that only repeat their parent should be deleted.
+    said: Said that repetition is wasted cognitive overhead.
+    basis: guided
+    fingerprint: abdea90c5799
 - id: MODEL-11
   text: Each system element except the system itself shall name exactly one parent, recorded separately from its dependencies.
-  origin: engineer
   traces_to: SYS-6
-  source: |-
-    Q24 (one parent per element, reuse through dependencies): "I think we're talking about the same thing? As long as both 'RENDER' and 'PHYSICS' can depend on it". See DR-8.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 8). Answering Q24, which proposed one parent per system element, with a shared element reused through dependencies; see DR-8.
+    said: Thought they and the agent were talking about the same thing, as long as both RENDER and PHYSICS can depend on the shared element.
+    basis: guided
+    fingerprint: 44b449ee8b5a
 - id: MODEL-16
   text: |-
     Requirement text shall follow the wording rules: exactly one "shall", one of the EARS (Easy Approach to Requirements Syntax) sentence patterns, and no banned terms (vague words, escape clauses, open-ended endings, test or implementation vocabulary).
-  origin: engineer
   traces_to: SYS-21
-  source: |-
-    Q25 (how strict the wording rules should be): "I like strictness (B). It's a free way to get the LLM on rails." See DR-9.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 8). Answering Q25, which asked how strict the requirement wording rules should be; see DR-9.
+    said: Chose strictness (option B), calling it a free way to keep the model on rails.
+    basis: guided
+    fingerprint: 192040ccdc3f
 - id: MODEL-13
   text: Each requirement shall carry a rationale.
-  origin: agent
   traces_to: SYS-19
   why: the rationale is the first thing an agent reads when you ask why a requirement exists. That's why the NASA and INCOSE handbooks make it mandatory.
+  basis: derived
 - id: MODEL-15
   text: A requirement ID shall never be reused, including after its requirement is deleted.
-  origin: agent
   traces_to: SYS-19
   why: |-
     "why did AGENT-17 disappear?" only works if AGENT-17 has always meant one thing.
+  basis: derived
 - id: MODEL-17
   text: Requirement and need text shall contain no language-specific names, such as function, class or file names.
-  origin: agent
   traces_to: SYS-8
   why: a requirement that names a C++ class can't guide a Rust rebuild. Those names belong in test links and related-code lists.
+  basis: derived
 - id: MODEL-18
   text: Each requirement shall have at least one verification item, or a recorded reason for having none.
-  origin: agent
   traces_to: SYS-10
   why: a requirement that nothing checks is only a wish. The recorded reason lets you accept a gap on purpose.
+  basis: derived
 - id: MODEL-21
   text: Each implementation shall declare a root directory, under which its related-code paths and test links resolve.
-  origin: agent
   traces_to: SYS-9
   why: lets a C++ original and a Rust port share one repository.
+  basis: derived
 - id: MODEL-22
   text: Exactly one implementation shall be marked primary.
-  origin: agent
   traces_to: SYS-9
   why: gives changes a default target (CHANGE-8).
+  basis: derived
 - id: MODEL-23
   text: A run time shall count as long when it exceeds 60 seconds, unless the repository's configuration sets another limit.
-  origin: agent
   traces_to: SYS-12
   why: keeps the cheap tier fast enough to run after every change. 60 seconds is a guess, which is why it's configurable.
+  basis: derived
 - id: MODEL-34
-  text: Each approval record shall hold the approver, the channel, the date and time, the number of items approved in the same action, the engineer's words, and the fingerprint of the content approved.
+  text: Each lock record shall hold the person who locked the item, the channel, the date and time, the number of items locked in the same action, and the fingerprint of the content locked, plus a summary of what the engineer said when an agent records the lock.
   traces_to: SYS-33
-  origin: agent
-  why: SYS-33 lists what an approval must show. The channel is the review page, the terminal, chat, a harness menu or a restatement (AGENT-50).
+  why: SYS-33 lists what an approval must show. A record the hook or the feedback block makes is mechanical, so it holds no words; an agent recording one adds a summary.
+  basis: derived
 - id: MODEL-35
-  text: The spec shall keep every approval of an item, oldest first.
+  text: The spec shall keep every lock of an item, oldest first.
   traces_to: SYS-39
-  origin: agent
   why: an item approved several times, or approved again after a change, carries more signal than a single approval, and the dates show how fresh each approval is.
+  basis: derived
 - id: MODEL-36
-  text: A quote shall hold the engineer's exact words, the date and time the engineer said them, and a summary of what was being discussed.
+  text: An intent record shall hold its author, the date and time of the statement, the context of the discussion, a summary of what the person said, and the fingerprint of the item it was recorded for.
   traces_to: SYS-35
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 20:31
-    words: I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 20:31
     context: Discussing where the engineer's words should be kept on the requirements.
+    said: Imagined their words living on the requirements with some metadata, namely the date and time, the words, and some background on the context, and did not want the context to be model-written text asserting a lot on its own.
+    basis: guided
+    fingerprint: 46ba0776eb1c
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Revising round 12's choice to keep the engineer's words verbatim (DR-46), while planning the review page.
+    said: Wants a summary close to what was said, lightly cleaned up, with its author and the context of the discussion, instead of the exact words.
+    basis: guided
+    fingerprint: 46ba0776eb1c
+- id: MODEL-37
+  text: |-
+    Each intent record shall state its basis: stated when what the person said, taken alone, says what the item requires, or guided when the person's choice or constraint fixed the item without saying it.
+  traces_to: SYS-42
+  why: CLI-22's refusal depends on this boundary, so it needs a test two agents apply alike (DR-54).
+  basis: derived
+- id: MODEL-38
+  text: |-
+    Each requirement and decision record with neither an intent record nor a lock shall state its basis: derived when an item above it needs it, or added when nothing a person locked, stated or guided needs it.
+  traces_to: SYS-42
+  why: separates what a request needed from what the agent added on its own initiative, which a refactor can reshape or drop most freely (DR-54).
+  basis: derived
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 5). Reviewing SYS-21 and how open decisions should warn the engineer about what to read closely. Moved from the retired MODEL-14.
+    said: Wants an item flagged when a human had a hand in it or there are notes from earlier decision records, so the reader knows not to skim it or sign it off too early.
+    basis: guided
+    fingerprint: f63421d594e9
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 5). Reviewing SYS-21 and how open decisions should warn the engineer about what to read closely. Moved from the retired MODEL-14.
+    said: Suggested considering adding this to the rendering UI as well, so they know what to read.
+    basis: guided
+    fingerprint: f63421d594e9
+- id: MODEL-39
+  text: The spec shall record each review a person sends back, with the person, the date and time, the version-control revision the page was generated from, whether the working tree differed from that revision, and, when it did, the fingerprint of each item the page showed.
+  traces_to: SYS-48
+  why: a comparison since a person's last review needs a fixed point per person (DR-59). A revision fixes the content exactly when the page was made from committed work, so the fingerprints are kept only when it wasn't, which keeps the record small.
+  basis: derived
+- id: MODEL-40
+  text: A verification item or system element definition with neither an intent record nor a lock shall count as derived.
+  traces_to: SYS-42
+  why: these follow from the requirements they serve, and asking agents to label each one would be bookkeeping with no signal. Needs always carry an intent record (AGENT-37).
+  basis: derived

@@ -1,130 +1,333 @@
 - id: NEED-1
   text: The engineer needs to keep intellectual control of a product of 100,000+ lines of code by reading its requirements, and only occasionally its verification items.
-  origin: engineer
-  source: |-
-    "allow a single engineer to maintain intellectual control over what they are building, even as the product balloons to 100k+ LOC … only showing the highest signal things (REQs). VERs are more for the LLMs … and also for the sole engineer to read occasionally"
   context: you want to work as a guide, not a line-by-line auditor. One person directs agents across a codebase that would normally need a team, and follows what the system must do and how that's changing, without reading the code in depth.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing what the toolkit is for.
+    said: Wants the toolkit to let a single engineer keep intellectual control over what they are building, even as the product grows past 100k lines of code, by showing only the highest-signal things, the requirements. Sees verification items as mostly for the agents, and for the engineer to read occasionally.
+    basis: stated
+    fingerprint: f4d032821275
 - id: NEED-2
   text: The engineer needs agents to surface the questions that spec work raises, so the engineer gets more chances to steer.
-  origin: engineer
-  source: |-
-    "for the LLM to stop and say 'wait, actually, now that I am forced to think in this way it begs the questions XYZ' those questions can be surfaced to the user, who now has more opportunities to steer"
   context: writing things down in systems-engineering form makes agents notice gaps. Each question they raise is a chance to change direction early, while it's cheap.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing what writing the spec in systems-engineering form should bring.
+    said: Wants an agent that is forced to think this way to stop and say that it raises certain questions, and wants those questions surfaced to the user, who then has more chances to steer.
+    basis: stated
+    fingerprint: e6075d038a36
 - id: NEED-3
   text: The engineer needs to reuse the toolkit across unrelated projects.
-  origin: engineer
-  source: |-
-    "this skill/set of skills must NOT reference [the host project]. I plan on reusing this."
   context: the toolkit is meant for many projects, so nothing in it may assume a particular one.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how the toolkit should be built, while using it on one particular project.
+    said: Said the skill or set of skills must not reference the host project, because they plan to reuse it.
+    basis: stated
+    fingerprint: 4b59906ae6a0
 - id: NEED-4
   text: The engineer needs the V&V documentation to be enough to rebuild the product in another language.
-  origin: engineer
-  source: |-
-    "if I took all the V&V documentation and said 'build this in rust' I'd want that to work"
   context: you want the design kept separate from the code. Then you can ask agents to rebuild the product in Rust, or on another framework, and get the same product.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing what the verification and validation documentation should be enough for.
+    said: Said that if they took all the V&V documentation and asked for the product to be built in Rust, they would want that to work.
+    basis: stated
+    fingerprint: 4f923c2ad874
 - id: NEED-5
   text: The engineer needs the process to cost the main agent little attention.
-  origin: engineer
-  source: |-
-    "How to make this system relatively low overhead, so that the agent I'm interfacing with doesn't have to think about it much"
   context: the main agent should mostly just code. The toolkit and its subagents do the spec bookkeeping.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Setting out the questions the toolkit has to answer.
+    said: Asked how to make the system relatively low overhead, so that the agent they interface with doesn't have to think about it much.
+    basis: stated
+    fingerprint: a2be556c6d6f
 - id: NEED-6
   text: The engineer needs to choose, per change, between specifying first and building first.
-  origin: engineer
-  source: |-
-    "the system should support two CUJs … We want to support both workflows cleanly."
   context: |-
     there are two scenarios.
-    - **Planning:** you ask for the spec of a feature, review it and approve it. Agents then implement it from a to-do list and report anything they had to change. The same to-do list can drive a rebuild in a new language.
+    - **Planning:** you ask for the spec of a feature, review it and lock it. Agents then implement it from a to-do list and report anything they had to change. The same to-do list can drive a rebuild in a new language.
     - **Building:** you ask for a change to be built and try the result. The agent updates the spec during or after the work, whichever suits it, and you review the spec changes once the change is done.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Describing two ways of working: asking for a feature's spec and reviewing it before it is built, or asking for a change to be built and reviewing the spec afterwards.
+    said: Said the system should support both of these critical user journeys, and support both workflows cleanly.
+    basis: stated
+    fingerprint: 6ce64f8ee788
 - id: NEED-7
   text: The engineer needs to develop quickly, running the full verification only occasionally and without supervising it.
-  origin: engineer
-  source: |-
-    "I want to be able to develop quickly with agility, and occasionally say 'hey let's run the full suite' and walk away"
-  context: day to day, you want changes fast, and you often try the binary while agents polish tests and spec in parallel. Occasionally you start a full verification run and walk away. You come back to fixes, reworded requirements, new verification items and a health summary, which you approve or comment on.
+  context: day to day, you want changes fast, and you often try the binary while agents polish tests and spec in parallel. Occasionally you start a full verification run and walk away. You come back to fixes, reworded requirements, new verification items and a health summary, which you lock or comment on.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how they want to work day to day and when the full verification runs.
+    said: Wants to be able to develop quickly and with agility, and occasionally ask for the full suite to be run and walk away.
+    basis: stated
+    fingerprint: 9536aea52e2e
 - id: NEED-8
   text: The engineer needs the reasoning behind each decision to stay available to future agents and to the engineer.
-  origin: engineer
-  source: |-
-    "any documentation, links to external docs, things that came up in the building, build notes, reasoning for why something is the way it is, should be persisted"
   context: weeks later, an agent about to change a requirement should be able to find out why it is the way it is, and then go ahead or flag the change to you. Reasoning from design discussions, including artifacts you liked, should outlive the conversation.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing what the toolkit should keep from the work of building.
+    said: Wants any documentation, links to external documents, things that came up while building, build notes, and reasoning for why something is the way it is, persisted.
+    basis: stated
+    fingerprint: 682676a9ce0e
 - id: NEED-9
   text: The engineer needs verification that isn't weakened by the agents whose work it checks.
-  origin: engineer
-  source: |-
-    "it's important that the system engineers who make the requirements are not also the same ones that make the verification items because there is a perverse incentive to make it easier"
   context: in professional practice, requirement writers don't write their own verification, because a single author unconsciously makes it easier to pass. Agents have the same incentive, and coding agents are known to edit tests until they pass.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). The project's first message, describing the method.
+    said: Said it's important that the systems engineers who write the requirements aren't the same ones who write the verification items, because there's a perverse incentive to make verification easier.
+    basis: stated
+    fingerprint: bd89e0ab426b
 - id: NEED-10
   text: The engineer needs to bring an existing project into the toolkit by reviewing only its needs.
-  origin: engineer
-  source: |-
-    "The end goal is a user just looks at the NEEDS, confirms them, states 'approve everything' and moves on. Future changes get more rigor. Otherwise, reviewing the existing project will take forever."
-  context: when an existing project comes in, the job is to record what it is and why, not to redesign it. Agents should do as much of that thinking as they can by reading the code, comments and structure. They should ask only high-value questions and leave you to confirm the needs and approve the rest in one go. Rigor goes into the changes that follow.
+  context: when an existing project comes in, the job is to record what it is and why, not to redesign it. Agents should do as much of that thinking as they can by reading the code, comments and structure. They should ask only high-value questions and leave you to confirm the needs in one go, with everything beneath them following from them. Rigor goes into the changes that follow.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing, in round 5, how an existing project is brought into the toolkit.
+    said: Said the end goal is that a user looks only at the needs, confirms them, says to approve everything, and moves on, with more rigor for future changes; otherwise reviewing the existing project would take forever.
+    basis: stated
+    fingerprint: df5feea8324b
 - id: NEED-11
   text: The engineer needs each minute spent reviewing to yield as much steering as possible.
-  origin: engineer
-  source: |-
-    "Repetition is wasted cognitive overhead. The goal of this framework is to maximize the steering-to-human-time ratio, and maintain intellectual control over the design without having to look at the code in depth"
   context: every repeated or low-value item costs you attention. Agents should do the thinking they can, bring you only the decisions that matter most, and make each one quick to settle with a recommended option.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q20 in round 5, which asked whether element requirements that only repeat their parent should be deleted.
+    said: Said repetition is wasted cognitive overhead, and that the goal of the framework is to maximize the ratio of steering to human time and keep intellectual control over the design without having to look at the code in depth.
+    basis: stated
+    fingerprint: d02a05ffd7be
 - id: NEED-12
   text: The engineer needs to use the toolkit with more than one agent harness.
-  origin: engineer
-  source: |-
-    "I'd like to use this methodology in other agentic use cases possibly … In the future I'll also use this in antigravity, so I don't want to couple too closely to claude code"
   context: you use Claude Code today and plan to use Antigravity next (still with Claude models), and possibly other agent setups. The method shouldn't be tied to any one of them.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing, in round 5, how the toolkit plugs into agent harnesses.
+    said: Would possibly like to use the methodology in other agentic use cases, and will also use it in Antigravity in the future, so doesn't want it coupled too closely to Claude Code.
+    basis: stated
+    fingerprint: f5eef14e177a
 - id: NEED-13
   text: The engineer needs the toolkit to improve from the friction agents meet while using it.
-  origin: engineer
-  source: |-
-    "Agents should be encouraged to modify this skill if the UX can be improved, or if the user is trying to use them in a new way … if an agent has to jump through 16 hoops to get something done, the human will never know, and therefore the skill will never be improved."
   context: agents are the toolkit's heaviest users. When one has to work around the toolkit, you only hear about it if the agent says so, and without that the toolkit never gets better. Agents should also adapt the toolkit when you start using it in a new way.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Discussing how the skill should treat agents' changes to the toolkit itself.
+    said: Wants agents encouraged to modify the skill if its UX can be improved, or if the user is trying to use it in a new way. Otherwise, if an agent has to jump through 16 hoops to get something done, the human will never know, and the skill will never be improved.
+    basis: stated
+    fingerprint: 069e0df7af2d
 - id: NEED-14
-  text: The engineer needs to see who approved each item and how.
-  origin: engineer
-  source: |-
-    "What matters is that in the future we can see WHO approved it and HOW." · "Approved directly by a human on a UI? probably higher value. Approved as part of a batch approve on UI? Lower value. Approved as part of a batch approve on LLM chat? About the same,  maybe slightly lower. Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful." (2026-10-17)
-  context: Asked who should record an approval given by picking an option in a menu. The engineer answered that who records it doesn't matter, and that the record of who approved and how does.
+  text: The engineer needs to see who locked each item and how.
+  context: Asked who should record a lock given by picking an option in a menu. The engineer answered that who records it doesn't matter, and that the record of who locked it and how does.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. The agent asked who should record an approval given by picking an option in a menu.
+    said: Said that what matters is being able to see later who approved an item and how.
+    basis: stated
+    fingerprint: 863007136bf7
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12, the same discussion, on how much signal each way of approving carries.
+    said: |-
+      Ranked the ways of approving: directly by a person on a UI is probably higher value; as part of a batch on a UI, lower; as part of a batch in chat, about the same, maybe slightly lower; in chat after many questions, recorded as rationale in the change, is useful and higher signal.
+    basis: guided
+    fingerprint: 863007136bf7
 - id: NEED-15
-  text: The engineer needs to tell which items they approved explicitly and which are delegated under an item they approved.
-  origin: engineer
-  source: |-
-    "As long as its clear what items got explicit approval, and which got approval by proxy, sure." · "Let's use delegated then. It'll imply the LLM chose it, and could be changed in the future, but at least we know where the req fits in the graph." (2026-10-17)
+  text: The engineer needs to tell which items a person locked or stated and which an agent decided beneath them.
   context: Asked whether approving an item should delegate everything under it in the requirement tree, and what to call that.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. The agent asked whether approving an item should delegate everything under it in the requirement tree, and what to call that.
+    said: Agreed, as long as it's clear which items got explicit approval and which got approval by proxy.
+    basis: stated
+    fingerprint: bc936ba321a0
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12, the same discussion, choosing a name for approval by proxy.
+    said: |-
+      Chose the word delegated: it implies the agent chose the item and that it could change later, while still showing where the requirement fits in the graph.
+    basis: guided
+    fingerprint: bc936ba321a0
 - id: NEED-16
-  text: The engineer needs their statements kept word for word on the requirements those statements directly express.
-  origin: engineer
-  source: |-
-    "Just to be clear, the goal is not 'every requirement must have a quote'. After all, if I say "make a 3d game that does XYZ" there will be many many requirements spawned from that "the 3d engine must render in xyz time", getting super nitty gritty. However, If I said "make a 3d game that does xyz (high level statement) and make sure the players feet are purple" that might call out two very different parts of the requirement tree (purple feet being much closer to the 'character model' portion of components). So, the goal here is: 'spread out the quotes where applicable, but build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree"." (2026-10-17) · "Also important tto try to document anything I say and divvy it up across the requirements, so if some part of the tree is approved by proxy (therefore more likely to change in the future) but has some quotes from me, then it can be brought up in the future by the LLM if its changed as we add features. It's all about signaling importance and intent of each requirement." · "I was imaginign quotes would live on the reqs, with some metadata (the date/time, the exact quote, and some background on the context". The quote shouldn't be "yes do this" and context be LLM written text that asserts a lot of things. But for example, in the above paragraph I gave a lot of reasoning. That could go somewhere, and the context summary would provide more info." (2026-10-17)
-  context: Discussing delegated requirements and where the engineer's words should be kept, then clarifying that not every requirement needs a quote.
+  text: The engineer needs what people say about the product kept on the items it shapes as an attributed summary close to their words, never word for word.
+  context: Revising round 12's choice to keep the engineer's words verbatim (DR-46), while planning the review page.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Revising round 12's choice to keep the engineer's words verbatim (DR-46), while planning the review page.
+    said: Likes that the reasoning behind decisions is recorded, but is concerned about committing unreviewed verbatim quotes to a public repository. Wants instead an AI summary close to what was said, lightly cleaned up, with its author and the context of the discussion, so that a reader of the context and the summary can tell how far the person specified the thing and what they left unspecified. Wants a separation between the conversation and what is published.
+    basis: stated
+    fingerprint: 77395f576516
 - id: NEED-17
-  text: The engineer needs agents to point out, once a change is built and tested, each item the engineer approved, wrote or decided that the change altered, and to ask whether to keep each alteration.
-  origin: engineer
-  source: |-
-    "It means: build and test the change, then say "hey, because of how I did this, XYZ had to change" and ask for permission to change them. It's all about surfacing things- oftentimes the user is like "LGTM, I saw the final product, its fine" but htis is all about surfacing the one thing the user actually cared a lot about "actually I really _do_ care about the camera view sticking in the view when scrolling down, if this has to change let's roll it back and discuss why {commence conversation}"" (2026-10-17)
-  context: Asked what raising a change to an approved item should mean in code-first mode, where the agent never stops to ask (DR-15).
+  text: The engineer needs agents to point out, once a change is built and tested, each item the engineer locked, wrote or decided that the change altered, and to ask whether to keep each alteration.
+  context: Asked what raising a change to a locked item should mean in code-first mode, where the agent never stops to ask (DR-15).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. The agent asked what raising a change to an approved item should mean in code-first mode, where the agent never stops to ask (DR-15).
+    said: |-
+      Said it means building and testing the change, then saying which items had to change because of how it was done, and asking permission to change them. It's all about surfacing: often the user is happy with the final product, but this surfaces the one thing they really cared about, such as a camera view that stays in place when scrolling down, which, if it has to change, they would want rolled back and discussed.
+    basis: stated
+    fingerprint: 45fdfb8c6fe9
 - id: NEED-18
-  text: The engineer needs to approve the key requirements without reading every requirement, with agents proposing which ones as they work.
-  origin: engineer
-  source: |-
-    "Then the idea here being that LLMs can fish for approval on key requirements, but humans don't _have_ to read all the requiremnets for everything (for example, business logic around 'when this button is clicked, X shall occur' is less interesting than two or three layers up the tree 'the X interface shall enable user to do Y'." · "it should be easy to have LLM propose different nodes in the graph for approval as it works- and take that feedback and 'lock' the requirement in so that in the future its less likely to be changed in sweeping changes (without it being brought up)." (2026-10-17)
-  context: Discussing whether approval could pass down the requirement tree, and whether anything about approvals should block a merge.
+  text: The engineer needs to lock the key requirements without reading every requirement, with agents proposing which ones as they work.
+  context: Discussing whether a lock could pass down the requirement tree, and whether anything about locks should block a merge.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Discussing whether approval could pass down the requirement tree.
+    said: |-
+      Wants agents to be able to fish for approval on key requirements without people having to read all the requirements: low-level business logic, such as what happens when a button is clicked, is less interesting than what an interface two or three layers up the tree should let a user do.
+    basis: stated
+    fingerprint: d9f8283c790d
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Discussing whether anything about approvals should block a merge.
+    said: Wants it easy for the agent to propose nodes in the graph for approval as it works, and to take that feedback and lock the requirement in, so that it is less likely to be changed in sweeping changes without being brought up.
+    basis: stated
+    fingerprint: d9f8283c790d
 - id: NEED-19
   text: The engineer needs agents making large changes to weigh each item by the human attention it received.
-  origin: engineer
-  source: |-
-    "Everything about this system is geared towards: 1. documenting decisions 2. documenting the 'signal' these decisions provide. Every piece of software is like a fractal of decisions. If we want humans to have high leverage (produce 1000x more code) while keeping high intellectual control over the system, we need to document the nodes of the fractal." · "I don't want a 'value of decision' marker, but I want all of these to be useful for reasoning over as the LLM does large refactors. It should feel more comfortable changing things that were less reviewed by humans, and more likely to call out / chat with a human about design over more pivitol historical decisions." (2026-10-17)
-  context: Discussing what approval records are for.
+  context: Discussing what lock records are for.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Discussing what approval records are for.
+    said: Said everything about the system is geared toward documenting decisions and the signal those decisions provide. Every piece of software is like a fractal of decisions, and for people to have high leverage, producing far more code, while keeping intellectual control of the system, the nodes of that fractal need documenting.
+    basis: guided
+    fingerprint: f0dba227025d
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12, the same discussion.
+    said: Doesn't want a value-of-decision marker, but wants all of this to be useful for the agent to reason over during large refactors. The agent should feel more comfortable changing things people reviewed less, and be more likely to raise and discuss with a person design that touches more pivotal historical decisions.
+    basis: stated
+    fingerprint: f0dba227025d
 - id: NEED-20
   text: The engineer needs the requirement tree to follow the system's structure, not the order or framing of their requests.
-  origin: engineer
-  source: |-
-    "However, If I said "make a 3d game that does xyz (high level statement) and make sure the players feet are purple" that might call out two very different parts of the requirement tree (purple feet being much closer to the 'character model' portion of components). So, the goal here is: 'spread out the quotes where applicable, but build the requirement tree in away that makes the most sense from an SE perspective. Don't let the users framing force the shape of the tree". Like, the "players feet must be purple" shouldn't be close to the top of the tree. It would be like, 'game world' -> 'game characters' -> 'player' -> 'player model' -> 'textures' -> 'req: purple feet, approved by human, quotes'." (2026-10-17)
   context: |-
     Clarifying NEED-16: which requirements carry the engineer's words, and where in the tree those requirements belong.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: |-
+      Round 12. Clarifying NEED-16 as it then stood (the engineer's words kept on the requirements): which requirements carry the engineer's words, and where in the tree those requirements belong.
+    said: |-
+      Gave an example: asking for a 3D game that does certain things, and for the player's feet to be purple, calls out two very different parts of the requirement tree. Wants their statements spread across the requirements where applicable, but the tree built in the way that makes most sense from a systems-engineering perspective, without the user's framing forcing its shape. The purple-feet requirement belongs deep in the tree, under game world, game characters, player, player model and textures, not near the top.
+    basis: stated
+    fingerprint: a1b82906c13e
 - id: NEED-21
   text: The engineer needs agents to point out which existing items already account for what the engineer asks for.
-  origin: engineer
-  source: |-
-    "This was helpful: surfacing requirements, connecting dots, telling me 'oh yeah, XYZ accounts for it' is great. Let's do more of that in thie framework. It's helpful because it can help us weave the graph tighter through conversation, help find conenctions, etc." (2026-10-17)
   context: Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-17'
+    context: Round 12. Responding to the agent pointing out that SYS-9 already covered what the engineer had just described.
+    said: Found it helpful that the agent surfaced requirements, connected dots and said that an existing item already accounts for it. Wants more of that in the framework, because it helps weave the graph tighter through conversation and find connections.
+    basis: stated
+    fingerprint: 369834e05842
+- id: NEED-22
+  text: |-
+    The engineer needs agents to build fast while recording how directly a person asked for each item: by name, in conversation, indirectly, or not at all.
+  context: Describing the problem the toolkit solves, then settling the levels of intent.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Describing the problem the toolkit solves.
+    said: Said agents can build whole applications with many features in one pass, adding hundreds of thousands of lines, but nothing records which parts a person intended, which follow from the request, and which the agent added to be helpful, and code is a poor record of intent. Wants that recorded, with agent judgment on how directly each item was asked for, so that a large refactor reshapes what nobody asked for and brings what was asked for back to a person. Wants fast development that leaves concrete breadcrumbs of what was specified directly, less directly, or not at all.
+    basis: stated
+    fingerprint: a76a6e13f38f
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Settling the levels of intent the agent proposed.
+    said: |-
+      Agreed to five levels: explicit, stated, guided, derived and added.
+    basis: guided
+    fingerprint: a76a6e13f38f
+- id: NEED-23
+  text: The engineer needs to review each round of agent work on one page that shows what people intended, what changed since their last review and which items most deserve locking in, and to send feedback from that page to the agent.
+  context: Setting out the user journey the toolkit should support.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Setting out the user journey the toolkit should support.
+    said: |-
+      Described the journey: they ask for an app in free form, with a few high-level needs and a few detailed requirements. The agent builds it and its spec, then offers a page to check. The page highlights what a person specified directly, shows an interactive graph of the requirement tree, and lists the items most useful to lock in. They comment on a few items and lock a few, copy the feedback back to the agent, and the agent adjusts the spec or code and regenerates the page. After the next feature the page also shows, readably, what changed. Wants the Markdown views removed in favor of this page.
+    basis: stated
+    fingerprint: 36e52f38adfa
+- id: NEED-24
+  text: The engineer needs agents to have everything the review page shows, so the conversation and the page can be used interchangeably.
+  context: Agreeing to how the spec diff would work.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Agreeing to how the spec diff would work.
+    said: Wants everything shown on the review page also available to agents, so the conversation flows freely while they ask questions and ask for changes. Wants a spec diff command, so agents can read differences in a form that suits them, built on the same library as the page.
+    basis: stated
+    fingerprint: dbcbdadb2f9f
+- id: NEED-25
+  text: The engineer needs each request that conflicts with what a person stated or locked raised with options, before it is built or once it is built, whichever way the engineer works on that change.
+  context: Discussing how changes should treat locked items, then reviewing this need in round 18.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Discussing how changes should treat locked items.
+    said: |-
+      Wants the flow: build feature X, done; build feature Y, done; build feature Z, and the agent answers that it conflicts with X in specific ways, lists the requirements involved, and offers ways to reword, edit, add or change items.
+    basis: stated
+    fingerprint: c7553c88c466
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Reviewing this need, which then raised conflicts only before building.
+    said: |-
+      Corrected that raising a conflict before building isn't always wanted: the spec is committed with the code, so building first and confirming after must be supported too. Both workflows, spec first then build and build first then spec, are first class.
+    basis: stated
+    fingerprint: c7553c88c466
+- id: NEED-26
+  text: Several engineers need to direct one product, with every statement and lock attributed to the person who made it.
+  context: Agreeing that intent records carry their author.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Agreeing that intent records carry their author.
+    said: Said this has to be a multi-user system to work, and asked that each author's username or email address be recorded, whatever they commit with.
+    basis: stated
+    fingerprint: 1dfc3ba621f2
+- id: NEED-27
+  text: The engineer needs what they ask for in conversation locked in without a separate approval step, with the review page used for confirming.
+  context: Revising the chat-approval rules (AGENT-33, AGENT-48, DR-41).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Revising the rules for approving in chat (AGENT-33, AGENT-48, DR-41).
+    said: Finds the approval process too prescriptive. Wants a free-form conversational flow, more use of displays for confirming, and requirements a person mentions in conversation locked in automatically. Said the approval vocabulary can go.
+    basis: stated
+    fingerprint: 306e16920f08
+- id: NEED-28
+  text: The engineer needs each change reviewed at the level of its spec rather than its code, by its author or by another reviewer, with the review kept where the change is reviewed.
+  context: Answering who applies a feedback block from the review page (round 18, D2).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18, decision D2, which asked who applies a feedback block pasted from the review page.
+    said: |-
+      Said the person pastes the feedback block, so it can travel: a pull-request reviewer can open the review page and post the block on the pull request as their review notes, and an author can review their own change and paste the block to the agent. Part of the design is to allow system-level review in place of code review, since code will soon be too large for people to review.
+    basis: stated
+    fingerprint: 691319d934b7

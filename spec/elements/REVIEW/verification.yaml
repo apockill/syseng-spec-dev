@@ -4,28 +4,25 @@
   - REVIEW-14
   method: test
   technique: unit test
-  origin: agent
-  description: The rendered view lists needs, then system requirements, then constraints, then each system element; each system requirement lists what refines it.
+  description: The review page's sections come in order, what awaits the person first; its graph lists the system before its parts and needs before system requirements; each item carries what it traces to, which the page inverts to show what refines it.
   tests:
     python:
-    - tests/test_render.py::test_view_reads_top_down
-    - tests/test_render.py::test_system_requirement_lists_what_refines_it
+    - tests/test_render.py::test_the_page_reads_top_down
+    - tests/test_render.py::test_the_page_knows_what_refines_each_item
 - id: REVIEW-V2
   verifies:
   - REVIEW-3
   method: test
   technique: unit test
-  origin: agent
-  description: The rendered requirements view contains no verification items.
+  description: The page's graph and full spec hide verification items until the person turns them on.
   tests:
     python:
-    - tests/test_render.py::test_view_hides_verification_items
+    - tests/test_render.py::test_verification_items_are_hidden_until_asked_for
 - id: REVIEW-V3
   verifies:
   - REVIEW-10
   method: test
   technique: unit test
-  origin: agent
   description: The change record view shows each change's reason beside it, with the old and new wording.
   tests:
     python:
@@ -35,32 +32,128 @@
   - REVIEW-12
   method: test
   technique: unit test
-  origin: agent
   description: The change record view puts open decisions above the changes to the spec.
   tests:
     python:
     - tests/test_decisions.py::test_view_puts_open_decisions_first_and_flags_the_engineers_items
 - id: REVIEW-V5
   verifies:
-  - REVIEW-16
+  - SYS-34
   - REVIEW-17
   method: test
   technique: unit test
-  origin: agent
-  description: The requirements view marks an approved item, an item changed since approval, and a delegated item with the item it sits under. It shows a quote with its date and time and its context.
+  description: The page shows a locked item that changed since as explicit and changed, an agent's item as derived under the stated item above it, and an added item as added; it shows each intent record with its person, its date and time and its context.
   tests:
     python:
-    - tests/test_review.py::test_views_mark_approved_changed_and_delegated_items
-    - tests/test_review.py::test_quotes_are_shown_with_when_and_what_was_discussed
+    - tests/test_render.py::test_the_page_marks_each_items_level_and_what_its_under
+    - tests/test_render.py::test_intent_reaches_the_page_with_who_when_and_context
 - id: REVIEW-V6
   verifies:
   - REVIEW-18
   - REVIEW-19
   method: test
   technique: unit test
-  origin: agent
   description: A proposed requirement is shown with its full text and the item it sits under. A proposed decision record is shown with its context, decision and alternatives, the full text of each requirement it decides, and the titles of the other items its text mentions.
   tests:
     python:
     - tests/test_review.py::test_proposals_are_listed_with_reasons_until_approved
     - tests/test_review.py::test_a_proposed_decision_shows_its_reasoning_and_what_it_mentions
+- id: REVIEW-V7
+  verifies:
+  - SYS-45
+  - REVIEW-1
+  - REVIEW-20
+  - REVIEW-22
+  - REVIEW-24
+  - CLI-25
+  method: test
+  technique: unit test
+  description: The review command writes one HTML file beside the toolkit's hook, ignored by version control, with a local snapshot of what it showed. The file loads nothing from the network and embeds every section in order, conflicts before other decisions, with a comparison against each version named. Rendering removes the Markdown views from earlier versions.
+  tests:
+    python:
+    - tests/test_review_page.py::test_the_page_is_one_offline_file_with_every_section_in_order
+    - tests/test_review_page.py::test_the_review_command_writes_the_page_beside_the_hook_ignored_by_version_control
+    - tests/test_review_page.py::test_the_page_lists_conflicts_first_and_proposes_items_to_lock_with_reasons
+    - tests/test_render.py::test_render_removes_the_markdown_views_and_writes_the_page
+- id: REVIEW-V8
+  verifies:
+  - SYS-46
+  - SYS-53
+  - REVIEW-4
+  - REVIEW-6
+  - REVIEW-13
+  - REVIEW-15
+  - REVIEW-21
+  - REVIEW-23
+  - REVIEW-25
+  - REVIEW-26
+  - REVIEW-27
+  method: demonstration
+  technique: manual
+  description: In a browser, at desktop width and at 320 pixels wide, the person locks and unlocks items, comments, keeps or rolls back an alteration, disowns or corrects an intent record, chooses an option in a decision, and changes who they're reviewing as; a reload keeps their unsent feedback; Copy feedback gives a summary that reads on its own followed by the block. Clicking an ID shows the item's text. The graph indents each element under its parent with its items as marks by level, highlights elements whose requirements changed, and, for a selected item, draws what it traces to and what refines it. Demonstrated in round 22 with a headless browser driven over its debugging protocol.
+- id: REVIEW-V9
+  verifies:
+  - REVIEW-28
+  - REVIEW-29
+  method: test
+  technique: unit test
+  description: Clicking an ID opens the item in the side pane and selects it in the graph; pointing at an ID or an item's card highlights it in the graph; nothing scrolls the reader's place; the page holds a pane for the item in focus and one for the graph. Demonstrated in round 23 in a browser at 1440 and 360 pixels wide, where the pane is a drawer.
+  tests:
+    python:
+    - tests/test_review_page.py::test_items_open_beside_the_reader_and_light_up_in_the_graph
+    - tests/test_review_page.py::test_the_item_in_focus_is_tall_and_its_split_with_the_graph_can_be_dragged
+- id: REVIEW-V10
+  verifies:
+  - REVIEW-30
+  method: test
+  technique: unit test
+  description: A decision lists each item it involves with its own answers and a count of how many are answered; a suggested wording travels in the block and becomes a feedback item for the agent; choosing a conflict's option keeps the items it names, re-recording each at its earlier level, and turns the ones it rolls back into feedback items; an option can't name an item the decision doesn't involve.
+  tests:
+    python:
+    - tests/test_review_page.py::test_each_item_in_a_decision_is_answered_on_its_own
+    - tests/test_review_page.py::test_a_suggested_wording_goes_to_the_agent_as_feedback
+    - tests/test_review_page.py::test_choosing_a_conflict_option_keeps_and_rolls_back_the_items_it_names
+- id: REVIEW-V11
+  verifies:
+  - REVIEW-20
+  - REVIEW-31
+  method: test
+  technique: unit test
+  description: The tabs run from most to least signal, For you first; For you shows the agent's recommendations, then the decisions waiting, then the answers to the person's feedback; a recommendation's reason shows once, with a way to lock all it names; earlier recommendations and the counted list are set apart; each card shows as answered once the person acts on it.
+  tests:
+    python:
+    - tests/test_review_page.py::test_the_first_tab_holds_what_awaits_the_person_then_the_agents_recommendations
+- id: REVIEW-V12
+  verifies:
+  - REVIEW-23
+  method: test
+  technique: unit test
+  description: The page knows which of the person's reviews were applied, and drops feedback it copied for one of them.
+  tests:
+    python:
+    - tests/test_review_page.py::test_feedback_already_applied_is_dropped_from_the_page
+- id: REVIEW-V13
+  verifies:
+  - REVIEW-29
+  - REVIEW-30
+  - SYS-51
+  - CLI-23
+  method: test
+  technique: unit test
+  description: Clicking anywhere on an item's card, other than a control, opens it like clicking its ID; typing a suggested wording refreshes marks without rebuilding the list it's typed in, so the box keeps focus; Copy feedback copies at once and shows the block only when the browser won't copy; a lock, keep or comment sent again is skipped as already on record. Demonstrated in round 27 in a browser with a real click.
+  tests:
+    python:
+    - tests/test_review_page.py::test_clicking_an_items_card_opens_it_like_its_id
+    - tests/test_review_page.py::test_typing_a_wording_never_rebuilds_the_list_it_is_typed_in
+    - tests/test_review_page.py::test_copy_feedback_copies_at_once
+    - tests/test_review_page.py::test_feedback_sent_again_is_not_recorded_twice
+- id: REVIEW-V14
+  verifies:
+  - REVIEW-32
+  method: test
+  technique: unit test
+  description: The spec is measured (requirements, verification items, requirements without verification, coverage, linked tests, the intent mix and more); compared with an earlier measurement, each measure says whether it got better or worse, the worse ones first. The page's data and the overview section for agents carry the same numbers, and the page opens For you with the overview. Demonstrated in round 28 in a browser at desktop and phone widths.
+  tests:
+    python:
+    - tests/test_review_page.py::test_the_overview_measures_the_spec_and_marks_what_got_worse
+    - tests/test_review_page.py::test_the_page_opens_on_the_overview_and_agents_can_read_it

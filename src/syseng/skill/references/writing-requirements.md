@@ -5,17 +5,16 @@
 The spec reads top-down. The engineer reads the top two layers. The rest is for drilling in, and for agents.
 
 - **Needs** are outcomes the engineer wants, in their own terms.
-  - Draft them only from what the engineer says.
-  - Record the context too: their reasoning, and any scenarios of use, paraphrased rather than quoted.
+  - Draft them only from what the engineer says, with their intent on each.
+  - Record the context too: their reasoning, and any scenarios of use, paraphrased.
   - Nothing verifies needs. The engineer validates them.
 - **System requirements** say what the system as a whole shall do. Each one `serves:` one or more needs.
 - **Constraints** are limits the engineer puts on the solution, such as the implementation language.
-- **System-element requirements** refine a system requirement for one part of the system. Each one `traces_to:` exactly one requirement, and never restates it.
-  - A requirement that records a design choice rather than an ask is `derived: true`, with a `why`. Derived requirements are the first things the engineer should review.
+- **System-element requirements** refine a requirement of their element's parent; an element directly under the system refines a system requirement. Each one `traces_to:` exactly one requirement, and never restates it. If the parent has nothing to refine, give the parent a requirement of its own first.
 
 System elements form a tree, one `parent` each, with the system at the root. Reuse goes in `depends_on`, never in a second parent. When an element changes, everything that depends on it is affected.
 
-Place each requirement where the system's structure puts it, not where the engineer's request started. "Make a 3D game where the player's feet are purple" yields high-level requirements near the top and one detail deep in the tree (world → characters → player → model → textures), each quoting the words it expresses.
+Place each requirement where the system's structure puts it, not where the engineer's request started. "Make a 3D game where the player's feet are purple" yields high-level requirements near the top and one detail deep in the tree (world → characters → player → model → textures). Each carries the intent its request expressed, and the detail sits under the textures.
 
 ## Wording
 
@@ -32,21 +31,26 @@ The checker enforces these rules. Its errors explain each one, and references/ru
 - **No code names:** no identifiers, file names or call syntax. A rebuild in another language has to be able to follow the requirement.
 - **No test wording.** How a requirement is checked belongs in a verification item.
 
-Every requirement carries its rationale. Agent proposals use `why:`. The engineer's own words go in `quotes:`.
+Every requirement carries its rationale: the person's intent, or the agent's `why:`.
 
-## The engineer's words
+## Intent records
 
-Quote the engineer on each requirement their words directly express. Not every requirement needs a quote: most are derived from a few statements.
+What a person says goes on the items it directly expresses as intent records, through `spec edit`. Not every requirement has one: most follow from a few statements, and are derived.
 
 ```yaml
-quotes:
-  - said: 2026-10-17 21:26        # when they said it
-    words: |-                     # exactly what they wrote, typos and all; their reasoning, not just "yes"
-      Like, the "players feet must be purple" shouldn't be close to the top of the tree.
-    context: Discussing where detailed requirements belong.   # what was being discussed, and nothing more
+intent:
+  - by: Ada Lovelace <ada@example.com>   # filled in from `git config syseng.author` when left out
+    when: 2026-10-17 21:26                # filled in with the time of the edit when left out
+    context: Discussing where detailed requirements belong.
+    said: Wants the purple-feet detail placed deep in the tree, under the player model's textures, not near the top.
+    basis: stated                         # or guided
+    fingerprint: 3f2a9c0b71de             # always filled in by `spec edit`
 ```
 
-The context line frames the quote. It never adds claims of its own. Older items keep the engineer's words in `source:`.
+- `said` summarizes, close to their words but never word for word, and in the third person. Keep their hedges and strength (probably, must), add no number or mechanism they didn't give, and say what they left open when they said so. No double quotation marks.
+- `context` frames the statement: what was being discussed and what prompted it. It adds no claim of its own.
+- `basis` is `stated` when what they said, taken alone, says what the item requires, and `guided` when their choice or constraint fixed it without saying it. When unsure, the lower level.
+- An item no person addressed says where it came from instead: `basis: derived` (something above needs it) or `basis: added` (an agent's own idea).
 
 ## Verification items
 
@@ -58,14 +62,11 @@ A verification item says how one or more requirements are checked:
 
 System requirements also get system-level verification, such as an end-to-end run, not only their children's tests.
 
-## Approvals
+## Levels and locks
 
-The engineer approves meaning: needs, requirements, verification items, decision records and element definitions. Each approval records who gave it, how (chat, a menu, the terminal, the review page, or a restatement), when, how many items were approved together, the engineer's words, and the decisions settled before it. Every approval is kept, oldest first.
+Each item has a level of intent, computed every time and never stored:
+- **explicit:** a person locked it. A lock is a person's own act, naming the items: a lock line in chat, a menu choice, the terminal, or the review page. Each lock records who, how, when, how many items were locked together, and the content's fingerprint. Every lock is kept, oldest first.
+- **stated** or **guided:** from the item's intent records.
+- **derived** or **added:** from its basis. A derived item under an added one counts as added.
 
-Each item has a review state, computed every time and never stored:
-- **approved:** the engineer approved this exact content;
-- **changed:** they approved an earlier version, and it has changed since;
-- **delegated:** not approved itself, but under an item that is approved. It's yours to decide while that item still holds;
-- **unreviewed:** nothing above it is approved.
-
-Rewording an item changes its state. Re-linking its tests doesn't. Links the checker can verify need no approval.
+An item keeps its level after it changes, until a person answers the change: a newer lock or intent record that matches it, or a rollback. Rewording an item changes its fingerprint; re-linking its tests doesn't. Links the checker can verify need no lock.

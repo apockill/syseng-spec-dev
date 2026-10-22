@@ -11,6 +11,14 @@
   decision: the Python CLI holds all the logic. The method ships as one Agent Skill in the open SKILL.md format, which Claude Code, Antigravity and most other harnesses read. A harness can also get thin glue that calls the CLI; the setup command writes that glue into the repository. There is no plugin.
   alternatives: a Claude Code plugin as the product (the first proposal). The CLI and the skill only, with no glue anywhere, which leaves the merge-time check as the only hard gate.
   consequences: Claude Code is the first harness with glue (DR-3, DR-4, DR-6, DR-7). In a harness without glue, those enforcements become instructions, and the merge-time check (CHECK-15) is the backstop.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Answering Q21 in round 6, which asked how the toolkit plugs into agent harnesses. The agent recommended option B: the CLI is the product, the method is one portable skill, and harness glue is optional.
+    said: Chose option B.
+    basis: guided
+    fingerprint: 0b72ae3a99ed
 - id: DR-11
   title: Adopt systems-engineering vocabulary
   decided_by: engineer
@@ -23,6 +31,13 @@
     "system element" replaces "component". Verification items name one of the four standard methods (test, analysis, demonstration, inspection) and a technique (unit test, integration test, reasoning check). The full vocabulary is in [glossary.md](glossary.md).
   alternatives: keep "component", which is familiar to software engineers but isn't the standard term.
   consequences: agents that know SE terms can apply them directly.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q18 in round 4, which asked whether to adopt the systems-engineering vocabulary proposed in the glossary, including system element in place of component.
+    said: Agreed to adopt it.
+    basis: guided
+    fingerprint: 188c87530a54
 - id: DR-18
   title: Restructure the spec into layers
   decided_by: engineer
@@ -34,6 +49,13 @@
   decision: needs come first, then system requirements that serve them, then element requirements, each tracing to exactly one system requirement. Design choices moved into this file.
   alternatives: a flat list grouped by system element.
   consequences: the layer to read is now needs, system requirements and constraints. Q20 then removed restatements (DR-22).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q16 in round 4, which proposed restructuring the spec into layers (needs, then system requirements, then element requirements, each tracing to what it serves) and moving design choices into decision records.
+    said: Agreed, and asked for it to be done as the next round.
+    basis: guided
+    fingerprint: f16f8574d8fe
 - id: DR-22
   title: No restatement; system requirements can be allocated directly
   decided_by: engineer
@@ -46,6 +68,14 @@
   decision: remove requirements that only restate their parent. A system requirement can be allocated to a system element without an element-level copy. Round 5 removed eleven restatements.
   alternatives: keep the copies, so that each system element "owns" its requirements.
   consequences: less to read. Allocation is shown on the system requirement itself.
+  status: superseded in round 18 by DR-58 on allocation. Element requirements flow down through their parent; its rule against restating holds.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q20 in round 5, which asked whether element requirements that only repeat their parent should be deleted.
+    said: Decided they go, saying repetition is wasted cognitive overhead and that the framework's goal is to maximize the ratio of steering to human time.
+    basis: guided
+    fingerprint: 72ecbb74fe1d
 - id: DR-25
   title: A harness that can start subagents is required, and the skill states outcomes, not means
   decided_by: engineer
@@ -59,6 +89,14 @@
   decision: the toolkit assumes an agent harness that can start subagents, and there's no model-API path. The skill's language stays generic enough for Claude Code, Antigravity, Codex and future harnesses. It states outcomes and ideal setups, and leaves the means to the agent.
   alternatives: an API path added later (my recommendation in Q22), or an API path only.
   consequences: reasoning checks can't run in plain CI without an agent. Instructions specific to one harness live only in that harness's adapter (DR-1).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Answering Q22 in round 8, which asked whether reasoning checks need a path that runs outside any agent harness. The agent had recommended adding a model-API path later.
+    said: |-
+      Decided that some harness must always be involved, and it has to support subagents. Said how something is done is up to the agent: the toolkit tells it the needs and how to ideally configure the subagents, without being overly prescriptive.
+    basis: stated
+    fingerprint: b197e796eb5f
 - id: DR-32
   title: A Nix flake for development, and standard packaging for everyone else
   decided_by: agent
@@ -70,6 +108,7 @@
   decision: flake.nix provides Python with PyYAML and pytest for working on the toolkit, and `bin/spec` runs the CLI from the checkout. pyproject.toml keeps the toolkit installable with pip everywhere else. Nothing outside this repository's own development setup depends on Nix (SYS-32).
   alternatives: A pip virtual environment, which works here but isn't the engineer's convention.
   consequences: Agents run `spec` from the PATH, as in any other repository. On the engineer's machine it's installed with `pipx install --editable` from this checkout, so changes apply at once (DR-52).
+  basis: derived
 - id: DR-44
   title: Approval works like delegated authority in configuration management
   decided_by: agent
@@ -80,7 +119,7 @@
   - AGENT
   requirements: SYS-33, SYS-34, SYS-35, SYS-36, SYS-37, SYS-38, SYS-39, SYS-40
   recorded: round 12 (spec-first)
-  status: built in round 12.
+  status: built in round 12. Extended in round 18 by DR-54, whose five levels of intent replace its two states.
   context: The engineer wants to approve the key points of the requirement tree, let agents decide the rest, and have each later change to what they approved, wrote or decided brought back to them (NEED-14 to NEED-20). Today every item needs approval, and over 200 items are waiting.
   decision: |-
     Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).
@@ -90,3 +129,94 @@
     - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
   alternatives: Approving every item, which is today's rule and doesn't scale. A stored importance score, which the engineer ruled out.
   consequences: The engineer approves a few key items per change instead of every item. Agents need each item's approval state at the moment they change it (SYS-39). The merge check never blocks; it lists the alterations the engineer hasn't answered yet (CHECK-15, round 12 D1).
+  basis: derived
+- id: DR-54
+  title: Five levels of intent, computed from locks, intent records and a recorded basis
+  decided_by: engineer
+  elements:
+  - SYS
+  - MODEL
+  - CHECK
+  - REVIEW
+  - AGENT
+  requirements: SYS-42, SYS-34, MODEL-37, MODEL-38, MODEL-40, CHECK-18, CHECK-24, AGENT-60
+  recorded: round 18
+  context: Approval gave items two states that matter, approved or delegated, and an item the engineer stated in conversation showed as unreviewed unless they approved it by ID. The engineer wants agents to build fast while recording how directly a person asked for each item, using agent judgment, with anything they say they want locked at some level.
+  decision: |-
+    Five levels, highest first:
+    - **explicit:** a person locked it by name, on the review page, in chat or in the terminal. A lock record, which is what an approval record was before round 18.
+    - **stated:** a person asked for this item. An intent record with the basis stated.
+    - **guided:** a person shaped it without asking for it, for example by choosing an option, reacting to a demo, or giving a constraint it follows from. An intent record with the basis guided.
+    - **derived:** something above it needs it, and no person addressed it. The basis derived.
+    - **added:** an agent's own idea, which nothing a person asked for needs. The basis added.
+
+    An item takes its highest level. An explicit, stated or guided item shows as changed once its content differs from what its lock or intent record was given for. Levels are computed each time and never stored. Choosing stated or guided, and derived or added, is the agent's judgment when it records the item, and the review page shows each one for correction.
+
+    The basis records how an item came about, not how much it matters, so SYS-40 holds: agents still weigh dates, edit counts and discussions for themselves.
+
+    What each level means for a later change: a conflict with an explicit or stated item is raised before building (DR-57); an alteration to a guided item is asked about once built (SYS-37); derived and added items are changed freely, and the change is logged.
+  alternatives: Two states, approved and delegated (DR-44 alone), which can't tell what a request needed from what an agent added. A stored level field, which says nothing about who or when. A numeric score, which the engineer ruled out (SYS-40).
+  consequences: |-
+    Every requirement and decision record carries a basis, an intent record or a lock; for this repository the migration supplies them (DR-61). Verification items and element definitions count as derived unless a person said or locked something about them (MODEL-40). A derived item under an added item counts as added.
+    - A lock or intent record keeps its level after the item changes, until a person answers the change; changed is judged against the newest record (CHECK-24).
+    - Keeping an alteration re-records the item at its earlier level; it becomes explicit only if the person locks it.
+    - DR-44's delegation remains, as the item a derived or added item names above it (SYS-34).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Settling how to record how directly a person asked for each item; the agent proposed five levels.
+    said: |-
+      Wants agent judgment, with anything they say they want locked at some level: explicit, in conversation, or lower, with derived the lowest. Agreed to the five levels as proposed: explicit, stated, guided, derived and added.
+    basis: guided
+    fingerprint: 023ffa8b8424
+- id: DR-58
+  title: Requirements flow down the system breakdown
+  decided_by: engineer
+  elements:
+  - SYS
+  - MODEL
+  - CHECK
+  requirements: SYS-50, CHECK-22
+  recorded: round 18
+  context: All 181 element requirements traced straight to a system requirement, including those of VERIFY's children, so the requirement tree was one level deep and crossed the element tree. DR-22 allowed a system requirement to be allocated directly to any element. The engineer said flow-down along the system breakdown was their original intent.
+  decision: A requirement on an element traces to exactly one requirement of the element's parent, and an element directly under the system traces to a system requirement. Intermediate elements get requirements of their own for their children to refine, and MODEL-33 still forbids restating. The derived mark for requirements that trace to nothing is retired (SYS-6). The checker reports violations as to-dos where the repository's settings don't enforce flow-down, and as errors where they do. New repositories enforce it from the start; this repository switches after the migration (DR-61).
+  alternatives: Direct allocation (DR-22), which keeps the requirement tree shallow and the graph tangled.
+  consequences: DR-22 is superseded on allocation, and its rule against restating holds. The review page's graph can draw one tree.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. The agent pointed out that every element requirement traced straight to a system requirement, so the requirement tree was one level deep and crossed the element tree.
+    said: Said flow-down along the system breakdown was their original intent for the requirement tree, and that it should be made so.
+    basis: guided
+    fingerprint: 29264623e0c7
+- id: DR-61
+  title: Change meaning first, then migrate structure, intent and vocabulary in one pass
+  decided_by: engineer
+  elements:
+  - SYS
+  - MODEL
+  - CHECK
+  - AGENT
+  requirements: SYS-35, SYS-42, SYS-50
+  recorded: round 18
+  context: The engineer asked for a migration away from the approval vocabulary, either first or as part of the flow-down migration.
+  decision: |-
+    - This round changes meaning only.
+    - Phase 1 builds the tooling, including the CLI's refusal (CLI-22), reading old and new fields side by side. Until the migration, old fields map to levels: an approval is a lock; an engineer origin, a source or quotes field, or a decision the engineer made, is stated intent; an agent origin is derived.
+    - Phase 2 migrates this repository element by element, touching each item once: re-trace it for flow-down, summarize its verbatim words into intent records with person and basis, turn its approvals into explicit locks, retire the origin field and the derived mark, and rename the approval vocabulary to locks and the engineer to a person where several people apply. Its rewordings are declared as rewordings. The old fields and commands then go, and the checker rejects them.
+    - Phases 3 to 5 build the comparison, the review page and the feedback loop.
+  alternatives: A separate migration per concern, which touches each item two or three times and asks for a review each time.
+  consequences: Until Phase 2 the spec mixes vocabularies, and this round's statements sit as summaries in the old source field.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18. Planning the migration of this repository to the new model.
+    said: Asked for a migration away from the approval vocabulary, either first or as part of the flow-down migration.
+    basis: guided
+    fingerprint: c3f3153a5a50
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Round 18, decision D1, which asked how far the migration should go in removing verbatim text already committed; the agent recommended summarizing everywhere in current files.
+    said: Chose to migrate fully to the new system, since version control keeps the history.
+    basis: guided
+    fingerprint: c3f3153a5a50

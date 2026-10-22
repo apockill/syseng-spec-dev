@@ -3,7 +3,6 @@
   - CLI-5
   method: test
   technique: unit test
-  origin: agent
   description: Before an edit is applied, the agent sees each touched item before and after, and what it refines.
   tests:
     python:
@@ -13,8 +12,7 @@
   - CLI-6
   method: test
   technique: unit test
-  origin: agent
-  description: An edit that changes the meaning of an approved or depended-on item is held until each affected item is acknowledged by name; edits that affect nothing, or change only a rationale, apply at once.
+  description: An edit that changes the meaning of a locked or depended-on item is held until each affected item is acknowledged by name; edits that affect nothing, or change only a rationale, apply at once.
   tests:
     python:
     - tests/test_edit.py::test_edit_touching_approved_item_needs_named_acks
@@ -26,7 +24,6 @@
   - CLI-7
   method: test
   technique: unit test
-  origin: agent
   description: One invocation applies several operations and allocates an ID for each new item.
   tests:
     python:
@@ -36,7 +33,6 @@
   - CLI-8
   method: test
   technique: unit test
-  origin: agent
   description: An operation without a reason is refused, and nothing is written.
   tests:
     python:
@@ -47,7 +43,6 @@
   - SYS-5
   method: test
   technique: integration test
-  origin: agent
   description: Setting up an empty repository writes a spec that the checker passes with no errors, the skill, and the Claude Code hooks and subagents, and no launcher. Setup says when `spec` isn't on the PATH, and removes the launcher an earlier setup wrote. Setting up for Antigravity writes the skill and no Claude Code files. An existing spec is left as it was.
   tests:
     python:
@@ -61,7 +56,6 @@
   - CLI-10
   method: test
   technique: integration test
-  origin: agent
   description: A second setup reports every file unchanged, and a setup run without naming harnesses refreshes every harness already set up. Settings and hooks that setup didn't write survive two runs, and setup's own hooks appear once. Unreadable settings stop setup without being overwritten. A skill page the skill no longer has is removed. The drift check reports an edited installed file and writes nothing.
   tests:
     python:
@@ -71,13 +65,13 @@
     - tests/test_init.py::test_init_refuses_unreadable_settings
     - tests/test_init.py::test_init_removes_skill_files_the_skill_no_longer_has
     - tests/test_init.py::test_check_reports_installed_files_that_drifted
+    - tests/test_init.py::test_text_after_the_section_survives_a_refresh_unchanged
 - id: CLI-V7
   verifies:
   - CLI-12
   method: test
   technique: unit test
-  origin: agent
-  description: Approving an item that a resolved decision involved records that decision with the approval.
+  description: Locking an item that a resolved decision involved records that decision with the lock.
   tests:
     python:
     - tests/test_review.py::test_an_approval_lists_the_decisions_settled_before_it
@@ -87,8 +81,7 @@
   - CHANGE-16
   method: test
   technique: unit test
-  origin: agent
-  description: An edit's context shows the edited item's review state, such as the approved item it's delegated under. Each logged edit records its date and time.
+  description: An edit's context shows the edited item's review state, such as the locked item it's delegated under. Each logged edit records its date and time.
   tests:
     python:
     - tests/test_review.py::test_an_edit_shows_what_the_agent_should_weigh
@@ -99,21 +92,19 @@
   - AGENT-58
   method: test
   technique: integration test
-  origin: agent
-  description: Messages and views name `spec`. In a set-up host repository, the output of check, show, edit and the help texts, and every page the toolkit wrote, cite no requirement IDs except the host's own and illustrative examples, and the engineer's quoted words are rendered unchanged.
+  description: Messages and views name `spec`. In a set-up host repository, the output of check, show, edit and the help texts, and every page the toolkit wrote, cite no requirement IDs except the host's own and illustrative examples, and a person's recorded intent is rendered unchanged.
   tests:
     python:
     - tests/test_agent_experience.py::test_messages_name_the_spec_command
     - tests/test_agent_experience.py::test_a_host_repository_sees_no_toolkit_requirement_ids
-    - tests/test_agent_experience.py::test_the_engineers_words_are_never_rewritten
+    - tests/test_agent_experience.py::test_a_persons_recorded_intent_is_never_rewritten
 - id: CLI-V10
   verifies:
   - CLI-16
   - CLI-20
   method: test
   technique: integration test
-  origin: agent
-  description: Setup appends the section to an existing instruction file, keeps the rest of the file, and changes nothing when run again. It leaves a CLAUDE.md that includes AGENTS.md alone, and with instructions turned off it writes no instruction file. It allows the everyday commands without allowing approve or resolve, and lists each rule once.
+  description: Setup appends the section to an existing instruction file, keeps the rest of the file, and changes nothing when run again. It leaves a CLAUDE.md that includes AGENTS.md alone, and with instructions turned off it writes no instruction file. It allows the everyday commands without allowing lock or resolve, and lists each rule once.
   tests:
     python:
     - tests/test_init.py::test_init_points_every_session_at_the_skill
@@ -127,8 +118,7 @@
   - CLI-19
   method: test
   technique: integration test
-  origin: agent
-  description: An edit that needs acknowledgments says how to retry it, a retry with only acknowledgments applies it, and a retry with nothing left to retry says so. The status command shows the open change, the request, the alteration awaiting the engineer with its line, and the check summary. An edit's context shows a two-line value as two lines.
+  description: An edit that needs acknowledgments says how to retry it, a retry with only acknowledgments applies it, and a retry with nothing left to retry says so. The status command shows the open change, the request, the alteration awaiting the engineer with the lock line that keeps it, and the check summary. An edit's context shows a two-line value as two lines.
   tests:
     python:
     - tests/test_agent_experience.py::test_a_batch_can_be_retried_with_acknowledgments_alone
@@ -139,7 +129,6 @@
   - CLI-21
   method: test
   technique: integration test
-  origin: agent
   description: Setup links the machine's user-level skill and subagent folders to the installed toolkit and copies nothing into the repository. It removes the copies earlier setups put in a repository, keeps other skills there, and changes nothing when run again with the recorded harnesses. A skill of the engineer's own at the user-level path is left alone. Hermes gets its link only when Hermes is set up on the machine.
   tests:
     python:
@@ -147,3 +136,74 @@
     - tests/test_init.py::test_older_per_repository_installs_move_to_the_machine
     - tests/test_init.py::test_skills_and_agents_of_your_own_are_left_alone
     - tests/test_init.py::test_hermes_gets_its_link_and_the_note_that_no_hooks_run
+- id: CLI-V13
+  verifies:
+  - CLI-22
+  method: test
+  technique: unit test
+  description: In a spec-first change, an edit that changes the text of a stated item is refused, naming how to raise the conflict. It passes when marked a rewording, when it carries the person's request as stated intent, or when it names a resolved conflict that involves the item, but not an unresolved one.
+  tests:
+    python:
+    - tests/test_levels.py::test_spec_first_refuses_to_change_what_a_person_stated
+    - tests/test_levels.py::test_spec_first_allows_a_rewording_or_the_persons_own_request
+    - tests/test_levels.py::test_spec_first_allows_a_change_under_a_resolved_conflict_that_names_the_item
+- id: CLI-V14
+  verifies:
+  - CLI-28
+  - CHECK-27
+  method: test
+  technique: unit test
+  description: Migration refuses while items keep fields of the older format. Once they're converted, it moves locks to the new file with no words, fills in the person running it where earlier records named no one, marks the spec current and enforces flow-down, and won't run twice. It takes verbatim words out of change records but keeps values written as summaries, and carries a lock over a declared rewording. A migrated spec reports an older field.
+  tests:
+    python:
+    - tests/test_migrate.py::test_migrate_refuses_while_items_keep_the_older_fields
+    - tests/test_migrate.py::test_migrate_moves_locks_without_words_and_marks_the_spec_current
+    - tests/test_migrate.py::test_migrate_takes_verbatim_words_out_of_change_records_and_keeps_summaries
+    - tests/test_migrate.py::test_migrate_carries_a_lock_over_a_declared_rewording
+    - tests/test_migrate.py::test_a_migrated_spec_rejects_the_older_fields
+- id: CLI-V15
+  verifies:
+  - CLI-26
+  method: test
+  technique: unit test
+  description: The diff command prints the differences as text, grouped by element with each item's classes, level and reasons, and as YAML with counts and items. Since a person's last review, it compares against the revision their review was made from, and says so when they haven't sent one.
+  tests:
+    python:
+    - tests/test_diff.py::test_the_cli_prints_text_and_yaml
+    - tests/test_diff.py::test_since_review_compares_against_the_revision_the_page_was_made_from
+- id: CLI-V16
+  verifies:
+  - SYS-47
+  - CLI-24
+  method: test
+  technique: unit test
+  description: Every section of the review page prints as text, and as YAML, from the same data the page embeds.
+  tests:
+    python:
+    - tests/test_review_page.py::test_every_section_is_available_to_agents_as_text_and_yaml
+- id: CLI-V17
+  verifies:
+  - CLI-23
+  - CLI-27
+  - SYS-51
+  - MODEL-39
+  method: test
+  technique: unit test
+  description: A feedback block, found inside surrounding text, records a lock in its reviewer's name via the page and refuses a lock on an item that changed since; an unlock takes the lock off and keeps the history; a choice resolves its decision unless the options changed; an intent record the person disowns is removed through a logged edit; the review is recorded so the next comparison starts there; a block that names no person as name and email address is refused.
+  tests:
+    python:
+    - tests/test_review_page.py::test_a_lock_is_recorded_in_the_reviewers_name_and_a_stale_one_is_refused
+    - tests/test_review_page.py::test_an_unlock_takes_the_lock_off_and_keeps_the_history
+    - tests/test_review_page.py::test_a_choice_resolves_the_decision_unless_its_options_changed
+    - tests/test_review_page.py::test_an_intent_record_the_person_disowns_is_removed_through_an_edit
+    - tests/test_review_page.py::test_the_review_is_recorded_so_the_next_comparison_starts_there
+    - tests/test_review_page.py::test_a_block_must_name_a_person
+- id: CLI-V18
+  verifies:
+  - CLI-21
+  method: test
+  technique: unit test
+  description: A toolkit running from the Nix store is linked through a profile that exposes the same files, so the links survive an upgrade; one running from a checkout is linked as it is; with no profile, the store path is used. Demonstrated in round 30 by building the flake's package and running check, review and status from it, and with nix run.
+  tests:
+    python:
+    - tests/test_init.py::test_a_toolkit_installed_with_nix_is_linked_through_the_profile

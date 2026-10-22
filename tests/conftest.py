@@ -74,6 +74,7 @@ def _own_home(tmp_path, monkeypatch):
     (tmp_path / "home").mkdir(exist_ok=True)
     monkeypatch.setenv("HOME", str(tmp_path / "home"))
     monkeypatch.delenv("CLAUDE_CONFIG_DIR", raising=False)
+    monkeypatch.setenv("SYSENG_AUTHOR", "Tess Tester <tess@example.com>")  # who records name, unless a test says
 
 
 @pytest.fixture

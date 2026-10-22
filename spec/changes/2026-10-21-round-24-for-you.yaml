@@ -1,0 +1,149 @@
+request: |-
+  Review page feedback: a taller item-in-focus pane, and one clear first section holding what needs the engineer's answer and what the agent recommends they look at and lock
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-21'
+entries:
+- op: modify
+  id: REVIEW-20
+  at: 2026-10-21T15:21-07:00
+  reason: the engineer couldn't tell where the agent's recommendations were.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 4e4417d9ee88
+  fingerprint_after: 1b8153ee1486
+  requested: true
+  before:
+    text: |-
+      The review page shall show, in this order: the decisions and alterations awaiting the person, the responses to the person's last feedback, the differences since the person's last review, the intent captured since then, the items proposed for locking with the reason for each, a graph of the spec, and the full spec.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: |-
+        Round 18: setting out the review journey the toolkit should support, and the page that replaces the generated Markdown views.
+      said: Described a page that highlights what a person specified directly, shows a graph of the requirement tree and a list of the items most useful to lock in, and, once later features are built, also shows the differences.
+      basis: guided
+      fingerprint: 4e4417d9ee88
+  after:
+    text: |-
+      The review page shall show, in this order: what is for the person, meaning the decisions and alterations awaiting them and then the items agents recommend they lock, each with its reason; the responses to their last feedback; the differences since their last review; the intent captured since then; and the full spec.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: |-
+        Round 18: setting out the review journey the toolkit should support, and the page that replaces the generated Markdown views.
+      said: Described a page that highlights what a person specified directly, shows a graph of the requirement tree and a list of the items most useful to lock in, and, once later features are built, also shows the differences.
+      basis: guided
+      fingerprint: 4e4417d9ee88
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:25
+      context: Using the review page, which had what awaited them under Your decision and the agents' recommendations under Worth locking.
+      said: Found the page unclear about which section is the high-signal one, the items to lock or look at and give feedback on, and asked which section holds what the agent recommends they look at.
+      basis: stated
+      fingerprint: 1b8153ee1486
+  acks:
+    REVIEW-20: reordered at the engineer's request, recorded as their stated intent
+    REVIEW-V7: still verifies the page's sections; its order check is updated with this change
+    DR-60: still holds; DR-66 arranges the page's sections
+    DR-66: consequence added for round 24
+- op: modify
+  id: REVIEW-28
+  at: 2026-10-21T15:21-07:00
+  reason: the engineer's feedback on the pane.
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Using the review page for the first time, after clicking Show in the spec on an item.
+      said: Wants Show in the spec to open the item in a new window or a side panel, not scroll all the way down so they lose their place.
+      basis: stated
+      fingerprint: cb3177c27bc4
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 14:06
+      context: Using the review page for the first time, after clicking Show in the spec on an item.
+      said: Wants Show in the spec to open the item in a new window or a side panel, not scroll all the way down so they lose their place.
+      basis: stated
+      fingerprint: cb3177c27bc4
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:25
+      context: Looking at an element opened in the side pane, which showed only part of it above the graph, with its own scrollbar.
+      said: Found the item in focus a bit small, with the scrollbar making it awkward, and suggested making it taller.
+      basis: stated
+      fingerprint: cb3177c27bc4
+- op: modify
+  id: DR-66
+  at: 2026-10-21T15:21-07:00
+  reason: round 24's changes to the layout.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 86783872b2e5
+  fingerprint_after: ead79d399691
+  before:
+    consequences: Every section is one click away and the graph is always in sight. Answers given item by item can be sent at any time; what's left unanswered stays waiting.
+  after:
+    consequences: |-
+      Every section is one click away and the graph is always in sight. Answers given item by item can be sent at any time; what's left unanswered stays waiting.
+      - Round 24: the first tab, For you, holds what awaits the person and then the agents' recommendations, so the high-signal part of the page is one place. The item in focus takes most of the pane by default, and a handle between it and the graph sets the split, remembered in the browser.
+  acks:
+    DR-66: consequence added for round 24
+- op: add
+  id: REVIEW-V11
+  at: 2026-10-21T15:24-07:00
+  reason: verifies REVIEW-20 as rewritten in round 24.
+  after:
+    verifies:
+    - REVIEW-20
+    method: test
+    technique: unit test
+    description: The page's first tab, For you, shows what needs the person's answer and then what agents recommend they lock, each recommendation's reason once with a way to lock all it names; the newest round's recommendations lead, earlier ones still unlocked are set apart, and the counted list adds at most five.
+    tests:
+      python:
+      - tests/test_review_page.py::test_the_first_tab_holds_what_awaits_the_person_then_the_agents_recommendations
+- op: modify
+  id: REVIEW-V9
+  at: 2026-10-21T15:24-07:00
+  reason: covers the taller pane and its splitter (round 24).
+  before:
+    tests:
+      python:
+      - tests/test_review_page.py::test_items_open_beside_the_reader_and_light_up_in_the_graph
+  after:
+    tests:
+      python:
+      - tests/test_review_page.py::test_items_open_beside_the_reader_and_light_up_in_the_graph
+      - tests/test_review_page.py::test_the_item_in_focus_is_tall_and_its_split_with_the_graph_can_be_dragged
+decisions: []
+friction: []
+proposals:
+- ids:
+  - NEED-22
+  - NEED-23
+  - NEED-24
+  - NEED-25
+  - NEED-26
+  - NEED-27
+  - NEED-28
+  why: |-
+    These seven needs say what the toolkit is for since round 18: recording how directly you asked for each item, the review page, agents seeing what you see, conflicts raised with options, several engineers, conversational locking, and system-level review. You stated each one but none is locked, and nearly everything built today sits beneath them, so locking them puts the direction itself on record as yours.
+  proposed: 2026-10-21T15:22-07:00
+- ids:
+  - DR-54
+  - DR-62
+  - DR-57
+  - DR-55
+  why: |-
+    These four decide what reaches you and what agents may do without asking: the five levels of intent (DR-54), how what you say becomes intent and only your own acts become locks (DR-62), when a conflict stops the work in each mode (DR-57), and that your words are summarized, never quoted (DR-55). An agent could otherwise revise them as its own reasoning.
+  proposed: 2026-10-21T15:22-07:00
+- ids:
+  - SYS-49
+  - SYS-50
+  why: |-
+    The two rules agents will meet most often: a request that conflicts with what you stated or locked comes back to you with options (SYS-49), and every requirement refines its parent element's (SYS-50). You stated both; locking them means a later change to either is raised with you first.
+  proposed: 2026-10-21T15:22-07:00
+closed: '2026-10-21'

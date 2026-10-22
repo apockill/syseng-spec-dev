@@ -1,119 +1,209 @@
 - id: CLI-1
   text: The toolkit shall provide one command-line tool through which agents query, edit, check, verify and render the spec.
-  origin: engineer
   traces_to: SYS-27
-  source: |-
-    "The commandline interface the LLM uses" · "I want the CLI to be the main way agents edit the spec." · "Can't the CLI be the implementation?"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 1: describing the toolkit they wanted, listing its parts.
+    said: Named, as one of the parts, a command-line interface that the agent uses.
+    basis: guided
+    fingerprint: 3cdff3fa71f3
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 2: answering Q1, which asked how agents edit the spec, either through the CLI only or by editing plain YAML directly with the CLI for queries and checks.
+    said: Wants the CLI to be the main way agents edit the spec.
+    basis: stated
+    fingerprint: 3cdff3fa71f3
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 5: discussing whether the toolkit should be tied to Claude Code.
+    said: Asked whether the CLI could be the implementation, since they may want to use the method in other agentic settings and don't want to couple it too closely to Claude Code.
+    basis: guided
+    fingerprint: 3cdff3fa71f3
 - id: CLI-2
   text: The CLI shall generate, for a named implementation, a to-do list of the requirements and verification items not yet implemented or not passing in it.
-  origin: engineer
   traces_to: SYS-9
-  source: |-
-    "This ends up forming an automated 'todo' list for the LLM … 'let's implement this project in rust' and the todo list can be regenerated but for an entire different implementation"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 1: describing how the spec would mark what each implementation has implemented and what it hasn't.
+    said: Said this ends up forming an automated to-do list for the agent, and that for a request such as implementing the project in Rust, the to-do list can be regenerated for an entirely different implementation.
+    basis: stated
+    fingerprint: f3a29ae4a5e6
 - id: CLI-5
   text: |-
-    Before applying an edit, the CLI shall show the agent the edit's context: affected parent and child requirements, linked verification items and tests, dependent system elements, and approval status.
-  origin: engineer
+    Before applying an edit, the CLI shall show the agent the edit's context: affected parent and child requirements, linked verification items and tests, dependent system elements, and lock status.
   traces_to: SYS-20
-  source: |-
-    "if an agent wants to edit the spec, the CLI has a chance to intercept the request and give extra context (for example, dumping the descendant V&V / REQs into context, then asking 'confirm?' or something)"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 2: answering Q1, which asked how agents edit the spec, and explaining why agents should edit it through the CLI.
+    said: Said that when an agent wants to edit the spec, the CLI has a chance to intercept the request and give extra context, for example putting the descendant verification items and requirements into context and then asking for confirmation, or something like it.
+    basis: stated
+    fingerprint: 07bb7e5106e4
 - id: CLI-3
   text: |-
     The CLI shall answer four queries: one system element's spec, the system elements related to given files, the trace from a requirement to its verification items and tests, and a requirement's history (its rationale, each change with its reason, and its linked context).
-  origin: agent
   traces_to: SYS-20
   why: lets an agent pull exactly the spec it needs into context, instead of all of it.
+  basis: derived
 - id: CLI-4
   text: The CLI shall order a to-do list with each system element's items after those of the system elements it depends on.
-  origin: agent
   traces_to: SYS-9
   why: lets an agent build from the bottom up. A port starts at the leaves.
+  basis: derived
 - id: CLI-6
-  text: When an edit affects approved items or items that others depend on, the CLI shall apply it only after the agent acknowledges each affected item by name.
-  origin: agent
+  text: When an edit affects locked items or items that others depend on, the CLI shall apply it only after the agent acknowledges each affected item by name.
   traces_to: SYS-20
-  refines: |-
-    "then asking 'confirm?'"
-  why: a model will rubber-stamp a generic "confirm?". Naming each affected item makes it actually consider each one. See DR-19.
+  why: a model will rubber-stamp a generic confirmation prompt. Naming each affected item makes it actually consider each one. See DR-19.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 2: answering Q1, which asked how agents edit the spec, and describing what the CLI could do when an agent edits it.
+    said: Suggested that, after giving the agent extra context, the CLI could ask it to confirm, or something like that.
+    basis: guided
+    fingerprint: ec771f842ca6
 - id: CLI-7
   text: The CLI shall accept multiple edits in a single invocation.
-  origin: agent
   traces_to: SYS-25
   why: a twenty-requirement update should be one call, not twenty. The input format is DR-2.
+  basis: derived
 - id: CLI-8
   text: The CLI shall reject a modification or removal that has no reason.
-  origin: agent
   traces_to: SYS-19
   why: this enforces CHANGE-5 at write time, while the reason is fresh.
+  basis: derived
 - id: CLI-9
   text: The CLI shall set up a repository in one command, writing the spec skeleton where none exists and the hooks for each harness the engineer names, and linking this machine's user-level folders to the toolkit's skill and subagents.
   traces_to: SYS-5
-  origin: agent
   why: SYS-5 asks for one-step setup. The launcher gives agents one command that works on every machine (DR-39). The skill and the harness glue are what make an agent follow the method (DR-38, DR-40).
+  basis: derived
 - id: CLI-10
   text: When setup runs again, the CLI shall refresh the files it wrote and leave every other file and setting unchanged.
   traces_to: SYS-5
-  origin: agent
   why: running setup again is how a repository picks up a newer skill or hook, and it must never overwrite the engineer's own settings, such as their other Claude Code hooks.
+  basis: derived
 - id: CLI-11
-  text: When no approver is named, the CLI shall record as approver the user name configured for the repository's version control.
-  traces_to: SYS-33
-  origin: agent
-  why: who approved is part of SYS-33, and the version-control user name is one the engineer has already set.
+  text: When recording an intent record or a lock, the CLI shall record as the person the name and email address set for the toolkit in version control's configuration or the environment, or version control's own user name and email address when neither is set.
+  traces_to: SYS-43
+  why: on a machine where an agent commits, version control's user is the agent, so the person needs a setting of their own (DR-56).
+  basis: derived
 - id: CLI-12
-  text: When recording an approval, the CLI shall record each resolved decision that involved the item.
+  text: When recording a lock, the CLI shall record each resolved decision that involved the item.
   traces_to: SYS-33
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 20:01
-    words: Approved over llm after many questions (which would be recorded as part of rationale in the ticket, indicating higher signal) is useful.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 20:01
     context: Discussing which kinds of approval carry more signal.
+    said: Said an approval given in conversation with the agent after many questions is useful, since the questions would be recorded as part of the rationale in the ticket and indicate higher signal.
+    basis: guided
+    fingerprint: ab00063cabc1
 - id: CLI-13
-  text: Before applying an edit, and when showing an item, the CLI shall show the item's review state, its approvals with their channels, whether it carries the engineer's words or decision, its last edit and number of edits, the discussions that involved it, and how many items link to it.
+  text: Before applying an edit, and when showing an item, the CLI shall show the item's level of intent, its locks with their channels, its intent records, its last edit and number of edits, the discussions that involved it, and how many items link to it.
   traces_to: SYS-39
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 22:12
-    words: |-
-      I think whats better reflective of what I'm trying to say is 'metrics that can represent importance are surfaced to the llm in interfaces where it would be useful (last edit, # of discussion, approval types, # of context links, etc...) but not "IMPORTANT" or "NOT IMPORTANT" classification or scoring.
-    context: Approving SYS-40, which rules out a stored importance score.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 22:12
+    context: Commenting on SYS-40, which rules out a stored importance score, while approving it.
+    said: Said what better reflects their intent is that metrics that can represent importance, such as the last edit, the number of discussions, the kinds of approval and the number of context links, are surfaced to the agent in interfaces where they would be useful, with no classification or scoring of items as important or not important.
+    basis: guided
+    fingerprint: eaffddce674c
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:09
+    context: Reviewing an alteration on the review page (review d64ac586c7).
+    said: Kept the item as it now reads.
+    basis: guided
+    fingerprint: 86b0e5957927
 - id: CLI-14
-  text: The CLI shall record in the open change an agent's proposal that the engineer approve items, with the agent's reason.
+  text: The CLI shall record in the open change an agent's proposal that the engineer lock items, with the agent's reason.
   traces_to: SYS-38
-  origin: agent
   why: SYS-38 needs the proposals kept somewhere the engineer reviews, and the change record is that place.
+  basis: derived
 - id: CLI-15
   text: Every message and generated view shall name the toolkit's command in the form that runs it in the repository at hand.
   traces_to: SYS-25
-  origin: agent
   why: agents type what messages tell them. With the toolkit on the PATH, that is `spec` in every repository, and no message may name another form.
+  basis: derived
 - id: CLI-16
   text: Setup shall add to the host repository's instruction file a section, between markers, that tells every session to follow the skill.
   traces_to: SYS-5
-  origin: agent
   why: a session only loads the skill when something tells it to, and the instruction file is what every harness reads at the start.
+  basis: derived
 - id: CLI-17
   text: When an edit needs acknowledgments or has errors, the CLI shall accept the same edit again with only the acknowledgments added.
   traces_to: SYS-25
-  origin: agent
   why: sending a large batch again just to add acknowledgments costs tokens and invites copying mistakes.
+  basis: derived
 - id: CLI-18
   text: The CLI shall summarize in one command the open change, its open decisions, the alterations and proposals awaiting the engineer, and the check's result.
   traces_to: SYS-14
-  origin: agent
   why: an agent starting work, or an engineer catching up, otherwise has to piece this together from four commands.
+  basis: derived
 - id: CLI-19
   text: An edit's context shall show multi-line text with its lines intact.
   traces_to: SYS-30
-  origin: agent
   why: decision records use bullet lists, and flattening them into one line makes them unreadable.
+  basis: derived
 - id: CLI-20
-  text: For harnesses with permission rules, setup shall let agents run the toolkit's commands without asking, except the commands that record the engineer's words.
+  text: For harnesses with permission rules, setup shall let agents run the toolkit's commands without asking, except the commands that record a person's locks or decisions.
   traces_to: SYS-5
-  origin: agent
-  why: without the rules every check and edit waits for a click. Approving and resolving record the engineer's words, so the engineer sees and confirms each of those.
+  why: without the rules every check and edit waits for a click. Locking and resolving record what a person did, so the person sees and confirms each of those.
+  basis: derived
 - id: CLI-21
   text: Setup shall install the skill and the subagents once per machine, as links to the installed toolkit, instead of copying them into repositories.
   traces_to: SYS-5
-  origin: agent
   why: copies drift apart and fall behind the toolkit. The engineer noticed two copies of the skill, asked how updates would reach their other repositories, and chose the user-level location.
+  basis: derived
+- id: CLI-22
+  text: In spec-first mode, the CLI shall refuse an edit that changes the text of an item at the explicit or stated level unless the edit names a conflict a person resolved for that item, adds that person's request for the change as an intent record, or is declared a rewording.
+  traces_to: SYS-49
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: |-
+      Round 18: discussing how the toolkit should keep an agent from changing items a person locked or stated without first raising the conflict (SYS-49).
+    said: Agreed that such an edit should be refused rather than only warned about.
+    basis: guided
+    fingerprint: b48f2b0be44b
+- id: CLI-23
+  text: The CLI shall apply a block of feedback in the name of the person it names, recording each lock, unlock, choice, answer on an alteration and intent correction only where the item or decision still matches what the page showed, and reporting each entry it refuses.
+  traces_to: SYS-51
+  why: the CLI never interprets feedback, credits it to the person who gave it, and records nothing for content the person didn't see. Comments and change requests go into the open change for the agent (CHANGE-19).
+  basis: derived
+- id: CLI-24
+  text: For each section of the review page, the CLI shall print the same information as text and as structured data.
+  traces_to: SYS-47
+  why: the page and the commands draw on one library, so an agent can answer from what the person is looking at (DR-59).
+  basis: derived
+- id: CLI-25
+  text: The CLI shall generate the review page in one command and print the page's location.
+  traces_to: SYS-45
+  why: the agent hands the person a path or link at the end of each change.
+  basis: derived
+- id: CLI-26
+  text: The CLI shall print the spec differences between two versions as text or as structured data, comparing the working tree by default.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: |-
+      Round 18: planning the review page and its view of the differences.
+    said: Said that if the dashboard has a readable diff view, there should also be spec diff commands, so agents can read the differences in a form that suits them.
+    basis: guided
+    fingerprint: 262b8cbe0e2b
+- id: CLI-27
+  text: The CLI shall apply a feedback block given on standard input or in a file, whoever pasted or posted it.
+  traces_to: SYS-51
+  why: a block may arrive in the conversation or from a pull-request review, so the agent applies it; the block, not the machine, names the reviewer (CLI-23).
+  basis: derived
+- id: CLI-28
+  text: The CLI shall move a spec to the current format in one command, once agents have turned each person's words into intent records.
+  traces_to: SYS-35
+  basis: derived
+  why: what needs judgment, summarizing a person's words, is the agent's; the rest (locks, change records, the format's version) is mechanical, and every repository that used the older format needs it (DR-63).

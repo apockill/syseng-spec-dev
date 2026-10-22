@@ -79,22 +79,62 @@ _RULES = [
          "A link to an item that doesn't exist (or was retired) points readers nowhere.",
          "Fix the ID, or drop the reference."),
     Rule("T004", "requirement without verification", "", "", severity="todo"),
+    Rule("T005", "requirement skips a level of the system breakdown",
+         "Requirements flow down the system breakdown: a requirement on an element "
+         "refines one of its parent element's requirements, so the requirement tree has the same shape as the "
+         "element tree and every detail sits under the part of the system it belongs to.",
+         "Point `traces_to` at a requirement of the element's parent. If the parent has none that fits, give the "
+         "parent a requirement of its own for this one to refine.",
+         severity="todo"),  # an error where toolkit.yaml sets `flow_down: enforced` (DR-58)
     # --- attributes
     Rule("A001", "requirement without rationale",
          "The rationale is what an agent reads first when asked why a requirement exists.",
          "Add a `why` (or, for the engineer's own words, a `source`)."),
-    Rule("A002", "missing origin",
-         "Origin tells the engineer whether an item is their own words or an agent's proposal.",
-         "Set `origin: engineer` or `origin: agent`."),
-    Rule("A003", "unreviewed item", "", "", severity="todo"),
+    Rule("A002", "no intent and no basis",
+         "Every item says how directly a person asked for it: a person's intent on it, or where it came from.",
+         "Add the person's `intent:` with `spec edit`, or set `basis: derived` or `basis: added`."),
+    Rule("A003", "changed since a person locked, stated or guided it", "", "", severity="todo"),
     Rule("A004", "alteration awaiting the engineer's answer",
          "A change altered an item the engineer approved, wrote or decided, and they haven't kept it or had it "
          "rolled back.",
-         "Ask the engineer whether to keep it, giving the line that keeps it, such as `CHECK-3 LGTM`.",
+         "Ask the engineer whether to keep it. The review page shows it for them to keep or roll back.",
          severity="todo"),
     Rule("A005", "approval for an unknown item",
          "An approval that matches nothing can't protect anything.",
          "Remove the stale approval, or fix its ID."),
+    Rule("A006", "incomplete intent record",
+         "An intent record is signal only with its author, when it was said, what was being discussed, a summary of "
+         "what was said, whether it states or guides the item, and the content it was given for.",
+         "Give each record `by`, `when`, `context`, `said` and `basis` (stated or guided). Add intent through "
+         "`spec edit`, which fills in `by`, `when` and `fingerprint`."),
+    Rule("A007", "verbatim quote in an intent record",
+         "Intent records summarize what a person said, close to their words but never word for word, so "
+         "conversation stays out of what the repository publishes. Double quotation marks are the sign of a quote.",
+         "Rewrite the summary in the third person, keeping the person's hedges and strength and adding nothing they "
+         "didn't say. Single quotes and apostrophes are fine."),
+    Rule("A008", "invalid basis",
+         "An item's basis says where it came from when no person stated, guided or locked it: derived when something "
+         "above needs it, added when an agent added it unasked.",
+         "Set `basis: derived` or `basis: added`, or record the person's intent instead."),
+    Rule("A009", "field of the older format",
+         "This spec has moved to intent records and locks, so a person's words live only as summarized intent "
+         "records, and an agent's items say where they came from with a basis.",
+         "Replace `source`, `quotes` or `refines` with `intent:` records, `origin` with intent or a basis, and drop "
+         "`derived`; take `words` out of locks."),
+    Rule("A010", "invalid lock",
+         "A lock is a record of who locked which content, how and when; a malformed one can't show any of that.",
+         "Fix the field the message names. Locks are written by `spec lock`, which fills every field in."),
+    Rule("F001", "feedback not yet answered",
+         "A person's comment from the review page is steering; one that's never answered is lost, and their next "
+         "review page shows each comment with its response.",
+         "Do what the comment asks, or explain why not, then record it: `spec feedback respond F<n> \"...\"`."),
+    Rule("C001", "altered intent with no conflict raised",
+         "This change alters an item a person locked or stated, and nothing brings that to them with options. "
+         "In code-first mode the change goes ahead, so the end of the change is "
+         "where the conflict must be raised.",
+         "Raise it: `spec decide` with `kind: conflict`, `involves:` naming the item, and options such as keeping "
+         "the new text, rolling back, or rewording, one recommended. A pure rewording is declared with "
+         "`rewording: true` on the edit instead."),
     # --- verification items
     Rule("V001", "invalid verification item",
          "A verification item needs a method and a technique to be runnable and reviewable.",
@@ -104,9 +144,9 @@ _RULES = [
          "A verification item that points at a test that isn't there verifies nothing, and nobody notices.",
          "Fix the link to `path::name`, where the name is a pytest test (`test_x` or `TestThing::test_x`) or a "
          "GoogleTest (`Suite.Test`). If the test is gone, remove the link."),
-    Rule("R001", "rendered view out of date",
-         "The Markdown views are what the engineer reads; a stale view shows a spec that no longer exists.",
-         "Run `spec render`."),
+    Rule("R001", "stale Markdown view",
+         "The review page replaced the Markdown views; one left behind shows a spec that no longer exists.",
+         "Run `spec render`, which removes it, and `spec review` for the page."),
     # --- wording (MODEL-16, MODEL-17)
     Rule("W001", "not exactly one 'shall'",
          "One requirement, one obligation: a second 'shall' hides a second requirement that can't be traced, verified or approved on its own.",

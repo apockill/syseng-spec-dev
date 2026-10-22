@@ -62,6 +62,14 @@ A decision record, approval or verification item points at an ID that doesn't ex
 ### T004: requirement without verification (to-do)
 The requirement has no verification item yet. This is listed as a to-do, not an error. For requirements a change touches, the done gate will make it one.
 
+<a id="t005"></a>
+### T005: requirement skips a level of the system breakdown (to-do, or error where enforced)
+Requirements flow down the system breakdown. A requirement on an element refines one of its parent element's requirements; an element directly under the system refines a system requirement. The requirement tree then has the same shape as the element tree, and a detail such as "the player's feet are purple" sits under textures, under the player model, under characters, not near the top.
+- Point `traces_to` at a requirement of the element's parent.
+- If the parent has nothing that fits, give the parent a requirement of its own for this one to refine. Don't restate the parent's requirement.
+
+It's a to-do until `flow_down: enforced` is set in spec/toolkit.yaml, which new repositories start with. Then it's an error.
+
 ## Attributes
 
 <a id="a001"></a>
@@ -71,12 +79,21 @@ The rationale is what an agent reads first when someone asks why a requirement e
 - If an agent proposed it, set `why` to the reasoning.
 
 <a id="a002"></a>
-### A002: missing origin
-`origin` says whose idea an item is: `engineer` (from their words) or `agent` (a proposal). The review page uses it to show the engineer what to read.
+### A002: no intent and no basis
+Every item says how directly a person asked for it. A person's words go on it as `intent:` records; an item no person asked for says where it came from with `basis: derived` (something above needs it) or `basis: added` (an agent's own idea). Verification items count as derived. In a spec not yet migrated, `origin: engineer` or `origin: agent` still counts.
 
 <a id="a003"></a>
-### A003: unreviewed item (to-do)
-Nothing covers this item: neither it nor anything above it in the trace graph is approved, or it changed after the engineer approved it. An item under an approved item is delegated, and isn't a to-do. Approvals are recorded by `spec approve`, only from the engineer's own words.
+### A003: changed since a person locked, stated or guided it (to-do)
+A person locked this item, asked for it, or shaped it, and its content has changed since their newest record. The item keeps its level until they answer: they keep it as it is now (a new lock or intent record), or it goes back to what they gave.
+
+Every item has a level of intent, computed each time:
+- **explicit:** a person locked it by name;
+- **stated:** a person asked for it, and what they said, taken alone, says what it requires;
+- **guided:** a person's choice or constraint fixed it without saying it;
+- **derived:** something above it needs it, and no person addressed it;
+- **added:** an agent added it unasked, and nothing a person gave needs it.
+
+Derived and added items are the agent's to change. They aren't to-dos.
 
 <a id="a004"></a>
 ### A004: alteration awaiting the engineer's answer (to-do)
@@ -85,6 +102,53 @@ A change altered an item the engineer approved, wrote or decided, and they haven
 <a id="a005"></a>
 ### A005: approval for an unknown item
 An approval names an item that doesn't exist. Remove it, or fix the ID.
+
+<a id="a006"></a>
+### A006: incomplete intent record
+An intent record says what a person asked for, as a summary on the item it shapes. Each record needs:
+- `by`: the person, as `Name <email>`;
+- `when`: the date and time they said it;
+- `context`: what was being discussed and what prompted it, adding no claim they didn't make;
+- `said`: what they said, summarized close to their words;
+- `basis`: `stated` when what they said, taken alone, says what the item requires, or `guided` when their choice or constraint fixed it. When unsure, use the lower level;
+- `fingerprint`: the item's content when the record was made.
+
+Add intent with `spec edit` (`intent:` on an add or modify). It fills in `by`, `when` and `fingerprint`.
+
+<a id="a007"></a>
+### A007: verbatim quote in an intent record
+Intent records summarize. They keep the person's hedges and strength ("probably", "must"), add no number or mechanism they didn't give, and say what they left open when they said so. They never quote word for word, so conversation stays out of what the repository publishes. Double quotation marks are taken as the sign of a quote; single quotes and apostrophes are fine.
+
+<a id="a008"></a>
+### A008: invalid basis
+An item no person stated, guided or locked says where it came from: `basis: derived` when something above it needs it, or `basis: added` when an agent added it on its own initiative. Added items are the most freely changed in a refactor, and the review page lists them for a person to keep or cut.
+
+<a id="a009"></a>
+### A009: field of the older format
+After `spec migrate`, a spec keeps a person's words only as intent records: summarized, attributed, never quoted. Older fields are gone:
+- `source`, `quotes` and `refines` become `intent:` records;
+- `origin: engineer` becomes intent, and `origin: agent` becomes `basis: derived` or `basis: added`;
+- the `derived` mark is retired, because every requirement traces to its parent's;
+- locks hold no `words`, only a summary an agent adds, and their time is `locked_at`.
+
+<a id="a010"></a>
+### A010: invalid lock
+A lock records who locked which content, how and when: `id`, `fingerprint`, `locked_at`, `by` (as `Name <email>`), `via` (terminal, chat, menu, page or restated), and optionally `batch`, `said` (a summary an agent adds), `note`, `after`, `text` and `migrated_from`. `spec lock` writes every field; fix the one the message names.
+
+<a id="f001"></a>
+### F001: feedback not yet answered
+A person sent feedback from the review page, and one of its comments, corrections or roll-back requests has no response in the open change. Do what it asks, or explain why not, then record it with `spec feedback respond F<n> "..."`. Their next review page shows each comment with its response.
+
+## Conflicts
+
+<a id="c001"></a>
+### C001: altered intent with no conflict raised
+This change altered an item a person locked or stated, and nothing brings that to them. In code-first mode the change goes ahead, so the end of the change is where it's raised:
+- `spec decide` with `kind: conflict`, `involves:` naming the item, and options, such as keeping the new text, rolling back, or rewording, with one recommended and each showing the text it would give;
+- or, when the meaning didn't change, mark the edit `rewording: true`;
+- or, when the person asked for this very change, add their request to the edit as `intent:` with basis stated.
+
+In spec-first mode, `spec edit` refuses such an edit until the person has chosen an option, and the edit names it with `conflict: D<n>`.
 
 ## Verification items
 
@@ -103,8 +167,8 @@ A verification item needs:
 A verification item links a test that doesn't exist: the file is missing, or the file has no test by that name. A link is `path` or `path::name`, resolved against the implementation's root. In a Python file the name is a pytest test (`test_x`, or `TestThing::test_x`, with any `[parameters]` ignored). In a C++ file it's a GoogleTest (`Suite.Test`, declared with `TEST`, `TEST_F`, `TEST_P` or `TYPED_TEST`). In any other file, the name only has to appear in it. Fix the link, or remove it if the test is gone.
 
 <a id="r001"></a>
-### R001: rendered view out of date
-`requirements.md` and `decisions.md` are generated. A stale view shows the engineer a spec that no longer exists. Run `spec render`, and never edit the views by hand.
+### R001: stale Markdown view
+The review page replaced the generated Markdown views. A `requirements.md`, `decisions.md` or change-record `.md` left in spec/ shows a spec that no longer exists. `spec render` removes it; `spec review` writes the page.
 
 ## Wording
 

@@ -126,7 +126,7 @@ def test_hermes_gets_its_link_and_the_note_that_no_hooks_run(repo, machine):
 def test_the_instructions_say_what_each_harness_hooks_do(repo, machine):
     init.run(repo, ["claude-code", "hermes"])
     text = (repo / "AGENTS.md").read_text()
-    for hook in ("Spec guard", "Done gate", "Approval reader"):
+    for hook in ("Spec guard", "Done gate", "Lock reader"):
         assert hook in text
     assert "In other harnesses no toolkit hooks run" in text
 
@@ -192,3 +192,25 @@ def test_agents_may_run_the_everyday_commands_without_asking(repo, machine):
     assert "Bash(spec edit *)" in allow and "Bash(spec status *)" in allow
     assert not [r for r in allow if "approve" in r or "resolve" in r]   # those record the engineer's words
     assert len(allow) == len(set(allow))
+
+
+def test_a_toolkit_installed_with_nix_is_linked_through_the_profile(tmp_path, monkeypatch):
+    store = tmp_path / "nix/store"
+    pkg = store / "abc123-syseng-0.1.0" / "lib/python3.13/site-packages/syseng/skill"
+    pkg.mkdir(parents=True)
+    profile = tmp_path / "profile"
+    (profile / "lib/python3.13/site-packages").mkdir(parents=True)
+    (profile / "lib/python3.13/site-packages/syseng").symlink_to(pkg.parent)
+    monkeypatch.setattr(init, "NIX_STORE", str(store) + "/")
+    monkeypatch.setattr(init, "profile_roots", lambda: [tmp_path / "nowhere", profile])
+    assert init.stable(pkg) == profile / "lib/python3.13/site-packages/syseng/skill"   # follows `nix profile upgrade`
+    elsewhere = tmp_path / "checkout/src/syseng/skill"
+    assert init.stable(elsewhere) == elsewhere                                          # a checkout is linked as is
+    monkeypatch.setattr(init, "profile_roots", lambda: [])
+    assert init.stable(pkg) == pkg                                                      # no profile: the store path
+
+
+def test_text_after_the_section_survives_a_refresh_unchanged():
+    after = "\n## Our own notes\n\nKeep these.\n"
+    text = init.merge_instructions("# Project\n") + after
+    assert init.merge_instructions(text) == text                                       # CLI-10: other text unchanged

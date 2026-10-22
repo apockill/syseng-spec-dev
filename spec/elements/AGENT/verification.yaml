@@ -3,7 +3,6 @@
   - AGENT-40
   method: test
   technique: unit test
-  origin: agent
   description: An open decision is refused unless it says why it ranks where it does.
   tests:
     python:
@@ -13,7 +12,6 @@
   - AGENT-20
   method: test
   technique: unit test
-  origin: agent
   description: An agent's edit or write to each kind of file the toolkit manages is refused, and the refusal names the command to use instead. Edits to the toolkit's settings file, hand-written pages and code pass. Shell commands that redirect into, tee into, edit in place, remove, move or copy over a managed file are refused. Reading those files and running the toolkit pass.
   tests:
     python:
@@ -26,7 +24,6 @@
   - AGENT-12
   method: test
   technique: integration test
-  origin: agent
   description: When the agent stops while the spec has errors, the stop hook sends it back once with each finding in the checker's format, as feedback rather than an error. When the agent is already continuing because of that, the hook lets it stop. With no errors the agent stops without a message. On a machine without the toolkit, the engineer gets a notice instead.
   tests:
     python:
@@ -40,26 +37,23 @@
   - AGENT-43
   method: test
   technique: integration test
-  origin: agent
-  description: A line that approves items by ID records each item's approval, with the whole message as the engineer's words, marked as given in chat, and the agent is told what was recorded. Such a line either starts with "approve" or is only IDs followed by "LGTM", and it may be any line of a longer message. Lines that approve "everything", give an exception by description, or mix IDs with other words record nothing, and the agent is told to confirm the exact list. "lgtm" without IDs, quoted lines, pasted text, capitalized words that aren't elements, and unknown IDs record nothing.
+  description: A line that locks items by ID records each item's lock, with no words but a note that the prompt hook recorded it, marked as given in chat, and the agent is told what was recorded. Such a line either starts with "approve" or "lock", or is only IDs followed by "LGTM", and it may be any line of a longer message. Lines that lock "everything", give an exception by description, or mix IDs with other words record nothing, and the agent is told to confirm the exact list. "lgtm" without IDs, quoted lines, pasted text, capitalized words that aren't elements, and unknown IDs record nothing.
   tests:
     python:
     - tests/test_hooks.py::test_approvals_that_name_items_by_id_are_read
     - tests/test_hooks.py::test_approvals_that_need_interpreting_are_not_read
     - tests/test_hooks.py::test_lines_that_approve_no_items_are_ignored
-    - tests/test_hooks.py::test_chat_approval_is_recorded_with_the_engineers_words
+    - tests/test_hooks.py::test_chat_approval_is_recorded_without_the_engineers_words
     - tests/test_hooks.py::test_approval_on_any_line_of_a_longer_message
     - tests/test_hooks.py::test_quoted_lines_are_not_approvals
     - tests/test_hooks.py::test_described_exceptions_record_nothing
     - tests/test_hooks.py::test_lgtm_is_not_an_approval
     - tests/test_hooks.py::test_pasted_text_is_not_the_engineers_approval
-    - tests/test_hooks.py::test_unknown_ids_record_nothing
 - id: AGENT-V5
   verifies:
   - AGENT-42
   method: inspection
   technique: unit test
-  origin: agent
   description: No page of the skill names an agent harness, a harness's own tools or instruction files, or Nix. The skill's front matter follows the Agent Skills format. Every toolkit command that the skill and the subagents name exists.
   tests:
     python:
@@ -71,7 +65,6 @@
   - AGENT-45
   method: inspection
   technique: unit test
-  origin: agent
   description: The skill has a section that invites agents to improve it, and that section names the command for reporting friction.
   tests:
     python:
@@ -81,7 +74,6 @@
   - AGENT-46
   method: test
   technique: unit test
-  origin: agent
   description: Reporting friction records the workaround and the proposed improvement in the open change, where the engineer reads them.
   tests:
     python:
@@ -92,23 +84,12 @@
   - AGENT-49
   method: test
   technique: integration test
-  origin: agent
-  description: For a harness without hooks, the instruction-file section says that none run and that recording approvals, editing through the CLI and checking before reporting are the agent's job. With Claude Code set up too, it also names each hook and what it does. The skill has no placeholders, so it's installed exactly as written.
+  description: For a harness without hooks, the instruction-file section says that none run and that recording locks, editing through the CLI and checking before reporting are the agent's job. With Claude Code set up too, it also names each hook and what it does. The skill has no placeholders, so it's installed exactly as written.
   tests:
     python:
     - tests/test_init.py::test_hermes_gets_its_link_and_the_note_that_no_hooks_run
     - tests/test_init.py::test_the_instructions_say_what_each_harness_hooks_do
     - tests/test_skill.py::test_the_skill_is_installed_as_is
-- id: AGENT-V9
-  verifies:
-  - AGENT-48
-  method: inspection
-  technique: unit test
-  origin: agent
-  description: The skill tells agents to give the engineer the exact line that records an approval.
-  tests:
-    python:
-    - tests/test_skill.py::test_skill_tells_agents_to_give_the_exact_approval_line
 - id: AGENT-V10
   verifies:
   - AGENT-50
@@ -120,8 +101,7 @@
   - AGENT-56
   method: inspection
   technique: unit test
-  origin: agent
-  description: The skill tells agents to propose items for approval, most consequential first; to ask about each alteration with the line that keeps it; to quote the engineer's reasoning with a context line that only frames it; to place requirements by the system element they constrain; to add the engineer's words to the items that already cover a request; and to record restatements as approvals.
+  description: The skill tells agents to propose items for locking, most consequential first; to ask about each alteration with the lock line that keeps it; to summarize the engineer's reasoning with a context that adds no claim; to place requirements by the system element they constrain; to add a request as intent to the items that already cover it, including a restatement; to record the lower level when unsure; to record a requirement for each feature they add unasked; and to look for conflicts with locked or stated items.
   tests:
     python:
     - tests/test_skill.py::test_skill_teaches_the_approval_model
@@ -130,9 +110,8 @@
   - AGENT-57
   method: test
   technique: unit test
-  origin: agent
   description: |-
-    "Core 13 LGTM.", "need 16 LGTM" and "approve dr 4 and Core 2" approve the items they name when CORE is a system element. "Round 12 LGTM" approves nothing.
+    "Core 13 LGTM.", "need 16 LGTM" and "approve dr 4 and Core 2" lock the items they name when CORE is a system element. "Round 12 LGTM" locks nothing.
   tests:
     python:
     - tests/test_hooks.py::test_ids_written_out_in_words_are_read
@@ -145,6 +124,14 @@
   - REASON-5
   method: demonstration
   technique: manual
-  origin: agent
   description: |-
-    In headless Claude Code sessions in a scratch repository set up by `spec init`, whose spec has one wording error: finishing a turn brings the error back as feedback, an Edit to a spec file is refused with the command to use, "need 1 lgtm" records NEED-1's approval in chat, and the reasoning-check subagent's search of the whole repository is refused.
+    In headless Claude Code sessions in a scratch repository set up by `spec init`, whose spec has one wording error: finishing a turn brings the error back as feedback, an Edit to a spec file is refused with the command to use, "need 1 lgtm" records NEED-1's lock in chat, and the reasoning-check subagent's search of the whole repository is refused.
+- id: AGENT-V13
+  verifies:
+  - AGENT-62
+  method: inspection
+  technique: unit test
+  description: The skill tells agents to hand over the review page at the end of each change, to apply a pasted feedback block as it is, and to answer each feedback item.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_teaches_the_approval_model

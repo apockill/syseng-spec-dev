@@ -1,0 +1,72 @@
+request: |-
+  Phase 3 of round 18's plan: a spec diff between any two versions (working tree, revision, branch merge base, last review) as one library that the CLI prints for agents and the review page will render
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-21'
+entries:
+- op: modify
+  id: DIFF-3
+  at: 2026-10-21T13:45-07:00
+  reason: a change to a rationale or a test link fitted none of the classes; built in round 21.
+  before:
+    text: |-
+      The comparison shall report, for each differing item, each of these that applies: added, removed, moved to another parent, changed in meaning, reworded, or changed in intent only.
+    why: An item can move and change at once, so several apply. A parent is the requirement an item traces to, or an element's parent element. Reworded means a text change its change record declared a rewording; any other change to fingerprinted content is a change in meaning. Changed in intent only means only its locks or intent records changed.
+  after:
+    text: |-
+      The comparison shall report, for each differing item, each of these that applies: added, removed, moved to another parent, changed in meaning, reworded, changed in intent only, or changed in details only.
+    why: An item can move and change at once, so several apply. A parent is the requirement an item traces to, or an element's parent element. Reworded means a text change its change record declared a rewording; any other change to fingerprinted content is a change in meaning. Changed in intent only means only its locks, intent records or basis changed; changed in details only means only fields that carry no meaning changed, such as a rationale or a test link.
+  acks:
+    DR-59: still holds; the details class is one more class the same comparison reports
+- op: add
+  id: DIFF-V1
+  at: 2026-10-21T13:45-07:00
+  reason: verifies DIFF-3 to DIFF-5.
+  after:
+    verifies:
+    - DIFF-3
+    - DIFF-4
+    - DIFF-5
+    - SYS-48
+    method: test
+    technique: unit test
+    description: Against the last commit, a locked requirement changed in meaning is reported with its reason, its level on both sides and a flag that it alters what a person locked; a declared rewording is reported as reworded; an item that only gained intent is changed in intent only; a new item is added with its level. An item that moved and changed gets both classes. A verification item changed while what it verifies didn't is flagged.
+    tests:
+      python:
+      - tests/test_diff.py::test_each_differing_item_gets_its_classes_reasons_and_levels
+      - tests/test_diff.py::test_a_move_and_a_change_are_both_reported
+      - tests/test_diff.py::test_a_verification_item_changed_on_its_own_is_flagged
+- op: add
+  id: DIFF-V2
+  at: 2026-10-21T13:45-07:00
+  reason: verifies DIFF-1 and DIFF-2.
+  after:
+    verifies:
+    - DIFF-1
+    - DIFF-2
+    method: test
+    technique: unit test
+    description: Comparing a feature branch with main uses their merge base, so newer work on main doesn't appear; comparing leaves the working tree's status unchanged; an unknown name is an error.
+    tests:
+      python:
+      - tests/test_diff.py::test_a_branch_is_compared_at_its_merge_base
+      - tests/test_diff.py::test_comparing_leaves_the_working_tree_alone
+      - tests/test_diff.py::test_an_unknown_name_is_an_error
+- op: add
+  id: CLI-V15
+  at: 2026-10-21T13:45-07:00
+  reason: verifies CLI-26.
+  after:
+    verifies:
+    - CLI-26
+    method: test
+    technique: unit test
+    description: The diff command prints the differences as text, grouped by element with each item's classes, level and reasons, and as YAML with counts and items. Since a person's last review, it compares against the revision their review was made from, and says so when they haven't sent one.
+    tests:
+      python:
+      - tests/test_diff.py::test_the_cli_prints_text_and_yaml
+      - tests/test_diff.py::test_since_review_compares_against_the_revision_the_page_was_made_from
+decisions: []
+friction: []
+closed: '2026-10-21'

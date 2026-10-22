@@ -1,17 +1,25 @@
 - id: INTEG-1
   text: An integration-test item shall run its declared commands.
-  origin: engineer
-  traces_to: SYS-10
-  source: |-
-    "'INTEGRATION TEST' which would be a combination of 'run XYZ COMMANDS'"
+  traces_to: VERIFY-2
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+    said: Described an integration test as a combination of running some commands and perhaps reasoning about them.
+    basis: stated
+    fingerprint: 8ce24899f508
 - id: INTEG-2
   text: Where an integration-test item declares a reasoning step, the technique shall judge the commands' output with a reasoning check.
-  origin: engineer
-  traces_to: SYS-10
-  source: |-
-    "and perhaps 'REASON' about them"
+  traces_to: VERIFY-2
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+    said: Described an integration test as a combination of running some commands and perhaps reasoning about them.
+    basis: guided
+    fingerprint: d66b8eb24e15
 - id: INTEG-3
   text: An integration-test item shall pass only when each command's exit status and output meet the item's declared expectations.
-  origin: agent
-  traces_to: SYS-10
+  traces_to: VERIFY-2
   why: without declared expectations, "passed" only means "didn't crash".
+  basis: derived

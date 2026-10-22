@@ -10,11 +10,8 @@ entries:
   at: 2026-10-17T22:53-07:00
   reason: the engineer's report of where SYS-30 wasn't met.
   after:
-    quotes:
-    - said: 2026-10-17 22:47
-      words: |-
-        The UX for the round 12 record isn't really useful. CUJ: In '## Proposed for your explicit approval' You state 'change-13' and give a brief truncated description, but I'm not really sure of the full context, or the full text. I then had to ctrl-f change 13, and read it, then scroll all the way back to the top to the '## Proposed for your explicit approval' section.
-      context: Reviewing round 12's change record, whose proposals section broke this requirement.
+    quotes: |-
+      [verbatim words removed when this spec moved to intent records]
 - op: add
   id: REVIEW-18
   at: 2026-10-17T22:53-07:00
@@ -23,10 +20,8 @@ entries:
     text: Each item the change record asks the engineer to approve or answer for shall be shown in full, with its parent and rationale for a requirement, and with its context, decision, alternatives, consequences and the requirements it decides for a decision record.
     traces_to: SYS-30
     origin: engineer
-    quotes:
-    - said: 2026-10-17 22:47
-      words: You state 'change-13' and give a brief truncated description, but I'm not really sure of the full context, or the full text. I then had to ctrl-f change 13, and read it, then scroll all the way back to the top to the '## Proposed for your explicit approval' section.
-      context: Reviewing round 12's change record.
+    quotes: |-
+      [verbatim words removed when this spec moved to intent records]
 - op: add
   id: REVIEW-19
   at: 2026-10-17T22:53-07:00
@@ -35,10 +30,8 @@ entries:
     text: Wherever the change record shows an item for the engineer to approve or answer for, it shall list with their titles the other items that the shown text mentions.
     traces_to: SYS-30
     origin: engineer
-    quotes:
-    - said: 2026-10-17 22:47
-      words: dr-47, similar to change-13, but I couldn't remember the exact context for it. CHECK-18 or CHECK-19 for example.
-      context: Reviewing round 12's change record.
+    quotes: |-
+      [verbatim words removed when this spec moved to intent records]
 - op: add
   id: AGENT-57
   at: 2026-10-17T22:53-07:00
@@ -129,6 +122,10 @@ decisions:
     detail: Today's rule. Nothing slips past you, at the cost of reading mechanics like DR-45 and DR-48.
   - label: Never
     detail: Agent decision records stay as memory only. Choices that matter to you would have to surface as requirements or open decisions instead.
-  status: open
+  status: resolved
+  chosen: Only those whose consequences reach you
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose Only those whose consequences reach you on the review page (summary)
+  resolved: '2026-10-21'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
 friction: []
 closed: '2026-10-17'

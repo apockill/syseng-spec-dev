@@ -38,8 +38,10 @@ def test_the_skill_is_installed_as_is():
         assert "hooks" in notes.read_text()
 
 
-def test_skill_tells_agents_to_give_the_exact_approval_line():
-    assert "give them the exact line that records it" in (init.SKILL / "SKILL.md").read_text()
+def test_skill_teaches_locks_without_a_ritual():
+    text = (init.SKILL / "SKILL.md").read_text()
+    assert "Locks belong to the engineer" in text and "never their exact words" in text
+    assert "a general \"looks good\" locks nothing" in text
 
 
 def test_skill_invites_agents_to_improve_it():
@@ -72,7 +74,12 @@ def test_auditor_subagent_is_described():
 def test_skill_teaches_the_approval_model():
     text = (init.SKILL / "SKILL.md").read_text()
     assert "spec propose" in text and "most consequential first" in text          # AGENT-51
-    assert "the line that keeps it" in text                                            # AGENT-52
-    assert "not just their \"yes\"" in text and "says only what was being discussed" in text  # AGENT-53, AGENT-54
+    assert "whose consequences reach the engineer" in text and "no substitute for your judgment" in text
+    assert "which they keep on the page (or with `lock <ID>`)" in text                 # AGENT-52
+    assert "Run `spec review`" in text and "spec feedback apply" in text and "spec feedback respond" in text  # AGENT-62, SYS-52
+    assert "not just their \"yes\"" in text and "adds no claim they didn't make" in text  # AGENT-53, AGENT-54
     assert "Place each requirement under the system element it constrains" in text     # AGENT-55
-    assert "add the engineer's words to them" in text and "--via <chat|menu|restated>" in text  # AGENT-56, AGENT-50
+    assert "add the request to them as intent" in text and "or restate one" in text     # AGENT-56, AGENT-50
+    assert "record the lower level" in text and "Summarize, never quote" in text        # AGENT-63, SYS-35
+    assert "with `basis: added`) for each feature a user would notice" in text          # AGENT-60
+    assert "Look for conflicts" in text and "kind: conflict" in text                   # AGENT-61, CHANGE-17

@@ -27,7 +27,7 @@ def test_rewording_unapproves_but_relinking_does_not(spec):
 
 def test_merge_check_never_fails_because_of_approvals(spec, capsys):
     root = spec.write()
-    assert "A003" in spec.codes(severity="todo")       # nothing is approved, so everything is unreviewed
+    assert "A003" not in spec.codes(severity="todo")   # nothing a person gave has changed since
     assert cli.main(["--spec", str(root), "check", "--merge"]) == 0
     assert "No alteration awaits the engineer's answer." in capsys.readouterr().out
 

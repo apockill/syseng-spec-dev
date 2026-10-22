@@ -13,7 +13,7 @@ entries:
     text: The toolkit shall install and run on machines without Nix.
     origin: engineer
     source: |-
-      "Let's not overindex too much on nix. Most users of this might not use nix, after all." (round 11, replying to a friction report)
+      [verbatim words removed when this spec moved to intent records]
 - op: add
   id: CLI-9
   reason: slice 3 builds `spec init`.
@@ -383,7 +383,7 @@ entries:
     traces_to: SYS-27
     origin: engineer
     source: |-
-      "the framework must still work without the hooks, the hooks are convenience and guardrails to improve experience, but should not be core. I'm using hermes agent for some coding, and other times it defers to claude code. When hermes uses the system it should still work, but obviously the claude code one will be less likely to make mistakes due to the harnesses, etc." (2026-10-17, deciding to keep the Claude Code hooks)
+      [verbatim words removed when this spec moved to intent records]
 - op: add
   id: AGENT-48
   reason: the engineer's words in round 11.
@@ -392,7 +392,7 @@ entries:
     traces_to: SYS-14
     origin: engineer
     source: |-
-      "Those sessions are okay, as long as the agent knows about them and can tell me things like "please state Approve" and "LGTM" for the specific items. That way I know what to do and can be trained into it." (2026-10-17; "those sessions" are the Claude Code session hooks)
+      [verbatim words removed when this spec moved to intent records]
 - op: add
   id: AGENT-49
   reason: the engineer's words in round 11.
@@ -401,7 +401,7 @@ entries:
     traces_to: SYS-29
     origin: engineer
     source: |-
-      "Those sessions are okay, as long as the agent knows about them" (2026-10-17; "those sessions" are the Claude Code session hooks)
+      [verbatim words removed when this spec moved to intent records]
 - op: add
   id: AGENT-V8
   reason: verifies the harness notes.
@@ -464,7 +464,8 @@ decisions:
     detail: Menus only resolve decisions. Approvals come from a typed "approve <IDs>" message, your terminal, or the review page. Safest and slowest, and different from how you've approved so far.
   status: resolved
   chosen: The agent, quoting the menu
-  words: What menu? Like on a website interface we build for this, or a tool call that presents a menu? Either way, I think it doesn't matter? What matters is that in the future we can see WHO approved it and HOW.
+  words: |-
+    [verbatim words removed when this spec moved to intent records]
   resolved: '2026-10-17'
 friction:
 - workaround: Toolkit messages name commands as `spec …` (for example "list them with `spec check --todo`"), but agents in a set-up repository run `.syseng/spec`; an agent following a message literally gets 'command not found' and has to translate.

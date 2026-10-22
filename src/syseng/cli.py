@@ -1,9 +1,9 @@
 """The `spec` command (CLI-1).
 
   spec check [--merge] [--todo] [--json]   report everything unfinished (CHECK-1)
-  spec render                               regenerate the Markdown views
+  spec render                               write the review page (and remove old Markdown views)
   spec show ID                              one item: trace, children, verification, history
-  spec approve ID... --words TEXT [--via]   record the engineer's approval, with who and how (SYS-33)
+  spec lock ID... [--words TEXT] [--via]    record a person's lock, with who and how (SYS-33); alias: approve
   spec propose ID... --why TEXT             propose items for the engineer's explicit approval (SYS-38)
   spec change start|close|show              open and close the change record edits are logged in
   spec edit [--dry-run] < edits.yaml        change the spec (CLI-5 to CLI-8)
@@ -11,20 +11,23 @@
   spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12)
   spec friction --workaround … --proposal … report friction with the toolkit (AGENT-46)
   spec init [--harness NAME]                set up a repository in one step (SYS-5)
+  spec migrate [--dry-run]                  move the spec to the current format, after agents convert words
+  spec diff [OLDER] [NEWER] [--since-review] [--format text|yaml]   what changed in the spec (SYS-48)
+  spec review [--against REV] [--section NAME --format text|yaml]  the review page, or one section of it
+  spec feedback apply|respond|list          apply a review page's feedback block; answer its comments
 
 Run from anywhere inside a repository that has spec/toolkit.yaml, or pass --spec DIR.
 """
 
 import argparse
 import datetime
-import getpass
 import json
 import re
-import subprocess
 import sys
 from pathlib import Path
 
-from syseng import changes, edit, fingerprint, init, model, render, review, yamlio
+from syseng import (changes, diff, edit, feedback, fingerprint, init, levels, migrate, model, page, pagedata, people,
+                    render, review, yamlio)
 from syseng import check as checker
 
 
@@ -55,17 +58,19 @@ def cmd_check(args) -> int:
                   else "No alteration awaits the engineer's answer.")
             for cid, alt in pending:
                 print(f"  {changes._label(spec, alt['id'])}: {' and '.join(alt['reasons'])}; altered in {cid}. "
-                      f"Keep it: `{alt['id']} LGTM`")
+                      f"Keep it: `lock {alt['id']}`")
             print()
         print(checker.summarize(findings))
     return 1 if any(f.severity == "error" for f in findings) else 0
 
 
 def cmd_render(args) -> int:
+    """Removes Markdown views from before the review page, then writes the page (DR-60)."""
     spec = _load(args)
-    written = render.write_views(spec)
-    print("\n".join(f"wrote {p.relative_to(spec.root.parent)}" for p in written) or "views already up to date")
-    return 0
+    for p in render.write_views(spec):
+        print(f"removed {p.relative_to(spec.root.parent)}, a Markdown view the review page replaced")
+    args.against, args.person, args.out, args.section, args.format = None, None, None, None, "text"
+    return cmd_review(args)
 
 
 def cmd_show(args) -> int:
@@ -84,13 +89,19 @@ def cmd_show(args) -> int:
         print(f"{iid} was retired: {retired[0].get('note')}" if retired else f"{iid}: no such item")
         return 1
     d = item.data
-    print(f"{iid} [{item.kind}, in {item.element}, origin {d.get('origin') or d.get('decided_by')}, "
-          f"approval: {review.state_of(spec, iid).state}]")
+    print(f"{iid} [{item.kind}, in {item.element}, level of intent: {levels.describe(spec, iid)}]")
     print(f"  {d.get('text') or d.get('title') or d.get('description', '')}")
     print(f"  attention: {review.describe(spec, iid)}")
     for a in review.history(spec, iid):
-        print(f"  approved {a.get('approved_at') or a.get('approved_on')} by {a.get('by', 'the engineer')} via "
-              f"{a.get('via')}: {' '.join(str(a.get('words', '')).split())}")
+        said = " ".join(str(a.get("words", "")).split())
+        print(f"  locked {a.get('locked_at') or a.get('approved_at') or a.get('approved_on')} by "
+              f"{a.get('by', 'the engineer')} via "
+              f"{a.get('via')}" + (f": {said}" if said else ""))
+    for r in levels.intent_records(d):  # SYS-39: what a person said about it, and when
+        print(f"  {r.get('basis')} by {r.get('by')}, {r.get('when')}: {' '.join(str(r.get('said', '')).split())} "
+              f"[{' '.join(str(r.get('context', '')).split())}]")
+    if d.get("basis"):
+        print(f"  basis: {d['basis']}")
     for key in ("source", "why", "refines", "context", "decision"):
         if d.get(key):
             print(f"  {key}: {' '.join(str(d[key]).split())}")
@@ -131,10 +142,6 @@ def _print_history(spec: model.Spec, iid: str) -> None:
         for e in change.data.get("entries") or []:
             if e.get("id") == iid:
                 print(f"  history: {e.get('op')} in {change.id}: {e.get('reason', '')}")
-    yaml_named = {c.path.with_suffix(".md").name for c in changes.all_changes(spec)}
-    for md in sorted((spec.root / "changes").glob("*.md")):
-        if md.name not in yaml_named and re.search(rf"\b{re.escape(iid)}\b", md.read_text()):
-            print(f"  mentioned in changes/{md.name}")
 
 
 def _expand(ids: list[str]) -> list[str]:
@@ -149,16 +156,6 @@ def _expand(ids: list[str]) -> list[str]:
     return out
 
 
-def _approver(repo: Path) -> str:
-    """CLI-11: the version-control user name, else the login name."""
-    try:
-        name = subprocess.run(["git", "config", "user.name"], cwd=repo, capture_output=True, text=True,
-                              timeout=10).stdout.strip()
-    except (OSError, subprocess.TimeoutExpired):
-        name = ""
-    return name or getpass.getuser()
-
-
 def _settled(spec: model.Spec, iid: str) -> list[str]:
     """CLI-12: the resolved decisions that involved an item, so its approval shows what was discussed first."""
     return [f"{c.id} {d.get('id')}" for c in changes.all_changes(spec) for d in c.data.get("decisions") or []
@@ -170,24 +167,26 @@ def cmd_approve(args) -> int:
     ids = list(dict.fromkeys(_expand(args.ids)))
     missing = [i for i in ids if i not in spec.items and i not in spec.elements]
     if missing:
-        print(f"spec approve: unknown IDs: {', '.join(missing)}; nothing recorded")
+        print(f"spec lock: unknown IDs: {', '.join(missing)}; nothing recorded")
         return 1
     now = datetime.datetime.now().astimezone().isoformat(timespec="minutes")
-    by = args.by or _approver(spec.root.parent)
+    by = args.by or people.person(spec.repo_root())[0]  # CLI-11
     records = list(spec.approvals)  # every approval is kept, oldest first (MODEL-35)
     for iid in ids:
         kind, data = review.kind_and_data(spec, iid)
-        record = {"id": iid, "fingerprint": fingerprint.of(kind, data), "approved_at": now, "by": by,
-                  "via": args.via, "batch": len(ids), "words": args.words}
+        record = {"id": iid, "fingerprint": fingerprint.of(kind, data), "locked_at": now, "by": by,
+                  "via": args.via, "batch": len(ids)}
+        if args.words:  # a summary of what the person said; records made mechanically hold none (MODEL-34)
+            record["words"] = args.words
         if args.note:
             record["note"] = args.note
         if _settled(spec, iid):
             record["after"] = _settled(spec, iid)
         record["text"] = fingerprint.summary(kind, data)
         records.append(record)
-    records.sort(key=lambda a: (render._id_key(a["id"]), str(a.get("approved_at") or a.get("approved_on") or "")))
-    yamlio.write(spec.root / "approvals.yaml", records)
-    print(f"approved {len(ids)} item{'s' if len(ids) != 1 else ''}:")
+    records.sort(key=lambda a: (render._id_key(a["id"]), levels.when(a)))
+    yamlio.write(spec.locks_path(), records)
+    print(f"locked {len(ids)} item{'s' if len(ids) != 1 else ''}:")
     for iid in ids:
         print(f"  {changes._label(spec, iid) if iid in spec.items else f'{iid} ({spec.elements[iid].title})'}")
     render.write_views(model.load(spec.root))
@@ -223,6 +222,9 @@ def cmd_change(args) -> int:
             c = changes.current(spec)
             if c is None:
                 print("no change is open")
+                return 0
+            if args.full:  # the whole record as text: what an engineer would read, for an agent too (SYS-47)
+                print(changes.view(spec, c), end="")
                 return 0
             print(f"{c.id}: {c.data.get('request', '')} ({c.data.get('mode')}, target {c.data.get('target')}); "
                   f"{len(c.data.get('entries') or [])} edits, "
@@ -273,6 +275,11 @@ def cmd_edit(args) -> int:
 def cmd_status(args) -> int:
     """Where things stand, for an agent starting work or an engineer catching up (CLI-18)."""
     spec = _load(args)
+    who, source = people.person(spec.repo_root())
+    print(f"Recording people as: {who} (from {source})")
+    if not people.is_set(spec.repo_root()):  # DR-56: on a machine where an agent commits, this is the agent
+        print(f"  If that isn't the person directing this work, set it: "
+              f"`git config {people.SETTING} \"Name <email>\"`")
     c = changes.current(spec)
     if c is None:
         print('No change is open. Start one before editing the spec: `spec change start "<what was asked>"`')
@@ -289,11 +296,11 @@ def cmd_status(args) -> int:
     if pending:
         print("Awaiting the engineer's answer:")
         for cid, alt in pending:
-            print(f"  {changes._label(spec, alt['id'])}, altered in {cid}. Keep it: `{alt['id']} LGTM`")
+            print(f"  {changes._label(spec, alt['id'])}, altered in {cid}. Keep it: `lock {alt['id']}`")
     waiting = [i for ch in changes.all_changes(spec) for p in ch.data.get("proposals") or [] for i in p.get("ids") or []
                if review.kind_and_data(spec, i) and review.state_of(spec, i).state != review.APPROVED]
     if waiting:
-        print(f"Proposed for the engineer's approval: `approve {', '.join(dict.fromkeys(waiting))}`")
+        print(f"Proposed for locking: `lock {', '.join(dict.fromkeys(waiting))}`")
     print(checker.summarize(checker.check(spec)))
     return 0
 
@@ -347,7 +354,7 @@ def cmd_propose(args) -> int:
         print(f"spec propose: {e}")
         return 1
     render.write_views(model.load(spec.root))
-    print(f"proposed for the engineer's explicit approval in {c.id}: {', '.join(ids)}")
+    print(f"proposed for locking in {c.id}: {', '.join(ids)}; the review page shows them with your reason")
     return 0
 
 
@@ -360,6 +367,104 @@ def cmd_friction(args) -> int:
     changes.log_friction(c, args.workaround, args.proposal)
     render.write_views(model.load(spec.root))
     print(f"logged in {c.id}; the engineer sees it in the change record")
+    return 0
+
+
+def cmd_diff(args) -> int:
+    """CLI-26: the spec differences between two versions, for agents (the review page renders the same data)."""
+    spec = _load(args)
+    try:
+        if args.since_review:
+            result = diff.since_review(spec, people.person(spec.repo_root())[0])
+        else:
+            result = diff.between(spec, args.older or "HEAD", args.newer)
+    except diff.DiffError as e:
+        print(f"spec diff: {e}")
+        return 1
+    if args.format == "yaml":
+        print(yamlio.dumps(result.to_data()), end="")
+    else:
+        print(diff.to_text(result, spec), end="")
+    return 0
+
+
+def cmd_review(args) -> int:
+    """CLI-25, CLI-24: the review page in one command, or any of its sections for an agent."""
+    spec = _load(args)
+    who = args.person or people.person(spec.repo_root())[0]
+    data = pagedata.build(spec, who, args.against or [])
+    if args.section:
+        if args.format == "yaml":
+            print(yamlio.dumps(data[args.section] if args.section != "items" else data["items"]), end="")
+        else:
+            print(pagedata.section_text(data, args.section), end="")
+        return 0
+    out = Path(args.out) if args.out else page.default_path(spec.root)
+    page.write(data, out, out.parent / "reviews")
+    awaiting = len(data["awaiting"]["decisions"]) + len(data["awaiting"]["alterations"])
+    print(f"wrote {out}")
+    print(f"  open it: file://{out.resolve()}")
+    print(f"  {awaiting} awaiting a decision, {len(data['changes'][0]['items']) if data['changes'] else 0} items changed "
+          f"since {data['changes'][0]['older']['label'] if data['changes'] else 'the last review'}, "
+          f"{len(data['captured'])} intent records captured, {len(data['proposals'])} proposed for locking")
+    return 0
+
+
+def cmd_feedback(args) -> int:
+    """CLI-23, CLI-27: apply the block a review page copied, in its person's name; answer each comment."""
+    spec = _load(args)
+    try:
+        if args.action == "apply":
+            text = Path(args.file).read_text() if args.file else sys.stdin.read()
+            report = feedback.apply(spec, feedback.parse(text))
+            for label, ids in (("locked", report.locked), ("unlocked", report.unlocked), ("kept", report.kept),
+                               ("resolved", report.resolved), ("removed intent on", report.removed_intent)):
+                if ids:
+                    print(f"{label}: {', '.join(ids)}")
+            if report.to_answer:
+                print(f"to answer, with `spec feedback respond F<n> \"...\"`: {', '.join(report.to_answer)}")
+            if report.already:
+                print(f"already on record, skipped: {', '.join(report.already)}")
+            for r in report.refused:
+                print(f"not applied: {r}")
+            if not any(vars(report).values()):
+                print("reviewed, with nothing to add; recorded as their latest review")
+        elif args.action == "respond":
+            if len(args.rest) < 2:
+                print('spec feedback respond: give the item and your response, as in `spec feedback respond F2 "..."`')
+                return 1
+            f = feedback.respond(spec, args.rest[0], " ".join(args.rest[1:]))
+            print(f"responded to {f['n']}")
+        else:
+            waiting = feedback.unanswered(spec)
+            for _, f in waiting:
+                print(f"{f['n']} [{f.get('kind')}] {f.get('id') or f.get('decision') or 'general'}: {f.get('comment')}")
+            print(f"{len(waiting)} waiting for a response" if waiting else "every feedback item has a response")
+    except (feedback.FeedbackError, changes.ChangeError, edit.EditError) as e:
+        print(f"spec feedback: {e}")
+        return 1
+    render.write_views(model.load(spec.root))
+    return 0
+
+
+def cmd_migrate(args) -> int:
+    """CLI-28: the mechanical part of moving a spec to intent records and locks (DR-63)."""
+    spec = _load(args)
+    try:
+        report = migrate.run(spec, changes.current(spec), dry_run=args.dry_run)
+    except (migrate.MigrateError, changes.ChangeError) as e:
+        print(f"spec migrate: {e}")
+        return 1
+    verb = "would" if args.dry_run else "did"
+    print(f"spec migrate {'(dry run) ' if args.dry_run else ''}{verb}:")
+    print(f"  carry {len(report['carried'])} locks over items this change only reworded"
+          + (f": {', '.join(report['carried'])}" if report["carried"] else ""))
+    print(f"  move {report['locks']} locks to locks.yaml, removing the words of {report['words_removed']}")
+    print(f"  take verbatim words out of {report['scrubbed']} logged values and answers in the change records")
+    print(f"  remove {len(report['legacy_records'])} hand-written change records from before records were YAML")
+    print(f"  set spec_version 2; flow-down: {report['flow_down']}")
+    if not args.dry_run:
+        render.write_views(model.load(spec.root))
     return 0
 
 
@@ -397,6 +502,10 @@ def cmd_init(args) -> int:
         note = group[0].note if len(group) == 1 else f"{len(group)} files"
         print(f"  {status:<9} {path}" + (f"  ({note})" if note else ""))
     print("\nCommit the files it wrote in the repository. The links in your home folder are this machine's.")
+    if not people.is_set(repo):  # DR-56: intent and locks name a person, who may not be version control's user
+        who, source = people.person(repo)
+        print(f"Intent and locks will be recorded as {who} (from {source}). If that isn't you, set it once on this "
+              f"machine: `git config --global {people.SETTING} \"Name <email>\"`.")
     if steps[0].status == "created":
         print("Next, ask your agent to onboard the project. The syseng skill tells it how.")
     return 0
@@ -413,20 +522,21 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--todo", action="store_true", help="also list to-dos")
     p.add_argument("--json", action="store_true", help="machine-readable output")
     p.set_defaults(fn=cmd_check)
-    p = sub.add_parser("render", help="regenerate the Markdown views")
+    p = sub.add_parser("render", help="write the review page, removing Markdown views from earlier versions")
     p.set_defaults(fn=cmd_render)
     p = sub.add_parser("show", help="show one item with its trace and approval")
     p.add_argument("id")
     p.set_defaults(fn=cmd_show)
-    p = sub.add_parser("approve", help="record the engineer's approval of items")
+    p = sub.add_parser("lock", aliases=["approve"], help="record a person's lock on items (alias: approve)")
     p.add_argument("ids", nargs="+", help="IDs, or ranges like NEED-1..NEED-12")
-    p.add_argument("--words", required=True, help="the engineer's words, as evidence")
-    p.add_argument("--via", default="terminal", choices=["terminal", "chat", "menu", "page", "restated"],
-                   help="how the engineer gave it; `restated` when they restated what the item says")
-    p.add_argument("--by", help="who approved (default: the repository's version-control user name)")
+    p.add_argument("--words", help="a summary of what the person said, never their exact words")
+    p.add_argument("--via", default="terminal", choices=["terminal", "chat", "menu", "page"],
+                   help="how the person gave it")
+    p.add_argument("--by", help=f"who locked it, as Name <email> (default: `git config {people.SETTING}`, then "
+                                f"${people.ENV}, then version control's user)")
     p.add_argument("--note", help="anything else about how it was given, such as a pasted reply they confirmed")
     p.set_defaults(fn=cmd_approve)
-    p = sub.add_parser("propose", help="propose items for the engineer's explicit approval, saying why")
+    p = sub.add_parser("propose", help="recommend items for the engineer to lock, saying why")
     p.add_argument("ids", nargs="+", help="IDs, or ranges like CHECK-3..CHECK-5")
     p.add_argument("--why", required=True, help="why these deserve the engineer's attention")
     p.set_defaults(fn=cmd_propose)
@@ -436,6 +546,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--mode", choices=list(changes.MODES), help="default: code-first")
     p.add_argument("--target", help="implementation the change targets (default: the primary one)")
     p.add_argument("--slug", help="a few words for the file name")
+    p.add_argument("--full", action="store_true", help="show: print the whole record as text")
     p.set_defaults(fn=cmd_change)
     p = sub.add_parser("edit", help="change the spec with a YAML batch on stdin (see `spec edit --help`)",
                        description=edit.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -459,6 +570,32 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--workaround", required=True)
     p.add_argument("--proposal", required=True)
     p.set_defaults(fn=cmd_friction)
+    p = sub.add_parser("diff", help="what changed in the spec between two versions (default: HEAD to the working tree)",
+                       description=diff.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("older", nargs="?", help="a branch (compared at its merge base), tag or commit; default HEAD")
+    p.add_argument("newer", nargs="?", help="a branch, tag or commit; default the working tree")
+    p.add_argument("--since-review", action="store_true", help="compare against your last review instead")
+    p.add_argument("--format", choices=["text", "yaml"], default="text")
+    p.set_defaults(fn=cmd_diff)
+    p = sub.add_parser("review", help="generate the review page (or print one of its sections)",
+                       description=pagedata.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--against", action="append", metavar="REV",
+                   help="also compare against this branch, tag or commit; repeat for several")
+    p.add_argument("--person", help="who the page is for, as Name <email> (default: the person this machine records)")
+    p.add_argument("--out", help="where to write the page (default: .syseng/review.html)")
+    p.add_argument("--section", choices=list(pagedata.SECTIONS), help="print this section instead of writing the page")
+    p.add_argument("--format", choices=["text", "yaml"], default="text")
+    p.set_defaults(fn=cmd_review)
+    p = sub.add_parser("feedback", help="apply a review page's feedback block (stdin or --file), or answer it",
+                       description=feedback.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("action", choices=["apply", "respond", "list"])
+    p.add_argument("rest", nargs="*", help="respond: the item (F<n>) and your response")
+    p.add_argument("--file", help="apply: read the block from a file instead of stdin")
+    p.set_defaults(fn=cmd_feedback)
+    p = sub.add_parser("migrate", help="move the spec to the current format (intent records and locks)",
+                       description=migrate.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--dry-run", action="store_true", help="report what it would do; write nothing")
+    p.set_defaults(fn=cmd_migrate)
     p = sub.add_parser("init", help="set up a repository: spec skeleton, skill and harness glue",
                        description=init.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--harness", action="append", choices=list(init.HARNESSES),

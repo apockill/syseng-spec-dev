@@ -1,32 +1,54 @@
 - id: REASON-1
   text: A reasoning-check item shall consist of a prompt asking a model to judge a stated aspect of the product, plus the inputs that judgment needs.
-  origin: engineer
-  traces_to: SYS-10
-  source: |-
-    "'REASONING TEST' which is a prompt that asks an LLM to reason about certain aspects we want to think about, that might be hard to confirm"
+  traces_to: VERIFY-2
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+    said: Described a reasoning test as a prompt that asks a model to reason about certain aspects they want to think about, which might be hard to confirm.
+    basis: guided
+    fingerprint: 741d2206cc79
 - id: REASON-2
   text: The technique shall run each reasoning check in a fresh subagent that does not inherit the conversation, given only its item's prompt and declared inputs.
-  origin: engineer
-  traces_to: SYS-11
-  source: |-
-    "Subagents that do reasoning should be spun up with 0 context about the project, and only given what is absolutely necessary to verify … (this should be a req)" · "I imagine there's a 'forking' ability, which preserves user conversation. If that exists, I do not want to use it." See DR-7.
+  traces_to: VERIFY-15
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing how reasoning checks should run.
+    said: Wants subagents that do reasoning spun up with no context about the project, given only what is absolutely necessary to verify, and asked that this be a requirement.
+    basis: stated
+    fingerprint: 9603922f3bff
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 2). Answering Q5, about how the subagents that run reasoning checks are isolated; see DR-7.
+    said: Imagined there is a forking ability that preserves the user's conversation, and does not want to use it if it exists.
+    basis: stated
+    fingerprint: 9603922f3bff
 - id: REASON-5
   text: A reasoning check shall have read access to the product's code, excluding the spec directory.
-  origin: engineer
-  traces_to: SYS-11
-  source: |-
-    "For the subagent to verify and reason through things, it will need to read code. However, we should tell it to NOT read in spec/ directory." See DR-7.
+  traces_to: VERIFY-15
   reworded: |-
     round 9: "shall be able to read" became "shall have read access to" (INCOSE R10).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (round 2). Answering Q5, about how the subagents that run reasoning checks are isolated; see DR-7.
+    said: Said the subagent will need to read code to verify and reason through things, but should be told not to read in the spec directory.
+    basis: stated
+    fingerprint: cc03961505b9
 - id: REASON-3
   text: Each reasoning check shall return a pass or fail verdict with evidence quoted from its inputs.
-  origin: agent
-  traces_to: SYS-10
+  traces_to: VERIFY-2
   why: a bare verdict can't be audited. Quoted evidence shows why it failed in seconds.
+  basis: derived
 - id: REASON-4
   text: For an item that verifies a requirement the toolkit judges important, the technique shall take the majority verdict of three independent runs.
-  origin: agent
-  traces_to: SYS-24
-  refines: |-
-    "the goal being to have slightly more deterministic results"
+  traces_to: VERIFY-16
   why: one sample from a nondeterministic judge tells you little, and three runs is the smallest number that gives a majority. In round 5 the trigger changed from a critical flag to an importance judgment.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Date approximate (rounds 1 to 11). Describing reasoning checks, whose verdicts come from a model.
+    said: Gave the goal of having slightly more deterministic results.
+    basis: guided
+    fingerprint: 3e2b2cfa10b3

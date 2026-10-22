@@ -1,41 +1,72 @@
 - id: ONBOARD-1
   text: When onboarding an existing project, the toolkit shall extract its needs, requirements, verification items and decision records from the project's code, tests, comments and documentation.
-  origin: engineer
   traces_to: SYS-23
-  source: |-
-    "we simply need to guess/extract/format the spec from the project, clarify certain design decisions (so as to extract NEEDs/REQs/VERs)"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 5: reviewing SYS-23, how an existing project is brought into the toolkit.
+    said: Said that for an existing project the agent simply needs to guess, extract and format the spec from the project, clarifying certain design decisions so as to extract the needs, requirements and verification items.
+    basis: stated
+    fingerprint: a5e56970a6cb
 - id: ONBOARD-2
   text: Onboarding shall describe the project's current state without proposing changes to it.
-  origin: engineer
   traces_to: SYS-23
-  source: |-
-    "this is less about 'steering' and more about 'encoding the state of the project correctly, and encoding the WHY the state is the way it is correctly'"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 5: reviewing SYS-23, how an existing project is brought into the toolkit.
+    said: Said onboarding is less about steering and more about encoding the state of the project correctly, and why the state is the way it is.
+    basis: stated
+    fingerprint: e47c149ee54b
 - id: ONBOARD-3
   text: Onboarding shall run every check the toolkit offers, expensive checks and auditors included, on the extracted spec.
-  origin: engineer
   traces_to: SYS-23
-  source: |-
-    "This step … should be extra careful, run all the checks, rechecks, skeptical subagents... the whole kitchen sink, to ensure that everything is captured." Asking for onboarding counts as the request SYS-12 needs.
+  why: asking for onboarding counts as the request SYS-12 needs.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 5: reviewing SYS-23, how an existing project is brought into the toolkit.
+    said: Said this step should be extra careful, running all the checks, rechecks and skeptical subagents, the whole kitchen sink, to make sure everything is captured.
+    basis: stated
+    fingerprint: 1a39d73f6b60
 - id: ONBOARD-4
   text: Onboarding shall take the reasons for the current design from code comments and structure wherever they reveal them.
-  origin: engineer
   traces_to: SYS-23
-  source: |-
-    "Sometimes the WHY can be found through code comments / obvious structure."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 5: reviewing SYS-23, how an existing project is brought into the toolkit, and where the reasons behind its current state come from.
+    said: Said the reasons can sometimes be found through code comments or obvious structure.
+    basis: stated
+    fingerprint: fc8e23a59620
 - id: ONBOARD-5
   text: Onboarding shall ask the engineer only about reasons the project itself doesn't reveal.
-  origin: engineer
   traces_to: SYS-23
-  source: |-
-    "Sometimes no, and that's when clear use of the users times is in order, asking high signal questions."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 5: reviewing SYS-23, and continuing from the reasons that code comments or structure reveal.
+    said: Said that sometimes the reasons can't be found that way, and that is when using the user's time is in order, by asking high-signal questions.
+    basis: stated
+    fingerprint: 43064eb1f2bb
 - id: ONBOARD-6
-  text: Onboarding shall end with a spec the engineer can approve after reviewing only its needs.
-  origin: engineer
+  text: Onboarding shall end with a spec the engineer can lock after reviewing only its needs.
   traces_to: SYS-23
-  source: |-
-    "The end goal is a user just looks at the NEEDS, confirms them, states 'approve everything' and moves on."
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 5: reviewing SYS-23, how an existing project is brought into the toolkit.
+    said: Said the end goal is that a user just looks at the needs, confirms them, says to approve everything, and moves on.
+    basis: stated
+    fingerprint: 77acd2c89baa
 - id: ONBOARD-7
   text: Onboarding shall record each failing test or broken link it finds as an open decision, without fixing it.
-  origin: agent
   traces_to: SYS-23
   why: this follows from ONBOARD-2. Fixing things during onboarding would be steering you didn't ask for.
+  basis: derived

@@ -253,7 +253,8 @@ decisions:
     detail: A web page with the colors, hover text and approve buttons. Nicest to read, least urgent.
   status: resolved
   chosen: The skill and the Claude Code adapter
-  words: Skill + Claude Code adapter (Recommended), chosen from the menu
+  words: |-
+    [verbatim words removed when this spec moved to intent records]
   resolved: '2026-10-11'
 friction:
 - workaround: Wrapped commands in `nix develop -c bash -c '...'`; an apostrophe in the YAML broke the outer quotes.

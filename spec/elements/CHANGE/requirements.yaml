@@ -1,86 +1,153 @@
 - id: CHANGE-1
-  text: The toolkit shall support a spec-first mode, in which the engineer approves the spec changes before implementation begins.
-  origin: engineer
+  text: The toolkit shall support a spec-first mode, in which the engineer reviews the spec changes before implementation begins.
   traces_to: SYS-17
-  source: |-
-    "the engineer wants to know BEFORE the code is written how the specs will be built … I then examine the diff and agree 'lgtm', then the implementation is created"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the workflow in which the spec is settled before the code.
+    said: Described a workflow in which the engineer wants to know, before the code is written, how the specs will be built; they examine the diff and agree with an lgtm, and then the implementation is created.
+    basis: stated
+    fingerprint: f46076df6dc2
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-21 15:09
+    context: Reviewing an alteration on the review page (review d64ac586c7).
+    said: Kept the item as it now reads.
+    basis: stated
+    fingerprint: 9f0e1577674e
 - id: CHANGE-2
   text: The toolkit shall support a code-first mode, in which the engineer reviews the spec changes after the change is implemented.
-  origin: engineer
   traces_to: SYS-17
-  source: |-
-    "hey build it real quick, then update the spec to match" · "afterwards, or during implementation (however works best / is most natural for the agent). I don't want to be too prescriptive"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the workflow in which the code comes first.
+    said: |-
+      Described a request of the form: build it real quick, then update the spec to match.
+    basis: stated
+    fingerprint: 5d18273de0dd
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Round 7, on when the agent should update the spec in code-first mode.
+    said: Said the spec can be updated afterwards or during implementation, however works best or is most natural for the agent, and that they don't want to be too prescriptive.
+    basis: guided
+    fingerprint: 5d18273de0dd
 - id: CHANGE-3
   text: Each change record shall keep a list of open decisions.
-  origin: engineer
   traces_to: SYS-16
-  source: |-
-    "the LLM should add it to a list of things to flag to the user"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, on what happens when reasoning or integration-plus-reasoning tests fail.
+    said: Wants the LLM to add such a failure to a list of things to flag to the user.
+    basis: guided
+    fingerprint: 6e9f0d4c6e49
 - id: CHANGE-9
   text: When a request names no mode, the toolkit shall use code-first mode.
-  origin: engineer
   traces_to: SYS-17
-  source: |-
-    Q10: "Agree".
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Answering Q10, which asked which mode applies when a request names none, the agent leaning toward code-first so that the common case asks nothing of the engineer.
+    said: Agreed that code-first should be the default.
+    basis: guided
+    fingerprint: 5db1b16e4a32
 - id: CHANGE-10
   text: Each open decision shall offer options, with one marked as recommended.
-  origin: engineer
   traces_to: SYS-26
-  source: |-
-    "it should always propose options and have a 'Recommended' option, so the user can say 'yeah go for it' to a whole set" · "The alternatives are A B or C"
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Answering Q6, which asked whether accepting a failed reasoning test whose behavior contradicts a requirement's text should change the requirement too.
+    said: Agreed it should, with a flag to the user explaining why the requirement had to change and listing the alternatives, such as A, B or C.
+    basis: guided
+    fingerprint: 5fe2d505528c
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Round 5, responding to SYS-21 (finding weak or ambiguous requirements and verification items) on how the issues the toolkit raises should be presented.
+    said: Wants the agent always to propose options and mark one as Recommended, so the user can give one go-ahead to a whole set.
+    basis: stated
+    fingerprint: 5fe2d505528c
 - id: CHANGE-12
   text: The toolkit shall accept the recommended options of a set of open decisions from one statement by the engineer.
-  origin: engineer
   traces_to: SYS-26
-  source: |-
-    "so the user can say 'yeah go for it' to a whole set"
   reworded: |-
     round 9: "The engineer shall be able to accept" became "The toolkit shall accept", because "be able to" describes a capability, not a behavior (INCOSE R10).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Round 5, responding to SYS-21 on how the issues the toolkit raises should be presented.
+    said: Wants a Recommended option on each proposal so the user can give one go-ahead to a whole set.
+    basis: stated
+    fingerprint: 024822733892
 - id: CHANGE-4
   text: Each change record shall summarize the engineer's request.
-  origin: agent
   traces_to: SYS-19
   why: lets auditors ask "you asked for X, so why does the spec now also say Y?". It's a summary rather than a quote, which matches how decision records treat your words (AGENT-35).
+  basis: derived
 - id: CHANGE-5
   text: Each change record shall give a reason for each requirement the change added, modified or removed.
-  origin: agent
   traces_to: SYS-19
-  refines: |-
-    "I view the spec diff and say 'hey why does this component no longer have a requirement to do x or y' and the agent is able to explain"
   why: an agent starting fresh months later can only answer "why?" if someone wrote the reason down at the time.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing how the engineer reviews a change.
+    said: Described viewing the spec diff, asking why a component no longer has a requirement to do something, and the agent being able to explain.
+    basis: guided
+    fingerprint: 96ab74441240
 - id: CHANGE-8
   text: Each change record shall name the implementation the change targets, defaulting to the primary implementation.
-  origin: agent
   traces_to: SYS-9
   why: CHECK-11 and the to-do list need to know which implementation "done" refers to.
+  basis: derived
 - id: CHANGE-11
   text: Each open decision shall say whether it involves an item the engineer stated, or one with decision records behind it.
-  origin: agent
   traces_to: SYS-26
-  refines: |-
-    "If a human had hand / there are notes of previous ADRs, then flag that so the user knows not to skim/lgtm too early."
   why: you asked for this on flagged items. I applied it to every open decision, because the risk of skimming too early is the same.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Rounds 1 to 11, date approximate. Round 5, responding to SYS-21 on how the issues the toolkit raises should be presented.
+    said: Asked that where a human had a hand in something, or there are notes of earlier decision records, this be flagged so the user knows not to skim or lgtm too early.
+    basis: guided
+    fingerprint: 318ede87e508
 - id: CHANGE-13
-  text: An item shall count as approved, written or decided by the engineer when it has an approval record, when its origin is the engineer or it quotes the engineer, or when it is a decision record the engineer made.
+  text: An item shall count as locked, written or decided by the engineer when its level of intent is explicit, stated or guided.
   traces_to: SYS-37
-  origin: agent
-  why: |-
-    the engineer, approving SYS-37: "'approved, wrote or decided.' is kind of vague. Maybe child reqs specify this further." This pins it down.
+  why: the levels of intent (SYS-42) now say how directly a person asked for an item, so they define this too.
+  basis: derived
 - id: CHANGE-14
-  text: Each change record shall list each alteration the change made to an item the engineer approved, wrote or decided, with the line that keeps it, until the engineer keeps it or it is rolled back.
+  text: Each change record shall list each alteration the change made to an item the engineer locked, wrote or decided, until the engineer keeps it, it is rolled back, or a review the engineer sent back has shown it.
   traces_to: SYS-37
-  origin: agent
-  why: the change record is where the engineer reviews a change, so the alterations to answer belong at its top, right after open decisions.
+  why: the change record keeps the alterations to answer, and the review page shows them first (REVIEW-20).
+  basis: derived
 - id: CHANGE-15
-  text: Each change record shall list the items proposed for the engineer's explicit approval, in the order proposed, each with its reason, followed by one line that approves those still waiting.
+  text: Each change record shall list the items proposed for the engineer to lock, in the order proposed, each with its reason.
   traces_to: SYS-38
-  origin: agent
-  why: a proposal made mid-change survives the conversation, and the engineer can approve every waiting item at once.
+  why: a proposal made mid-change survives the conversation, and the review page lists the ones still waiting (REVIEW-20).
+  basis: derived
 - id: CHANGE-16
   text: Each change-log entry shall record the date and time of the edit.
   traces_to: SYS-39
-  origin: engineer
-  quotes:
-  - said: 2026-10-17 22:12
-    words: Timestamps and history of changes is important, so the agent can see some decisions are old, some are newer, and will know what is more likely 'ok to change' and what is likely 'fresh, and representative of the latest direction'
-    context: Approving SYS-39, which shows agents an item's approval and history before they change it.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-17 22:12
+    context: Said while locking SYS-39, which shows agents an item's lock and history before they change it.
+    said: Considers timestamps and a history of changes important, so the agent can see that some decisions are old and some newer, and can tell what is more likely fine to change from what is likely fresh and representative of the latest direction.
+    basis: guided
+    fingerprint: 9039b4f3b4fd
+- id: CHANGE-17
+  text: Each change record shall keep each conflict between the request and an item at the explicit or stated level as an open decision that names the conflicting items.
+  traces_to: SYS-49
+  why: a conflict raised only in chat is lost with the conversation. As an open decision it shows at the top of the review page, with options and one recommended (CHANGE-10).
+  basis: derived
+- id: CHANGE-18
+  text: An alteration to an item a conflict names shall count as kept when its new content matches what the option the person chose showed for it.
+  traces_to: SYS-49
+  why: the person has already decided it, and asking again would repeat the question (NEED-11). Anything the option didn't show is still asked about once built.
+  basis: derived
+- id: CHANGE-19
+  text: Each change record shall keep each comment from a person's feedback with the agent's response to it.
+  traces_to: SYS-52
+  why: the next review page shows each comment and what was done about it.
+  basis: derived

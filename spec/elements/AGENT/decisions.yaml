@@ -10,6 +10,7 @@
   decision: a Claude Code PreToolUse hook refuses agents' file edits under the spec directory. Its refusal names the CLI command to use instead.
   alternatives: an instruction in the skill, which is easy to ignore. Linting afterwards, by which time the edit has already happened.
   consequences: the engineer can still edit spec files by hand, because hooks only see agents' tool calls.
+  basis: derived
 - id: DR-4
   title: Run the checker from a stop hook
   decided_by: agent
@@ -23,20 +24,21 @@
   decision: a Claude Code Stop hook runs the checker when the agent tries to finish, and blocks with the findings. It blocks at most once per turn, so a mid-task question to the engineer still gets through.
   alternatives: relying on the skill's instructions. A CI-only check, which comes too late.
   consequences: the checker must be fast (CHECK-12).
+  basis: derived
 - id: DR-6
-  title: Record chat approvals from the engineer's own message
+  title: Record chat locks from the engineer's own message
   decided_by: agent
   elements:
   - AGENT
   requirements: AGENT-21, AGENT-33, AGENT-34
   recorded: round 4 (decided in round 3)
-  status: |-
-    part of the Claude Code adapter (DR-1). Other harnesses get an equivalent where they offer the hooks for it. Narrowed in round 11 by DR-41: the hook records only approvals that name items by ID, and anything else is confirmed with the engineer first.
-  context: the engineer wants to approve in chat, but only with unambiguous wording.
-  decision: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. Approvals the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
-  alternatives: letting the agent record approvals, which risks a misreading. Approving only on the review page, which is safe but slower.
+  status: amended in round 18 by DR-62. Records the hook makes hold no words, and restatements become intent records, not approvals.
+  context: the engineer wants to lock items in chat, but only with unambiguous wording.
+  decision: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
+  alternatives: letting the agent record locks, which risks a misreading. Locking only on the review page, which is safe but slower.
   consequences: |-
-    Q23 settled the phrasing: a message that starts with "approve" and names the items, or says to approve everything except some items. When the exceptions are given by description, every item they could refer to stays unapproved (AGENT-43). In harnesses without such a hook, chat approval falls back to the review page or the terminal.
+    Q23 settled the phrasing: a message that starts with "approve" (now also "lock") and names the items, or says to lock everything except some items. When the exceptions are given by description, none of the items they could refer to is locked (AGENT-43). In harnesses without such a hook, locking from chat falls back to the review page or the terminal.
+  basis: derived
 - id: DR-15
   title: Code-first never stops to ask; only spec-first may
   decided_by: engineer
@@ -48,6 +50,14 @@
   decision: in code-first mode, agents finish the change and report every contradiction and question at the end. In spec-first mode, an agent may stop on a contradiction the engineer would likely want to decide first.
   alternatives: stopping in either mode whenever the agent judges a contradiction important. That was the engineer's first answer, refined in round 3.
   consequences: a code-first change may be built on a reading the engineer later rejects. The open decisions make that visible immediately.
+  status: confirmed in round 18 by DR-57. In code-first mode, conflicts with explicit or stated items are raised once the change is built.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Clarifying their answer to Q4, which asked whether an agent should stop and ask when a request contradicts the spec; their first answer had been to stop whenever a contradiction matters.
+    said: Said that only when the person is planning a change should anything halt the flow and come back to ask them what to do.
+    basis: stated
+    fingerprint: 8324de3f06bb
 - id: DR-16
   title: Defer verifying agent-behavior requirements
   decided_by: engineer
@@ -59,6 +69,13 @@
   decision: verify them by demonstration, meaning the engineer observes them in real use, until an eval harness exists.
   alternatives: build scenario evals now.
   consequences: following current eval guidance, the first eval scenarios should come from real failures seen in use.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 3, date approximate. Answering Q15, which asked how to verify the requirements about agent behavior.
+    said: Agreed to shelve verifying agent behavior until an eval harness exists, wanting to start building and iterate.
+    basis: guided
+    fingerprint: 1baa5c09024e
 - id: DR-17
   title: Independence through review, not separate authors
   decided_by: agent
@@ -70,6 +87,7 @@
   decision: checks come from fresh-context auditors that didn't author the change. One auditor examines only the tests and verification items that the change modified or deleted.
   alternatives: separate authoring agents for requirements and for verification, which was the earlier spec-first design.
   consequences: this removes the incentive to go easy. It doesn't remove blind spots shared by every instance of one model.
+  basis: derived
 - id: DR-27
   title: IDs always come with a title, linked where possible
   decided_by: engineer
@@ -82,6 +100,13 @@
   decision: every mention of a spec item gives its title alongside its ID, and links to it where the medium allows. The review page shows an item's text when you hover over or click its ID.
   alternatives: bare IDs, or titles only. Titles alone would lose the stable reference that traceability needs.
   consequences: messages run slightly longer, and nothing needs to be looked up.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: Round 8, date approximate. Discussing how agents refer to spec items in messages, since bare IDs left them unable to tell what an ID refers to.
+    said: Asked that IDs, where they must be used, link to a location or to the spec; or that agents just use the title, or give the ID with a short description.
+    basis: guided
+    fingerprint: 223a35e862fa
 - id: DR-38
   title: The skill ships inside the package, and setup installs it with the launcher's name filled in
   decided_by: agent
@@ -99,6 +124,7 @@
   alternatives: A skill that tells agents to run `spec` from the PATH, which breaks whenever the toolkit lives in a virtual environment the agent's shell hasn't activated. Keeping the skill outside the package, which pip wouldn't install.
   consequences: The installed copy is committed with the repository, so it can fall behind the toolkit; `spec init --check` reports the difference and `spec init` refreshes it. A checkout on a system without symlinks would see the link as a plain file, and Claude Code would miss the skill there. The rules page moved from docs/ into the skill.
   status: superseded in round 17 by DR-53 on where the skill is installed. Its rules for the skill's content still hold.
+  basis: derived
 - id: DR-40
   title: Claude Code hooks are one standard-library script, committed with the repository
   decided_by: agent
@@ -106,31 +132,109 @@
   - AGENT
   requirements: AGENT-20, AGENT-12, SYS-27
   recorded: round 11 (slice 3)
-  context: The spec guard (DR-3), the done gate (DR-4) and chat approvals (DR-6) need hooks. The guard runs before every edit and shell command, so it must be fast, and it should work on a clone where the toolkit isn't installed yet.
+  context: The spec guard (DR-3), the done gate (DR-4) and chat locks (DR-6) need hooks. The guard runs before every edit and shell command, so it must be fast, and it should work on a clone where the toolkit isn't installed yet.
   decision: |-
     `.syseng/hook` is one Python script that uses only the standard library. `spec init` copies it from the package and registers it in .claude/settings.json for three events: before each tool call, when the agent stops, and when the engineer sends a message.
     - It refuses a tool call by exiting with code 2, giving the reason on standard error.
-    - The guard refuses edits to the files the toolkit manages: elements, change records, approvals, retired IDs and generated views. Its refusal names the command to use. toolkit.yaml and hand-written pages such as the glossary stay editable.
+    - The guard refuses edits to the files the toolkit manages: elements, change records, lock records, retired IDs and generated views. Its refusal names the command to use. toolkit.yaml and hand-written pages such as the glossary stay editable.
     - For shell commands, it refuses plain writes into those files: redirections, tee, rm, mv, cp, and in-place sed or perl.
     - When the agent stops with errors in the spec, it sends the findings back as feedback, which Claude Code doesn't show as an error.
     - Only the stop and prompt hooks run the toolkit, as `spec` from the PATH. When it isn't installed, nothing is blocked, and the engineer sees a notice.
   alternatives: Hooks that call the toolkit for everything, which costs a Python start-up with PyYAML on every tool call and fails on machines without the toolkit. A Claude Code plugin, which DR-1 ruled out.
   consequences: A script that opens spec files itself, in python or awk, gets past the guard. The change log and the auditors are the backstop. The hook copy can fall behind the toolkit until `spec init` runs again.
+  basis: derived
 - id: DR-41
-  title: Chat approvals are recorded only when they name items by ID, and anything else is confirmed first
+  title: Chat locks are recorded only when they name items by ID, and anything else is confirmed first
   decided_by: agent
   elements:
   - AGENT
   requirements: AGENT-21, AGENT-33, AGENT-34, AGENT-43
   recorded: round 11 (slice 3)
   context: |-
-    DR-6 has a hook record chat approvals: a message that starts with "approve" and names the items, or approves everything except some items. A hook can't tell which items "everything" covered in the agent's last message, or which items a described exception refers to (AGENT-43). It also can't see what the engineer was last shown (AGENT-34).
+    DR-6 has a hook record chat locks: a message that starts with "approve" (now also "lock") and names the items, or locks everything except some items. A hook can't tell which items "everything" covered in the agent's last message, or which items a described exception refers to (AGENT-43). It also can't see what the engineer was last shown (AGENT-34).
   decision: |-
-    The prompt hook reads each line of the engineer's message on its own. A line approves when it starts with "approve" (or "approved") and its first clause names only item IDs and ranges, or when it is only item IDs followed by "LGTM", "approved" or "looks good", as in "SYS-32 LGTM".
+    The prompt hook reads each line of the engineer's message on its own. A line locks items when it starts with "approve" or "lock" (or "approved", "locked") and its first clause names only item IDs and ranges, or when it is only item IDs followed by "LGTM", "approved", "locked" or "looks good", as in "SYS-32 LGTM".
     - An ID may be written as a word and a number, such as "Change 13", when the word names a system element, needs or decision records (AGENT-57).
     - It records the whole message as the engineer's words, marked as given in chat, and tells the agent what it recorded.
-    - Any other approval, such as "approve everything except the wording ones", records nothing. The hook tells the agent to show the exact list, leaving out every item an exception could refer to, and to get the engineer's confirmation, in a menu where the harness has one.
-    - Quoted lines and pasted text never count, and a capitalized word counts as a system element only when that element exists. A message with "lgtm" or "looks good" and no IDs gets a note that it approves nothing.
-  alternatives: Reading "everything" as every unapproved item in the open change, which can approve items the engineer was never shown. Letting the agent interpret every approval, which DR-6 ruled out.
-  consequences: |-
-    "Approve everything except …" costs one extra confirmation. An approval covers the items as they are when the engineer sends the message, and the hook asks the agent to say if it changed any of them after showing them. Claude Code also runs this hook for messages from other sessions and from background subagents, so an agent that sent a message starting with "approve" could create an approval. The skill forbids that, and each approval records its words.
+    - Any other lock line, such as one that locks everything except the wording ones, records nothing. The hook tells the agent to show the exact list, leaving out every item an exception could refer to, and to get the engineer's confirmation, in a menu where the harness has one.
+    - Quoted lines and pasted text never count, and a capitalized word counts as a system element only when that element exists. A message with "lgtm" or "looks good" and no IDs gets a note that it locks nothing.
+  alternatives: Reading "everything" as every item not locked in the open change, which can lock items the engineer was never shown. Letting the agent interpret every lock, which DR-6 ruled out.
+  consequences: A line that locks everything except some items costs one extra confirmation. A lock covers the items as they are when the engineer sends the message, and the hook asks the agent to say if it changed any of them after showing them. Claude Code also runs this hook for messages from other sessions and from background subagents, so an agent that sent a message starting with "approve" or "lock" could create a lock. The skill forbids that, and each lock records its words.
+  status: amended in round 18 by DR-62. The hook records no message text, and a pasted feedback block from the review page counts.
+  basis: derived
+- id: DR-57
+  title: A conflict with an explicit or stated item is raised with options, before building in spec-first mode and once built in code-first mode
+  decided_by: engineer
+  elements:
+  - AGENT
+  - CHANGE
+  - CLI
+  requirements: SYS-49, NEED-25, CHANGE-17, CHANGE-18, CLI-22, CHECK-26, AGENT-61
+  recorded: round 18
+  context: Under DR-15 a code-first change finishes and reports, and SYS-37 asks about alterations once they're built. The engineer wants requests that conflict with nothing built without interruption, and a request that conflicts with earlier intent answered with the conflict, the requirements involved, and ways to reword, edit, add or change items. They prefer conflicts shown on the review page, and left the agent-side tooling to the agent.
+  decision: |-
+    - A request conflicts with an item when it can't be met without changing that item's meaning, or when it makes the item impossible to meet.
+    - For each request, the agent compares it with the explicit and stated items in the elements it affects, in the elements that depend on those, and above them in the trace (AGENT-61).
+    - A conflict becomes an open decision that names the conflicting items and offers options (reword, edit, add, change, roll back, or drop part of the request), one recommended, each showing the new text it would give the items. It heads the review page, and the agent says in chat that it's there, with enough to answer in chat.
+    - **Spec-first mode:** the conflict is raised before building. The CLI refuses an edit that changes the text of an explicit or stated item unless the edit names a conflict a person resolved for that item, adds the person's own request for the change as an intent record, or is declared a rewording.
+    - **Code-first mode:** the change is built, and the spec, committed with the code, is updated with it. When the agent marks the change done, the checker reports each altered explicit or stated item that no conflict names, so the agent must raise each one with options, rolling back included.
+    - A declared rewording is shown on the review page as one, for the person to check. The refusal and the done check are guardrails against forgetting, not a security boundary.
+    - Alterations that match what the chosen option showed count as kept, and the choice is recorded as stated intent on those items, with the person's identity.
+  alternatives: Asking after building, as DR-15 and SYS-37 do, which builds on a reading the engineer may reject. A separate impact command listing the locked items in scope before any edit, which was dropped because the edit context already shows them and only the edit says what the request changes.
+  consequences: DR-15 holds. Code-first changes never stop, and spec-first changes stop for conflicts. In code-first mode a request may be built on a reading the person then rejects, and the roll-back option is the remedy.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Discussing how changes should treat items a person stated or locked.
+    said: |-
+      Wants the flow to be: build feature X, done; build feature Y, done; build feature Z, and the agent answers that it conflicts with X in specific ways, lists the requirements involved, and offers ways to reword, edit, add or change items. Prefers such conflicts shown to the person on the review page, and is indifferent about the agent-side tooling.
+    basis: guided
+    fingerprint: 7d3f1afbb073
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Reviewing NEED-25 in round 18, which then had conflicts raised before building in every case.
+    said: |-
+      Corrected that raising a conflict before building isn't always wanted: the spec is committed with the code, so building first and confirming after must be supported too. Both workflows, spec first then build and build first then spec, are first class.
+    basis: guided
+    fingerprint: 7d3f1afbb073
+- id: DR-62
+  title: What a person says becomes intent without an approval step, and locks stay a person's own act
+  decided_by: engineer
+  elements:
+  - AGENT
+  - MODEL
+  - REVIEW
+  - CLI
+  requirements: SYS-44, MODEL-37, AGENT-21, AGENT-50, AGENT-56, AGENT-63, REVIEW-25, SYS-51, SYS-53, CLI-23, CLI-27
+  recorded: round 18
+  context: The engineer found approvals too prescriptive (typed lines, IDs, confirmations) and wants what they say in conversation locked in automatically, with the review page used for confirming. AGENT-48's typed line is removed in this round.
+  decision: |-
+    - When a person says what they want, in conversation or in a page comment, the agent adds an intent record to each item the words directly express: stated when the words alone say what the item requires, guided when the person's choice or constraint fixed it. When unsure, the lower level (AGENT-63). A restatement of an existing item is a stated intent record, not an approval.
+    - The review page shows what was captured since the person's last review, to correct or remove.
+    - A lock (the explicit level) is a person's own act: a page control, the terminal, or a lock line in chat, which the prompt hook still reads as a shortcut.
+    - Records made mechanically, by the prompt hook or from a feedback block, hold no words: the person, the channel, the IDs and the fingerprints.
+    - A feedback block names its reviewer, carries fingerprints, and reads on its own as review notes (SYS-53). The person pastes it to the agent, or posts it on a pull request as their review, and the agent applies it with the CLI (D2). The block, not the machine applying it, names who gave each lock; where the block was posted is the evidence of who wrote it.
+  alternatives: Keeping approval in chat by ID only (DR-41), which is the ritual the engineer wants gone. Letting the agent lock what a person says, which would make every captured remark explicit and leave the explicit level meaning nothing.
+  consequences: A misreading by the agent becomes intent until the person corrects it on the page, so the captured-intent section matters. DR-6 and DR-41 are amended, and pasted text counts when it's a feedback block.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Revising the chat-approval rules (AGENT-33, AGENT-48, DR-41).
+    said: Finds the approval process too prescriptive. Wants a free-form conversational flow, more use of displays for confirming, and requirements a person mentions in conversation locked in automatically. The approval vocabulary can go.
+    basis: guided
+    fingerprint: 7592f405900b
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: |-
+      Answering D2, which asked who applies a feedback block pasted from the review page: the prompt hook or the agent.
+    said: |-
+      Chose the agent. The person pastes the block, so it can travel: a pull-request reviewer can post it on the pull request as review notes, or an author can review their own change and paste it to the agent. The aim is system-level review in place of code review, since code will soon be too large for people to review.
+    basis: guided
+    fingerprint: 7592f405900b
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-21'
+    context: Setting a condition on recording what a person says as intent on the items it expresses (SYS-44).
+    said: |-
+      The agent has to judge which items a statement directly expresses, but should keep it tight rather than loose: for a request for a self-driving car, the requirement that the car drives itself can be marked as theirs, but a detail such as a module producing the next stretch of driving trajectories is not.
+    basis: guided
+    fingerprint: 7592f405900b

@@ -1,9 +1,9 @@
 """Change records (CHANGE): what was asked, in which mode, what changed in the spec and why,
 and the open decisions waiting for the engineer.
 
-A change record is spec/changes/<date>-round-<N>[-<slug>].yaml, with a generated Markdown view
-beside it. At most one change is open at a time; `spec edit` logs every edit into it with its
-reason (CHANGE-5). Older rounds were hand-written Markdown and stay as they are.
+A change record is spec/changes/<date>-round-<N>[-<slug>].yaml. `spec change show --full` prints
+it as text. At most one change is open at a time; `spec edit` logs every edit into it with its
+reason (CHANGE-5).
 """
 
 import datetime
@@ -107,16 +107,28 @@ def add_decision(change: Change, decision: dict) -> str:
         raise ChangeError("mark exactly one option `recommended: true`")
     if not decision.get("importance"):
         raise ChangeError("say why this decision ranks where it does, in `importance`")
+    kind = decision.get("kind")
+    if kind not in (None, "conflict"):
+        raise ChangeError("`kind` is `conflict` for a conflict with what a person locked or stated, or left out")
+    if kind == "conflict" and not decision.get("involves"):
+        raise ChangeError("a conflict names the items it involves, in `involves`")
+    for o in options:  # what choosing the option does to each item, so it can be applied as chosen (DR-57)
+        for key in ("keeps", "rolls_back"):
+            stray = [i for i in o.get(key) or [] if i not in (decision.get("involves") or [])]
+            if stray:
+                raise ChangeError(f"option {o.get('label')!r} {key.replace('_', ' ')} {', '.join(stray)}, which the "
+                                  "decision doesn't involve")
     decisions = change.data.setdefault("decisions", [])
     did = f"D{len(decisions) + 1}"
-    entry = {"id": did, "question": decision["question"], "importance": decision["importance"],
-             "involves": decision.get("involves") or [], "options": options, "status": "open"}
+    entry = {"id": did, **({"kind": kind} if kind else {}), "question": decision["question"],
+             "importance": decision["importance"], "involves": decision.get("involves") or [], "options": options,
+             "status": "open"}
     decisions.append(entry)
     change.save()
     return did
 
 
-def resolve(change: Change, ids: list[str], words: str, option: int | None) -> list[str]:
+def resolve(change: Change, ids: list[str], words: str, option: int | None, by: str | None = None) -> list[str]:
     """Records the engineer's choice. With no option, takes the recommended one (CHANGE-12)."""
     by_id = {d["id"]: d for d in change.data.get("decisions") or []}
     unknown = [i for i in ids if i not in by_id]
@@ -128,7 +140,7 @@ def resolve(change: Change, ids: list[str], words: str, option: int | None) -> l
         opts = d.get("options") or []
         chosen = (opts[option - 1] if option else next(o for o in opts if o.get("recommended")))
         d.update({"status": "resolved", "chosen": chosen.get("label"), "words": words,
-                  "resolved": datetime.date.today().isoformat()})
+                  "resolved": datetime.date.today().isoformat(), **({"by": by} if by else {})})
         done.append(i)
     change.save()
     return done
@@ -362,17 +374,12 @@ def _one_line(value) -> str:
 
 
 def _quote_line(q: dict) -> str:
-    """A quote on one line: the engineer's words, then when and about what (MODEL-36)."""
+    """A record on one line: an intent record's summary with who, when and why (MODEL-36), or an older quote."""
+    context = " ".join(str(q.get("context", "")).split())
+    if "basis" in q:
+        said = " ".join(str(q.get("said", "")).split())
+        return f"{q.get('basis')} by {q.get('by', '')}, {q.get('when', '')}: {said} ({context})"
     words = " ".join(str(q.get("words", "")).split())
-    return f"\"{words}\" ({q.get('said', '')}; {' '.join(str(q.get('context', '')).split())})"
+    return f"\"{words}\" ({q.get('said', '')}; {context})"
 
 
-def write_views(spec: Spec) -> list[Path]:
-    written = []
-    for change in all_changes(spec):
-        path = change.path.with_suffix(".md")
-        text = view(spec, change)
-        if not path.exists() or path.read_text() != text:
-            path.write_text(text)
-            written.append(path)
-    return written

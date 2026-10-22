@@ -6,5 +6,6 @@ depends_on:
 - CHECK
 - VERIFY
 - REVIEW
+- DIFF
 purpose: The single tool through which agents, and the engineer, query, edit, check, verify and render the spec.
 related_code: {}

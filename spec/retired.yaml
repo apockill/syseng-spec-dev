@@ -60,3 +60,28 @@
   ids:
   - AGENT-23
   note: AGENT-23, merged into AGENT-24 in round 5.
+- element: AGENT
+  ids:
+  - AGENT-V9
+  note: |-
+    AGENT-V9, in 2026-10-21-round-18-intent-levels-and-dashboard: it verifies only AGENT-48, removed in this batch; its test goes with the skill rewrite in Phase 2.
+- element: AGENT
+  ids:
+  - AGENT-48
+  note: |-
+    AGENT-48, in 2026-10-21-round-18-intent-levels-and-dashboard: the engineer finds typed approval lines too prescriptive (NEED-27). The review page is where items are locked and alterations kept.
+- element: AGENT
+  ids:
+  - AGENT-59
+  note: |-
+    AGENT-59, in 2026-10-21-round-18-intent-levels-and-dashboard: audit: it restated SYS-44, and its one addition, choosing stated or guided, is MODEL-37's.
+- element: REVIEW
+  ids:
+  - REVIEW-16
+  note: |-
+    REVIEW-16, in 2026-10-21-round-18-intent-levels-and-dashboard: restates SYS-34 as rewritten in this batch.
+- element: MODEL
+  ids:
+  - MODEL-14
+  note: |-
+    MODEL-14, in 2026-10-21-round-20-migrate-to-intent: the origin field is retired; how directly a person asked for an item is now its level of intent (SYS-42), recorded by MODEL-37 and MODEL-38. Its intent records move to MODEL-38.

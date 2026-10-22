@@ -1,8 +1,8 @@
 # syseng: a systems-engineering spec toolkit
 
-One engineer directing AI agents on a large codebase reads **requirements**, not code. This toolkit keeps a project's needs, requirements, verification items and decision records in `spec/`. It checks them mechanically and renders them as Markdown views.
+One engineer directing AI agents on a large codebase reads **requirements**, not code. This toolkit keeps a project's needs, requirements, verification items and decision records in `spec/`, and records how directly a person asked for each one: locked by name, stated, guided, derived from something above, or added by an agent unasked. Agents build fast and reshape what nobody asked for freely; what a person stated or locked comes back to them when a change conflicts with it.
 
-This repository specifies itself with its own toolkit. Start with [spec/requirements.md](spec/requirements.md). It's generated, so don't edit it by hand.
+This repository specifies itself with its own toolkit. Run `spec review` and open the page it writes (`.syseng/review.html`): what awaits you, what changed since your last review, the intent captured from your conversations, the items most worth locking, the system as a graph, and the full spec. Copy your feedback from the page and paste it to your agent, or post it on a pull request as your review.
 
 ## Install and set up a repository
 
@@ -18,7 +18,7 @@ spec init                               # one step: spec/, the skill, Claude Cod
 - `.syseng/hook`, the Claude Code hooks. It uses only Python's standard library, so its guards work even where the toolkit isn't installed;
 - the skill, in `.claude/skills/syseng/` (and `.agents/skills/syseng/` with `--harness antigravity`);
 - the hooks in `.claude/settings.json`, and two subagents in `.claude/agents/`: an auditor and a reasoning check;
-- permission rules that let agents run the everyday commands without asking. Claude Code applies a project's rules once you've trusted the folder. `approve` and `resolve` still ask, so you see each command that records your words;
+- permission rules that let agents run the everyday commands without asking. Claude Code applies a project's rules once you've trusted the folder. `lock`, `resolve` and `migrate` still ask, so you see each command that records what you did;
 - a short section in `AGENTS.md`, or `CLAUDE.md`, telling every session to follow the skill. `--no-instructions` leaves those files alone.
 
 For Hermes, add `--harness hermes`: the skill goes in `.agents/skills/syseng/`, and you run `hermes skills trust` once in the repository.
@@ -32,12 +32,15 @@ Agents follow the skill, so most of the time you just talk to your agent. The co
 ```sh
 spec status           # what's open, what awaits you, and the check's summary
 spec check            # everything unfinished in the spec (--todo lists to-dos, --merge before landing a branch)
-spec show MODEL-1     # one item: its trace, what refines it, its verification, its history
-spec approve SYS-7 --words "approve SYS-7"   # record the engineer's approval, fingerprinted
-spec render           # regenerate spec/requirements.md, spec/decisions.md and the change views
+spec show MODEL-1     # one item: its level of intent, who gave it, its trace, verification and history
+spec lock SYS-7 --via chat   # record a person's lock, fingerprinted (`approve` is an alias)
+spec review          # write the review page (--against main on a branch; --section NAME for one section as text)
+spec diff main       # what changed in the spec since the branch left main (--format yaml for agents)
+spec feedback apply  # apply the block copied from the review page; `respond F<n> "…"` answers its comments
+spec change show --full      # the open change record, as text
 ```
 
-In Claude Code, a line of your message that approves items by ID, such as `approve SYS-7, CHECK-3..CHECK-5` or `SYS-7 LGTM`, is recorded as your approval. Anything vaguer gets confirmed first.
+What you say about what you want becomes **intent** on the items it directly expresses: a summary close to your words, never a quote, with your name and email, the date and the context. Set who you are once per machine with `git config --global syseng.author "Name <email>"`. In Claude Code, a line of your message that locks items by ID, such as `lock SYS-7, CHECK-3..CHECK-5` or `SYS-7 LGTM`, is recorded as your lock. Anything vaguer gets confirmed first.
 
 Agents change the spec only through `spec edit` (see `spec edit --help`). Every edit is logged, with its reason, in the open change record:
 
@@ -74,5 +77,7 @@ If you use Nix, `nix develop` gives a shell with Python, PyYAML and pytest.
   - `skill/`: the skill `spec init` installs: SKILL.md and its reference pages, including `references/rules.md`, which explains each checker rule.
   - `adapters/`: harness glue: `hook.py` (installed as `.syseng/hook`) and the Claude Code subagents.
 - `spec/elements/<ID>/`: one directory per system element, holding `element.yaml`, `requirements.yaml`, `verification.yaml` and `decisions.yaml`.
-- `spec/approvals.yaml`, `retired.yaml`, `questions.yaml`, `toolkit.yaml`: approvals, retired IDs, questions and settings.
-- `spec/changes/`: change records, one per round of changes.
+- `spec/locks.yaml`, `retired.yaml`, `questions.yaml`, `toolkit.yaml`: locks, retired IDs, questions and settings.
+- `spec/changes/`: change records, one YAML file per round of changes: every edit with its reason, the conflicts and decisions, and friction reports.
+
+A spec from before intent records (`spec_version: 1`) moves over in two steps: an agent turns each person's words into intent records with `spec edit`, then `spec migrate` does the rest.

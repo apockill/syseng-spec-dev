@@ -8,7 +8,7 @@ mode: whether a branch lands is the engineer's call (CHECK-15, DR-31).
 from dataclasses import dataclass
 from pathlib import Path
 
-from syseng import render, review, testlinks
+from syseng import levels, records, render, review, testlinks
 from syseng.model import Spec
 from syseng.rules import METHODS, RULES, TECHNIQUES, check_wording
 
@@ -22,10 +22,11 @@ class Finding:
     line: int | None = None
     excerpt: str | None = None
     span: tuple[int, int] | None = None
+    level: str | None = None  # overrides the rule's severity, for rules a repository's settings make errors
 
     @property
     def severity(self) -> str:
-        return RULES[self.code].severity
+        return self.level or RULES[self.code].severity
 
 
 def _f(code, message, item=None, where=None, excerpt=None, span=None) -> Finding:
@@ -42,6 +43,8 @@ def check(spec: Spec) -> list[Finding]:
     out += _verification(spec)
     out += _test_links(spec)
     out += _approvals(spec)
+    out += _conflicts(spec)
+    out += _feedback(spec)
     out += _rendered(spec)
     return out
 
@@ -152,10 +155,31 @@ def _traces(spec: Spec) -> list[Finding]:
         for el in item.data.get("elements") or []:
             if el not in spec.elements:
                 out.append(_f("T003", f"{item.id} names unknown system element {el}", item.id, item))
+    out += _flow_down(spec)
     verified = {r for vi in spec.of_kind("vi") for r in (vi.data.get("verifies") or [])}
     for item in spec.requirements():
         if item.id not in verified and not item.data.get("verification_deferred"):
             out.append(_f("T004", f"{item.id} has no verification item yet", item.id, item))
+    return out
+
+
+def _flow_down(spec: Spec) -> list[Finding]:
+    """CHECK-22: a requirement on an element refines a requirement of the element's parent (DR-58)."""
+    out = []
+    enforced = spec.config.get("flow_down") == "enforced"
+    for item in spec.of_kind("requirement"):
+        target = spec.items.get(str(item.data.get("traces_to") or ""))
+        element = spec.elements.get(item.element)
+        if item.data.get("derived") or target is None or element is None or not element.parent:
+            continue  # untraced and legacy-derived requirements are T001's to report
+        parent = spec.elements.get(element.parent)
+        ok = target.element == element.parent and (target.kind == "requirement" or (
+            parent is not None and not parent.parent and target.kind in ("system", "constraint")))
+        if not ok:
+            where = f"{target.element}'s" if target.kind == "requirement" else "the system's"
+            out.append(Finding("T005", f"{item.id} is on {item.element}, whose parent is {element.parent}, but "
+                                       f"refines {target.id}, one of {where} requirements", item.id, item.file,
+                               item.line, level="error" if enforced else None))
     return out
 
 
@@ -174,15 +198,38 @@ def _attributes(spec: Spec) -> list[Finding]:
     out = []
     for item in spec.of_kind("need", "system", "constraint", "requirement", "vi"):
         origin = item.data.get("origin")
-        if origin not in ("engineer", "agent"):
+        if origin is not None and origin not in ("engineer", "agent"):
             out.append(_f("A002", f"{item.id} has origin {origin!r}", item.id, item))
+        elif origin is None and item.kind != "vi" and not item.data.get("intent") and not (
+                item.kind != "need" and (item.data.get("basis") or review.history(spec, item.id))):
+            out.append(_f("A002", f"{item.id} says neither who asked for it nor where it came from", item.id, item))
         if not item.data.get("text") and item.kind != "vi":
             out.append(_f("S007", f"{item.id} has no `text`", item.id, item))
     for item in spec.requirements():
-        if not (item.data.get("why") or item.data.get("source") or item.data.get("quotes")):
+        if not (item.data.get("why") or item.data.get("source") or item.data.get("quotes") or item.data.get("intent")):
             out.append(_f("A001", f"{item.id} has neither `why` nor `source`", item.id, item))
     for item in spec.items.values():
         out += _quote_findings(item)
+        out += _intent_findings(item, item.data, item.id)
+        basis = item.data.get("basis")
+        if basis is not None and basis not in levels.ITEM_BASES:
+            out.append(_f("A008", f"{item.id} has basis {basis!r}", item.id, item))
+    for e in spec.elements.values():
+        out += _intent_findings(e, e.data, e.id)
+    if spec.version >= 2:  # DR-63: a migrated spec keeps no field of the older format
+        from syseng import migrate
+        for iid, found in migrate.legacy_items(spec):
+            out.append(_f("A009", f"{iid} has {', '.join(f'`{f}`' for f in found)}", iid, spec.items[iid]))
+        for a in spec.approvals:
+            old = [k for k in ("words", "approved_at", "approved_on") if k in a]
+            if old:
+                out.append(Finding("A009", f"the lock on {a.get('id')} has {', '.join(f'`{k}`' for k in old)}",
+                                   a.get("id"), spec.locks_path()))
+                continue
+            wrong = records.problems(records.Lock, a)
+            if wrong:
+                out.append(Finding("A010", f"the lock on {a.get('id')}: {'; '.join(wrong)}", a.get("id"),
+                                   spec.locks_path()))
     for item in spec.of_kind("decision"):
         if item.data.get("decided_by") not in ("engineer", "agent"):
             out.append(_f("S007", f"{item.id} needs `decided_by: engineer` or `agent`", item.id, item))
@@ -204,6 +251,32 @@ def _quote_findings(item) -> list[Finding]:
         missing = [k for k in ("words", "said", "context") if not (isinstance(q, dict) and q.get(k))]
         if missing:
             out.append(_f("S007", f"quote {n} on {item.id} has no `{'`, `'.join(missing)}`", item.id, item))
+    return out
+
+
+def _intent_findings(where, data: dict, iid: str) -> list[Finding]:
+    """CHECK-20 and CHECK-25: each intent record is complete, and summarizes rather than quotes."""
+    recs = data.get("intent")
+    if recs is None:
+        return []
+    if not isinstance(recs, list):
+        return [_f("A006", f"{iid}'s `intent` must be a list of records", iid, where)]
+    out = []
+    for n, r in enumerate(recs, 1):
+        if not isinstance(r, dict):
+            out.append(_f("A006", f"intent record {n} on {iid} isn't a mapping", iid, where))
+            continue
+        wrong = records.problems(records.IntentRecord, r)
+        if wrong:
+            out.append(_f("A006", f"intent record {n} on {iid}: {'; '.join(wrong)}", iid, where))
+        for key in ("said", "context"):
+            text = str(r.get(key) or "")
+            for mark in ('"', "\u201c", "\u201d"):
+                if mark in text:
+                    at = text.index(mark)
+                    out.append(Finding("A007", f"intent record {n} on {iid} has a double quotation mark in `{key}`",
+                                       iid, where.file, where.line, text, (at, at + 1)))
+                    break
     return out
 
 
@@ -266,18 +339,59 @@ def _approvals(spec: Spec) -> list[Finding]:
     for a in spec.approvals:
         aid = a.get("id")
         if aid not in spec.items and aid not in spec.elements:
-            out.append(Finding("A005", f"approval for {aid}, which doesn't exist", aid, spec.root / "approvals.yaml"))
-    for status in approval_status(spec):  # delegated items aren't to-dos (CHECK-19)
-        if status["state"] == review.CHANGED:
-            out.append(Finding("A003", f"{status['id']} changed since the engineer approved it", status["id"],
-                               status["file"], status["line"]))
-        elif status["state"] == review.UNREVIEWED:
-            out.append(Finding("A003", f"{status['id']} is unreviewed: nothing above it is approved", status["id"],
-                               status["file"], status["line"]))
+            out.append(Finding("A005", f"lock on {aid}, which doesn't exist", aid, spec.locks_path()))
+    approvable = [(i.id, i.file, i.line) for i in spec.items.values()]
+    approvable += [(e.id, e.file, 1) for e in spec.elements.values()]
+    for iid, file, line in approvable:  # CHECK-19: what awaits a person is a change to what a person gave
+        lv = levels.level_of(spec, iid)
+        if lv.changed and not levels.seen_since(spec, levels.last_changed(spec, iid)):  # DR-68: until shown
+            who = (lv.newest or {}).get("by")
+            out.append(Finding("A003", f"{iid} changed since {who or 'a person'} {_verb(lv.given)} it", iid, file,
+                               line))
     for cid, alt in review.unanswered(spec):
         out.append(Finding("A004", f"{alt['id']} was altered in {cid} ({', '.join(alt['reasons'])}) and awaits "
                                    f"the engineer's answer", alt["id"]))
     return out
+
+
+def _verb(level: str) -> str:
+    return {levels.EXPLICIT: "locked", levels.STATED: "stated", levels.GUIDED: "guided"}.get(level, "gave")
+
+
+def _conflicts(spec: Spec) -> list[Finding]:
+    """CHECK-26: before the open change is done, each alteration to an item a person locked or stated is either
+    raised as a conflict, declared a rewording, or carries the person's own request for it."""
+    from syseng import changes
+    try:
+        change = changes.current(spec)
+    except changes.ChangeError:
+        return []
+    if change is None:
+        return []
+    named = {i for d in change.data.get("decisions") or [] for i in d.get("involves") or []}
+    out = []
+    for alt in review.alterations(spec, change):
+        if alt["answered"] or alt["id"] in named:
+            continue
+        if all(e.get("rewording") or e.get("conflict") or e.get("requested") for e in alt["entries"]):
+            continue
+        logged = {e.get("level") for e in alt["entries"]} - {None}
+        if logged and not logged & {levels.EXPLICIT, levels.STATED}:
+            continue  # guided items are asked about once built, not raised as conflicts (DR-57)
+        out.append(Finding("C001", f"{alt['id']} was altered in this change ({', '.join(alt['reasons'])}), and no "
+                                   f"conflict names it", alt["id"]))
+    return out
+
+
+def _feedback(spec: Spec) -> list[Finding]:
+    """CHECK-23: each comment from a person's feedback in the open change has a recorded response."""
+    from syseng import changes, feedback
+    try:
+        waiting = feedback.unanswered(spec)
+    except changes.ChangeError:
+        return []
+    return [Finding("F001", f"{f.get('n')} from {f.get('by')}" + (f" on {f['id']}" if f.get("id") else "")
+                            + f" ({f.get('kind')}) has no response yet", f.get("id")) for _, f in waiting]
 
 
 def approval_status(spec: Spec) -> list[dict]:
@@ -294,12 +408,9 @@ def approval_status(spec: Spec) -> list[dict]:
 
 # ---------------------------------------------------------------- rendered views
 def _rendered(spec: Spec) -> list[Finding]:
-    out = []
-    for name, text in render.views(spec).items():
-        path = spec.root / name
-        if not path.exists() or path.read_text() != text:
-            out.append(Finding("R001", f"{name} doesn't match the spec", file=path))
-    return out
+    """Markdown views from before the review page: they show a spec that no longer exists (DR-60)."""
+    return [Finding("R001", f"{p.relative_to(spec.root)} is a Markdown view the toolkit no longer generates", file=p)
+            for p in render.stale_views(spec)]
 
 
 # ---------------------------------------------------------------- formatting
@@ -343,14 +454,16 @@ def summarize(findings: list[Finding]) -> str:
     errors = [f for f in findings if f.severity == "error"]
     todos = [f for f in findings if f.severity == "todo"]
     unverified = sum(1 for f in todos if f.code == "T004")
-    unreviewed = sum(1 for f in todos if f.code == "A003")
+    changed = sum(1 for f in todos if f.code == "A003")
+    flow = sum(1 for f in todos if f.code == "T005")
     unserved = sum(1 for f in todos if f.code == "T002")
     unanswered = sum(1 for f in todos if f.code == "A004")
     parts = [f"{len(errors)} error{'s' if len(errors) != 1 else ''}"]
     if todos:
         served = f"{_n(unserved, 'need')} nothing serves yet, " if unserved else ""
         answers = f"{_n(unanswered, 'alteration')} awaiting the engineer's answer, " if unanswered else ""
+        changes_ = f", {_n(changed, 'item')} changed since a person gave it" if changed else ""
+        flows = f", {_n(flow, 'requirement')} skipping a level of the breakdown" if flow else ""
         parts.append(f"{_n(len(todos), 'to-do')} ({answers}{served}{_n(unverified, 'requirement')} without "
-                     f"verification items, {_n(unreviewed, 'unreviewed item')}; list them with "
-                     f"`spec check --todo`)")
+                     f"verification items{changes_}{flows}; list them with `spec check --todo`)")
     return "spec check: " + ", ".join(parts)

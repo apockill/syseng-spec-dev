@@ -5,7 +5,16 @@
   - ONBOARD
   requirements: SYS-23, ONBOARD-1 to ONBOARD-7
   recorded: round 5
-  context: I had proposed adopting the toolkit gradually, grandfathering existing gaps in a baseline (CHECK-13). The engineer wants the opposite. Bringing a project in should capture everything at once, as carefully as possible, so that the engineer only confirms the needs and approves the rest. Reviewing an existing project line by line would take forever.
+  context: I had proposed adopting the toolkit gradually, grandfathering existing gaps in a baseline (CHECK-13). The engineer wants the opposite. Bringing a project in should capture everything at once, as carefully as possible, so that the engineer only confirms the needs and locks the rest. Reviewing an existing project line by line would take forever.
   decision: onboarding extracts the full spec and the reasons behind it, runs every check (including expensive ones and auditors), and asks only questions the project can't answer. It records the current state without proposing changes. Rigor goes into later changes instead.
   alternatives: gradual adoption with a shrinking baseline of grandfathered findings.
   consequences: onboarding is expensive in tokens and time, but it happens once per project.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: '2026-10-11'
+    context: |-
+      Date approximate (rounds 1 to 11). Round 5: reviewing SYS-23 (onboarding an existing project), after the agent had proposed adopting the toolkit gradually with existing gaps grandfathered in a baseline (CHECK-13).
+    said: |-
+      Wants the opposite of gradual adoption: onboarding should capture everything at once, as carefully as possible, running every check, so that they only confirm the needs and approve the rest. Said reviewing an existing project line by line would take forever.
+    basis: stated
+    fingerprint: b9c24e355c70

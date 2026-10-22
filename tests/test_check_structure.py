@@ -81,6 +81,15 @@ def test_missing_origin_is_reported(spec):
     assert "A002" in spec.codes()
 
 
+def test_an_item_with_no_intent_and_no_basis_is_reported(spec):
+    del spec.files["elements/CORE/requirements.yaml"][0]["origin"]
+    spec.write()
+    assert "A002" in spec.codes()
+    spec.files["elements/CORE/requirements.yaml"][0]["basis"] = "derived"
+    spec.write()
+    assert "A002" not in spec.codes()
+
+
 def test_retired_id_reuse_is_reported(spec):
     spec.files["retired.yaml"] = [{"element": "CORE", "ids": ["CORE-1"], "note": "CORE-1, in round 1."}]
     spec.write()
