@@ -155,3 +155,24 @@
     - It runs once. After it, the checker reports any older field as an error.
   alternatives: A migration script outside the toolkit, as round 9 used, which other repositories couldn't reuse. Asking the engineer to re-lock every reworded item, which DR-29 already chose against.
   consequences: Carrying locks over rewordings is possible only during this one migration, so an agent can't use it to keep a lock across a later edit. Records from before round 12 name the person who ran the migration, with a note, because no approver was recorded then.
+- id: DR-70
+  title: The flake provides the toolkit as a package, and setup links a Nix install through the profile
+  decided_by: agent
+  elements:
+  - CLI
+  requirements: CLI-9, CLI-21, SYS-32
+  recorded: round 30
+  context: On NixOS, pipx would fetch pydantic's compiled wheel, which often won't load there. The repository's flake had only a development shell. Setup links the user-level skill to the installed toolkit, and a Nix install lives at a store path that changes with every version.
+  decision: |-
+    - The flake's default package builds the toolkit with Python, PyYAML and pydantic from nixpkgs, with `spec` as its program. `nix profile install <repository>` puts it on the PATH, `nix run <repository> -- <command>` runs it once, and `nix profile upgrade` re-reads the place it was installed from.
+    - When the toolkit runs from the Nix store, setup links the user-level skill and subagents through the profile (`~/.nix-profile` or its equivalents) when the same files are there, so the links follow each upgrade.
+    - Machines without Nix still install with pipx or uv (SYS-32).
+  alternatives: A wrapper script in the machine's Nix configuration that runs the checkout, which needs no upgrade step but isn't something other machines can install. pipx on NixOS, which depends on nix-ld for pydantic's compiled part.
+  consequences: In this repository an agent that changes the toolkit runs `nix profile upgrade` so the installed `spec` matches the checkout; the repository's AGENTS.md says so.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-22 09:30
+    context: Choosing how to put `spec` on the PATH of a NixOS machine whose Nix setup another agent manages.
+    said: Found nix profile interesting, checked that upgrading is one command that re-reads the local checkout rather than GitHub, and asked for instructions to give their Nix agent.
+    basis: guided
+    fingerprint: ce5da775d80d

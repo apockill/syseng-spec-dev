@@ -114,7 +114,8 @@ def merge_instructions(text: str | None, harnesses: list[str] = ("claude-code",)
     text = text or ""
     start, end = text.find("<!-- syseng:"), text.find(INSTRUCTIONS_END)
     if start != -1 and end > start:
-        return text[:start] + block + text[end + len(INSTRUCTIONS_END):].lstrip("\n")
+        rest = text[end + len(INSTRUCTIONS_END):].lstrip("\n")  # what follows keeps one blank line before it
+        return text[:start] + block + ("\n" + rest if rest else "")
     return (text.rstrip("\n") + "\n\n" if text.strip() else "") + block
 
 
@@ -173,15 +174,42 @@ def hermes_home() -> Path:
     return Path.home() / ".hermes"
 
 
+NIX_STORE = "/nix/store/"
+
+
+def profile_roots() -> list[Path]:
+    """Where a Nix profile exposes what it installed; each survives `nix profile upgrade`."""
+    user = os.environ.get("USER") or Path.home().name
+    return [Path.home() / ".nix-profile", Path.home() / ".local/state/nix/profile",
+            Path("/etc/profiles/per-user") / user, Path("/run/current-system/sw")]
+
+
+def stable(target: Path) -> Path:
+    """A path to the installed toolkit that outlives an upgrade. A toolkit installed with Nix lives at a store path
+    that changes with every version, so the same file is reached through the profile instead, when it's there."""
+    text = str(target)
+    if not text.startswith(NIX_STORE):
+        return target
+    inside = Path(*Path(text[len(NIX_STORE):]).parts[1:])  # the path within the package's store directory
+    for root in profile_roots():
+        candidate = root / inside
+        try:
+            if candidate.exists() and candidate.resolve() == target.resolve():
+                return candidate
+        except OSError:
+            continue
+    return target
+
+
 def machine_links(harnesses: list[str]) -> dict[Path, Path]:
     """Links in this machine's user-level folders: path -> what it points at in the installed toolkit (CLI-21)."""
     links: dict[Path, Path] = {}
     if "claude-code" in harnesses:
-        links[claude_home() / "skills" / "syseng"] = SKILL
+        links[claude_home() / "skills" / "syseng"] = stable(SKILL)
         for src in sorted(AGENT_DEFINITIONS.glob("*.md")):
-            links[claude_home() / "agents" / src.name] = src
+            links[claude_home() / "agents" / src.name] = stable(src)
     if "hermes" in harnesses and hermes_home().is_dir():
-        links[hermes_home() / "skills" / "syseng"] = SKILL
+        links[hermes_home() / "skills" / "syseng"] = stable(SKILL)
     return links
 
 
