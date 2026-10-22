@@ -139,6 +139,12 @@ section.block > p.lede { margin: 0 0 12px; color: var(--text-muted); font-size: 
 .cls { font-size: 11px; padding: 0 7px; border-radius: 999px; border: 1px solid var(--border-strong); color: var(--text-secondary); }
 .cls.cls-meaning, .cls.cls-removed { border-color: color-mix(in srgb, var(--st-serious) 60%, transparent); }
 .cls.cls-added { border-color: color-mix(in srgb, var(--st-good) 60%, transparent); }
+.cls.cls-reworded, .cls.cls-moved { border-color: color-mix(in srgb, var(--accent, #7aa2ff) 55%, transparent); }
+.cls.toggle { display: inline-flex; align-items: center; gap: 4px; background: none; font: inherit; font-size: 11px; cursor: pointer; }
+.cls.toggle:hover { color: var(--text-primary); border-color: var(--text-muted); }
+.cls.toggle.on { color: var(--text-primary); background: color-mix(in srgb, var(--st-serious) 14%, transparent); }
+.cls.cls-reworded.toggle.on, .cls.cls-moved.toggle.on { background: color-mix(in srgb, var(--accent, #7aa2ff) 16%, transparent); }
+.act.diffs { margin-right: 6px; }
 
 /* ---------------------------------------------------------------- feedback controls */
 .actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
@@ -165,6 +171,7 @@ textarea.note:focus, input:focus { outline: 2px solid color-mix(in srgb, var(--a
 .field .v { color: var(--text-secondary); white-space: pre-wrap; overflow-wrap: anywhere; }
 del { background: var(--diff-del); text-decoration: line-through; text-decoration-color: var(--st-critical); border-radius: 3px; }
 ins { background: var(--diff-ins); text-decoration: none; border-radius: 3px; }
+del + ins { margin-left: 2px; }
 .reason { margin-top: 6px; font-size: 12.5px; color: var(--text-secondary); }
 .reason b { color: var(--text-muted); font-weight: 500; }
 .flag { margin-top: 6px; }

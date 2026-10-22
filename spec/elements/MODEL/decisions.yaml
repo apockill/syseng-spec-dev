@@ -21,7 +21,7 @@
   context: the engineer proposed recording locks (then called approvals) with a hash or git state, so the toolkit can tell when locked content has changed.
   decision: each lock stores the item's fingerprint and the locked text itself.
   alternatives: a fingerprint alone, which shows *that* something changed but not *what*. A git revision, which fails for locks given before a commit.
-  consequences: the review page can always show what changed since the lock. [approvals.md](approvals.md) already follows this format by hand.
+  consequences: the review page can always show what changed since the lock. locks.yaml keeps this format.
   basis: derived
 - id: DR-8
   title: A decomposition tree plus a separate dependency graph
@@ -84,7 +84,7 @@
   context: I proposed a separate item type for the engineer's CUJs. The engineer preferred annotating needs with them, so that future agents know why a need exists.
   decision: |-
     each need records its context in paraphrase: the reasoning and the scenarios behind it.
-  alternatives: a scenario item type with its own IDs and approvals.
+  alternatives: a scenario item type with its own IDs and locks.
   consequences: this matches SE practice, which keeps operational scenarios in a narrative concept-of-operations document rather than as baselined line items.
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -191,17 +191,17 @@
   consequences: Re-formatting or re-linking an item never makes its lock stop matching, and rewording it always does. One old fingerprint, NEED-12's, had also covered the heading of the next section, because of a parsing bug in my interim scripts. Its new fingerprint covers just the need and its context.
   basis: derived
 - id: DR-45
-  title: Approvals are kept as a history, each with who and how
+  title: Locks are kept as a history, each with who and how
   decided_by: agent
   elements:
   - MODEL
   - CLI
   requirements: MODEL-34, MODEL-35, CLI-11, CLI-12
   recorded: round 12
-  context: The approvals file held one record per item, so approving again overwrote the earlier record and its words. SYS-33 asks what an approval says about who and how, and SYS-39 asks for history.
-  decision: Every approval is appended, never replaced, and each records the approver, the channel (terminal, chat, menu, page or restated), the date and time, how many items were approved together, the engineer's words, an optional note, and the resolved decisions that involved the item. An item's current approval is any record whose fingerprint matches its content, the latest one first.
-  alternatives: One record per item with a list of past approvals inside it, which makes the file harder to read in a diff. A separate history file, which splits what one approval means across two places.
-  consequences: The approvals file grows with every approval. Records from before round 12 lack the new fields, and the toolkit treats the missing fields as unknown.
+  context: The approvals file, as locks were stored before round 18, held one record per item, so locking again overwrote the earlier record. SYS-33 asks what a lock says about who and how, and SYS-39 asks for history.
+  decision: Every lock is appended to locks.yaml, never replaced, and each records the person, the channel (terminal, chat, menu or page), the date and time, how many items were locked together, an optional note, the resolved decisions that involved the item, and, when an agent records it, a summary of what the person said. An unlock is a record of its own, so the history stays append-only. An item's current lock is the latest record whose fingerprint matches its content, unless a later record released it.
+  alternatives: One record per item with a list of past locks inside it, which makes the file harder to read in a diff. A separate history file, which splits what one lock means across two places.
+  consequences: locks.yaml grows with every lock. Records from before round 12 lack the newer fields, and the toolkit treats the missing fields as unknown.
   basis: derived
   status: amended in round 18 by DR-55 and DR-62. A lock holds a summary only when an agent records one, and a restatement is intent, not a lock.
 - id: DR-46

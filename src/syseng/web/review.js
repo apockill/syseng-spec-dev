@@ -239,13 +239,71 @@
     draw();
     return wrap;
   }
+  // what changed on each item since the person last looked: the first comparison, then unanswered alterations (REVIEW-33)
+  const CHANGE = {};
+  const RANK = ["added", "meaning", "moved", "reworded", "intent", "details"];
+  const CHIP_WORDS = { added: "new", meaning: "edited", moved: "moved", reworded: "reworded", intent: "intent changed", details: "details changed" };
+  if (DATA.changes.length) for (const d of DATA.changes[0].items)
+    if (!d.classes.includes("removed")) CHANGE[d.id] = { cls: d.classes.slice().sort((a, b) => RANK.indexOf(a) - RANK.indexOf(b))[0],
+      before: d.before || {}, after: d.after || {}, since: DATA.changes[0].older.label };
+  for (const a of DATA.awaiting.alterations) {
+    if (CHANGE[a.id]) continue;
+    const before = {}, after = {};
+    for (const e of a.entries) {
+      for (const [k, v] of Object.entries(e.before || {})) if (!(k in before)) before[k] = v;
+      Object.assign(after, e.after || {});
+    }
+    CHANGE[a.id] = { cls: a.entries.every((e) => e.rewording) ? "reworded" : "meaning", before, after, since: `before ${a.change}` };
+  }
+  // diff mode: each item's own toggle (REVIEW-34), on top of one switch for every item (REVIEW-35)
+  let diffAll = false;
+  try { diffAll = localStorage.getItem("syseng-diff") === "1"; } catch (e) { /* fine */ }
+  const diffOne = {};
+  const bodies = new Set();
+  const TEXT_KEYS = ["text", "description", "purpose"];
+  const showsDiff = (id) => !!CHANGE[id] && CHANGE[id].cls !== "added" && (id in diffOne ? diffOne[id] : diffAll);
+  function changeChip(id, redraw) {
+    const c = CHANGE[id];
+    if (!c) return null;
+    const words = CHIP_WORDS[c.cls] || c.cls;
+    if (c.cls === "added") return h("span", { class: "cls cls-added", title: `Added since ${c.since}` }, words);
+    const on = showsDiff(id);
+    return h("button", { type: "button", class: `cls cls-${c.cls} toggle` + (on ? " on" : ""), "aria-pressed": on,
+      title: `Changed since ${c.since}. ${on ? "Hide" : "Show"} what changed.`,
+      onclick: () => { diffOne[id] = !on; redraw(); } }, icon("compare", "sm"), words);
+  }
+  function itemBody(id) {  // the head, title and text; in diff mode, what changed in each
+    const it = ITEMS[id];
+    const box = h("div", { class: "body" });
+    function draw() {
+      const c = CHANGE[id], on = showsDiff(id);
+      const has = (k) => on && (k in c.before || k in c.after);
+      const textKey = on ? TEXT_KEYS.find(has) : null;
+      const rest = on ? [...new Set([...Object.keys(c.before), ...Object.keys(c.after)])].filter((k) => k !== "title" && k !== textKey) : [];
+      fill(box, h("div", { class: "item-head" }, idButton(id), levelChip(id), changeChip(id, draw), ...statusChips(id), h("span", { class: "small" }, it.kind)),
+        has("title") ? h("div", { class: "item-text" }, h("b", {}, wordDiff(c.before.title, c.after.title)))
+          : it.title ? h("div", { class: "item-text" }, h("b", {}, it.title)) : null,
+        textKey ? h("div", { class: "item-text" }, wordDiff(c.before[textKey], c.after[textKey]))
+          : it.text ? h("div", { class: "item-text" }, linkify(it.text)) : null,
+        on ? h("div", { class: "fields" }, h("div", { class: "small muted" }, `Changes since ${c.since}`),
+          ...rest.map((k) => fieldDiff(k, c.before[k], c.after[k]))) : null);
+    }
+    draw();
+    bodies.add({ box, draw });
+    return box;
+  }
+  function setDiffAll(on) {
+    diffAll = on;
+    for (const k of Object.keys(diffOne)) delete diffOne[k];
+    try { localStorage.setItem("syseng-diff", on ? "1" : "0"); } catch (e) { /* fine */ }
+    for (const b of [...bodies]) { if (b.box.isConnected) b.draw(); else bodies.delete(b); }
+    const btn = document.getElementById("diffs");
+    if (btn) { btn.classList.toggle("on", on); btn.setAttribute("aria-pressed", on); }
+  }
   function itemCard(id, opts) {
     const it = ITEMS[id];
     if (!it) return h("div", { class: "card" }, id, " (no longer in the spec)");
-    const card = h("div", { class: "card", "data-item": id },
-      h("div", { class: "item-head" }, idButton(id), levelChip(id), ...statusChips(id), h("span", { class: "small" }, it.kind)),
-      it.title ? h("div", { class: "item-text" }, h("b", {}, it.title)) : null,
-      it.text ? h("div", { class: "item-text" }, linkify(it.text)) : null);
+    const card = h("div", { class: "card", "data-item": id }, itemBody(id));
     if (opts && opts.extra) card.append(opts.extra);
     if (opts && opts.details) card.append(details(id));
     const mark = triage(card, () => answered(id));
@@ -459,9 +517,7 @@
     const it = ITEMS[id];
     const sub = h("div", { class: "sub", "data-item": id });
     const mark = triage(sub, () => answered(id));
-    fill(sub, h("div", { class: "item-head" }, idButton(id), levelChip(id), ...statusChips(id), h("span", { class: "small" }, it.kind)),
-      it.title ? h("div", { class: "item-text" }, h("b", {}, it.title)) : null,
-      it.text ? h("div", { class: "item-text" }, linkify(it.text)) : null,
+    fill(sub, itemBody(id),
       itemActions(id, { ...opts, onchange: () => { mark(); if (onchange) onchange(); } }));
     return sub;
   }
@@ -759,6 +815,15 @@
     document.getElementById("repo").textContent = META.repository;
     document.getElementById("when").textContent = `${META.generated} · ${META.revision.slice(0, 7)}${META.dirty ? " + uncommitted" : ""}`;
     const t = document.getElementById("theme");
+    const changed = Object.values(CHANGE).filter((c) => c.cls !== "added").length;
+    t.before(h("button", { class: "act diffs" + (diffAll ? " on" : ""), id: "diffs", type: "button", "aria-pressed": diffAll,
+      title: `Show what changed on every edited item (${changed}), or hide it. Key: D`, onclick: () => setDiffAll(!diffAll) },
+    icon("compare", "sm"), "Diffs"));
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "d" && e.key !== "D") return;
+      if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest("input, textarea, select, [contenteditable]")) return;
+      setDiffAll(!diffAll);
+    });
     t.addEventListener("click", () => { const n = currentTheme() === "dark" ? "light" : "dark"; applyTheme(n); try { localStorage.setItem("syseng-theme", n); } catch (e) { /* fine */ } });
     applyTheme();
     const recs = DATA.proposals.filter((p) => p.from !== "computed");

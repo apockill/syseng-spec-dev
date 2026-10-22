@@ -16,15 +16,14 @@
   consequences: Every remaining rule fires only on real problems in this spec. Each exemption has a regression test, so a later change to the rules can't silently bring the noise back.
   basis: derived
 - id: DR-31
-  title: Missing verification, missing approvals and unserved needs are to-dos, not errors
+  title: Missing verification, missing locks and unserved needs are to-dos, not errors
   decided_by: agent
   elements:
   - CHECK
   requirements: CHECK-10, CHECK-14, CHECK-15, MODEL-18, SYS-9
   recorded: round 9 (slice 1)
-  context: 169 requirements have no verification item yet, and most items aren't approved. If those were errors, the checker would fail on every run, and agents would learn to ignore it.
-  decision: |-
-    They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12). The merge check (`spec check --merge`, CHECK-15) never fails because of approvals: whether a branch lands is the engineer's call (round 12, D1).
+  context: 169 requirements had no verification item yet, and most items weren't locked. If those were errors, the checker would fail on every run, and agents would learn to ignore it.
+  decision: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12). The merge check (`spec check --merge`, CHECK-15) never fails because of locks; whether a branch lands is the engineer's call (round 12, D1).
   alternatives: Failing on every missing item from day one.
   consequences: The checker stays green while to-dos remain, so the summary line is what keeps them visible.
   basis: derived
@@ -49,10 +48,9 @@
   requirements: CHECK-18, CHECK-19
   recorded: round 12
   context: Delegation needs a definition of "above" that covers every kind of item (DR-44).
-  decision: |-
-    An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest approved ancestor. An item that changed since its own approval isn't delegated: its change awaits the engineer. Nothing about the result is stored.
+  decision: An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest locked ancestor. An item that changed since its own lock isn't delegated; its change awaits the engineer. Nothing about the result is stored.
   alternatives: Delegating only through the requirement tree, which would leave every verification item, decision record and element unreviewed.
-  consequences: Approving a need delegates everything beneath it, including system requirements. The agent's proposals (SYS-38) are how key items still reach the engineer.
+  consequences: Locking a need delegates everything beneath it, including system requirements. The agent's proposals (SYS-38) are how key items still reach the engineer.
   basis: derived
   status: amended in round 18 by DR-54. A derived item names the nearest item above it that a person locked, stated or guided.
 - id: DR-50

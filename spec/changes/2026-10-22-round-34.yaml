@@ -1,0 +1,233 @@
+request: |-
+  Apply review 8b5e84e04f: locks, DR-45 still says approval; publish the review page as an artifact when the agent is Claude
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-22'
+entries:
+- op: modify
+  id: DR-45
+  at: 2026-10-22T16:02-07:00
+  reason: the engineer pointed out DR-45 still spoke of approvals; it now describes locks.yaml as built, including the amendments of DR-55 and DR-62 its status already noted.
+  before:
+    title: Approvals are kept as a history, each with who and how
+    context: The approvals file held one record per item, so approving again overwrote the earlier record and its words. SYS-33 asks what an approval says about who and how, and SYS-39 asks for history.
+    decision: Every approval is appended, never replaced, and each records the approver, the channel (terminal, chat, menu, page or restated), the date and time, how many items were approved together, the engineer's words, an optional note, and the resolved decisions that involved the item. An item's current approval is any record whose fingerprint matches its content, the latest one first.
+    alternatives: One record per item with a list of past approvals inside it, which makes the file harder to read in a diff. A separate history file, which splits what one approval means across two places.
+    consequences: The approvals file grows with every approval. Records from before round 12 lack the new fields, and the toolkit treats the missing fields as unknown.
+  after:
+    title: Locks are kept as a history, each with who and how
+    context: The approvals file, as locks were stored before round 18, held one record per item, so locking again overwrote the earlier record. SYS-33 asks what a lock says about who and how, and SYS-39 asks for history.
+    decision: Every lock is appended to locks.yaml, never replaced, and each records the person, the channel (terminal, chat, menu or page), the date and time, how many items were locked together, an optional note, the resolved decisions that involved the item, and, when an agent records it, a summary of what the person said. An unlock is a record of its own, so the history stays append-only. An item's current lock is the latest record whose fingerprint matches its content, unless a later record released it.
+    alternatives: One record per item with a list of past locks inside it, which makes the file harder to read in a diff. A separate history file, which splits what one lock means across two places.
+    consequences: locks.yaml grows with every lock. Records from before round 12 lack the newer fields, and the toolkit treats the missing fields as unknown.
+- op: modify
+  id: DR-44
+  at: 2026-10-22T16:02-07:00
+  reason: the engineer asked why DR-45 still said approval; this decision used the same retired word for the same act.
+  raised:
+  - a person locked it
+  level: explicit
+  fingerprint_before: 2a58655c60ad
+  fingerprint_after: a0c3dcbae9f1
+  rewording: true
+  before:
+    title: Approval works like delegated authority in configuration management
+    context: The engineer wants to approve the key points of the requirement tree, let agents decide the rest, and have each later change to what they approved, wrote or decided brought back to them (NEED-14 to NEED-20). Today every item needs approval, and over 200 items are waiting.
+    decision: |-
+      Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).
+      - The engineer approves key items explicitly, as a customer approves a baseline. Everything beneath an approved item is delegated: the agent decides it, as a contractor decides the detailed design.
+      - A change that alters an item the engineer approved, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it.
+      - Whether an item is approved, delegated or neither is computed from the approvals and the tree each time it's shown, and never stored (SYS-40).
+      - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
+    alternatives: Approving every item, which is today's rule and doesn't scale. A stored importance score, which the engineer ruled out.
+    consequences: The engineer approves a few key items per change instead of every item. Agents need each item's approval state at the moment they change it (SYS-39). The merge check never blocks; it lists the alterations the engineer hasn't answered yet (CHECK-15, round 12 D1).
+  after:
+    title: Locking works like delegated authority in configuration management
+    context: The engineer wants to lock the key points of the requirement tree, let agents decide the rest, and have each later change to what they locked, wrote or decided brought back to them (NEED-14 to NEED-20). Back then every item needed approval, and over 200 items were waiting.
+    decision: |-
+      Locking follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).
+      - The engineer locks key items explicitly, as a customer approves a baseline. Everything beneath a locked item is delegated: the agent decides it, as a contractor decides the detailed design.
+      - A change that alters an item the engineer locked, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it.
+      - Whether an item is locked, delegated or neither is computed from the locks and the tree each time it's shown, and never stored (SYS-40).
+      - Where a requirement sits and what the engineer said that it expresses are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and its intent records carry what the engineer said (SYS-35).
+    alternatives: Locking every item, which was the rule then and doesn't scale. A stored importance score, which the engineer ruled out.
+    consequences: The engineer locks a few key items per change instead of every item. Agents need each item's lock state at the moment they change it (SYS-39). The merge check never blocks; it lists the alterations the engineer hasn't answered yet (CHECK-15, round 12 D1).
+  acks:
+    DR-44: |-
+      a rewording: approval becomes lock, at the engineer's request on DR-45; the meaning is unchanged, and they re-lock it on the page
+- op: modify
+  id: DR-31
+  at: 2026-10-22T16:02-07:00
+  reason: retired vocabulary, approval, replaced with lock.
+  raised:
+  - a person locked it
+  level: explicit
+  fingerprint_before: 613a70551787
+  fingerprint_after: 7f36e05c1c57
+  rewording: true
+  before:
+    title: Missing verification, missing approvals and unserved needs are to-dos, not errors
+    context: 169 requirements have no verification item yet, and most items aren't approved. If those were errors, the checker would fail on every run, and agents would learn to ignore it.
+    decision: |-
+      They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12). The merge check (`spec check --merge`, CHECK-15) never fails because of approvals: whether a branch lands is the engineer's call (round 12, D1).
+  after:
+    title: Missing verification, missing locks and unserved needs are to-dos, not errors
+    context: 169 requirements had no verification item yet, and most items weren't locked. If those were errors, the checker would fail on every run, and agents would learn to ignore it.
+    decision: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12). The merge check (`spec check --merge`, CHECK-15) never fails because of locks; whether a branch lands is the engineer's call (round 12, D1).
+  acks:
+    DR-31: |-
+      a rewording: approval becomes lock, at the engineer's request on DR-45; the meaning is unchanged, and they re-lock it on the page
+- op: modify
+  id: DR-47
+  at: 2026-10-22T16:02-07:00
+  reason: retired vocabulary, approval, replaced with lock.
+  raised:
+  - a person locked it
+  level: explicit
+  fingerprint_before: b3b84715016c
+  fingerprint_after: 706496ce3891
+  rewording: true
+  before:
+    decision: |-
+      An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest approved ancestor. An item that changed since its own approval isn't delegated: its change awaits the engineer. Nothing about the result is stored.
+    consequences: Approving a need delegates everything beneath it, including system requirements. The agent's proposals (SYS-38) are how key items still reach the engineer.
+  after:
+    decision: An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest locked ancestor. An item that changed since its own lock isn't delegated; its change awaits the engineer. Nothing about the result is stored.
+    consequences: Locking a need delegates everything beneath it, including system requirements. The agent's proposals (SYS-38) are how key items still reach the engineer.
+  acks:
+    DR-47: |-
+      a rewording: approval becomes lock, at the engineer's request on DR-45; the meaning is unchanged, and they re-lock it on the page
+- op: modify
+  id: DR-6
+  at: 2026-10-22T16:02-07:00
+  reason: retired vocabulary replaced; "quoting the engineer's words" brought in line with the amendment its status already records (DR-62, DR-55).
+  raised:
+  - a person locked it
+  level: explicit
+  fingerprint_before: 1b9f55351fd2
+  fingerprint_after: 76399fb22d76
+  rewording: true
+  before:
+    status: amended in round 18 by DR-62. Records the hook makes hold no words, and restatements become intent records, not approvals.
+    decision: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
+  after:
+    status: amended in round 18 by DR-62. Records the hook makes hold no words, and restatements become intent records, not locks.
+    decision: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, with a summary of what the engineer said and the channel.
+  acks:
+    DR-6: |-
+      a rewording: approval becomes lock, at the engineer's request on DR-45; the meaning is unchanged, and they re-lock it on the page
+- op: modify
+  id: DR-51
+  at: 2026-10-22T16:02-07:00
+  reason: the command is `spec lock` now (approve is an alias), and no command records a person's words, as its status already says.
+  rewording: true
+  before:
+    decision: |-
+      `spec init` writes a short section between markers into AGENTS.md, or CLAUDE.md when that's the file the repository has, and rewrites only that section on later runs. It adds Claude Code allow rules for status, check, show, render, edit, change, decide, propose and friction. Approve and resolve stay with the permission prompt, so the engineer confirms each command that records their words.
+  after:
+    decision: |-
+      `spec init` writes a short section between markers into AGENTS.md, or CLAUDE.md when that's the file the repository has, and rewrites only that section on later runs. It adds Claude Code allow rules for status, check, show, render, edit, change, decide, propose and friction. Lock and resolve stay with the permission prompt, so the engineer confirms each command that records a lock or decision in their name.
+- op: modify
+  id: DR-5
+  at: 2026-10-22T16:02-07:00
+  reason: the consequence pointed at approvals.md, which no longer exists.
+  raised:
+  - a person locked it
+  level: explicit
+  fingerprint_before: acff6fb7da9a
+  fingerprint_after: 97a13b95c661
+  rewording: true
+  before:
+    consequences: the review page can always show what changed since the lock. [approvals.md](approvals.md) already follows this format by hand.
+  after:
+    consequences: the review page can always show what changed since the lock. locks.yaml keeps this format.
+  acks:
+    DR-5: |-
+      a rewording: approval becomes lock, at the engineer's request on DR-45; the meaning is unchanged, and they re-lock it on the page
+- op: modify
+  id: DR-12
+  at: 2026-10-22T16:02-07:00
+  reason: retired vocabulary, approval, replaced with lock.
+  raised:
+  - a person locked it
+  - a person stated or guided it
+  - a person decided it
+  level: explicit
+  fingerprint_before: 495b40506ad0
+  fingerprint_after: ed531786b300
+  rewording: true
+  before:
+    alternatives: a scenario item type with its own IDs and approvals.
+  after:
+    alternatives: a scenario item type with its own IDs and locks.
+  acks:
+    DR-12: |-
+      a rewording: approval becomes lock, at the engineer's request on DR-45; the meaning is unchanged, and they re-lock it on the page
+- op: modify
+  id: MODEL-34
+  at: 2026-10-22T16:02-07:00
+  reason: retired vocabulary, approval, replaced with lock.
+  rewording: true
+  before:
+    why: SYS-33 lists what an approval must show. A record the hook or the feedback block makes is mechanical, so it holds no words; an agent recording one adds a summary.
+  after:
+    why: SYS-33 lists what a lock must show. A record the hook or the feedback block makes is mechanical, so it holds no words; an agent recording one adds a summary.
+- op: modify
+  id: MODEL-35
+  at: 2026-10-22T16:02-07:00
+  reason: retired vocabulary, approval, replaced with lock.
+  rewording: true
+  before:
+    why: an item approved several times, or approved again after a change, carries more signal than a single approval, and the dates show how fresh each approval is.
+  after:
+    why: an item locked several times, or locked again after a change, carries more signal than a single lock, and the dates show how fresh each lock is.
+- op: add
+  id: AGENT-64
+  at: 2026-10-22T16:03-07:00
+  reason: the engineer asked for the review page to be published as an artifact when the agent is Claude; the skill states it for any harness that can publish a private page, keeping SYS-27.
+  requested: true
+  after:
+    text: Where the agent's harness can publish a private web page, the agent shall publish the review page there and give the person its link.
+    traces_to: SYS-29
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 16:03
+      context: After opening the review page for a pull request as a Claude artifact, which GitHub can't render itself.
+      said: Found that Claude artifacts work well for the review page, and wants them used when the agent they're working with is Claude.
+      basis: stated
+      fingerprint: b29e83558b65
+- op: add
+  id: AGENT-V14
+  at: 2026-10-22T16:03-07:00
+  reason: verifies the skill directs it.
+  after:
+    verifies:
+    - AGENT-64
+    method: inspection
+    technique: reasoning check
+    description: The skill's hand-over step directs an agent whose harness can publish a private web page, such as Claude's artifacts, to publish the review page there and give the person the link, including on a pull request; and to give the file's location otherwise.
+decisions: []
+friction: []
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-22T16:00-07:00
+  review: 8b5e84e04f
+  id: DR-45
+  kind: comment
+  comment: I thought we got rid of "approval" in favor of locking and lock status?
+  response: |-
+    You're right. DR-45 was left over from before locks replaced approvals. It now describes locks.yaml as built: who, channel, when, batch, note, resolved decisions, a summary when an agent records the lock, and unlocks as their own records. Nine other items still used approval for the current system, and I reworded those too: DR-44, DR-31, DR-47, DR-6, DR-51, DR-5, DR-12, MODEL-34 and MODEL-35. Places that describe the history, such as 'then called approvals' or 'without an approval step', are unchanged. DR-44, DR-31, DR-47, DR-6, DR-5 and DR-12 were locked, so they now show as locked to an earlier version. They're proposed for re-locking.
+  responded: 2026-10-22T16:02-07:00
+proposals:
+- ids:
+  - DR-44
+  - DR-31
+  - DR-47
+  - DR-6
+  - DR-5
+  - DR-12
+  why: You locked these; they were reworded only, approval to lock, and now show as locked to an earlier version.
+  proposed: 2026-10-22T16:03-07:00
+closed: '2026-10-22'

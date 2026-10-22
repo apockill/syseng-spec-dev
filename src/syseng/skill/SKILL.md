@@ -38,7 +38,7 @@ Derived and added items are yours to reshape. Explicit and stated items are a pe
 5. **Keep the spec in step as part of the same change.** Update the requirements and verification items the change affects, record a requirement (with `basis: added`) for each feature a user would notice that you add unasked, and add a decision record for each design decision you make. See "Editing the spec".
 6. **Before calling the change done,** run every cheap check: the project's tests, then `spec check`. Fix every error.
 7. **Before the engineer reviews,** have fresh-context auditors check your spec updates. See references/auditing.md.
-8. **Hand over the review page.** Run `spec review` (add `--against main` on a branch) and give the person the page's location. It shows, in order: the conflicts and decisions awaiting them, your responses to their last feedback, what changed since their last review, the intent you captured, the items most worth locking, the system as a graph, and the full spec.
+8. **Hand over the review page.** Run `spec review` (add `--against main` on a branch). Where your harness can publish a private web page, as Claude's artifacts do, publish the page there and give the person the link, on the pull request too when there is one; otherwise give them the file's location. It shows, in order: the conflicts and decisions awaiting them, your responses to their last feedback, what changed since their last review, the intent you captured, the items most worth locking, the system as a graph, and the full spec.
 9. **Report** in a few lines, beside the page:
    - what changed;
    - each measure the overview marks worse (`spec review --section overview`), such as verification coverage, with why, and what you'd do about it;

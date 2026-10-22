@@ -267,12 +267,12 @@
 - id: MODEL-34
   text: Each lock record shall hold the person who locked the item, the channel, the date and time, the number of items locked in the same action, and the fingerprint of the content locked, plus a summary of what the engineer said when an agent records the lock.
   traces_to: SYS-33
-  why: SYS-33 lists what an approval must show. A record the hook or the feedback block makes is mechanical, so it holds no words; an agent recording one adds a summary.
+  why: SYS-33 lists what a lock must show. A record the hook or the feedback block makes is mechanical, so it holds no words; an agent recording one adds a summary.
   basis: derived
 - id: MODEL-35
   text: The spec shall keep every lock of an item, oldest first.
   traces_to: SYS-39
-  why: an item approved several times, or approved again after a change, carries more signal than a single approval, and the dates show how fresh each approval is.
+  why: an item locked several times, or locked again after a change, carries more signal than a single lock, and the dates show how fresh each lock is.
   basis: derived
 - id: MODEL-36
   text: An intent record shall hold its author, the date and time of the statement, the context of the discussion, a summary of what the person said, and the fingerprint of the item it was recorded for.

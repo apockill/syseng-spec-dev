@@ -287,3 +287,38 @@
     said: Finds statistics like that really helpful. Wants the dashboard's landing page to open with a high-level overview, such as the numbers of changed, edited, new and deleted items, items without verification items, connections between things and tests written, presented cleanly without too much noise. Also wants measures of the project's health that degraded called out visually, for example when a change lowers verification coverage.
     basis: stated
     fingerprint: fe62d522f563
+- id: REVIEW-33
+  text: Wherever the review page shows an item that changed since the person's last review, it shall mark the item as new or as edited, naming the kind of edit.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-22 16:10
+    context: Reviewing the agent's recommended items on the review page, several shown as locked to an earlier version.
+    said: When the AI asks them to review something it isn't always clear whether the item was edited or added, and they want that made clear.
+    basis: stated
+    fingerprint: 5ad478570d49
+- id: REVIEW-34
+  text: When the person turns on an edited item's diff, the review page shall show that item's differences inline.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-22 16:10
+    context: Reviewing the agent's recommended items on the review page, several shown as locked to an earlier version.
+    said: Sometimes wants to see the diff of an edited item, so it should be easy to view.
+    basis: stated
+    fingerprint: 3d49c146e26c
+- id: REVIEW-35
+  text: The review page shall offer one control that turns the diffs of every edited item on or off.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-22 16:10
+    context: Reviewing the agent's recommended items on the review page, several shown as locked to an earlier version.
+    said: Viewing diffs all the time is hard, so they want a neat way to control when they are or aren't in diff mode.
+    basis: stated
+    fingerprint: aff644cd1bb1
+- id: REVIEW-36
+  text: When agents have proposed an item for locking more than once, the review page shall show the item with its newest proposal.
+  traces_to: SYS-38
+  basis: derived
+  why: the page groups the newest change's proposals at the top; an item proposed again under an older reason dropped out of that group, so the engineer saw five of the six items they were asked to look at.

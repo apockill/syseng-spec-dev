@@ -110,7 +110,7 @@
   consequences: Agents run `spec` from the PATH, as in any other repository. On the engineer's machine it's installed with `pipx install --editable` from this checkout, so changes apply at once (DR-52).
   basis: derived
 - id: DR-44
-  title: Approval works like delegated authority in configuration management
+  title: Locking works like delegated authority in configuration management
   decided_by: agent
   elements:
   - SYS
@@ -120,15 +120,15 @@
   requirements: SYS-33, SYS-34, SYS-35, SYS-36, SYS-37, SYS-38, SYS-39, SYS-40
   recorded: round 12 (spec-first)
   status: built in round 12. Extended in round 18 by DR-54, whose five levels of intent replace its two states.
-  context: The engineer wants to approve the key points of the requirement tree, let agents decide the rest, and have each later change to what they approved, wrote or decided brought back to them (NEED-14 to NEED-20). Today every item needs approval, and over 200 items are waiting.
+  context: The engineer wants to lock the key points of the requirement tree, let agents decide the rest, and have each later change to what they locked, wrote or decided brought back to them (NEED-14 to NEED-20). Back then every item needed approval, and over 200 items were waiting.
   decision: |-
-    Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).
-    - The engineer approves key items explicitly, as a customer approves a baseline. Everything beneath an approved item is delegated: the agent decides it, as a contractor decides the detailed design.
-    - A change that alters an item the engineer approved, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it.
-    - Whether an item is approved, delegated or neither is computed from the approvals and the tree each time it's shown, and never stored (SYS-40).
-    - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
-  alternatives: Approving every item, which is today's rule and doesn't scale. A stored importance score, which the engineer ruled out.
-  consequences: The engineer approves a few key items per change instead of every item. Agents need each item's approval state at the moment they change it (SYS-39). The merge check never blocks; it lists the alterations the engineer hasn't answered yet (CHECK-15, round 12 D1).
+    Locking follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example).
+    - The engineer locks key items explicitly, as a customer approves a baseline. Everything beneath a locked item is delegated: the agent decides it, as a contractor decides the detailed design.
+    - A change that alters an item the engineer locked, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it.
+    - Whether an item is locked, delegated or neither is computed from the locks and the tree each time it's shown, and never stored (SYS-40).
+    - Where a requirement sits and what the engineer said that it expresses are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and its intent records carry what the engineer said (SYS-35).
+  alternatives: Locking every item, which was the rule then and doesn't scale. A stored importance score, which the engineer ruled out.
+  consequences: The engineer locks a few key items per change instead of every item. Agents need each item's lock state at the moment they change it (SYS-39). The merge check never blocks; it lists the alterations the engineer hasn't answered yet (CHECK-15, round 12 D1).
   basis: derived
 - id: DR-54
   title: Five levels of intent, computed from locks, intent records and a recorded basis

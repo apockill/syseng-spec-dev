@@ -6,6 +6,14 @@
   batch: 1
   text: An item shall count as approved, written or decided by the engineer when it has an approval record, when its origin is the engineer or it quotes the engineer, or when it is a decision record the engineer made.
   note: approver not recorded with an email address; the migration filled in the person running it
+- id: CHANGE-13
+  fingerprint: 7b50717c11d4
+  locked_at: 2026-10-22T16:00-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 4
+  review: 8b5e84e04f
+  text: An item shall count as locked, written or decided by the engineer when its level of intent is explicit, stated or guided.
 - id: CHECK-14
   fingerprint: d6397a381791
   locked_at: 2026-10-17T23:00-07:00
@@ -15,6 +23,22 @@
   text: The checker shall report each item whose content no longer matches the fingerprint of its latest lock.
   migrated_from: edd78f0eb7a1
   note: approver not recorded with an email address; the migration filled in the person running it
+- id: CHECK-29
+  fingerprint: d1147fe87204
+  locked_at: 2026-10-22T16:00-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 4
+  review: 8b5e84e04f
+  text: The checker shall report each requirement on a system element with sub-elements that has neither a verification item nor a requirement refining it, saying that it is neither decomposed nor verified.
+- id: CHECK-V14
+  fingerprint: 7180cb162341
+  locked_at: 2026-10-22T16:00-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 4
+  review: 8b5e84e04f
+  text: A requirement on an element with sub-elements that nothing refines or verifies is reported as neither decomposed nor verified; a refined one and a leaf element's one get the plain to-do.
 - id: DR-1
   fingerprint: 0b72ae3a99ed
   locked_at: '2026-10-11'
@@ -51,6 +75,15 @@
     Scenarios of use are context on needs, not an item type: each need records its context in paraphrase: the reasoning and the scenarios behind it.
   migrated_from: 4ac13ccfd11d
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: DR-12
+  fingerprint: ed531786b300
+  locked_at: 2026-10-22T16:14-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 6
+  review: 1d91756866
+  text: |-
+    Scenarios of use are context on needs, not an item type: each need records its context in paraphrase: the reasoning and the scenarios behind it.
 - id: DR-13
   fingerprint: 991262901a9b
   locked_at: '2026-10-11'
@@ -246,6 +279,15 @@
   text: |-
     Missing verification, missing approvals and unserved needs are to-dos, not errors: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12). The merge check (`spec check --merge`, CHECK-15) never fails because of approvals: whether a branch lands is the engineer's call (round 12, D1).
   note: kept under D1 of round 20 (Keep all ten as rewritten), chosen on the review page
+- id: DR-31
+  fingerprint: 7f36e05c1c57
+  locked_at: 2026-10-22T16:14-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 6
+  review: 1d91756866
+  text: |-
+    Missing verification, missing locks and unserved needs are to-dos, not errors: They're reported as to-dos, summarized in one line and listed by `spec check --todo`. Only errors fail the check. The done gate (CHECK-11) will make missing verification an error for the requirements a change touches. A need that no requirement serves yet is a to-do too, so needs can be recorded before the requirements that serve them, as spec-first planning does (round 12). The merge check (`spec check --merge`, CHECK-15) never fails because of locks; whether a branch lands is the engineer's call (round 12, D1).
 - id: DR-32
   fingerprint: 1df7b1e7bcb8
   locked_at: '2026-10-11'
@@ -341,6 +383,15 @@
   review: c168d24951
   text: |-
     Approval works like delegated authority in configuration management: Approval follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example). - The engineer approves key items explicitly, as a customer approves a baseline. Everything beneath an approved item is delegated: the agent decides it, as a contractor decides the detailed design. - A change that alters an item the engineer approved, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it. - Whether an item is approved, delegated or neither is computed from the approvals and the tree each time it's shown, and never stored (SYS-40). - Where a requirement sits and whose words it carries are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and it quotes the engineer's words it expresses (SYS-35).
+- id: DR-44
+  fingerprint: a0c3dcbae9f1
+  locked_at: 2026-10-22T16:14-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 6
+  review: 1d91756866
+  text: |-
+    Locking works like delegated authority in configuration management: Locking follows the split configuration management makes between a customer and a contractor (MIL-HDBK-61A, for example). - The engineer locks key items explicitly, as a customer approves a baseline. Everything beneath a locked item is delegated: the agent decides it, as a contractor decides the detailed design. - A change that alters an item the engineer locked, wrote or decided is like a Class I change: it goes back to the engineer once built and tested (SYS-37). Any other change is like a Class II change: the agent decides, and the change record logs it. - Whether an item is locked, delegated or neither is computed from the locks and the tree each time it's shown, and never stored (SYS-40). - Where a requirement sits and what the engineer said that it expresses are separate, as INCOSE keeps "trace to parent" apart from "trace to source": the system's structure places it (SYS-36), and its intent records carry what the engineer said (SYS-35).
 - id: DR-47
   fingerprint: 6031b58792b3
   locked_at: 2026-10-17T23:00-07:00
@@ -359,6 +410,24 @@
   text: |-
     An item's ancestors, for delegation, are what it traces to: An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest approved ancestor. An item that changed since its own approval isn't delegated: its change awaits the engineer. Nothing about the result is stored.
   note: kept under D1 of round 20 (Keep all ten as rewritten), chosen on the review page
+- id: DR-47
+  fingerprint: 706496ce3891
+  locked_at: 2026-10-22T16:14-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 6
+  review: 1d91756866
+  text: |-
+    An item's ancestors, for delegation, are what it traces to: An item's ancestors are the needs a system requirement serves, the requirement an element requirement traces to, the requirements a verification item verifies, the requirements a decision record names, and a system element's parent, followed upward. An item is delegated under its nearest locked ancestor. An item that changed since its own lock isn't delegated; its change awaits the engineer. Nothing about the result is stored.
+- id: DR-48
+  fingerprint: c1f2c12b9d76
+  locked_at: 2026-10-22T16:00-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 4
+  review: 8b5e84e04f
+  text: |-
+    Alterations to the engineer's items are flagged when logged, and answered by a lock or rollback: When an edit changes the meaning of such an item, the change log records why it counts (locked, their words, their decision) and the item's fingerprints before and after. Before applying it, the CLI asks the agent to acknowledge it. The alteration stays listed in the change record, and as a to-do, until the engineer locks the item as it now is (kept), or it's back to its earlier content (rolled back). A removed item is listed but can't be kept by a lock.
 - id: DR-5
   fingerprint: acff6fb7da9a
   locked_at: '2026-10-11'
@@ -368,6 +437,15 @@
     Lock records store a fingerprint and the locked content: each lock stores the item's fingerprint and the locked text itself.
   migrated_from: 6dc3ea774c82
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: DR-5
+  fingerprint: 97a13b95c661
+  locked_at: 2026-10-22T16:14-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 6
+  review: 1d91756866
+  text: |-
+    Lock records store a fingerprint and the locked content: each lock stores the item's fingerprint and the locked text itself.
 - id: DR-54
   fingerprint: 023ffa8b8424
   locked_at: 2026-10-21T15:51-07:00
@@ -413,6 +491,15 @@
   text: |-
     Record chat locks from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
   note: kept an alteration
+- id: DR-6
+  fingerprint: 76399fb22d76
+  locked_at: 2026-10-22T16:14-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 6
+  review: 1d91756866
+  text: |-
+    Record chat locks from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, with a summary of what the engineer said and the channel.
 - id: DR-62
   fingerprint: 7592f405900b
   locked_at: 2026-10-21T16:16-07:00

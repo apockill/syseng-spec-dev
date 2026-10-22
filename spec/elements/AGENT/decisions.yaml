@@ -32,9 +32,9 @@
   - AGENT
   requirements: AGENT-21, AGENT-33, AGENT-34
   recorded: round 4 (decided in round 3)
-  status: amended in round 18 by DR-62. Records the hook makes hold no words, and restatements become intent records, not approvals.
+  status: amended in round 18 by DR-62. Records the hook makes hold no words, and restatements become intent records, not locks.
   context: the engineer wants to lock items in chat, but only with unambiguous wording.
-  decision: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
+  decision: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, with a summary of what the engineer said and the channel.
   alternatives: letting the agent record locks, which risks a misreading. Locking only on the review page, which is safe but slower.
   consequences: |-
     Q23 settled the phrasing: a message that starts with "approve" (now also "lock") and names the items, or says to lock everything except some items. When the exceptions are given by description, none of the items they could refer to is locked (AGENT-43). In harnesses without such a hook, locking from chat falls back to the review page or the terminal.

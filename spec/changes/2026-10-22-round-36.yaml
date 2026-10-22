@@ -1,0 +1,11 @@
+request: |-
+  Apply review 1d91756866: re-lock the reworded decisions
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-22'
+entries: []
+decisions: []
+friction: []
+feedback: []
+closed: '2026-10-22'

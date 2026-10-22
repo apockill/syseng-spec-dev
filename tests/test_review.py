@@ -101,12 +101,12 @@ def test_proposals_are_listed_with_reasons_until_approved(spec):
     assert cli.main(["--spec", str(root), "propose", "CORE-1", "--why", "it decides how every widget looks"]) == 0
     s = model.load(root)
     view = changes.view(s, changes.current(s))
-    assert "## Proposed for your explicit approval" in view and "`approve CORE-1`" in view
+    assert "## Proposed for you to lock" in view and "`lock CORE-1`" in view
     assert "> The core shall stamp each widget." in view                     # its full text, on the spot
     assert "*Under:* SYS-1 (The system shall make widgets.)" in view        # and what it sits under
     _approve(spec, root, "CORE-1", "--words", "approve CORE-1")
     s = model.load(root)
-    assert "*Already approved:* CORE-1" in changes.view(s, changes.current(s))
+    assert "*Already locked:* CORE-1" in changes.view(s, changes.current(s))
 
 
 def test_a_proposed_decision_shows_its_reasoning_and_what_it_mentions(spec):
