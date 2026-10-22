@@ -153,7 +153,7 @@ def log_friction(change: Change, workaround: str, proposal: str) -> None:
 
 
 def add_proposal(change: Change, ids: list[str], why: str) -> None:
-    """SYS-38: an agent proposes items for the engineer's explicit approval, saying why they deserve it."""
+    """SYS-38: an agent proposes items for the engineer to lock, saying why they deserve it."""
     if not (why or "").strip():
         raise ChangeError("say why these items deserve the engineer's attention")
     change.data.setdefault("proposals", []).append(
@@ -320,7 +320,7 @@ def _alterations_section(spec: Spec, change: Change) -> list[str]:
         return []
     out = ["## Alterations awaiting your answer", ""]
     pending = [a for a in alts if not a["answered"] and not a["removed"]]
-    out += (["This change altered items you approved, wrote or decided. Keep each one with the line shown, or ask "
+    out += (["This change altered items you locked, wrote or decided. Keep each one with the line shown, or ask "
              "for it to be rolled back.", ""] if pending else ["None left.", ""])
     for a in pending:
         head, body = _full(spec, a["id"])
@@ -350,7 +350,7 @@ def _proposals_section(spec: Spec, change: Change) -> list[str]:
     proposals = change.data.get("proposals") or []
     if not proposals:
         return []
-    out, pending, done = ["## Proposed for your explicit approval", ""], [], []
+    out, pending, done = ["## Proposed for you to lock", ""], [], []
     for p in proposals:
         ids = [i for i in p.get("ids") or [] if review.kind_and_data(spec, i)]
         for iid in ids:
@@ -361,9 +361,9 @@ def _proposals_section(spec: Spec, change: Change) -> list[str]:
             head, body = _full(spec, iid)
             out += [f"### {head}", "", f"**Why I'm asking:** {p.get('why', '')}", "", *body, ""]
     if pending:
-        out += [f"To approve every item above: `approve {', '.join(pending)}`", ""]
+        out += [f"To lock every item above: `lock {', '.join(pending)}`", ""]
     if done:
-        out += [f"*Already approved:* {', '.join(_label(spec, i) for i in done)}", ""]
+        out += [f"*Already locked:* {', '.join(_label(spec, i) for i in done)}", ""]
     return out
 
 

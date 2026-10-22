@@ -157,3 +157,20 @@
     python:
     - tests/test_review_page.py::test_the_overview_measures_the_spec_and_marks_what_got_worse
     - tests/test_review_page.py::test_the_page_opens_on_the_overview_and_agents_can_read_it
+- id: REVIEW-V15
+  verifies:
+  - REVIEW-36
+  method: test
+  technique: unit test
+  description: An item proposed in one change and again in a later one is listed once, with the later change's reason.
+  tests:
+    python:
+    - tests/test_review_page.py::test_an_item_proposed_again_shows_with_its_newest_proposal
+- id: REVIEW-V16
+  verifies:
+  - REVIEW-33
+  - REVIEW-34
+  - REVIEW-35
+  method: demonstration
+  technique: reasoning check
+  description: On a generated review page, each card for an item changed since the last review shows a chip saying new, edited, reworded, moved, intent changed or details changed; clicking an edit's chip shows that card's title, text and other changed fields as a word diff, and clicking it again hides them; the header's Diffs switch, or the D key outside a text box, shows or hides the diffs on every card, and is remembered.

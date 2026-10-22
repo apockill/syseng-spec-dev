@@ -63,6 +63,17 @@ def test_the_page_lists_conflicts_first_and_proposes_items_to_lock_with_reasons(
     assert props and props[0]["id"] == "NEED-1" and "3 items sit beneath it" in props[0]["why"]  # most of the tree
 
 
+def test_an_item_proposed_again_shows_with_its_newest_proposal(repo):
+    first = changes.start(model.load(repo), "first", None, None, None)
+    changes.add_proposal(first, ["CORE-1"], "the old reason")
+    changes.close(first)
+    second = changes.start(model.load(repo), "second", None, None, None)
+    changes.add_proposal(second, ["SYS-1", "CORE-1"], "the new reason")
+    props = [p for p in pagedata.proposals(model.load(repo)) if p["from"] != "computed"]
+    assert [(p["id"], p["why"], p["change"]) for p in props] == [
+        ("SYS-1", "the new reason", second.id), ("CORE-1", "the new reason", second.id)]
+
+
 def test_every_section_is_available_to_agents_as_text_and_yaml(repo, capsys):
     for name in pagedata.SECTIONS:
         assert cli.main(["--spec", str(repo), "review", "--section", name]) == 0

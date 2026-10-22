@@ -62,6 +62,8 @@ A decision record, approval or verification item points at an ID that doesn't ex
 ### T004: requirement without verification (to-do)
 The requirement has no verification item yet. This is listed as a to-do, not an error. For requirements a change touches, the done gate will make it one.
 
+On an element with sub-elements, a requirement that no sub-element's requirement refines is called out as neither decomposed nor verified: give it a verification item at its own level, or requirements below that refine it.
+
 <a id="t005"></a>
 ### T005: requirement skips a level of the system breakdown (to-do, or error where enforced)
 Requirements flow down the system breakdown. A requirement on an element refines one of its parent element's requirements; an element directly under the system refines a system requirement. The requirement tree then has the same shape as the element tree, and a detail such as "the player's feet are purple" sits under textures, under the player model, under characters, not near the top.

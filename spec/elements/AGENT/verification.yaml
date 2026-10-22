@@ -135,3 +135,9 @@
   tests:
     python:
     - tests/test_skill.py::test_skill_teaches_the_approval_model
+- id: AGENT-V14
+  verifies:
+  - AGENT-64
+  method: inspection
+  technique: reasoning check
+  description: The skill's hand-over step directs an agent whose harness can publish a private web page, such as Claude's artifacts, to publish the review page there and give the person the link, including on a pull request; and to give the file's location otherwise.

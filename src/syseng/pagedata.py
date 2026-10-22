@@ -196,16 +196,15 @@ def captured(spec: Spec, sets: list[dict]) -> list[dict]:
 def proposals(spec: Spec, limit: int = 5) -> list[dict]:
     """The items most worth locking: the agents' proposals first, then the most-depended-on items a person gave but
     hasn't locked, each with its reason (SYS-38, AGENT-40)."""
-    out, seen = [], set()
+    latest: dict[str, dict] = {}  # an item proposed again shows with its newest proposal, oldest first (REVIEW-36)
     for c in changes.all_changes(spec):
         for p in c.data.get("proposals") or []:
             for iid in p.get("ids") or []:
-                if iid in seen or review.kind_and_data(spec, iid) is None:
+                if review.kind_and_data(spec, iid) is None or levels.level_of(spec, iid).level == levels.EXPLICIT:
                     continue
-                if levels.level_of(spec, iid).level == levels.EXPLICIT:
-                    continue
-                seen.add(iid)
-                out.append({"id": iid, "why": p.get("why", ""), "from": "an agent's proposal", "change": c.id})
+                latest.pop(iid, None)
+                latest[iid] = {"id": iid, "why": p.get("why", ""), "from": "an agent's proposal", "change": c.id}
+    out, seen = list(latest.values()), set(latest)
     below = _beneath(spec)
     candidates = []
     for iid in list(spec.items):

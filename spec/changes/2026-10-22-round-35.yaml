@@ -1,0 +1,89 @@
+request: |-
+  Review page: make clear whether each item was added or edited, and let the person show its diff per item or turn diff mode on for every item
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-22'
+entries:
+- op: add
+  id: REVIEW-33
+  at: 2026-10-22T16:10-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: Wherever the review page shows an item that changed since the person's last review, it shall mark the item as new or as edited, naming the kind of edit.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 16:10
+      context: Reviewing the agent's recommended items on the review page, several shown as locked to an earlier version.
+      said: When the AI asks them to review something it isn't always clear whether the item was edited or added, and they want that made clear.
+      basis: stated
+      fingerprint: 5ad478570d49
+- op: add
+  id: REVIEW-34
+  at: 2026-10-22T16:10-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: When the person turns on an edited item's diff, the review page shall show that item's differences inline.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 16:10
+      context: Reviewing the agent's recommended items on the review page, several shown as locked to an earlier version.
+      said: Sometimes wants to see the diff of an edited item, so it should be easy to view.
+      basis: stated
+      fingerprint: 3d49c146e26c
+- op: add
+  id: REVIEW-35
+  at: 2026-10-22T16:10-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: The review page shall offer one control that turns the diffs of every edited item on or off.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 16:10
+      context: Reviewing the agent's recommended items on the review page, several shown as locked to an earlier version.
+      said: Viewing diffs all the time is hard, so they want a neat way to control when they are or aren't in diff mode.
+      basis: stated
+      fingerprint: aff644cd1bb1
+- op: add
+  id: REVIEW-36
+  at: 2026-10-22T16:10-07:00
+  reason: fixes DR-47 missing from the latest recommendation group.
+  after:
+    text: When agents have proposed an item for locking more than once, the review page shall show the item with its newest proposal.
+    traces_to: SYS-38
+    basis: derived
+    why: the page groups the newest change's proposals at the top; an item proposed again under an older reason dropped out of that group, so the engineer saw five of the six items they were asked to look at.
+- op: add
+  id: REVIEW-V15
+  at: 2026-10-22T16:10-07:00
+  reason: verifies the fix.
+  after:
+    verifies:
+    - REVIEW-36
+    method: test
+    technique: unit test
+    description: An item proposed in one change and again in a later one is listed once, with the later change's reason.
+    tests:
+      python:
+      - tests/test_review_page.py::test_an_item_proposed_again_shows_with_its_newest_proposal
+- op: add
+  id: REVIEW-V16
+  at: 2026-10-22T16:10-07:00
+  reason: verifies the chips and diff mode by driving the page.
+  after:
+    verifies:
+    - REVIEW-33
+    - REVIEW-34
+    - REVIEW-35
+    method: demonstration
+    technique: reasoning check
+    description: On a generated review page, each card for an item changed since the last review shows a chip saying new, edited, reworded, moved, intent changed or details changed; clicking an edit's chip shows that card's title, text and other changed fields as a word diff, and clicking it again hides them; the header's Diffs switch, or the D key outside a text box, shows or hides the diffs on every card, and is remembered.
+decisions: []
+friction: []
+closed: '2026-10-22'

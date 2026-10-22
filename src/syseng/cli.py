@@ -249,7 +249,7 @@ def cmd_edit(args) -> int:
     print("\n".join(result.context))
     if result.needs_acks:
         edit.save_last(spec.root, doc)
-        print("\nThis edit affects approved or depended-on items. Nothing was written. Acknowledge each one by name")
+        print("\nThis edit affects locked or depended-on items. Nothing was written. Acknowledge each one by name")
         print("(a line on why the edit is fine for it, or what else must change), then send the batch again with:\n")
         print("acks:")
         for iid, why in result.needs_acks.items():
@@ -524,7 +524,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(fn=cmd_check)
     p = sub.add_parser("render", help="write the review page, removing Markdown views from earlier versions")
     p.set_defaults(fn=cmd_render)
-    p = sub.add_parser("show", help="show one item with its trace and approval")
+    p = sub.add_parser("show", help="show one item with its trace, level of intent and locks")
     p.add_argument("id")
     p.set_defaults(fn=cmd_show)
     p = sub.add_parser("lock", aliases=["approve"], help="record a person's lock on items (alias: approve)")

@@ -29,7 +29,7 @@ person locked or stated: `rewording: true` when the meaning stays, or `conflict:
 resolved conflict that allows it.
 
 The batch runs against a scratch copy first. The CLI shows each operation's context,
-asks for acknowledgments only where an approved or depended-on item is affected, and
+asks for acknowledgments only where a locked or depended-on item is affected, and
 rejects the batch if it would introduce checker errors. Only then does it write the spec and
 log every operation, with its reason, in the open change record.
 """

@@ -124,6 +124,18 @@ def test_requirement_without_verification_is_a_todo_not_an_error(spec):
     assert "T004" in spec.codes(severity="todo")
 
 
+def test_requirement_above_the_leaves_that_nothing_refines_or_verifies_is_called_out(spec):
+    spec.files["elements/SYS/requirements.yaml"].append(
+        {"id": "SYS-2", "kind": "system", "text": "The system shall box widgets.", "origin": "engineer",
+         "serves": ["NEED-1"], "source": '"boxes too"'})
+    spec.files["elements/CORE/verification.yaml"] = []
+    spec.write()
+    todo = {f.item: f.message for f in spec.findings() if f.code == "T004"}
+    assert "neither decomposed nor verified" in todo["SYS-2"]      # on SYS, which has CORE below it
+    assert "neither" not in todo["SYS-1"]                          # CORE-1 refines it
+    assert "neither" not in todo["CORE-1"]                         # a leaf element's requirement
+
+
 def test_one_run_reports_every_problem(spec):
     spec.files["elements/CORE/element.yaml"]["depends_on"] = ["GHOST"]
     spec.files["elements/CORE/requirements.yaml"][0]["origin"] = None

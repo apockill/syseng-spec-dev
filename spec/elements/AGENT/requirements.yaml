@@ -539,3 +539,13 @@
       Gave the example of requiring a self-driving car, which may have a hundred thousand requirements, needs and verification items under it: the requirement that the car drives itself can be marked as theirs, but a detail such as a module producing the next stretch of driving trajectories is not. The agent has to judge, but should keep it tight rather than loose.
     basis: guided
     fingerprint: 5bb3ce09bf33
+- id: AGENT-64
+  text: Where the agent's harness can publish a private web page, the agent shall publish the review page there and give the person its link.
+  traces_to: SYS-29
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-22 16:03
+    context: After opening the review page for a pull request as a Claude artifact, which GitHub can't render itself.
+    said: Found that Claude artifacts work well for the review page, and wants them used when the agent they're working with is Claude.
+    basis: stated
+    fingerprint: b29e83558b65

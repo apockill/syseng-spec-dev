@@ -85,7 +85,7 @@
   recorded: round 14
   context: The engineer put the agent in charge of agent experience. In a live run, every toolkit command waited for permission, and nothing told a new session the method existed.
   decision: |-
-    `spec init` writes a short section between markers into AGENTS.md, or CLAUDE.md when that's the file the repository has, and rewrites only that section on later runs. It adds Claude Code allow rules for status, check, show, render, edit, change, decide, propose and friction. Approve and resolve stay with the permission prompt, so the engineer confirms each command that records their words.
+    `spec init` writes a short section between markers into AGENTS.md, or CLAUDE.md when that's the file the repository has, and rewrites only that section on later runs. It adds Claude Code allow rules for status, check, show, render, edit, change, decide, propose and friction. Lock and resolve stay with the permission prompt, so the engineer confirms each command that records a lock or decision in their name.
   alternatives: Relying on the skill's description to trigger, which a quick request may not do. Allowing every toolkit command, which would let a lock be recorded without the engineer seeing it.
   consequences: Claude Code ignores a project's allow rules until the engineer has trusted the folder once, interactively. `--no-instructions` leaves the instruction files alone.
   basis: derived
