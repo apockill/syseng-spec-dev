@@ -225,3 +225,13 @@
     said: Agreed, finding locked to an earlier version as descriptive a label as needed.
     basis: guided
     fingerprint: 40356cdaf36f
+- id: CHECK-29
+  text: The checker shall report each requirement on a system element with sub-elements that has neither a verification item nor a requirement refining it, saying that it is neither decomposed nor verified.
+  traces_to: SYS-7
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-22 15:20
+    context: Discussing the textbook check that a parent requirement is covered by its children, and its cheap mechanical part.
+    said: Wants everything the checker can flag cheaply flagged, opportunistically, provided it can be flagged without noisy false positives and is straightforward to add.
+    basis: stated
+    fingerprint: d1147fe87204
