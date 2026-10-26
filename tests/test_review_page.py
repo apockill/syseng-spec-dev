@@ -284,3 +284,22 @@ def test_the_page_opens_on_the_overview_and_agents_can_read_it(repo, capsys):
     assert "renderOverview(el);" in JS and "· worse" in JS and "All measures" in JS     # REVIEW-32
     assert cli.main(["--spec", str(repo), "review", "--section", "overview"]) == 0
     assert "Verification coverage: 50.0%" in capsys.readouterr().out
+
+
+def test_only_the_newest_changes_proposals_are_current(repo):
+    first = changes.start(model.load(repo), "first", None, None, None)
+    changes.add_proposal(first, ["CORE-1"], "an old reason")
+    changes.close(first)
+    second = changes.start(model.load(repo), "second", None, None, None)
+    data = pagedata.build(model.load(repo), ADA)
+    assert data["meta"]["change"] == second.id                         # REVIEW-37
+    assert [p["change"] for p in data["proposals"] if p["from"] != "computed"] == [first.id]
+
+
+def test_the_overview_shows_requirements_with_linked_tests_beside_coverage(spec):     # REVIEW-38
+    from syseng import health
+    spec.files["elements/CORE/verification.yaml"][0].update({"technique": "reasoning check", "tests": {}})
+    spec.write()
+    m = health.metrics(spec.load())
+    assert m["coverage"] > 0 and m["tested"] == 0           # a planned check counts as coverage, not as tested
+    assert any(key == "tested" for key, *_ in health.MEASURES)

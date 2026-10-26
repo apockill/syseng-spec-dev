@@ -193,3 +193,15 @@ def test_test_link_changes_are_logged_and_shown(open_spec):
     entry = _change(open_spec)["entries"][-1]
     assert entry["before"]["tests"] == {"python": ["tests/test_core.py::test_stamp"]}
     assert entry["after"]["tests"] == {"python": ["tests/test_core.py::test_other"]}
+
+
+def test_intent_read_from_a_document_keeps_its_source_and_author(open_spec):          # MODEL-41
+    op = {"modify": "CORE-1", "set": {"why": "stamped widgets sell."}, "reason": "r", "intent": {
+        "basis": "guided", "context": "Read during onboarding.", "said": "Wants each widget stamped.",
+        "source": "document", "source_path": "README.md", "source_author": "Ada <ada@example.com>"}}
+    result = edit.run(open_spec.root, [op])
+    if result.needs_acks:
+        result = edit.run(open_spec.root, {"edits": [op], "acks": {i: "fine" for i in result.needs_acks}})
+    assert result.applied, [f.message for f in result.errors]
+    rec = open_spec.load().items["CORE-1"].data["intent"][-1]
+    assert rec["source"] == "document" and rec["source_path"] == "README.md" and rec["by"] == "Ada <ada@example.com>"

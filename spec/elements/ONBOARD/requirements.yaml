@@ -21,7 +21,7 @@
     basis: stated
     fingerprint: e47c149ee54b
 - id: ONBOARD-3
-  text: Onboarding shall run every check the toolkit offers, expensive checks and auditors included, on the extracted spec.
+  text: Onboarding shall run every automated check the toolkit offers on the extracted spec.
   traces_to: SYS-23
   why: asking for onboarding counts as the request SYS-12 needs.
   intent:
@@ -32,6 +32,12 @@
     said: Said this step should be extra careful, running all the checks, rechecks and skeptical subagents, the whole kitchen sink, to make sure everything is captured.
     basis: stated
     fingerprint: 1a39d73f6b60
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 17:52
+    context: Answering D1 of round 37, on whether onboarding should run every check, after a trial in which agents ran reasoning checks by hand.
+    said: Onboarding should run all automated checks at the very least; agents shouldn't run the model-judged migration checks yet, because how they work hasn't been specified.
+    basis: stated
+    fingerprint: 0402260de9d5
 - id: ONBOARD-4
   text: Onboarding shall take the reasons for the current design from code comments and structure wherever they reveal them.
   traces_to: SYS-23
@@ -70,3 +76,50 @@
   traces_to: SYS-23
   why: this follows from ONBOARD-2. Fixing things during onboarding would be steering you didn't ask for.
   basis: derived
+- id: ONBOARD-8
+  text: During onboarding, the agent shall establish whether the repository publishes its directories or pushes its commits, raise each way the spec would be exposed as the first open decision on the review page, and keep the spec unpublished until the engineer answers.
+  traces_to: SYS-23
+  basis: added
+  why: in the trial, the spec would have been served as a website and pushed by a commit hook, with the engineer's email and security findings in it.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-26 08:08
+    context: Reviewing the overnight plan for the migration the engineer will keep, which asked the engineer to be reachable for a preflight.
+    said: Sees this as a post-flight step; once the digging and speccing is done, the agent hands over the review page as normal, taking special care that the items it highlights for approval come highest value first.
+    basis: stated
+    fingerprint: ac2a2c92bcd4
+- id: ONBOARD-9
+  text: Onboarding shall write one requirement per behaviour that a user, an operator or another element relies on, keeping constants the engineer didn't state in verification items or decision records.
+  traces_to: SYS-23
+  basis: added
+  why: the trial's three agents wrote between 226 and 445 requirements for the same code, about two in five with constants in them.
+- id: ONBOARD-10
+  text: Where the code only partly meets what the project intends, onboarding shall keep the requirement as intended and raise an open decision.
+  traces_to: SYS-23
+  basis: added
+  why: in the trial, agents sometimes reworded requirements to match the code, once weakening a safety rule.
+- id: ONBOARD-11
+  text: Onboarding shall count as verified only the verification items whose tests or checks have run.
+  traces_to: SYS-23
+  basis: added
+  why: one trial agent reported full coverage while 93 of its verification items had never run.
+- id: ONBOARD-12
+  text: Onboarding shall give the engineer options for running the model-judged checks, such as the high-value ones the agent selects or every one of them, each with its expected cost in agents, tokens, effort and verification items covered, and what leaving the checks unrun risks.
+  traces_to: SYS-23
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 17:52
+    context: Answering D1 of round 37, on whether onboarding should run every check.
+    said: Wants an estimate of the total cost of the reasoning checks (effort, number of agents, tokens, number of verification items and so on), a few options such as high-value ones at the agent's discretion or all of them, each with its expected cost, and the pros and cons of not running them.
+    basis: stated
+    fingerprint: a0004710230d
+- id: ONBOARD-13
+  text: The toolkit shall show the engineer the progress of an onboarding while it runs.
+  traces_to: SYS-23
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 17:52
+    context: Answering D1 of round 37, on whether onboarding should run every check.
+    said: The important thing is that the engineer can track the progress of the migration.
+    basis: stated
+    fingerprint: 36cfefd3a2e6

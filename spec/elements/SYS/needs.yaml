@@ -331,3 +331,13 @@
       Said the person pastes the feedback block, so it can travel: a pull-request reviewer can open the review page and post the block on the pull request as their review notes, and an author can review their own change and paste the block to the agent. Part of the design is to allow system-level review in place of code review, since code will soon be too large for people to review.
     basis: stated
     fingerprint: 691319d934b7
+- id: NEED-29
+  text: The engineer needs a repository to hold more than one spec, each covering its own project in a subdirectory, as teams in a monorepo would.
+  context: Monorepos, where each team specifies its own project. The engineer may later want a spec to say that one of its parts is managed by another spec, in another directory or repository; that is not wanted yet but should be kept in mind.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 17:52
+    context: Answering D2 of round 37, on where the spec lives.
+    said: Wants spec directories allowed in subdirectories throughout a repository, for monorepos where teams spec their own projects; may later allow a spec to point to another spec for a subcomponent, by path or by repository URL, but not now.
+    basis: stated
+    fingerprint: fa419b18da91

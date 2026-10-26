@@ -151,3 +151,49 @@
   tests:
     python:
     - tests/test_check_structure.py::test_requirement_above_the_leaves_that_nothing_refines_or_verifies_is_called_out
+- id: CHECK-V15
+  verifies:
+  - CHECK-30
+  method: test
+  technique: unit test
+  description: A gendered pronoun in a requirement is an error naming the item; "they" and "the engineer" pass.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_a_gendered_pronoun_in_a_need_requirement_or_intent_record_is_an_error
+- id: CHECK-V16
+  verifies:
+  - CHECK-3
+  method: test
+  technique: unit test
+  description: Tests that no verification item links are listed per file, with their names, as a to-do.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_tests_no_verification_item_links_are_listed_per_file
+- id: CHECK-V17
+  verifies:
+  - CHECK-3
+  method: test
+  technique: unit test
+  description: A unittest class whose name doesn't start with Test still has its test methods listed as unlinked.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_unittest_classes_count_as_tests_for_the_unlinked_list
+- id: CHECK-V18
+  verifies:
+  - CHECK-31
+  method: test
+  technique: unit test
+  description: A wording finding disappears when the item allows that rule with a reason, and an allow entry without a reason is itself an error.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_an_item_can_allow_a_wording_rule_with_a_reason
+- id: CHECK-V19
+  verifies:
+  - CHECK-32
+  method: test
+  technique: unit test
+  description: A parent with no verification item is told how many requirements refine it and that a roll-up is an option; a roll-up holds while every child is verified and becomes a to-do when one isn't.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_a_parent_without_verification_is_told_how_to_resolve_it
+    - tests/test_check_structure.py::test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified

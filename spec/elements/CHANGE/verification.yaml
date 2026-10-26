@@ -92,3 +92,30 @@
     python:
     - tests/test_levels.py::test_editing_an_item_added_earlier_in_the_same_change_alters_nothing_a_person_gave
     - tests/test_levels.py::test_an_element_gaining_a_dependency_needs_no_acknowledgments
+- id: CHANGE-V10
+  verifies:
+  - CHANGE-20
+  method: test
+  technique: unit test
+  description: An open decision rewritten in place keeps its ID and position; rewriting an unknown or answered decision is refused.
+  tests:
+    python:
+    - tests/test_decisions.py::test_an_open_decision_can_be_rewritten_in_place_until_answered
+- id: CHANGE-V11
+  verifies:
+  - CHANGE-21
+  method: test
+  technique: unit test
+  description: Withdrawing an open decision needs a reason, marks it withdrawn with that reason, and is refused for a decision already withdrawn.
+  tests:
+    python:
+    - tests/test_decisions.py::test_an_overtaken_decision_is_withdrawn_with_a_reason
+- id: CHANGE-V12
+  verifies:
+  - CHANGE-22
+  method: test
+  technique: unit test
+  description: A decision checked with the dry-run option is reported valid and isn't recorded.
+  tests:
+    python:
+    - tests/test_decisions.py::test_a_decision_can_be_checked_without_recording_it

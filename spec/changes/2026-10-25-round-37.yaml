@@ -1,0 +1,686 @@
+request: Restructure the skill for progressive disclosure and fix the onboarding failure modes found in the three-agent trial
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-25'
+entries:
+- op: add
+  id: AGENT-65
+  at: 2026-10-25T15:57-07:00
+  reason: the engineer asked for the skill to follow these practices; all three trial agents read every reference in full.
+  requested: true
+  after:
+    text: The skill's main file shall name each reference with the task that needs it, linking each reference directly, so an agent reads only the references its task needs.
+    traces_to: SYS-20
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 15:57
+      context: Asking for proposals to improve the skill after the three-agent onboarding trial.
+      said: Wants the skill to follow progressive-disclosure and Anthropic's skill-writing best practices.
+      basis: stated
+      fingerprint: b9c7fc800c64
+- op: add
+  id: AGENT-66
+  at: 2026-10-25T15:57-07:00
+  reason: a failure mode found in the trial.
+  after:
+    text: The skill shall direct agents to refer to a person by name or role, never by pronouns inferred from a name.
+    traces_to: SYS-30
+    basis: added
+    why: one trial agent wrote about the engineer with a pronoun guessed from their name.
+- op: add
+  id: AGENT-67
+  at: 2026-10-25T15:57-07:00
+  reason: a failure mode found in the trial.
+  after:
+    text: The skill shall direct agents to take the human author's identity from the engineer, never from an agent's memory or a guess.
+    traces_to: SYS-35
+    basis: added
+    why: all three trial agents set the human author from a memory note, without asking.
+- op: add
+  id: AGENT-68
+  at: 2026-10-25T15:57-07:00
+  reason: a failure mode found in the trial.
+  after:
+    text: The skill shall direct agents to record what they read in a document as guided intent at most, naming the document and its author.
+    traces_to: SYS-35
+    basis: added
+    why: in the trial, documents written by an agent's account were recorded as the engineer's own intent.
+- op: add
+  id: ONBOARD-8
+  at: 2026-10-25T15:57-07:00
+  reason: a failure mode found in the trial.
+  after:
+    text: Before creating the spec, onboarding shall establish whether the repository publishes its directories or pushes its commits, and stop for the engineer when either would expose the spec.
+    traces_to: SYS-23
+    basis: added
+    why: in the trial, the spec would have been served as a website and pushed by a commit hook, with the engineer's email and security findings in it.
+- op: add
+  id: ONBOARD-9
+  at: 2026-10-25T15:57-07:00
+  reason: a failure mode found in the trial.
+  after:
+    text: Onboarding shall write one requirement per behaviour that a user, an operator or another element relies on, keeping constants the engineer didn't state in verification items or decision records.
+    traces_to: SYS-23
+    basis: added
+    why: the trial's three agents wrote between 226 and 445 requirements for the same code, about two in five with constants in them.
+- op: add
+  id: ONBOARD-10
+  at: 2026-10-25T15:57-07:00
+  reason: a failure mode found in the trial.
+  after:
+    text: Where the code only partly meets what the project intends, onboarding shall keep the requirement as intended and raise an open decision.
+    traces_to: SYS-23
+    basis: added
+    why: in the trial, agents sometimes reworded requirements to match the code, once weakening a safety rule.
+- op: add
+  id: ONBOARD-11
+  at: 2026-10-25T15:57-07:00
+  reason: a failure mode found in the trial.
+  after:
+    text: Onboarding shall count as verified only the verification items whose tests or checks have run.
+    traces_to: SYS-23
+    basis: added
+    why: one trial agent reported full coverage while 93 of its verification items had never run.
+- op: add
+  id: AGENT-V15
+  at: 2026-10-25T15:57-07:00
+  reason: verifies the skill's layout.
+  after:
+    verifies:
+    - AGENT-65
+    method: inspection
+    technique: unit test
+    description: The skill's main file stays under 500 lines and links every reference; no reference links to another; each reference over 100 lines opens with its contents; no example writes intent as a flow mapping.
+    tests:
+      python:
+      - tests/test_skill.py::test_skill_md_stays_short_and_routes_to_every_reference
+      - tests/test_skill.py::test_references_are_one_level_deep_and_long_ones_have_contents
+      - tests/test_skill.py::test_examples_write_intent_in_block_style
+- op: add
+  id: ONBOARD-V1
+  at: 2026-10-25T15:57-07:00
+  reason: verifies the skill teaches these.
+  after:
+    verifies:
+    - AGENT-66
+    - AGENT-67
+    - AGENT-68
+    - ONBOARD-8
+    - ONBOARD-9
+    - ONBOARD-10
+    - ONBOARD-11
+    method: inspection
+    technique: unit test
+    description: The skill tells agents not to infer pronouns, not to set the human author from memory, and to name a document and its author when recording what they read; its onboarding reference has a preflight that stops for the engineer, an altitude rule keeping constants out of requirements, a rule against rewording requirements to match the code, and counts only checks that ran as verification.
+    tests:
+      python:
+      - tests/test_skill.py::test_skill_teaches_the_onboarding_lessons_of_the_three_agent_trial
+- op: add
+  id: DR-71
+  at: 2026-10-25T15:57-07:00
+  reason: records the restructure.
+  after:
+    title: The skill is a router over task-sized references
+    decided_by: agent
+    elements:
+    - AGENT
+    - ONBOARD
+    requirements: AGENT-65, ONBOARD-8, ONBOARD-9, ONBOARD-10, ONBOARD-11
+    context: In a trial, three agents onboarded copies of a nine-app repository with the skill. Each read every reference in full, needed none of the review, feedback and lock material, and still read the toolkit's source to learn field names. They diverged most on requirement depth (226 to 445 requirements for the same code) and on how honestly they reported coverage.
+    decision: SKILL.md keeps the loop, levels of intent, capturing intent and editing, and opens with a table naming each reference, the task that needs it and its size. Review, feedback, locks and conflicts move to references/review-and-locks.md; every kind's fields move to a new references/schema.md with block-style examples. The onboarding reference becomes a checklist with a preflight, an altitude rule, a build order, a partly-met rule and affordable ways to run every check. Long references open with their contents, and none links to another.
+    alternatives: Keeping one long SKILL.md, which agents read in full for every task. Splitting onboarding into its own skill, which would duplicate the editing and intent rules.
+    consequences: An agent changing code reads about 100 lines; an onboarding agent reads about 250. Tests hold the layout to Anthropic's skill-authoring guidance.
+    basis: derived
+- op: modify
+  id: AGENT-66
+  at: 2026-10-25T16:10-07:00
+  reason: the engineer asked for it.
+  requested: true
+  before:
+    text: The skill shall direct agents to refer to a person by name or role, never by pronouns inferred from a name.
+  after:
+    text: The skill shall direct agents to write needs about the engineer by that role and to refer to a person by name or role, never by pronouns inferred from a name.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 16:10
+      context: Reading the report on the three-agent onboarding trial, where one agent wrote about the engineer with a pronoun guessed from their name.
+      said: Wants this in the toolkit; needs should refer to the engineer by that role, and pronouns shouldn't be assumed, ideally with strict verification items.
+      basis: stated
+      fingerprint: 8a711bb9850c
+  acks:
+    ONBOARD-V1: the test checks the skill still says never to infer pronouns; the wording about the engineer gets its own check when the checker rule is built.
+- op: add
+  id: CHECK-30
+  at: 2026-10-25T16:10-07:00
+  reason: the engineer asked for strict verification of the pronoun rule; to be built once the round-2 trial finishes, so the trial runs against an unchanged checker.
+  requested: true
+  after:
+    text: The checker shall report as an error each gendered pronoun in a need, a requirement or an intent record.
+    traces_to: SYS-35
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 16:10
+      context: Reading the report on the three-agent onboarding trial, where one agent wrote about the engineer with a pronoun guessed from their name.
+      said: Wants pronouns not assumed, ideally enforced with strict verification items.
+      basis: stated
+      fingerprint: bde9b2931a31
+- op: add
+  id: AGENT-69
+  at: 2026-10-25T17:35-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: When an agent wants the engineer to answer something, the agent shall present it on a rendered page with enough context for a reader who hasn't followed the conversation to decide.
+    traces_to: SYS-30
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 17:35
+      context: After the agent listed decisions waiting on the engineer in a chat message during the onboarding trial.
+      said: Whenever something waits on them and an answer is wanted, wants a rendered page showing the decisions or items, written assuming they have none of the agent's context; approving through a text interface is hard, and LLMs tend to give too little context when they ask.
+      basis: stated
+      fingerprint: 4441c3f2f7f3
+- op: add
+  id: CHANGE-20
+  at: 2026-10-25T17:35-07:00
+  reason: needed to make open decisions self-contained before the engineer reads them.
+  after:
+    text: Until the engineer answers an open decision, the toolkit shall let an agent rewrite it in place, keeping its ID.
+    traces_to: SYS-16
+    basis: added
+    why: in the onboarding trial, agents filed decisions with wrong involved items or missing context and couldn't correct them; a duplicate decision would ask the engineer twice.
+- op: add
+  id: CHANGE-V10
+  at: 2026-10-25T17:36-07:00
+  reason: verifies CHANGE-20.
+  after:
+    verifies:
+    - CHANGE-20
+    method: test
+    technique: unit test
+    description: An open decision rewritten in place keeps its ID and position; rewriting an unknown or answered decision is refused.
+    tests:
+      python:
+      - tests/test_decisions.py::test_an_open_decision_can_be_rewritten_in_place_until_answered
+- op: add
+  id: AGENT-V16
+  at: 2026-10-25T17:36-07:00
+  reason: verifies AGENT-69.
+  after:
+    verifies:
+    - AGENT-69
+    method: inspection
+    technique: unit test
+    description: The skill tells agents to put anything the engineer should answer on a rendered page, written for a reader with none of the agent's context, and names the command that rewrites an open decision.
+    tests:
+      python:
+      - tests/test_skill.py::test_skill_puts_questions_for_the_engineer_on_a_rendered_page
+- op: add
+  id: REVIEW-37
+  at: 2026-10-25T17:38-07:00
+  reason: found while handing over the round-37 decisions.
+  after:
+    text: The review page shall present as the agent's current recommendations only those made in the newest change, listing older ones as earlier recommendations.
+    traces_to: SYS-38
+    basis: derived
+    why: a change with decisions but no proposals showed proposals from months-old changes as the agent's current advice, above the decisions it was handing over.
+- op: add
+  id: REVIEW-V17
+  at: 2026-10-25T17:38-07:00
+  reason: verifies REVIEW-37.
+  after:
+    verifies:
+    - REVIEW-37
+    method: test
+    technique: unit test
+    description: With an older change holding a proposal and a newer change holding none, the page marks the newer change as current, so the older proposal is listed as earlier.
+    tests:
+      python:
+      - tests/test_review_page.py::test_only_the_newest_changes_proposals_are_current
+- op: modify
+  id: ONBOARD-3
+  at: 2026-10-25T17:52-07:00
+  reason: the engineer narrowed their own earlier request in answering D1.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 1a39d73f6b60
+  fingerprint_after: 0402260de9d5
+  requested: true
+  before:
+    text: Onboarding shall run every check the toolkit offers, expensive checks and auditors included, on the extracted spec.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: |-
+        Date approximate (rounds 1 to 11). Round 5: reviewing SYS-23, how an existing project is brought into the toolkit.
+      said: Said this step should be extra careful, running all the checks, rechecks and skeptical subagents, the whole kitchen sink, to make sure everything is captured.
+      basis: stated
+      fingerprint: 1a39d73f6b60
+  after:
+    text: Onboarding shall run every automated check the toolkit offers on the extracted spec.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: |-
+        Date approximate (rounds 1 to 11). Round 5: reviewing SYS-23, how an existing project is brought into the toolkit.
+      said: Said this step should be extra careful, running all the checks, rechecks and skeptical subagents, the whole kitchen sink, to make sure everything is captured.
+      basis: stated
+      fingerprint: 1a39d73f6b60
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 17:52
+      context: Answering D1 of round 37, on whether onboarding should run every check, after a trial in which agents ran reasoning checks by hand.
+      said: Onboarding should run all automated checks at the very least; agents shouldn't run the model-judged migration checks yet, because how they work hasn't been specified.
+      basis: stated
+      fingerprint: 0402260de9d5
+  acks:
+    ONBOARD-3: the engineer narrowed it themselves in answering D1; the stated intent added with the edit records why.
+- op: add
+  id: ONBOARD-12
+  at: 2026-10-25T17:52-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: Onboarding shall give the engineer options for running the model-judged checks, such as the high-value ones the agent selects or every one of them, each with its expected cost in agents, tokens, effort and verification items covered, and what leaving the checks unrun risks.
+    traces_to: SYS-23
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 17:52
+      context: Answering D1 of round 37, on whether onboarding should run every check.
+      said: Wants an estimate of the total cost of the reasoning checks (effort, number of agents, tokens, number of verification items and so on), a few options such as high-value ones at the agent's discretion or all of them, each with its expected cost, and the pros and cons of not running them.
+      basis: stated
+      fingerprint: a0004710230d
+- op: add
+  id: ONBOARD-13
+  at: 2026-10-25T17:52-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: The toolkit shall show the engineer the progress of an onboarding while it runs.
+    traces_to: SYS-23
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 17:52
+      context: Answering D1 of round 37, on whether onboarding should run every check.
+      said: The important thing is that the engineer can track the progress of the migration.
+      basis: stated
+      fingerprint: 36cfefd3a2e6
+- op: add
+  id: NEED-29
+  at: 2026-10-25T17:52-07:00
+  reason: a new need the engineer stated.
+  requested: true
+  after:
+    text: The engineer needs a repository to hold more than one spec, each covering its own project in a subdirectory, as teams in a monorepo would.
+    context: Monorepos, where each team specifies its own project. The engineer may later want a spec to say that one of its parts is managed by another spec, in another directory or repository; that is not wanted yet but should be kept in mind.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 17:52
+      context: Answering D2 of round 37, on where the spec lives.
+      said: Wants spec directories allowed in subdirectories throughout a repository, for monorepos where teams spec their own projects; may later allow a spec to point to another spec for a subcomponent, by path or by repository URL, but not now.
+      basis: stated
+      fingerprint: fa419b18da91
+- op: add
+  id: SYS-54
+  at: 2026-10-25T17:52-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    kind: system
+    text: The toolkit shall support more than one spec in a repository, each in its own subdirectory and covering the project there.
+    serves:
+    - NEED-29
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 17:52
+      context: Answering D2 of round 37, on where the spec lives.
+      said: Wants spec directories allowed in subdirectories for monorepos.
+      basis: stated
+      fingerprint: 78c38ec0578f
+- op: add
+  id: SYS-55
+  at: 2026-10-25T17:52-07:00
+  reason: the engineer chose this option.
+  requested: true
+  after:
+    kind: system
+    text: The toolkit shall find each spec at the location its repository configures, spec/ by default.
+    serves:
+    - NEED-3
+    - NEED-29
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 17:52
+      context: Choosing an option of D2 of round 37, on whether the spec should move to a hidden folder.
+      said: Chose to keep spec/ as the default and make the location configurable.
+      basis: stated
+      fingerprint: 3672fbb445c9
+- op: add
+  id: MODEL-41
+  at: 2026-10-25T17:52-07:00
+  reason: the engineer chose this option and specified the kinds.
+  requested: true
+  after:
+    text: Each intent record shall name the kind of source it came from, such as a human conversation, an agent conversation, a document, a code comment or a commit message, and where the source has a location, that location.
+    traces_to: SYS-35
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 17:52
+      context: Choosing an option of D3 of round 37, on telling intent read from documents apart from what a person said.
+      said: Wants each intent record to say where it came from, more specifically than conversation versus document, so that sources can later count for more or less; a code comment may count differently from a document; conversation should say human conversation, and an agent answering a migrating agent's questions on the engineer's behalf should be tracked separately, as an agent conversation, counting low.
+      basis: stated
+      fingerprint: 62d75b8f1074
+- op: add
+  id: AGENT-70
+  at: 2026-10-25T18:02-07:00
+  reason: the engineer's framing of D4.
+  requested: true
+  after:
+    text: The skill shall direct agents to write requirements no person asked for at the level of behaviour a user or another element relies on, and requirements expressing what a person specified as deep as the person's statement goes.
+    traces_to: SYS-35
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-25 18:02
+      context: Discussing D4 of round 37 (how detailed requirements should be) after a backtest of proposed altitude rules on a motion-graphics website, a robot stop and a CLI.
+      said: Leans toward requirements proportional to observable behaviour, but cautions that a migration could fixate on every movement of an animation, so migrations need guardrails that suit the common case. Outside migration those guardrails are still the common case, but when a person calls out specifics, such as a letter that fades in and morphs into a logo, the agent should happily spec deep, with requirements under it about the morph, because speccing exists to give people surface to lock in, and what they leave unlocked is what gets tuned.
+      basis: stated
+      fingerprint: ee289508a96e
+- op: add
+  id: AGENT-71
+  at: 2026-10-25T22:23-07:00
+  reason: overnight iteration on the depth rules, as the engineer asked.
+  after:
+    text: The skill shall give agents rules for how deep to write requirements, covering which features get a requirement, where each value goes, inferred requirements, intent read from documents, code that falls short of intent, and splitting large elements.
+    traces_to: SYS-20
+    basis: derived
+    why: in the onboarding trial three agents wrote 226 to 445 requirements for the same code; backtests of 81 small samples showed these rules make agents agree on structure and counts (AGENT-70 states the principle).
+- op: add
+  id: AGENT-V17
+  at: 2026-10-25T22:23-07:00
+  reason: verifies the depth rules.
+  after:
+    verifies:
+    - AGENT-70
+    - AGENT-71
+    method: inspection
+    technique: unit test
+    description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or named-consumer cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
+    tests:
+      python:
+      - tests/test_skill.py::test_skill_teaches_how_deep_to_write_requirements
+- op: add
+  id: CHECK-V15
+  at: 2026-10-25T22:23-07:00
+  reason: verifies CHECK-30, built after round 2 as planned.
+  after:
+    verifies:
+    - CHECK-30
+    method: test
+    technique: unit test
+    description: A gendered pronoun in a requirement is an error naming the item; "they" and "the engineer" pass.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_gendered_pronoun_in_a_need_requirement_or_intent_record_is_an_error
+- op: add
+  id: CHECK-V16
+  at: 2026-10-25T22:23-07:00
+  reason: verifies CHECK-3, now built.
+  after:
+    verifies:
+    - CHECK-3
+    method: test
+    technique: unit test
+    description: Tests that no verification item links are listed per file, with their names, as a to-do.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_tests_no_verification_item_links_are_listed_per_file
+- op: add
+  id: MODEL-V14
+  at: 2026-10-25T22:23-07:00
+  reason: verifies MODEL-41, now built.
+  after:
+    verifies:
+    - MODEL-41
+    method: test
+    technique: unit test
+    description: An intent record defaults to a human conversation, accepts document, code comment, commit message and agent conversation sources, needs a path for a read source, and rejects unknown kinds.
+    tests:
+      python:
+      - tests/test_levels.py::test_intent_read_from_a_source_names_it
+- op: add
+  id: DR-72
+  at: 2026-10-25T22:23-07:00
+  reason: records the overnight toolkit fixes.
+  after:
+    title: Small fixes from the onboarding trial's friction lists
+    decided_by: agent
+    elements:
+    - CLI
+    - CHECK
+    - AGENT
+    requirements: CHECK-3, CHECK-30, MODEL-41
+    context: Every trial agent reported the same papercuts. The engineer allowed small toolkit fixes overnight alongside the skill work.
+    decision: |-
+      - `spec check` lists tests no verification item links (V003, a to-do), so agents stop writing their own scans.
+      - Gendered pronouns in needs, requirements and intent records are an error (W011).
+      - Intent records carry `source`, `source_path` and `source_author`.
+      - The guard ignores heredoc bodies and a `>` inside quotes, which it took for a redirection into spec/.
+      - Output piped to a reader that closes early (`| head`) ends quietly instead of with a BrokenPipe traceback.
+      - `spec init` guesses Python from test files when the root has no build file.
+      - The overview calls items changed since a person gave them "changed since a person gave it", not "locked to an earlier version", since most were never locked.
+    alternatives: Leaving them for later, which would have the next migration hit the same friction.
+    consequences: The next onboarding run measures the skill with these out of the way.
+    basis: derived
+- op: add
+  id: CHANGE-21
+  at: 2026-10-25T22:26-07:00
+  reason: needed to close D1 of round 37, which the engineer answered by comment.
+  after:
+    text: Until the engineer answers an open decision, the toolkit shall let an agent withdraw it with a reason.
+    traces_to: SYS-16
+    basis: added
+    why: in the trial and in round 37, decisions were overtaken by the engineer's comments or later findings; without a way to withdraw them they linger on the review page as questions nobody needs to answer.
+- op: add
+  id: CHANGE-V11
+  at: 2026-10-25T22:26-07:00
+  reason: verifies CHANGE-21.
+  after:
+    verifies:
+    - CHANGE-21
+    method: test
+    technique: unit test
+    description: Withdrawing an open decision needs a reason, marks it withdrawn with that reason, and is refused for a decision already withdrawn.
+    tests:
+      python:
+      - tests/test_decisions.py::test_an_overtaken_decision_is_withdrawn_with_a_reason
+- op: add
+  id: CHECK-V17
+  at: 2026-10-25T23:01-07:00
+  reason: the round-3 trial found 236 of 342 tests invisible to the unlinked list.
+  after:
+    verifies:
+    - CHECK-3
+    method: test
+    technique: unit test
+    description: A unittest class whose name doesn't start with Test still has its test methods listed as unlinked.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_unittest_classes_count_as_tests_for_the_unlinked_list
+- op: add
+  id: MODEL-V15
+  at: 2026-10-25T23:01-07:00
+  reason: the first build of MODEL-41 dropped the source fields when storing a record.
+  after:
+    verifies:
+    - MODEL-41
+    method: test
+    technique: unit test
+    description: An intent record read from a document keeps its source kind, path and author through spec edit, and is attributed to the source's author.
+    tests:
+      python:
+      - tests/test_edit.py::test_intent_read_from_a_document_keeps_its_source_and_author
+- op: add
+  id: CHANGE-22
+  at: 2026-10-25T23:01-07:00
+  reason: round-3 friction.
+  after:
+    text: The toolkit shall let an agent check an open decision's form without recording it.
+    traces_to: SYS-16
+    basis: added
+    why: agents in the trial validated decisions by hand before filing them, since a filed decision is permanent until answered.
+- op: add
+  id: CHANGE-V12
+  at: 2026-10-25T23:01-07:00
+  reason: verifies CHANGE-22.
+  after:
+    verifies:
+    - CHANGE-22
+    method: test
+    technique: unit test
+    description: A decision checked with the dry-run option is reported valid and isn't recorded.
+    tests:
+      python:
+      - tests/test_decisions.py::test_a_decision_can_be_checked_without_recording_it
+- op: add
+  id: DR-73
+  at: 2026-10-25T23:01-07:00
+  reason: records the fixes.
+  after:
+    title: Fixes from the round-3 migrations
+    decided_by: agent
+    elements:
+    - CHECK
+    - MODEL
+    - REVIEW
+    - AGENT
+    requirements: CHECK-3, MODEL-41, CHANGE-22
+    context: Both finished round-3 agents hit the same toolkit gaps while migrating the sites repository with the new skill.
+    decision: |-
+      - The unlinked-test list also reads unittest classes, whatever their names.
+      - spec edit keeps an intent record's source fields, and a record read from a source defaults to the source's author.
+      - A need may carry a basis (derived) and a why, for needs drafted only from agent-written documents.
+      - The overview adds "requirements with linked tests", since verification coverage counts planned checks that never ran.
+      - Adding an element appends it to the element order; spec decide gains --dry-run; spec status counts proposals the way the page does.
+      - The skill says to quote exact contract values ("node_id") so the code-name check reads them as values, files system-level verification items on the root element, has helpers report in their final message, and points the loop's audit step at onboarding's rule.
+    alternatives: Leaving them for the next round, which would hit the same gaps.
+    consequences: The next migration should find the unlinked list complete and the coverage figure honest.
+    basis: derived
+decisions:
+- id: D1
+  question: When an agent brings an existing project into the spec method ("onboarding"), should it run every check the toolkit has, as ONBOARD-3 records you asking for, or a smaller, fixed set?
+  importance: |-
+    This sets how long and how expensive every onboarding is, and how much of what it reports as verified is real. Background: besides the project's own tests and the mechanical `spec check`, there are two expensive kinds of check. Auditors are fresh agents that compare the spec with the code and report mismatches. Reasoning checks are verification items judged by a model reading the code against a prompt. Reasoning checks are only half built: the toolkit has no command that runs them or records their verdicts, so agents start a helper agent by hand for each one, and a check nobody ran still counts as coverage today. In the three-agent trial on the sites repository, one agent ran 3 of its roughly 100 reasoning checks yet reported 100% coverage; another ran 19 checks and 9 auditors, using about 30 helper agents and roughly a sixth of a 5-hour usage window. The auditors found the most valuable results of the whole trial: committed private keys, a path traversal in the app template, and robot-arm safety gaps. In round 5 you asked for onboarding to be the "kitchen sink" (ONBOARD-3).
+  involves:
+  - ONBOARD-3
+  options:
+  - label: Keep every check, run efficiently, and build the runner next
+    recommended: true
+    detail: |-
+      ONBOARD-3 stays as you stated it. The updated skill already batches the work: one helper per system element runs all of that element's reasoning checks, and each auditor kind runs once per element instead of once per item. Next, build `spec verify` so the toolkit itself runs reasoning checks, records each verdict, and counts only checks that ran as coverage. Cost: an onboarding of a repository like sites stays a long, expensive run.
+  - label: A fixed budget
+    detail: Onboarding runs the system-level and safety-related reasoning checks plus one drift and one conformance audit per element; everything else is reported honestly as not yet verified. Roughly half the cost, with gaps listed rather than closed. ONBOARD-3 would change, so this needs your confirmation.
+  - label: Pause the question until the runner exists
+    detail: Build `spec verify` first and decide afterwards, with real numbers on what a full run costs. Until then, onboardings follow the current skill.
+  status: withdrawn
+  withdrawn_because: |-
+    Answered by the engineer's comment in review d631bdae55: run every automated check, no model-judged checks during migrations yet, and offer options with costs instead (ONBOARD-3, ONBOARD-12, ONBOARD-13).
+  withdrawn: 2026-10-25T22:26-07:00
+- id: D2
+  question: Should the toolkit keep the spec in a visible spec/ folder at the repository root, or in a hidden .spec/ folder like .git/ and .github/?
+  importance: |-
+    The spec's folder name is fixed today: the toolkit, its hooks and its file guard all look for spec/. People are meant to read the spec through the review page and agents' reports, and agents through the `spec` command, so the YAML files themselves are rarely read by hand. The trial showed a concrete risk: in the sites repository every top-level folder is served as a website at <folder>.alexthiele.io, so a spec/ folder would likely have been published at spec.alexthiele.io, with names, emails and security findings in it. Most web servers and static-site tools skip hidden dot-folders by default. Changing the name later means migrating every repository that uses the toolkit, including this one.
+  involves: []
+  options:
+  - label: .spec/ for new repositories; existing spec/ folders keep working
+    recommended: true
+    detail: |-
+      `spec init` creates .spec/. The toolkit, hooks and guard look for .spec/ first and then spec/, so this repository and any already set up need no migration, and can move with one `git mv` whenever you like. Matches your view of the spec as configuration read through tools, and avoids accidental publishing. GitHub still shows .spec/ changes in pull requests.
+  - label: Keep spec/ as the default and make the location configurable
+    detail: Nothing changes by default; `spec init --spec-dir .spec` (or any path) is recorded in the repository, and every tool follows it. Repositories like sites must remember to choose differently.
+  - label: Move everything to .spec/
+    detail: One name everywhere; this repository and every other one migrate now. Simplest long-term, most churn today.
+  status: resolved
+  chosen: Keep spec/ as the default and make the location configurable
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose Keep spec/ as the default and make the location configurable on the review page (summary)
+  resolved: '2026-10-25'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+- id: D3
+  question: When an agent drafts the spec from existing documents (a README, design notes, commit messages) rather than from what you said, how should the spec show that the intent was read, not heard?
+  importance: |-
+    Every item records how directly a person asked for it: explicit (you locked it), stated (you said it), guided (your choice fixed it), derived or added (an agent's). This decides what an agent may change without asking you. In the trial, each agent recorded about 40 items as your guided intent, read from documents that an agent account had written, with the documents' dates. Three real examples: (1) DESK-1, "Set as a hard rule that the desk light and the projector are never on together", read from code comments that credit the rule to you; probably right. (2) ARM-29, "finds holding for long periods fine and wants to know how long the arm can hold … called that a test in itself", reconstructed from an agent's design note; plausible but second-hand. (3) BOX-9, "a flag given as a dash takes its value from stdin … so secrets stay out of argv", read from a README section an agent wrote; a feature description, not something you said. Today the toolkit can't tell these apart from things you said in a conversation. This mostly affects migrations: in normal spec-first or code-first work, intent comes from talking with you.
+  involves:
+  - AGENT-68
+  options:
+  - label: Mark where each intent record came from
+    recommended: true
+    detail: |-
+      Intent records gain `source: conversation` (the default) or `source: document` with the file and its author. Document-sourced records count as guided at most, appear in their own group on the review page ("read from documents, please confirm"), and a single confirmation turns them into yours. Items an agent read from its own documents become derived instead. Small change to the record format, the checker and the page.
+  - label: A new intent level below guided
+    detail: Add a "documented" level that never counts as your intent until you confirm it. Clearer in the level legend, but a sixth level everyone has to learn, and it mixes where intent came from with how strong it is.
+  - label: Leave it to the context text
+    detail: The updated skill already tells agents to name the document and its author in each record's context. Nothing in the toolkit changes; the page still shows these as your guided intent, so you'd have to read each one.
+  status: resolved
+  chosen: Mark where each intent record came from
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose Mark where each intent record came from on the review page (summary)
+  resolved: '2026-10-25'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+- id: D4
+  question: Should the skill guide how detailed requirements are with judgment rules (below) instead of mainly with a count per system element?
+  importance: |-
+    The three trial agents wrote 226, 345 and 445 requirements for the same code. Around two in five contained tuning constants, for example "wait 0.3 seconds and repeat the power-off up to 6 times", where the requirement you'd care about is "confirm the arm reads unpowered, and raise an alarm when it doesn't". You raised the core issue: the spec should grow with what you need and decide, not with code size. A static site and a site with elaborate motion graphics may meet the same needs with 1,000 versus 100,000 lines; the spec should differ by a requirement or two, so that "tone the motion down" changes one requirement while the code changes completely. The updated skill now says "one requirement per behaviour something relies on, constants out, about 5 to 15 per element, split past 30". The proposed rules: (1) Substitution test: if only today's implementation could satisfy it, it's too deep. (2) Pivot test: what would survive a plausible change of mind is a requirement; what wouldn't is design, recorded as a decision. (3) Count what a user or another part of the system can observe and would treat differently (modes, states, failures), not code branches; a black-box acceptance scenario per distinction is a good proxy. (4) Depth follows risk: safety limits and irreversible actions get exact numbers; a dashboard's refresh rate doesn't. (5) Counts per element are only a smoke alarm, never a target.
+  involves:
+  - ONBOARD-9
+  options:
+  - label: Adopt the five rules; keep counts only as a smoke alarm
+    recommended: true
+    detail: The writing-requirements reference leads with rules 1 to 4 and a few before/after examples; onboarding points to it. The 5-15-per-element figure stays as a warning sign. Auditors check new requirements against the substitution and pivot tests.
+  - label: Keep the current count-based guidance
+    detail: Simpler to follow, but it ties spec size to how the code happens to be split, which is the coupling you want to avoid.
+  - label: Adopt the rules and add a checker warning for constants
+    detail: Same as the first option, plus a to-do from `spec check` for any requirement containing a number with a unit the engineer didn't state. Catches the commonest slip mechanically, at the price of some false alarms on legitimate limits.
+  status: resolved
+  chosen: Adopt the five rules; keep counts only as a smoke alarm
+  words: Approved the depth rules in the overnight review (answer A), cutting three prescriptive parts (B1-B3) and keeping three (B4-B6).
+  resolved: '2026-10-26'
+friction: []
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-25T17:51-07:00
+  review: d631bdae55
+  decision: 2026-10-25-round-37 D1
+  kind: comment
+  comment: "It should run all automated checks at the very least, and give the user an estimate of the total cost (effort / # of agents / tokens / # of verification items, etc) to do the reasoning checks. The important thing is the user can track the progress of the mgiration, and be told the pros/cons of not running them. Maybe it could give a few options, like running 'high value' ones (at the agents discretion) or all of them, along with a summary of expected cost of each option.\n\nRegardless, this part of the system isn't fleshed out yet, so the agents shouldn't be running migration checks yet- we haven't really specced out exactly how they'll work. "
+  response: |-
+    Done in the spec and the skill. ONBOARD-3 now says onboarding runs every automated check: tests, spec check and the unlinked-test listing. ONBOARD-12 is new: options for running the model-judged checks, such as none, the high-value ones the agent picks, or every one, each with its cost in agents, tokens, effort and items covered, and what skipping them risks. ONBOARD-13 is new: you can follow an onboarding's progress (not built yet). The onboarding reference now tells agents not to run reasoning checks or auditors during a migration, and to hand you those options instead. One judgment call to confirm: I counted auditors as model-judged checks too, so they're off by default. In the trial they were the most valuable step, so they're the first thing the options should offer. D1 itself stays open, because none of its options matched your answer; the toolkit can't withdraw a decision yet.
+  responded: 2026-10-25T17:53-07:00
+- n: F2
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-25T17:51-07:00
+  review: d631bdae55
+  decision: 2026-10-25-round-37 D2
+  kind: comment
+  comment: |-
+    Configurability sounds good. Also, I have a new need that may change things a lot (or not a lot, depending on how this system was implemented): I would like to allow spec/ directories to exist in subdirectories, sprinkled throughout. The use case being monorepos: teams may want to have a spec/ dir to spec a project. In the future we may allow linking to another spec within a spec (e.g. this subcomponents spec is managed by path/to/spec/ or github.com/path/to/spec, but for now we won't implement that. Keep it in mind, though!
+  response: |-
+    Recorded. D2 is resolved as configurable, with spec/ as the default: SYS-55. Your monorepo need is NEED-29, served by SYS-54 (more than one spec in a repository, each in its own subdirectory). Linking a part of one spec to another spec, by path or repository URL, is noted in NEED-29's context as not wanted yet but to keep in mind. None of this is built yet. The model already loads a spec from a given root, so nested specs mostly need discovery (finding the nearest spec above a file), per-spec hooks and guard, and the review page choosing which spec to show.
+  responded: 2026-10-25T17:53-07:00
+- n: F3
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-25T17:51-07:00
+  review: d631bdae55
+  decision: 2026-10-25-round-37 D3
+  kind: comment
+  comment: "Documenting the origin of itnent is a good idea, and keeping track of where it comes from is great. Let's include more specificity (in the future we may want to upgrade / downgrade the meaningfullness of sources). For example, a source that comes from a code comment might be treated differnetly than a document. \n\nconversation should include 'human_conversation' so we're being clear. You never know- in the future we may have one AI talk to another during migrations. The use case being: \"human has an agent with a lot of knowledge about the project, and we now want \"agent with knowledge\" to answer questions from the \"agent that is doing the migration\", for example. That we would still count low, but is worth tracking as agent_conversation or something descriptive."
+  response: Recorded as MODEL-41. Each intent record names its source kind (human_conversation, agent_conversation, document, code_comment, commit_message) and the location where there is one, so sources can later count for more or less. agent_conversation is for an agent answering a migrating agent's questions on your behalf, counting low. Not built yet; it replaces the context-text workaround the skill uses today.
+  responded: 2026-10-25T17:53-07:00
+- n: F4
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-25T17:51-07:00
+  review: d631bdae55
+  decision: 2026-10-25-round-37 D4
+  kind: comment
+  comment: Can you bring this up in conversation? Let's discuss this further.
+  response: Discussed in the conversation, as you asked. D4 stays open until we settle it.
+  responded: 2026-10-25T17:53-07:00
+closed: '2026-10-26'

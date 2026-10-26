@@ -30,10 +30,12 @@ The agent that wrote a change shouldn't be the only one checking it. Before the 
 
 ## Reasoning checks
 
-A reasoning-check verification item is a prompt plus its declared inputs. Run each one this way:
+A reasoning-check verification item's `description` is its prompt, naming the files or commands it judges. Run each one this way:
 - in a fresh subagent, given only the prompt and the inputs;
 - the subagent may read the product's code, but never the spec directory, so the spec can't steer its verdict;
 - it returns pass or fail, with evidence quoted from its inputs;
 - for an important requirement, take the majority verdict of three independent runs.
+
+When there are many (an onboarding, a large element), one subagent may judge all of one element's reasoning checks together, returning a verdict per item; the rules above still hold for each verdict. Record every verdict: a failure becomes an open decision, and an item that wasn't run doesn't count as verified.
 
 Harness adapters provide ready-made auditor and reasoning-check subagents where the harness supports them. Otherwise, set them up yourself to these specifications.

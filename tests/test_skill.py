@@ -38,8 +38,12 @@ def test_the_skill_is_installed_as_is():
         assert "hooks" in notes.read_text()
 
 
+def _whole_skill():
+    return "\n".join(p.read_text() for p in SKILL_FILES)
+
+
 def test_skill_teaches_locks_without_a_ritual():
-    text = (init.SKILL / "SKILL.md").read_text()
+    text = _whole_skill()
     assert "Locks belong to the engineer" in text and "never their exact words" in text
     assert "a general \"looks good\" locks nothing" in text
 
@@ -72,7 +76,7 @@ def test_auditor_subagent_is_described():
 
 
 def test_skill_teaches_the_approval_model():
-    text = (init.SKILL / "SKILL.md").read_text()
+    text = _whole_skill()
     assert "spec propose" in text and "most consequential first" in text          # AGENT-51
     assert "whose consequences reach the engineer" in text and "no substitute for your judgment" in text
     assert "which they keep on the page (or with `lock <ID>`)" in text                 # AGENT-52
@@ -83,3 +87,58 @@ def test_skill_teaches_the_approval_model():
     assert "record the lower level" in text and "Summarize, never quote" in text        # AGENT-63, SYS-35
     assert "with `basis: added`) for each feature a user would notice" in text          # AGENT-60
     assert "Look for conflicts" in text and "kind: conflict" in text                   # AGENT-61, CHANGE-17
+
+
+# Progressive disclosure, after Anthropic's skill-authoring guidance (AGENT-65)
+REFERENCES = sorted((init.SKILL / "references").glob("*.md"))
+
+
+def test_skill_md_stays_short_and_routes_to_every_reference():
+    text = (init.SKILL / "SKILL.md").read_text()
+    assert len(text.splitlines()) < 500
+    for ref in REFERENCES:
+        assert f"references/{ref.name}" in text, f"SKILL.md doesn't route to {ref.name}"
+
+
+@pytest.mark.parametrize("path", REFERENCES, ids=lambda p: p.name)
+def test_references_are_one_level_deep_and_long_ones_have_contents(path):
+    text = path.read_text()
+    assert not re.search(r"\]\((?:references/)?[a-z-]+\.md\)", text), f"{path.name} links to another reference"
+    if len(text.splitlines()) > 100:
+        assert "## Contents" in text, f"{path.name} is over 100 lines with no contents"
+
+
+@pytest.mark.parametrize("path", SKILL_FILES, ids=lambda p: p.name)
+def test_examples_write_intent_in_block_style(path):
+    assert not re.search(r"intent:\s*\{", path.read_text()), f"{path.name} shows a flow-style intent mapping"
+
+
+def test_skill_teaches_the_onboarding_lessons_of_the_three_agent_trial():
+    text = _whole_skill()
+    assert "Never infer pronouns from a name" in text                                   # AGENT-66
+    assert "Never set it yourself from memory" in text                                   # AGENT-67
+    assert "Say where intent came from" in text and "source kind, path and author" in text  # AGENT-68
+    onboarding = (init.SKILL / "references" / "onboarding.md").read_text()
+    depth = (init.SKILL / "references" / "requirement-depth.md").read_text()
+    assert "## 1. Preflight" in onboarding and "raise it as the first open decision" in onboarding  # ONBOARD-8
+    assert "One requirement per feature" in text and "Most values end here" in depth      # ONBOARD-9
+    assert "Never reword a requirement, and never narrow a safety rule" in depth          # ONBOARD-10
+    assert "Run every automated check" in onboarding and "options with costs" in onboarding  # ONBOARD-3, ONBOARD-12
+    assert "isn't verification yet" in onboarding                                        # ONBOARD-11
+
+
+def test_skill_puts_questions_for_the_engineer_on_a_rendered_page():           # AGENT-69
+    text = _whole_skill()
+    assert "goes on a rendered page" in text and "a reader with none of your context" in text
+    assert "spec decide --replace" in text
+
+
+def test_skill_teaches_how_deep_to_write_requirements():                                # AGENT-70, AGENT-71
+    skill = (init.SKILL / "SKILL.md").read_text()
+    depth = (init.SKILL / "references" / "requirement-depth.md").read_text()
+    assert "**Depth follows intent.**" in skill and "as deep as they went" in skill
+    assert "Count features, not effects" in skill and "named consumer" in skill
+    assert "ask instead of picking" in skill and "never restated in an element" in skill
+    for part in ("## A. What counts as a noticeable feature", "## B. Where a value goes", "## C. Requirements you infer",
+                 "## D. Code that falls short", "## E. Intent read from documents", "## F. Splitting a big element"):
+        assert part in depth

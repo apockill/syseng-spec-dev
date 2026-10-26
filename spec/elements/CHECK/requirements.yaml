@@ -235,3 +235,33 @@
     said: Wants everything the checker can flag cheaply flagged, opportunistically, provided it can be flagged without noisy false positives and is straightforward to add.
     basis: stated
     fingerprint: d1147fe87204
+- id: CHECK-30
+  text: The checker shall report as an error each gendered pronoun in a need, a requirement or an intent record.
+  traces_to: SYS-35
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 16:10
+    context: Reading the report on the three-agent onboarding trial, where one agent wrote about the engineer with a pronoun guessed from their name.
+    said: Wants pronouns not assumed, ideally enforced with strict verification items.
+    basis: stated
+    fingerprint: bde9b2931a31
+- id: CHECK-31
+  text: When an item allows a wording rule with a recorded reason, the checker shall not report that rule for that item.
+  traces_to: SYS-7
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-26 08:08
+    context: Reviewing the overnight toolkit fixes, in particular the error for gendered pronouns.
+    said: Asked whether, like linters, there should be a way to override an error, for example when a requirement is about how the product itself writes pronouns; the rules exist to flag bad patterns to LLMs, and the engineer trusts LLMs, once told why a rule exists, to judge when it applies.
+    basis: stated
+    fingerprint: 489baac6f787
+- id: CHECK-32
+  text: When a requirement that other requirements refine has no verification item, the checker shall say how the to-do can be resolved, including verifying it by its children's verification.
+  traces_to: SYS-7
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-26 08:08
+    context: Reviewing whether fully decomposed system requirements should still need a verification item of their own.
+    said: Wants a way to say a requirement is verified by its children, or at least to keep it a to-do with the LLM told how to resolve it; verifying it at its own level is preferred when a test would not be arbitrary, and the convention should follow systems-engineering practice.
+    basis: stated
+    fingerprint: 7883d3928cec

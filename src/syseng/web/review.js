@@ -374,7 +374,7 @@
     renderOverview(el);
     // the agent's judgment leads (AGENT-51)
     const all = DATA.proposals.filter((p) => p.from !== "computed");
-    const latest = all.length ? all[all.length - 1].change : null;
+    const latest = META.change;  // proposals from older changes are earlier recommendations (REVIEW-37)
     const judged = all.filter((p) => p.change === latest && ITEMS[p.id]);
     el.append(h("h3", { class: "subhead" }, icon("lock", "sm"), "Recommended by the agent"));
     if (!judged.length) el.append(h("div", { class: "empty" }, "Nothing recommended right now."));
@@ -827,7 +827,7 @@
     t.addEventListener("click", () => { const n = currentTheme() === "dark" ? "light" : "dark"; applyTheme(n); try { localStorage.setItem("syseng-theme", n); } catch (e) { /* fine */ } });
     applyTheme();
     const recs = DATA.proposals.filter((p) => p.from !== "computed");
-    const judged = recs.filter((p) => p.change === (recs.length ? recs[recs.length - 1].change : null)).length;
+    const judged = recs.filter((p) => p.change === META.change).length;
     const counts = { awaiting: judged + DATA.awaiting.decisions.length,
       altered: DATA.awaiting.alterations.length, captured: DATA.captured.length,
       changes: DATA.changes.length ? DATA.changes[0].items.length : 0, items: Object.keys(ITEMS).length };
@@ -901,7 +901,8 @@
     }));
     const fixes = [];
     for (const [id, s] of items) for (const [idx, f] of Object.entries(s.intent || {}))
-      fixes.push(`${label(id)}, intent record ${+idx + 1}: ` + (f.action === "remove" ? "not what was meant; remove it" : `meant: ${f.correction || "(see comment)"}`));
+      fixes.push(`${label(id)}, intent record ${+idx + 1}: ` + (f.action === "remove" ? "not what was meant; remove it"
+        : f.correction ? `meant: ${f.correction}` : "marked for correction, but no text was typed"));
     group("Intent to correct", fixes);
     group("Wording suggested", items.filter(([id, s]) => answeredWording(id, s)).map(([id, s]) => `${id}: ${s.wording}`));
     group("Comments", items.filter(([, s]) => s.comment).map(([id, s]) => `${label(id)}: ${s.comment}`));
@@ -946,7 +947,10 @@
     const n = items.length + decisions.length + (state.general ? 1 : 0);
     state.copied = [...new Set([...(state.copied || []), META.review])];
     save();
-    copy(text, n ? `Copied ${n} piece${n > 1 ? "s" : ""} of feedback. Paste it to your agent, or post it as your review.`
+    const blank = items.reduce((k, [, s]) => k + Object.values(s.intent || {})
+      .filter((f) => f.action === "correct" && !(f.correction || "").trim()).length, 0);  // REVIEW-39
+    copy(text, blank ? `Copied, but ${blank} correction${blank > 1 ? "s have" : " has"} no text: type what you meant in the box under "Correct", then copy again.`
+      : n ? `Copied ${n} piece${n > 1 ? "s" : ""} of feedback. Paste it to your agent, or post it as your review.`
       : "Copied an empty review: paste it to your agent to mark this one done.");
   }
   function showBlock(text) {  // when the browser won't copy, the block is shown to copy by hand

@@ -10,9 +10,10 @@ from syseng.model import Spec
 # key, label, which direction is better ("up", "down", or None when it isn't better either way), shown as a tile
 MEASURES = [
     ("coverage", "Verification coverage", "up", True),
+    ("tested", "Requirements with linked tests", "up", True),
     ("unverified", "Requirements without verification", "down", True),
     ("tests", "Linked tests", "up", True),
-    ("stale", "Locked to an earlier version", "down", True),
+    ("stale", "Changed since a person gave it", "down", True),
     ("awaiting", "Waiting for your answer", "down", True),
     ("errors", "Checker errors", "down", True),
     ("todos", "Checker to-dos", "down", False),
@@ -44,6 +45,10 @@ def metrics(spec: Spec) -> dict:
         mix[lv[item.id].level] += 1
     return {
         "coverage": round(100 * (len(reqs) - unverified) / len(reqs), 1) if reqs else 100.0,
+        # what has a test behind it; planned reasoning checks and manual items don't count until they run
+        "tested": round(100 * len({r for v in vis if any((v.data.get("tests") or {}).values())
+                                   for r in (v.data.get("verifies") or [])} & {r.id for r in reqs})
+                        / len(reqs), 1) if reqs else 100.0,
         "unverified": unverified,
         "tests": sum(len(links or []) for v in vis for links in (v.data.get("tests") or {}).values()),
         "stale": sum(1 for x in lv.values() if x.stale),
@@ -80,5 +85,5 @@ def compare(now: dict, was: dict | None) -> list[dict]:
         worse = bool(delta and better and ((delta < 0) if better == "up" else (delta > 0)))
         improved = bool(delta and better and not worse)
         out.append({"key": key, "label": label, "now": now[key], "was": before, "delta": delta, "better": better,
-                    "worse": worse, "improved": improved, "tile": tile, "percent": key == "coverage"})
+                    "worse": worse, "improved": improved, "tile": tile, "percent": key in ("coverage", "tested")})
     return sorted(out, key=lambda m: (not m["worse"], not m["tile"]))

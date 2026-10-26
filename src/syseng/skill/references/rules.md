@@ -6,6 +6,18 @@ The wording rules (W…) come from INCOSE's *Guide to Writing Requirements*, cit
 
 Errors fail `spec check`. To-dos are listed by `spec check --todo` but don't fail it.
 
+The wording rules (W…) flag patterns that are usually wrong. When one doesn't apply to an item, because you know why the rule exists and this case is the exception, allow it on that item with the reason: `allow: [{rule: W011, why: "the requirement is about how the product writes pronouns"}]`. The reason is reviewed like any other text.
+
+## Contents
+
+- Structure: S001, S002, S003, S004, S005, S006, S007, S008
+- Traceability: T001, T002, T003, T004, T005
+- Attributes: A001, A002, A003, A004, A005, A006, A007, A008, A009, A010, F001
+- Conflicts: C001
+- Verification items: V001
+- Rendered views: V002, V003, V004, R001
+- Wording: W001, W002, W003, W004, W005, W006, W007, W008, W009, W010, W011
+
 ## Structure
 
 <a id="s001"></a>
@@ -102,7 +114,7 @@ Derived and added items are the agent's to change. They aren't to-dos.
 A change altered an item the engineer approved, wrote or decided, and they haven't yet kept the alteration or had it rolled back. Ask them, giving the line that keeps it, such as `CHECK-3 LGTM`. The merge check lists these before a branch lands, and never fails because of them.
 
 <a id="a005"></a>
-### A005: approval for an unknown item
+### A005: lock for an unknown item
 An approval names an item that doesn't exist. Remove it, or fix the ID.
 
 <a id="a006"></a>
@@ -168,6 +180,14 @@ A verification item needs:
 ### V002: linked test not found
 A verification item links a test that doesn't exist: the file is missing, or the file has no test by that name. A link is `path` or `path::name`, resolved against the implementation's root. In a Python file the name is a pytest test (`test_x`, or `TestThing::test_x`, with any `[parameters]` ignored). In a C++ file it's a GoogleTest (`Suite.Test`, declared with `TEST`, `TEST_F`, `TEST_P` or `TYPED_TEST`). In any other file, the name only has to appear in it. Fix the link, or remove it if the test is gone.
 
+<a id="v003"></a>
+### V003: test no verification item links (to-do)
+A Python test in the implementation's tree that no verification item links, listed per file. It checks something the spec doesn't claim, or a requirement that's missing. Link it from the verification item whose requirement it checks, or add the requirement it shows is missing. Folders that are hidden, vendored (`node_modules`, `site-packages`) or hold app data (`state`) are skipped.
+
+<a id="v004"></a>
+### V004: roll-up over an unverified child (to-do)
+A verification item with technique `roll-up` verifies a requirement through the verification of the requirements that refine it, the way systems engineering verifies a higher-level requirement by analysis of its subordinate results. It holds only while every child is verified: verify the child, or verify the parent at its own level. Prefer a test at the parent's own level where one wouldn't be arbitrary.
+
 <a id="r001"></a>
 ### R001: stale Markdown view
 The review page replaced the generated Markdown views. A `requirements.md`, `decisions.md` or change-record `.md` left in spec/ shows a spec that no longer exists. `spec render` removes it; `spec review` writes the page.
@@ -227,7 +247,7 @@ These are exempt: "how many" (a quantity, not a vague amount), and capitalized w
 
 <a id="w009"></a>
 ### W009: language-specific name (INCOSE R31)
-Requirements describe behavior in terms any implementation can meet, so a Rust rebuild can follow them. Code spans, file names, snake_case or camelCase identifiers and call syntax belong in test links and related-code lists.
+Requirements describe behavior in terms any implementation can meet, so a Rust rebuild can follow them. Code spans, file names, snake_case or camelCase identifiers and call syntax belong in test links and related-code lists. An exact value another program depends on (a JSON field name, a file name in a format others read) is part of the requirement: put it in double quotes, and the check reads it as a quoted value.
 
 <a id="w010"></a>
 ### W010: requirement states its own test (INCOSE R31)
@@ -235,3 +255,7 @@ A requirement says what must hold. How it's checked belongs in a verification it
 
 - ✗ The checker shall be verified by a unit test that…
 - ✓ The checker shall report each duplicate ID. *(The unit test lives in a verification item.)*
+
+<a id="w011"></a>
+### W011: gendered pronoun
+A need, a requirement or an intent record uses he, him, his, she, her or hers. Agents guess pronouns from names, and a wrong guess misgenders a real person in a record that lasts. Name the person or their role ("the engineer", "the operator") instead. Checked in needs, requirements, and the `said` and `context` of every intent record.

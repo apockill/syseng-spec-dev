@@ -31,6 +31,16 @@
   batch: 4
   review: 8b5e84e04f
   text: The checker shall report each requirement on a system element with sub-elements that has neither a verification item nor a requirement refining it, saying that it is neither decomposed nor verified.
+- id: CHECK-3
+  fingerprint: 1dda8445bab1
+  locked_at: 2026-10-26T08:09-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: chat
+  batch: 2
+  after:
+  - 2026-10-11-round-10-cli-editing D1
+  text: The checker shall report each test that no verification item links to.
+  said: In the overnight review the engineer strongly agreed with listing unlinked tests and the honest coverage measure, and invited locking both in with their direct approval.
 - id: CHECK-V14
   fingerprint: 7180cb162341
   locked_at: 2026-10-22T16:00-07:00
@@ -773,6 +783,23 @@
   text: The engineer needs verification that isn't weakened by the agents whose work it checks.
   migrated_from: 3db712f74d63
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: REVIEW-38
+  fingerprint: e30bb2497a97
+  locked_at: 2026-10-26T08:09-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: chat
+  batch: 2
+  text: The review page overview shall show the share of requirements whose verification links tests, beside the verification coverage.
+  said: In the overnight review the engineer strongly agreed with listing unlinked tests and the honest coverage measure, and invited locking both in with their direct approval.
+- id: SYS
+  fingerprint: 395a73f004d8
+  locked_at: 2026-10-26T09:16-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: 0a959844be
+  text: |-
+    The toolkit: the system as a whole: A reusable systems-engineering toolkit: a command-line tool, one portable skill and optional adapters for agent harnesses. It lets one engineer direct AI agents on a large codebase by reading requirements instead of code.
 - id: SYS-1
   fingerprint: d9c7fec31355
   locked_at: '2026-10-11'
@@ -1002,6 +1029,14 @@
   batch: 1
   text: Each view of an item shall show whether the engineer approved the item explicitly or the item is delegated under an item the engineer approved.
   note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it; approver not recorded with an email address; the migration filled in the person running it
+- id: SYS-34
+  fingerprint: 26af487f3d10
+  locked_at: 2026-10-26T09:16-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: 0a959844be
+  text: Each view of an item shall show the item's level of intent and, for a derived or added item, the nearest item above it that a person locked, stated or guided.
 - id: SYS-35
   fingerprint: bc517ab91d0e
   locked_at: 2026-10-17T22:22-07:00
@@ -1097,6 +1132,30 @@
   text: When a person says what they want, in conversation or in a comment on the review page, the toolkit shall record it as intent on the items it directly expresses, without an approval step.
   note: |-
     Recorded by the agent: the prompt hook couldn't run because the toolkit isn't on the PATH here.
+- id: SYS-45
+  fingerprint: 2fe89d51bea0
+  locked_at: 2026-10-26T09:16-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: 0a959844be
+  text: The toolkit shall present the spec to people as one generated, interactive review page.
+- id: SYS-46
+  fingerprint: 43c1b0c5edfc
+  locked_at: 2026-10-26T09:16-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: 0a959844be
+  text: The review page shall let a person lock and unlock items, comment on items, keep or roll back alterations, correct or remove intent records, and choose options in open decisions.
+- id: SYS-48
+  fingerprint: f3962feab456
+  locked_at: 2026-10-26T09:16-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: 0a959844be
+  text: The toolkit shall report the spec differences from an older version, either a version-control revision or a person's last review, to a newer version, either the working tree or a later revision.
 - id: SYS-49
   fingerprint: 8c5b7e273353
   locked_at: 2026-10-21T16:16-07:00

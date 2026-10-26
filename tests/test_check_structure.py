@@ -163,3 +163,68 @@ def test_yaml_round_trip_keeps_prose_readable(tmp_path):
     text = path.read_text()
     assert "''" not in text and "\\" not in text
     assert yamlio.read(path)[0]["source"] == '"it\'s quoted: really"'
+
+
+def test_a_gendered_pronoun_in_a_need_requirement_or_intent_record_is_an_error(spec):   # CHECK-30
+    spec.files["elements/CORE/requirements.yaml"][0]["text"] = "The core shall stamp each widget his way."
+    spec.write()
+    found = [f for f in spec.findings() if f.code == "W011"]
+    assert found and found[0].item == "CORE-1" and found[0].severity == "error"
+    spec.files["elements/CORE/requirements.yaml"][0]["text"] = "The core shall stamp each widget."
+    spec.files["elements/SYS/needs.yaml"][0]["text"] = "The engineer needs widgets the way they like them."
+    spec.write()
+    assert "W011" not in spec.codes()                       # "they" and "the engineer" are fine
+
+
+def test_tests_no_verification_item_links_are_listed_per_file(spec):                   # CHECK-3
+    spec.files["elements/CORE/verification.yaml"][0]["tests"] = {"python": ["tests/test_core.py::test_stamp"]}
+    spec.write()
+    todo = [f.message for f in spec.findings() if f.code == "V003"]
+    assert todo == ["tests/test_core.py has 1 test no verification item links: test_other"]
+
+
+def test_unittest_classes_count_as_tests_for_the_unlinked_list(spec):                   # CHECK-3
+    spec.write()
+    tests = spec.root.parent / "tests" / "test_core.py"
+    tests.write_text("import unittest\n\n\nclass AppsTest(unittest.TestCase):\n    def test_a(self):\n        pass\n")
+    todo = [f.message for f in spec.findings() if f.code == "V003"]
+    assert todo == ["tests/test_core.py has 1 test no verification item links: AppsTest::test_a"]
+
+
+def test_a_need_drafted_from_agent_documents_may_say_it_is_derived(spec):
+    need = spec.files["elements/SYS/needs.yaml"][0]
+    for k in ("origin", "source", "context"):
+        need.pop(k, None)
+    need.update({"basis": "derived", "why": "read from a README an agent account wrote"})
+    spec.write()
+    assert "A002" not in spec.codes()
+
+
+def test_an_item_can_allow_a_wording_rule_with_a_reason(spec):                         # CHECK-31
+    req = spec.files["elements/CORE/requirements.yaml"][0]
+    req["text"] = "The core shall label each widget with his or her name as the buyer typed it."
+    spec.write()
+    assert "W011" in spec.codes()
+    req["allow"] = [{"rule": "W011", "why": "the requirement is about how the product writes pronouns"}]
+    spec.write()
+    assert "W011" not in spec.codes()
+    req["allow"] = [{"rule": "W011"}]                       # no reason: refused
+    spec.write()
+    assert "W011" in spec.codes() and "S007" in spec.codes()
+
+
+def test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified(spec):         # CHECK-32
+    spec.files["elements/SYS/verification.yaml"] = [{
+        "id": "SYS-V1", "verifies": ["SYS-1"], "method": "analysis", "technique": "roll-up", "origin": "agent",
+        "description": "SYS-1 holds when every requirement refining it is verified."}]
+    spec.write()
+    assert "V004" not in spec.codes(severity="todo") and "V001" not in spec.codes()
+    spec.files["elements/CORE/verification.yaml"] = []
+    spec.write()
+    assert "V004" in spec.codes(severity="todo")
+
+
+def test_a_parent_without_verification_is_told_how_to_resolve_it(spec):                # CHECK-32
+    spec.write()
+    msg = next(f.message for f in spec.findings() if f.code == "T004" and f.item == "SYS-1")
+    assert "1 requirement refine it" in msg and "roll-up" in msg

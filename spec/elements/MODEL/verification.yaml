@@ -138,3 +138,30 @@
     - tests/test_levels.py::test_the_highest_level_applies
     - tests/test_levels.py::test_an_added_item_and_what_derives_from_it_count_as_added
     - tests/test_levels.py::test_an_invalid_basis_is_reported
+- id: MODEL-V14
+  verifies:
+  - MODEL-41
+  method: test
+  technique: unit test
+  description: An intent record defaults to a human conversation, accepts document, code comment, commit message and agent conversation sources, needs a path for a read source, and rejects unknown kinds.
+  tests:
+    python:
+    - tests/test_levels.py::test_intent_read_from_a_source_names_it
+- id: MODEL-V15
+  verifies:
+  - MODEL-41
+  method: test
+  technique: unit test
+  description: An intent record read from a document keeps its source kind, path and author through spec edit, and is attributed to the source's author.
+  tests:
+    python:
+    - tests/test_edit.py::test_intent_read_from_a_document_keeps_its_source_and_author
+- id: MODEL-V16
+  verifies:
+  - MODEL-34
+  method: test
+  technique: unit test
+  description: A lock recorded from the command line with a summary stores it in the lock's `said` field, which the checker accepts, not in the older `words` field.
+  tests:
+    python:
+    - tests/test_approvals.py::test_a_lock_recorded_with_a_summary_keeps_it_in_said

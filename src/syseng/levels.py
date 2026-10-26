@@ -25,7 +25,7 @@ RANK = {lvl: len(ORDER) - n for n, lvl in enumerate(ORDER)}
 PEOPLE = (EXPLICIT, STATED, GUIDED)  # the levels a person gave
 INTENT_BASES = (STATED, GUIDED)      # an intent record's basis (MODEL-37)
 ITEM_BASES = (DERIVED, ADDED)        # an item's own basis, without intent or a lock (MODEL-38)
-INTENT_FIELDS = ("by", "when", "context", "said", "basis", "fingerprint")  # MODEL-36, CHECK-20
+INTENT_FIELDS = ("by", "when", "context", "said", "basis", "fingerprint", "source", "source_path", "source_author")  # MODEL-36, CHECK-20
 
 
 DECAY = {EXPLICIT: STATED, STATED: GUIDED, GUIDED: DERIVED}  # one step down for a record given for an earlier version

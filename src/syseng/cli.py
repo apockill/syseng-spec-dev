@@ -93,7 +93,7 @@ def cmd_show(args) -> int:
     print(f"  {d.get('text') or d.get('title') or d.get('description', '')}")
     print(f"  attention: {review.describe(spec, iid)}")
     for a in review.history(spec, iid):
-        said = " ".join(str(a.get("words", "")).split())
+        said = " ".join(str(a.get("said") or a.get("words") or "").split())
         print(f"  locked {a.get('locked_at') or a.get('approved_at') or a.get('approved_on')} by "
               f"{a.get('by', 'the engineer')} via "
               f"{a.get('via')}" + (f": {said}" if said else ""))
@@ -177,7 +177,7 @@ def cmd_approve(args) -> int:
         record = {"id": iid, "fingerprint": fingerprint.of(kind, data), "locked_at": now, "by": by,
                   "via": args.via, "batch": len(ids)}
         if args.words:  # a summary of what the person said; records made mechanically hold none (MODEL-34)
-            record["words"] = args.words
+            record["said"] = args.words  # stored as `said`, the lock schema's field for it
         if args.note:
             record["note"] = args.note
         if _settled(spec, iid):
@@ -298,7 +298,7 @@ def cmd_status(args) -> int:
         for cid, alt in pending:
             print(f"  {changes._label(spec, alt['id'])}, altered in {cid}. Keep it: `lock {alt['id']}`")
     waiting = [i for ch in changes.all_changes(spec) for p in ch.data.get("proposals") or [] for i in p.get("ids") or []
-               if review.kind_and_data(spec, i) and review.state_of(spec, i).state != review.APPROVED]
+               if review.kind_and_data(spec, i) and levels.level_of(spec, i).level != levels.EXPLICIT]
     if waiting:
         print(f"Proposed for locking: `lock {', '.join(dict.fromkeys(waiting))}`")
     print(checker.summarize(checker.check(spec)))
@@ -311,13 +311,34 @@ def cmd_decide(args) -> int:
     if c is None:
         print("spec decide: no change is open")
         return 1
+    if args.withdraw:
+        try:
+            changes.withdraw(c, args.withdraw, args.reason or "")
+        except changes.ChangeError as e:
+            print(f"spec decide: {e}")
+            return 1
+        render.write_views(model.load(spec.root))
+        print(f"withdrew open decision {args.withdraw} in {c.id}")
+        return 0
+    if args.dry_run:  # validate against a copy of the change, write nothing
+        import copy
+        probe = copy.copy(c)
+        probe.data = copy.deepcopy(c.data)
+        probe.save = lambda: None
+        try:
+            did = changes.add_decision(probe, _read_doc(args) or {}, replace=args.replace)
+        except (changes.ChangeError, edit.EditError) as e:
+            print(f"spec decide: {e}")
+            return 1
+        print(f"dry run: decision {did} is valid; nothing was written")
+        return 0
     try:
-        did = changes.add_decision(c, _read_doc(args) or {})
+        did = changes.add_decision(c, _read_doc(args) or {}, replace=args.replace)
     except (changes.ChangeError, edit.EditError) as e:
         print(f"spec decide: {e}")
         return 1
     render.write_views(model.load(spec.root))
-    print(f"added open decision {did} to {c.id}")
+    print(f"{'rewrote' if args.replace else 'added'} open decision {did} {'in' if args.replace else 'to'} {c.id}")
     return 0
 
 
@@ -560,6 +581,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(fn=cmd_status)
     p = sub.add_parser("decide", help="add an open decision (YAML on stdin: question, importance, involves, options)")
     p.add_argument("--file", help="read the decision from a file instead of stdin")
+    p.add_argument("--replace", metavar="D<n>", help="rewrite this open decision of the open change in place")
+    p.add_argument("--withdraw", metavar="D<n>", help="withdraw this open decision, overtaken by events (needs --reason)")
+    p.add_argument("--reason", help="why the decision is withdrawn")
+    p.add_argument("--dry-run", action="store_true", help="check the decision without recording it")
     p.set_defaults(fn=cmd_decide)
     p = sub.add_parser("resolve", help="record the engineer's choice on open decisions")
     p.add_argument("ids", nargs="+")
@@ -616,4 +641,9 @@ def commands() -> set[str]:
 
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
-    return args.fn(args)
+    try:
+        return args.fn(args)
+    except BrokenPipeError:  # the reader went away, as with `spec show X | head`: not an error
+        import os
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        return 0

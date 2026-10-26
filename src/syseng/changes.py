@@ -96,7 +96,7 @@ def close(change: Change) -> None:
     change.save()
 
 
-def add_decision(change: Change, decision: dict) -> str:
+def add_decision(change: Change, decision: dict, replace: str | None = None) -> str:
     """Adds an open decision (CHANGE-3). It must offer options, one of them recommended (CHANGE-10)."""
     options = decision.get("options") or []
     if not decision.get("question"):
@@ -119,13 +119,38 @@ def add_decision(change: Change, decision: dict) -> str:
                 raise ChangeError(f"option {o.get('label')!r} {key.replace('_', ' ')} {', '.join(stray)}, which the "
                                   "decision doesn't involve")
     decisions = change.data.setdefault("decisions", [])
-    did = f"D{len(decisions) + 1}"
+    if replace:  # CHANGE-20: an open decision is rewritten in place until the person answers it
+        old = next((d for d in decisions if d.get("id") == replace), None)
+        if old is None:
+            raise ChangeError(f"{change.id} has no decision {replace}")
+        if old.get("status") != "open":
+            raise ChangeError(f"{replace} is already {old.get('status')}; file a new decision instead")
+        did = replace
+    else:
+        did = f"D{len(decisions) + 1}"
     entry = {"id": did, **({"kind": kind} if kind else {}), "question": decision["question"],
              "importance": decision["importance"], "involves": decision.get("involves") or [], "options": options,
              "status": "open"}
-    decisions.append(entry)
+    if replace:
+        decisions[decisions.index(old)] = entry
+    else:
+        decisions.append(entry)
     change.save()
     return did
+
+
+def withdraw(change: Change, did: str, reason: str) -> None:
+    """CHANGE-21: an open decision the conversation has overtaken is withdrawn with a reason, not left to linger."""
+    if not (reason or "").strip():
+        raise ChangeError("say why the decision is withdrawn")
+    d = next((x for x in change.data.get("decisions") or [] if x.get("id") == did), None)
+    if d is None:
+        raise ChangeError(f"{change.id} has no decision {did}")
+    if d.get("status") != "open":
+        raise ChangeError(f"{did} is already {d.get('status')}")
+    d.update({"status": "withdrawn", "withdrawn_because": reason,
+              "withdrawn": datetime.datetime.now().astimezone().isoformat(timespec="minutes")})
+    change.save()
 
 
 def resolve(change: Change, ids: list[str], words: str, option: int | None, by: str | None = None) -> list[str]:

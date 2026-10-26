@@ -99,7 +99,7 @@ _RULES = [
          "rolled back.",
          "Ask the engineer whether to keep it. The review page shows it for them to keep or roll back.",
          severity="todo"),
-    Rule("A005", "approval for an unknown item",
+    Rule("A005", "lock for an unknown item",
          "An approval that matches nothing can't protect anything.",
          "Remove the stale approval, or fix its ID."),
     Rule("A006", "incomplete intent record",
@@ -144,6 +144,13 @@ _RULES = [
          "A verification item that points at a test that isn't there verifies nothing, and nobody notices.",
          "Fix the link to `path::name`, where the name is a pytest test (`test_x` or `TestThing::test_x`) or a "
          "GoogleTest (`Suite.Test`). If the test is gone, remove the link."),
+    Rule("V003", "test no verification item links",
+         "A test nothing links to checks something the spec doesn't claim, or a requirement that's missing.",
+         "Link it from the verification item whose requirement it checks, or add the requirement it shows is "
+         "missing.", severity="todo"),
+    Rule("V004", "roll-up over an unverified child",
+         "A roll-up verifies a requirement by its children's verification, which holds only if every child is verified.",
+         "Verify the child, or verify the parent at its own level instead of by roll-up.", severity="todo"),
     Rule("R001", "stale Markdown view",
          "The review page replaced the Markdown views; one left behind shows a spec that no longer exists.",
          "Run `spec render`, which removes it, and `spec review` for the page."),
@@ -182,17 +189,21 @@ _RULES = [
          "INCOSE R20"),
     Rule("W009", "language-specific name",
          "A requirement that names code can't guide a rebuild in another language.",
-         "Describe the behavior or concept. Put code names in test links or related-code lists.",
+         "Describe the behavior or concept. Put code names in test links or related-code lists; quote an exact value "
+         "another program depends on, such as \"node_id\".",
          "INCOSE R31"),
     Rule("W010", "requirement states its own test",
          "A requirement says what must hold. How it's checked belongs in a verification item, written separately.",
          "Delete the verification wording, and put it in a verification item.",
          "INCOSE R31"),
+    Rule("W011", "gendered pronoun",
+         "Pronouns guessed from a name misgender people; the spec talks about real people for years.",
+         "Name the person or their role (the engineer, the operator) instead of he, she, his or her."),
 ]
 RULES = {r.code: r for r in _RULES}
 
 METHODS = ("test", "analysis", "demonstration", "inspection")
-TECHNIQUES = ("unit test", "integration test", "reasoning check", "manual")
+TECHNIQUES = ("unit test", "integration test", "reasoning check", "manual", "roll-up")
 
 # --- wording patterns -------------------------------------------------------------
 _QUOTED = re.compile(r'"[^"]*"')

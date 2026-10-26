@@ -84,6 +84,8 @@ def test_shell_writes_into_the_spec_are_refused(repo, command):
     "cp spec/requirements.md /tmp/review.md",
     "spec edit <<'YAML'\nedits:\n  - modify: CORE-1\n    set: {text: a > b}\n    reason: r\nYAML",
     "python -m pytest > /tmp/out.txt 2>&1",
+    "python3 - <<'P'\nfor r in rows: print(r['id'], '->', 'spec/elements/CORE/requirements.yaml')\nP",
+    "python3 -c \"print('a', '->', 'spec/retired.yaml')\"",
 ])
 def test_shell_reads_and_toolkit_commands_are_allowed(repo, command):
     assert _guard(hook.pre_tool, repo, "Bash", command=command) == 0

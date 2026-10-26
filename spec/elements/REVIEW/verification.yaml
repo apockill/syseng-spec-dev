@@ -174,3 +174,27 @@
   method: demonstration
   technique: reasoning check
   description: On a generated review page, each card for an item changed since the last review shows a chip saying new, edited, reworded, moved, intent changed or details changed; clicking an edit's chip shows that card's title, text and other changed fields as a word diff, and clicking it again hides them; the header's Diffs switch, or the D key outside a text box, shows or hides the diffs on every card, and is remembered.
+- id: REVIEW-V17
+  verifies:
+  - REVIEW-37
+  method: test
+  technique: unit test
+  description: With an older change holding a proposal and a newer change holding none, the page marks the newer change as current, so the older proposal is listed as earlier.
+  tests:
+    python:
+    - tests/test_review_page.py::test_only_the_newest_changes_proposals_are_current
+- id: REVIEW-V18
+  verifies:
+  - REVIEW-38
+  method: test
+  technique: unit test
+  description: A requirement verified only by a planned reasoning check counts toward verification coverage but not toward requirements with linked tests, and the overview lists both measures.
+  tests:
+    python:
+    - tests/test_review_page.py::test_the_overview_shows_requirements_with_linked_tests_beside_coverage
+- id: REVIEW-V19
+  verifies:
+  - REVIEW-39
+  method: demonstration
+  technique: manual
+  description: On a generated review page, marking an intent record "Correct" without typing and pressing Copy feedback shows a message naming the corrections with no text, and the copied summary says no text was typed instead of pointing at a comment.

@@ -98,6 +98,41 @@ _WRITE_LAST = {"cp", "install", "ln", "rsync", "copy-item"}
 _PREFIXES = {"sudo", "command", "env", "exec", "nice", "time"}
 
 
+_HEREDOC = re.compile(r"<<-?\s*(['\"]?)(\w+)\1")
+
+
+def _without_heredoc_bodies(command: str) -> str:
+    """A heredoc's body is data on standard input, so a `>` inside it is never a redirection."""
+    lines, out, ends = command.split("\n"), [], []
+    for line in lines:
+        if ends:
+            if line.strip() == ends[0]:
+                ends.pop(0)
+            continue
+        out.append(line)
+        ends += [m.group(2) for m in _HEREDOC.finditer(line)]
+    return "\n".join(out)
+
+
+def _redirect_targets(seg: str) -> list[str]:
+    """Redirection targets in one command segment, skipping any `>` inside quotes (as in `print('a', '->', b)`)."""
+    out, quote, i = [], None, 0
+    while i < len(seg):
+        c = seg[i]
+        if quote:
+            quote = None if c == quote else quote
+        elif c in "'\"":
+            quote = c
+        elif c == ">":
+            m = _REDIRECT.match(seg, max(i - 1, 0)) if i else _REDIRECT.match(" " + seg[i:])
+            if m:
+                out.append(m.group(1))
+                i = (m.end() if i else i + m.end() - 1)
+                continue
+        i += 1
+    return out
+
+
 def shell_targets(command: str, cwd: Path) -> list[Path]:
     """Files a shell command plainly writes: redirections, tee, rm/mv/cp and in-place sed or perl.
 
@@ -105,9 +140,9 @@ def shell_targets(command: str, cwd: Path) -> list[Path]:
     auditors are the backstop for those."""
     out: list[Path] = []
     base = cwd
-    for seg in _SEGMENTS.split(command):
-        for m in _REDIRECT.finditer(seg):
-            out.append(_abs(m.group(1).strip("'\""), base))
+    for seg in _SEGMENTS.split(_without_heredoc_bodies(command)):
+        for target in _redirect_targets(seg):
+            out.append(_abs(target.strip("'\""), base))
         try:
             words = shlex.split(seg)
         except ValueError:

@@ -85,7 +85,11 @@ def _guess_language(repo: Path) -> tuple[str, str]:
     for marker, language in _LANGUAGES:
         if (repo / marker).exists():
             return language, f"guessed from {marker}"
-    return "main", "no build file recognized"
+    from syseng import testlinks  # no build file at the root, as in a repository of several apps: go by its tests
+    tests = testlinks.python_tests(repo)
+    if tests:
+        return "python", f"guessed from {len(tests)} Python test file{'s' if len(tests) != 1 else ''}"
+    return "main", "no build file or tests recognized"
 
 
 def instruction_files(repo: Path) -> list[str]:
