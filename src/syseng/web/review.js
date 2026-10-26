@@ -374,7 +374,7 @@
     renderOverview(el);
     // the agent's judgment leads (AGENT-51)
     const all = DATA.proposals.filter((p) => p.from !== "computed");
-    const latest = all.length ? all[all.length - 1].change : null;
+    const latest = META.change;  // proposals from older changes are earlier recommendations (REVIEW-37)
     const judged = all.filter((p) => p.change === latest && ITEMS[p.id]);
     el.append(h("h3", { class: "subhead" }, icon("lock", "sm"), "Recommended by the agent"));
     if (!judged.length) el.append(h("div", { class: "empty" }, "Nothing recommended right now."));
@@ -827,7 +827,7 @@
     t.addEventListener("click", () => { const n = currentTheme() === "dark" ? "light" : "dark"; applyTheme(n); try { localStorage.setItem("syseng-theme", n); } catch (e) { /* fine */ } });
     applyTheme();
     const recs = DATA.proposals.filter((p) => p.from !== "computed");
-    const judged = recs.filter((p) => p.change === (recs.length ? recs[recs.length - 1].change : null)).length;
+    const judged = recs.filter((p) => p.change === META.change).length;
     const counts = { awaiting: judged + DATA.awaiting.decisions.length,
       altered: DATA.awaiting.alterations.length, captured: DATA.captured.length,
       changes: DATA.changes.length ? DATA.changes[0].items.length : 0, items: Object.keys(ITEMS).length };

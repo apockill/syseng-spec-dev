@@ -325,3 +325,13 @@
   traces_to: SYS-42
   why: these follow from the requirements they serve, and asking agents to label each one would be bookkeeping with no signal. Needs always carry an intent record (AGENT-37).
   basis: derived
+- id: MODEL-41
+  text: Each intent record shall name the kind of source it came from, such as a human conversation, an agent conversation, a document, a code comment or a commit message, and where the source has a location, that location.
+  traces_to: SYS-35
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 17:52
+    context: Choosing an option of D3 of round 37, on telling intent read from documents apart from what a person said.
+    said: Wants each intent record to say where it came from, more specifically than conversation versus document, so that sources can later count for more or less; a code comment may count differently from a document; conversation should say human conversation, and an agent answering a migrating agent's questions on the engineer's behalf should be tracked separately, as an agent conversation, counting low.
+    basis: stated
+    fingerprint: 62d75b8f1074

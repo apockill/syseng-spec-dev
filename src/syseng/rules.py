@@ -99,7 +99,7 @@ _RULES = [
          "rolled back.",
          "Ask the engineer whether to keep it. The review page shows it for them to keep or roll back.",
          severity="todo"),
-    Rule("A005", "approval for an unknown item",
+    Rule("A005", "lock for an unknown item",
          "An approval that matches nothing can't protect anything.",
          "Remove the stale approval, or fix its ID."),
     Rule("A006", "incomplete intent record",

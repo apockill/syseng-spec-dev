@@ -16,9 +16,16 @@ System elements form a tree, one `parent` each, with the system at the root. Reu
 
 Place each requirement where the system's structure puts it, not where the engineer's request started. "Make a 3D game where the player's feet are purple" yields high-level requirements near the top and one detail deep in the tree (world → characters → player → model → textures). Each carries the intent its request expressed, and the detail sits under the textures.
 
+## Altitude
+
+One requirement per behaviour a user, an operator or another element relies on, not one per function or test. Constants (timeouts, retries, intervals, thresholds) go in verification descriptions or decision records, unless the engineer stated the number or it's a safety limit. About 5 to 15 requirements per element; past 30, split the element or coarsen the requirements.
+
+- Too deep: "The tool shall give up on a request after 30 seconds without progress."
+- Right: "The tool shall give up on a request that makes no progress, and say so."
+
 ## Wording
 
-The checker enforces these rules. Its errors explain each one, and references/rules.md has the details.
+The checker enforces these rules, and each of its errors explains the rule it broke.
 
 - **Exactly one "shall"** per requirement.
 - **Shape:** `[condition, ]<subject> shall <response>.` Put conditions at the front (When, While, If, Where, In, During, At …).

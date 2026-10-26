@@ -92,3 +92,12 @@
     python:
     - tests/test_levels.py::test_editing_an_item_added_earlier_in_the_same_change_alters_nothing_a_person_gave
     - tests/test_levels.py::test_an_element_gaining_a_dependency_needs_no_acknowledgments
+- id: CHANGE-V10
+  verifies:
+  - CHANGE-20
+  method: test
+  technique: unit test
+  description: An open decision rewritten in place keeps its ID and position; rewriting an unknown or answered decision is refused.
+  tests:
+    python:
+    - tests/test_decisions.py::test_an_open_decision_can_be_rewritten_in_place_until_answered

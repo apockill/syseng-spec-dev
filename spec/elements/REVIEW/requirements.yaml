@@ -322,3 +322,8 @@
   traces_to: SYS-38
   basis: derived
   why: the page groups the newest change's proposals at the top; an item proposed again under an older reason dropped out of that group, so the engineer saw five of the six items they were asked to look at.
+- id: REVIEW-37
+  text: The review page shall present as the agent's current recommendations only those made in the newest change, listing older ones as earlier recommendations.
+  traces_to: SYS-38
+  basis: derived
+  why: a change with decisions but no proposals showed proposals from months-old changes as the agent's current advice, above the decisions it was handing over.

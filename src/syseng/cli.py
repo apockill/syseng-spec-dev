@@ -312,12 +312,12 @@ def cmd_decide(args) -> int:
         print("spec decide: no change is open")
         return 1
     try:
-        did = changes.add_decision(c, _read_doc(args) or {})
+        did = changes.add_decision(c, _read_doc(args) or {}, replace=args.replace)
     except (changes.ChangeError, edit.EditError) as e:
         print(f"spec decide: {e}")
         return 1
     render.write_views(model.load(spec.root))
-    print(f"added open decision {did} to {c.id}")
+    print(f"{'rewrote' if args.replace else 'added'} open decision {did} {'in' if args.replace else 'to'} {c.id}")
     return 0
 
 
@@ -560,6 +560,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(fn=cmd_status)
     p = sub.add_parser("decide", help="add an open decision (YAML on stdin: question, importance, involves, options)")
     p.add_argument("--file", help="read the decision from a file instead of stdin")
+    p.add_argument("--replace", metavar="D<n>", help="rewrite this open decision of the open change in place")
     p.set_defaults(fn=cmd_decide)
     p = sub.add_parser("resolve", help="record the engineer's choice on open decisions")
     p.add_argument("ids", nargs="+")

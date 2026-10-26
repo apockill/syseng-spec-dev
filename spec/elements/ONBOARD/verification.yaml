@@ -1,0 +1,15 @@
+- id: ONBOARD-V1
+  verifies:
+  - AGENT-66
+  - AGENT-67
+  - AGENT-68
+  - ONBOARD-8
+  - ONBOARD-9
+  - ONBOARD-10
+  - ONBOARD-11
+  method: inspection
+  technique: unit test
+  description: The skill tells agents not to infer pronouns, not to set the human author from memory, and to name a document and its author when recording what they read; its onboarding reference has a preflight that stops for the engineer, an altitude rule keeping constants out of requirements, a rule against rewording requirements to match the code, and counts only checks that ran as verification.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_teaches_the_onboarding_lessons_of_the_three_agent_trial

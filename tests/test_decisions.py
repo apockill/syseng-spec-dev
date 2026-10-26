@@ -79,3 +79,16 @@ def test_change_view_keeps_the_structure_of_multi_line_text(spec, change):
                                "after": {"decision": "Three parts:\n- one\n- two"}}]
     text = changes.view(spec.load(), change)
     assert "  - decision:\n    Three parts:\n    - one\n    - two" in text
+
+
+def test_an_open_decision_can_be_rewritten_in_place_until_answered(change):
+    changes.add_decision(change, _decision())
+    changes.add_decision(change, _decision(question="Paint or not?"))
+    assert changes.add_decision(change, _decision(question="Stamp twice, once, or never?"), replace="D1") == "D1"
+    ds = change.data["decisions"]
+    assert [d["id"] for d in ds] == ["D1", "D2"] and ds[0]["question"] == "Stamp twice, once, or never?"
+    with pytest.raises(changes.ChangeError, match="no decision D9"):
+        changes.add_decision(change, _decision(), replace="D9")
+    changes.resolve(change, ["D2"], "paint it", None, by="Ada <ada@example.com>")
+    with pytest.raises(changes.ChangeError, match="already"):
+        changes.add_decision(change, _decision(), replace="D2")

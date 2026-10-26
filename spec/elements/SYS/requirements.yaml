@@ -757,3 +757,28 @@
     said: Said a pull-request reviewer could post the block on the pull request as their review notes.
     basis: guided
     fingerprint: f1b0026507a2
+- id: SYS-54
+  kind: system
+  text: The toolkit shall support more than one spec in a repository, each in its own subdirectory and covering the project there.
+  serves:
+  - NEED-29
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 17:52
+    context: Answering D2 of round 37, on where the spec lives.
+    said: Wants spec directories allowed in subdirectories for monorepos.
+    basis: stated
+    fingerprint: 78c38ec0578f
+- id: SYS-55
+  kind: system
+  text: The toolkit shall find each spec at the location its repository configures, spec/ by default.
+  serves:
+  - NEED-3
+  - NEED-29
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 17:52
+    context: Choosing an option of D2 of round 37, on whether the spec should move to a hidden folder.
+    said: Chose to keep spec/ as the default and make the location configurable.
+    basis: stated
+    fingerprint: 3672fbb445c9

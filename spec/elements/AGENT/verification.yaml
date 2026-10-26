@@ -141,3 +141,23 @@
   method: inspection
   technique: reasoning check
   description: The skill's hand-over step directs an agent whose harness can publish a private web page, such as Claude's artifacts, to publish the review page there and give the person the link, including on a pull request; and to give the file's location otherwise.
+- id: AGENT-V15
+  verifies:
+  - AGENT-65
+  method: inspection
+  technique: unit test
+  description: The skill's main file stays under 500 lines and links every reference; no reference links to another; each reference over 100 lines opens with its contents; no example writes intent as a flow mapping.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_md_stays_short_and_routes_to_every_reference
+    - tests/test_skill.py::test_references_are_one_level_deep_and_long_ones_have_contents
+    - tests/test_skill.py::test_examples_write_intent_in_block_style
+- id: AGENT-V16
+  verifies:
+  - AGENT-69
+  method: inspection
+  technique: unit test
+  description: The skill tells agents to put anything the engineer should answer on a rendered page, written for a reader with none of the agent's context, and names the command that rewrites an open decision.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_puts_questions_for_the_engineer_on_a_rendered_page

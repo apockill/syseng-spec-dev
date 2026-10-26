@@ -6,6 +6,16 @@ The wording rules (W…) come from INCOSE's *Guide to Writing Requirements*, cit
 
 Errors fail `spec check`. To-dos are listed by `spec check --todo` but don't fail it.
 
+## Contents
+
+- Structure: S001, S002, S003, S004, S005, S006, S007, S008
+- Traceability: T001, T002, T003, T004, T005
+- Attributes: A001, A002, A003, A004, A005, A006, A007, A008, A009, A010, F001
+- Conflicts: C001
+- Verification items: V001
+- Rendered views: V002, R001
+- Wording: W001, W002, W003, W004, W005, W006, W007, W008, W009, W010
+
 ## Structure
 
 <a id="s001"></a>
@@ -102,7 +112,7 @@ Derived and added items are the agent's to change. They aren't to-dos.
 A change altered an item the engineer approved, wrote or decided, and they haven't yet kept the alteration or had it rolled back. Ask them, giving the line that keeps it, such as `CHECK-3 LGTM`. The merge check lists these before a branch lands, and never fails because of them.
 
 <a id="a005"></a>
-### A005: approval for an unknown item
+### A005: lock for an unknown item
 An approval names an item that doesn't exist. Remove it, or fix the ID.
 
 <a id="a006"></a>

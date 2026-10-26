@@ -235,3 +235,13 @@
     said: Wants everything the checker can flag cheaply flagged, opportunistically, provided it can be flagged without noisy false positives and is straightforward to add.
     basis: stated
     fingerprint: d1147fe87204
+- id: CHECK-30
+  text: The checker shall report as an error each gendered pronoun in a need, a requirement or an intent record.
+  traces_to: SYS-35
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 16:10
+    context: Reading the report on the three-agent onboarding trial, where one agent wrote about the engineer with a pronoun guessed from their name.
+    said: Wants pronouns not assumed, ideally enforced with strict verification items.
+    basis: stated
+    fingerprint: bde9b2931a31

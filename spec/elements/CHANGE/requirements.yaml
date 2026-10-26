@@ -151,3 +151,8 @@
   traces_to: SYS-52
   why: the next review page shows each comment and what was done about it.
   basis: derived
+- id: CHANGE-20
+  text: Until the engineer answers an open decision, the toolkit shall let an agent rewrite it in place, keeping its ID.
+  traces_to: SYS-16
+  basis: added
+  why: in the onboarding trial, agents filed decisions with wrong involved items or missing context and couldn't correct them; a duplicate decision would ask the engineer twice.

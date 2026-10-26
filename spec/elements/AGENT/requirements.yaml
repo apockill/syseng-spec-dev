@@ -549,3 +549,55 @@
     said: Found that Claude artifacts work well for the review page, and wants them used when the agent they're working with is Claude.
     basis: stated
     fingerprint: b29e83558b65
+- id: AGENT-65
+  text: The skill's main file shall name each reference with the task that needs it, linking each reference directly, so an agent reads only the references its task needs.
+  traces_to: SYS-20
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 15:57
+    context: Asking for proposals to improve the skill after the three-agent onboarding trial.
+    said: Wants the skill to follow progressive-disclosure and Anthropic's skill-writing best practices.
+    basis: stated
+    fingerprint: b9c7fc800c64
+- id: AGENT-66
+  text: The skill shall direct agents to write needs about the engineer by that role and to refer to a person by name or role, never by pronouns inferred from a name.
+  traces_to: SYS-30
+  basis: added
+  why: one trial agent wrote about the engineer with a pronoun guessed from their name.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 16:10
+    context: Reading the report on the three-agent onboarding trial, where one agent wrote about the engineer with a pronoun guessed from their name.
+    said: Wants this in the toolkit; needs should refer to the engineer by that role, and pronouns shouldn't be assumed, ideally with strict verification items.
+    basis: stated
+    fingerprint: 8a711bb9850c
+- id: AGENT-67
+  text: The skill shall direct agents to take the human author's identity from the engineer, never from an agent's memory or a guess.
+  traces_to: SYS-35
+  basis: added
+  why: all three trial agents set the human author from a memory note, without asking.
+- id: AGENT-68
+  text: The skill shall direct agents to record what they read in a document as guided intent at most, naming the document and its author.
+  traces_to: SYS-35
+  basis: added
+  why: in the trial, documents written by an agent's account were recorded as the engineer's own intent.
+- id: AGENT-69
+  text: When an agent wants the engineer to answer something, the agent shall present it on a rendered page with enough context for a reader who hasn't followed the conversation to decide.
+  traces_to: SYS-30
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 17:35
+    context: After the agent listed decisions waiting on the engineer in a chat message during the onboarding trial.
+    said: Whenever something waits on them and an answer is wanted, wants a rendered page showing the decisions or items, written assuming they have none of the agent's context; approving through a text interface is hard, and LLMs tend to give too little context when they ask.
+    basis: stated
+    fingerprint: 4441c3f2f7f3
+- id: AGENT-70
+  text: The skill shall direct agents to write requirements no person asked for at the level of behaviour a user or another element relies on, and requirements expressing what a person specified as deep as the person's statement goes.
+  traces_to: SYS-35
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-25 18:02
+    context: Discussing D4 of round 37 (how detailed requirements should be) after a backtest of proposed altitude rules on a motion-graphics website, a robot stop and a CLI.
+    said: Leans toward requirements proportional to observable behaviour, but cautions that a migration could fixate on every movement of an animation, so migrations need guardrails that suit the common case. Outside migration those guardrails are still the common case, but when a person calls out specifics, such as a letter that fades in and morphs into a logo, the agent should happily spec deep, with requirements under it about the morph, because speccing exists to give people surface to lock in, and what they leave unlocked is what gets tuned.
+    basis: stated
+    fingerprint: ee289508a96e

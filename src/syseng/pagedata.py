@@ -193,6 +193,11 @@ def captured(spec: Spec, sets: list[dict]) -> list[dict]:
 
 
 # ---------------------------------------------------------------- worth locking
+def _newest_change(spec: Spec) -> str | None:
+    c = changes.current(spec) or (changes.all_changes(spec) or [None])[-1]
+    return c.id if c else None
+
+
 def proposals(spec: Spec, limit: int = 5) -> list[dict]:
     """The items most worth locking: the agents' proposals first, then the most-depended-on items a person gave but
     hasn't locked, each with its reason (SYS-38, AGENT-40)."""
@@ -250,6 +255,7 @@ def build(spec: Spec, person: str, against: list[str] | None = None) -> dict:
         "meta": {"review": hashlib.sha256(f"{revision}{now}{person}".encode()).hexdigest()[:10], "person": person,
                  "generated": now, "revision": revision, "dirty": dirty, "repository": repo.name,
                  "levels": list(levels.ORDER),
+                 "change": _newest_change(spec),  # the agent's current recommendations are this change's (REVIEW-37)
                  "applied": [r.get("review") for r in levels.reviews(spec) if r.get("by") == person]},
         "overview": overview(spec, person, sets),
         "awaiting": awaiting(spec),
