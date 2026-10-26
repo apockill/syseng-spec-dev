@@ -92,3 +92,14 @@ def test_an_open_decision_can_be_rewritten_in_place_until_answered(change):
     changes.resolve(change, ["D2"], "paint it", None, by="Ada <ada@example.com>")
     with pytest.raises(changes.ChangeError, match="already"):
         changes.add_decision(change, _decision(), replace="D2")
+
+
+def test_an_overtaken_decision_is_withdrawn_with_a_reason(change):                     # CHANGE-21
+    changes.add_decision(change, _decision())
+    with pytest.raises(changes.ChangeError, match="say why"):
+        changes.withdraw(change, "D1", "")
+    changes.withdraw(change, "D1", "the engineer answered it in a comment")
+    d = change.data["decisions"][0]
+    assert d["status"] == "withdrawn" and d["withdrawn_because"].startswith("the engineer")
+    with pytest.raises(changes.ChangeError, match="already withdrawn"):
+        changes.withdraw(change, "D1", "again")

@@ -471,6 +471,28 @@ entries:
     alternatives: Leaving them for later, which would have the next migration hit the same friction.
     consequences: The next onboarding run measures the skill with these out of the way.
     basis: derived
+- op: add
+  id: CHANGE-21
+  at: 2026-10-25T22:26-07:00
+  reason: needed to close D1 of round 37, which the engineer answered by comment.
+  after:
+    text: Until the engineer answers an open decision, the toolkit shall let an agent withdraw it with a reason.
+    traces_to: SYS-16
+    basis: added
+    why: in the trial and in round 37, decisions were overtaken by the engineer's comments or later findings; without a way to withdraw them they linger on the review page as questions nobody needs to answer.
+- op: add
+  id: CHANGE-V11
+  at: 2026-10-25T22:26-07:00
+  reason: verifies CHANGE-21.
+  after:
+    verifies:
+    - CHANGE-21
+    method: test
+    technique: unit test
+    description: Withdrawing an open decision needs a reason, marks it withdrawn with that reason, and is refused for a decision already withdrawn.
+    tests:
+      python:
+      - tests/test_decisions.py::test_an_overtaken_decision_is_withdrawn_with_a_reason
 decisions:
 - id: D1
   question: When an agent brings an existing project into the spec method ("onboarding"), should it run every check the toolkit has, as ONBOARD-3 records you asking for, or a smaller, fixed set?
@@ -487,7 +509,10 @@ decisions:
     detail: Onboarding runs the system-level and safety-related reasoning checks plus one drift and one conformance audit per element; everything else is reported honestly as not yet verified. Roughly half the cost, with gaps listed rather than closed. ONBOARD-3 would change, so this needs your confirmation.
   - label: Pause the question until the runner exists
     detail: Build `spec verify` first and decide afterwards, with real numbers on what a full run costs. Until then, onboardings follow the current skill.
-  status: open
+  status: withdrawn
+  withdrawn_because: |-
+    Answered by the engineer's comment in review d631bdae55: run every automated check, no model-judged checks during migrations yet, and offer options with costs instead (ONBOARD-3, ONBOARD-12, ONBOARD-13).
+  withdrawn: 2026-10-25T22:26-07:00
 - id: D2
   question: Should the toolkit keep the spec in a visible spec/ folder at the repository root, or in a hidden .spec/ folder like .git/ and .github/?
   importance: |-

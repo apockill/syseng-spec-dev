@@ -311,6 +311,15 @@ def cmd_decide(args) -> int:
     if c is None:
         print("spec decide: no change is open")
         return 1
+    if args.withdraw:
+        try:
+            changes.withdraw(c, args.withdraw, args.reason or "")
+        except changes.ChangeError as e:
+            print(f"spec decide: {e}")
+            return 1
+        render.write_views(model.load(spec.root))
+        print(f"withdrew open decision {args.withdraw} in {c.id}")
+        return 0
     try:
         did = changes.add_decision(c, _read_doc(args) or {}, replace=args.replace)
     except (changes.ChangeError, edit.EditError) as e:
@@ -561,6 +570,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("decide", help="add an open decision (YAML on stdin: question, importance, involves, options)")
     p.add_argument("--file", help="read the decision from a file instead of stdin")
     p.add_argument("--replace", metavar="D<n>", help="rewrite this open decision of the open change in place")
+    p.add_argument("--withdraw", metavar="D<n>", help="withdraw this open decision, overtaken by events (needs --reason)")
+    p.add_argument("--reason", help="why the decision is withdrawn")
     p.set_defaults(fn=cmd_decide)
     p = sub.add_parser("resolve", help="record the engineer's choice on open decisions")
     p.add_argument("ids", nargs="+")

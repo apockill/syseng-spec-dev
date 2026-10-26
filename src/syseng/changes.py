@@ -139,6 +139,20 @@ def add_decision(change: Change, decision: dict, replace: str | None = None) -> 
     return did
 
 
+def withdraw(change: Change, did: str, reason: str) -> None:
+    """CHANGE-21: an open decision the conversation has overtaken is withdrawn with a reason, not left to linger."""
+    if not (reason or "").strip():
+        raise ChangeError("say why the decision is withdrawn")
+    d = next((x for x in change.data.get("decisions") or [] if x.get("id") == did), None)
+    if d is None:
+        raise ChangeError(f"{change.id} has no decision {did}")
+    if d.get("status") != "open":
+        raise ChangeError(f"{did} is already {d.get('status')}")
+    d.update({"status": "withdrawn", "withdrawn_because": reason,
+              "withdrawn": datetime.datetime.now().astimezone().isoformat(timespec="minutes")})
+    change.save()
+
+
 def resolve(change: Change, ids: list[str], words: str, option: int | None, by: str | None = None) -> list[str]:
     """Records the engineer's choice. With no option, takes the recommended one (CHANGE-12)."""
     by_id = {d["id"]: d for d in change.data.get("decisions") or []}

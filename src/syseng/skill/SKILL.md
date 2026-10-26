@@ -108,7 +108,7 @@ YAML
 
 - Give every ID a short title: "SYS-7 (done gate)".
 - Order questions by how much each answer would change, each with options and one recommended, plus a one-line way to accept everything. Use your harness's question menu if it has one. Record open decisions with `spec decide`, so they survive the conversation.
-- **Anything you want the engineer to answer goes on a rendered page,** not in chat: record it with `spec decide`, hand over the review page, and give the link. Write each decision for a reader with none of your context: what is being decided, why it matters now, what each option does and what follows from it, with examples. If you'd only be informing them, a chat line is enough. Until they answer, `spec decide --replace D<n>` rewrites an open decision.
+- **Anything you want the engineer to answer goes on a rendered page,** not in chat: record it with `spec decide`, hand over the review page, and give the link. Write each decision for a reader with none of your context: what is being decided, why it matters now, what each option does and what follows from it, with examples. If you'd only be informing them, a chat line is enough. Until they answer, `spec decide --replace D<n>` rewrites an open decision, and `spec decide --withdraw D<n> --reason "…"` withdraws one the conversation has overtaken.
 - **Locks belong to the engineer.** Record one only when they named the items; never lock your own work. Details in references/review-and-locks.md.
 - When asked "why is X like this?", answer from `spec show X`.
 

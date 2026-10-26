@@ -156,3 +156,8 @@
   traces_to: SYS-16
   basis: added
   why: in the onboarding trial, agents filed decisions with wrong involved items or missing context and couldn't correct them; a duplicate decision would ask the engineer twice.
+- id: CHANGE-21
+  text: Until the engineer answers an open decision, the toolkit shall let an agent withdraw it with a reason.
+  traces_to: SYS-16
+  basis: added
+  why: in the trial and in round 37, decisions were overtaken by the engineer's comments or later findings; without a way to withdraw them they linger on the review page as questions nobody needs to answer.
