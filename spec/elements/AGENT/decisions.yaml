@@ -250,3 +250,23 @@
   alternatives: Keeping one long SKILL.md, which agents read in full for every task. Splitting onboarding into its own skill, which would duplicate the editing and intent rules.
   consequences: An agent changing code reads about 100 lines; an onboarding agent reads about 250. Tests hold the layout to Anthropic's skill-authoring guidance.
   basis: derived
+- id: DR-74
+  title: Apply the engineer's overnight review
+  decided_by: engineer
+  elements:
+  - AGENT
+  - CHECK
+  - ONBOARD
+  - REVIEW
+  requirements: AGENT-71, CHECK-31, CHECK-32, ONBOARD-8, REVIEW-38
+  context: The engineer answered the overnight review page on the depth rules, six prescriptive rules, the toolkit fixes, system-level verification, the pre-migration steps and the merge.
+  decision: |-
+    - The depth rules are adopted (round 37 D4).
+    - Cut: the split point of about 30 requirements, splitting along test seams, and the cap of about 15 questions. Kept: one decision record per design topic (now scoped to values found in existing code), the onboarding order, and grouping thin parts of the same shape.
+    - Wording rules can be allowed per item with a reason (CHECK-31).
+    - A requirement can be verified by its children through a roll-up verification item, and the to-do for a parent says how to resolve it (CHECK-32).
+    - The preflight questions are raised post-flight, first on the review page, while the spec stays unpublished (ONBOARD-8).
+    - The unlinked-test list and the tested-coverage measure are locked by the engineer (CHECK-3, REVIEW-38).
+  alternatives: Keeping the numeric rules, which drove some convergence but presumed tests exist and fixed counts the engineer would rather not encode.
+  consequences: Element splitting and question counts are left to agents' judgment; the next migration shows whether counts stay close without them.
+  basis: derived

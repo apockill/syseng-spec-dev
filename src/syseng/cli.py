@@ -93,7 +93,7 @@ def cmd_show(args) -> int:
     print(f"  {d.get('text') or d.get('title') or d.get('description', '')}")
     print(f"  attention: {review.describe(spec, iid)}")
     for a in review.history(spec, iid):
-        said = " ".join(str(a.get("words", "")).split())
+        said = " ".join(str(a.get("said") or a.get("words") or "").split())
         print(f"  locked {a.get('locked_at') or a.get('approved_at') or a.get('approved_on')} by "
               f"{a.get('by', 'the engineer')} via "
               f"{a.get('via')}" + (f": {said}" if said else ""))
@@ -177,7 +177,7 @@ def cmd_approve(args) -> int:
         record = {"id": iid, "fingerprint": fingerprint.of(kind, data), "locked_at": now, "by": by,
                   "via": args.via, "batch": len(ids)}
         if args.words:  # a summary of what the person said; records made mechanically hold none (MODEL-34)
-            record["words"] = args.words
+            record["said"] = args.words  # stored as `said`, the lock schema's field for it
         if args.note:
             record["note"] = args.note
         if _settled(spec, iid):

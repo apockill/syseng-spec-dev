@@ -52,6 +52,8 @@ Refines exactly one requirement of its element's parent (for an element directly
   reason: …
 ```
 
+Optional: `allow: [{rule: W011, why: …}]` lets a wording rule that doesn't fit this item pass, with the reason on record (references/rules.md).
+
 Optional: `verification_deferred: <why>` marks a requirement as knowingly unverified for now (no test is possible here, or it waits on hardware); the checker then stops listing it as a to-do. Use it sparingly, with a real reason.
 
 ## vi (verification item)
@@ -61,7 +63,7 @@ Optional: `verification_deferred: <why>` marks a requirement as knowingly unveri
   element: BOX
   verifies: [BOX-3, BOX-4]
   method: test             # test, analysis, demonstration or inspection
-  technique: unit test     # unit test, integration test, reasoning check or manual
+  technique: unit test     # unit test, integration test, reasoning check, manual or roll-up
   description: A command built from a route sends that route's request and prints its JSON reply.
   tests:
     python: [tests/test_box.py::test_route_command]   # key: the implementation's name in toolkit.yaml
@@ -71,6 +73,7 @@ Optional: `verification_deferred: <why>` marks a requirement as knowingly unveri
 - A verification item for a system requirement or constraint is filed on the root element: `element: SYS` (or whatever the root's ID is).
 - A **reasoning check** has no tests; its `description` is the prompt a fresh model answers pass or fail, naming the files or commands it judges.
 - A **manual** item says what a person does and observes. It isn't verification until someone has done it.
+- A **roll-up** (method `analysis`) verifies a requirement through its children's verification. Use it for a parent whose children fully cover it and where a test of its own would be arbitrary; the checker keeps it honest (V004).
 - Describe only what the tests or prompt actually check. "Checks X" when the test checks half of X is the most common audit finding.
 
 ## decision (record)

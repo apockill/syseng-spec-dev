@@ -17,7 +17,7 @@ Onboarding records what the project is, and why. It doesn't redesign anything. D
 Copy this into your notes and tick it off:
 
 ```
-- [ ] 1. Preflight: where spec/ will live, what gets published or pushed, who the human author is
+- [ ] 1. Preflight: where spec/ will live, what gets published or pushed, who the human author is (raised at the end, not waited on)
 - [ ] 2. Element tree and system layer, before any element requirement
 - [ ] 3. One small element end to end (pilot)
 - [ ] 4. The other elements, each dry-run and checked as it lands
@@ -28,16 +28,16 @@ Copy this into your notes and tick it off:
 
 ## 1. Preflight
 
-Before `spec init` or any edit, find out:
-- **Where spec/ would be exposed.** Does the repository publish its directories (a web server serving top-level folders, a docs site)? Does a hook push commits on its own (look in `.git/hooks`)? Is the remote public? The spec will hold the engineer's name and email, and onboarding usually turns up security findings. If any of these would expose it, stop and ask the engineer before creating spec/ or committing.
-- **Who the human author is.** `spec status` says who records are attributed to. If it's an agent account, ask the engineer to set `git config syseng.author`. Don't set it from memory or guesswork.
-- **Who wrote the documents.** `git log --format='%an' -- README.md` and similar. Intent read from a document is the engineer's only where they wrote or directed it (references/requirement-depth.md, part E).
+Don't wait for the engineer: find these out, carry on, and put what needs them at the top of the review page you hand over at the end.
+- **Where spec/ would be exposed.** Does the repository publish its directories (a web server serving top-level folders, a docs site)? Does a hook push commits on its own (look in `.git/hooks`)? Is the remote public? The spec will hold the engineer's name and email, and onboarding usually turns up security findings. If any of these would expose it, raise it as the first open decision, and meanwhile don't publish the spec or let a commit push it (`git -c core.hooksPath=/dev/null commit` skips a pushing hook).
+- **Who the human author is.** `spec status` says who records are attributed to. If it's an agent account, don't set it yourself from memory or guesswork: raise it as an open decision, and record intent with its source (references/requirement-depth.md, part E) so it can be reattributed.
+- **Who wrote the documents.** `git log --format='%an' -- README.md` and similar. Intent read from a document is the engineer's only where they wrote or directed it (part E).
 
 Then run `spec init` (or ask the engineer to) and open the change: `spec change start "Onboard <project>"`. In a repository with several languages or none at its root, set `implementations` in `spec/toolkit.yaml` by hand (references/schema.md).
 
 ## 2. The tree and the system layer
 
-Map the system elements from the code's structure first: one tree with the project as the root, `depends_on` for reuse. Good first cuts are what can be deployed, owned or deleted separately (an app, a service, a library). Group thin parts with the same shape into one element. Give an element children only where it's too big to read as one, and only along seams its tests already follow.
+Map the system elements from the code's structure first: one tree with the project as the root, `depends_on` for reuse. Good first cuts are what can be deployed, owned or deleted separately (an app, a service, a library). Group thin parts with the same shape into one element. Give an element children where it's too big to read as one.
 
 Then write the system layer yourself, before any element requirement:
 - needs, from what the engineer has said and written (see Capturing intent in SKILL.md; documents are guided at most);
@@ -81,10 +81,11 @@ Record each failing test or broken link as an open decision. Don't fix it.
 
 ## 7. Handing over
 
-Merge related findings into decisions and rank them, most consequential first: aim for no more than about 15 questions, each with a recommended option. Then tell the engineer:
+Merge related findings into decisions and rank them, most consequential first, each with a recommended option. Every question costs the engineer attention, so merge what one answer would settle. Then tell the engineer:
 - the needs to confirm, and the one line that locks them (`lock NEED-1..NEED-n`);
 - the ranked questions;
 - coverage, how many checks ran, and the options and costs for the model-judged checks;
-- anything from the preflight that needs them before the spec is committed or published.
+- the preflight questions (exposure, author) first, since the spec can't be published until they're answered;
+- the items most worth locking, highest value first.
 
 Hand over the review page as references/review-and-locks.md says.

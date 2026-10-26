@@ -183,3 +183,12 @@
   tests:
     python:
     - tests/test_review_page.py::test_only_the_newest_changes_proposals_are_current
+- id: REVIEW-V18
+  verifies:
+  - REVIEW-38
+  method: test
+  technique: unit test
+  description: A requirement verified only by a planned reasoning check counts toward verification coverage but not toward requirements with linked tests, and the overview lists both measures.
+  tests:
+    python:
+    - tests/test_review_page.py::test_the_overview_shows_requirements_with_linked_tests_beside_coverage

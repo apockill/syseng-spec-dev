@@ -198,3 +198,33 @@ def test_a_need_drafted_from_agent_documents_may_say_it_is_derived(spec):
     need.update({"basis": "derived", "why": "read from a README an agent account wrote"})
     spec.write()
     assert "A002" not in spec.codes()
+
+
+def test_an_item_can_allow_a_wording_rule_with_a_reason(spec):                         # CHECK-31
+    req = spec.files["elements/CORE/requirements.yaml"][0]
+    req["text"] = "The core shall label each widget with his or her name as the buyer typed it."
+    spec.write()
+    assert "W011" in spec.codes()
+    req["allow"] = [{"rule": "W011", "why": "the requirement is about how the product writes pronouns"}]
+    spec.write()
+    assert "W011" not in spec.codes()
+    req["allow"] = [{"rule": "W011"}]                       # no reason: refused
+    spec.write()
+    assert "W011" in spec.codes() and "S007" in spec.codes()
+
+
+def test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified(spec):         # CHECK-32
+    spec.files["elements/SYS/verification.yaml"] = [{
+        "id": "SYS-V1", "verifies": ["SYS-1"], "method": "analysis", "technique": "roll-up", "origin": "agent",
+        "description": "SYS-1 holds when every requirement refining it is verified."}]
+    spec.write()
+    assert "V004" not in spec.codes(severity="todo") and "V001" not in spec.codes()
+    spec.files["elements/CORE/verification.yaml"] = []
+    spec.write()
+    assert "V004" in spec.codes(severity="todo")
+
+
+def test_a_parent_without_verification_is_told_how_to_resolve_it(spec):                # CHECK-32
+    spec.write()
+    msg = next(f.message for f in spec.findings() if f.code == "T004" and f.item == "SYS-1")
+    assert "1 requirement refine it" in msg and "roll-up" in msg

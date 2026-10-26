@@ -43,7 +43,7 @@ def test_approve_command_records_fingerprint_and_words(spec, capsys):
     assert cli.main(["--spec", str(root), "approve", "CORE-1", "SYS-1..1", "--words", "approve CORE-1, SYS-1"]) == 0
     records = {a["id"]: a for a in yamlio.read(root / "approvals.yaml")}
     assert set(records) == {"CORE-1", "SYS-1"}
-    assert records["CORE-1"]["words"] == "approve CORE-1, SYS-1"
+    assert records["CORE-1"]["said"] == "approve CORE-1, SYS-1" and "words" not in records["CORE-1"]
     assert records["CORE-1"]["fingerprint"] == fingerprint.of(
         "requirement", spec.files["elements/CORE/requirements.yaml"][0])
 
@@ -52,3 +52,12 @@ def test_approve_refuses_unknown_ids(spec, capsys):
     root = spec.write()
     assert cli.main(["--spec", str(root), "approve", "NOPE-9", "--words", "x"]) == 1
     assert yamlio.read(root / "approvals.yaml") == []
+
+
+def test_a_lock_recorded_with_a_summary_keeps_it_in_said(spec):                        # MODEL-34
+    from syseng import cli
+    spec.write()
+    assert cli.main(["--spec", str(spec.root), "lock", "CORE-1", "--via", "chat",
+                     "--words", "Locked the stamping rule after reviewing it."]) == 0
+    lock = spec.load().approvals[-1]
+    assert lock["said"].startswith("Locked") and "words" not in lock

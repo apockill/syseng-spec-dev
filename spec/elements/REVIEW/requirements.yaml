@@ -327,3 +327,13 @@
   traces_to: SYS-38
   basis: derived
   why: a change with decisions but no proposals showed proposals from months-old changes as the agent's current advice, above the decisions it was handing over.
+- id: REVIEW-38
+  text: The review page overview shall show the share of requirements whose verification links tests, beside the verification coverage.
+  traces_to: SYS-45
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-26 08:08
+    context: Reviewing the overnight toolkit fixes.
+    said: Strongly agrees with listing unlinked tests and with an honest coverage measure, and invited locking both in.
+    basis: stated
+    fingerprint: e30bb2497a97

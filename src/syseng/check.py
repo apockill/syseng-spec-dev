@@ -47,6 +47,25 @@ def check(spec: Spec) -> list[Finding]:
     out += _conflicts(spec)
     out += _feedback(spec)
     out += _rendered(spec)
+    return _allowed(spec, out)
+
+
+def _allowed(spec: Spec, findings: list[Finding]) -> list[Finding]:
+    """CHECK-31: an item may allow a wording rule, with a reason, like a linter's inline override. The rules flag
+    patterns that are usually wrong; an agent that knows why a rule exists can judge when it doesn't apply."""
+    out = []
+    for f in findings:
+        item = spec.items.get(f.item) if f.item else None
+        allows = (item.data.get("allow") or []) if item else []
+        if f.code.startswith("W") and any(isinstance(a, dict) and a.get("rule") == f.code
+                                          and str(a.get("why") or "").strip() for a in allows):
+            continue
+        out.append(f)
+    for item in spec.items.values():
+        for a in item.data.get("allow") or []:
+            if not (isinstance(a, dict) and str(a.get("rule", "")).startswith("W") and str(a.get("why") or "").strip()):
+                out.append(_f("S007", f"{item.id} has an `allow` entry that needs a wording rule (W…) and a `why`",
+                              item.id, item))
     return out
 
 
@@ -159,12 +178,24 @@ def _traces(spec: Spec) -> list[Finding]:
     out += _flow_down(spec)
     verified = {r for vi in spec.of_kind("vi") for r in (vi.data.get("verifies") or [])}
     refined = {str(i.data.get("traces_to")) for i in spec.of_kind("requirement") if i.data.get("traces_to")}
+    children: dict[str, int] = {}
+    for i in spec.of_kind("requirement"):
+        if i.data.get("traces_to"):
+            children[str(i.data["traces_to"])] = children.get(str(i.data["traces_to"]), 0) + 1
     branches = {e.parent for e in spec.elements.values() if e.parent}
     for item in spec.requirements():
         if item.id not in verified and not item.data.get("verification_deferred"):
             # CHECK-29: above the leaves, a requirement is met through its children or verified itself
             bare = item.kind != "constraint" and item.element in branches and item.id not in refined
-            gap = "; nothing refines it either, so it's neither decomposed nor verified" if bare else " yet"
+            n = children.get(item.id, 0)
+            if bare:
+                gap = "; nothing refines it either, so it's neither decomposed nor verified"
+            elif n:  # CHECK-32: say how the to-do can be resolved
+                gap = (f" of its own; {n} requirement{'s' if n != 1 else ''} refine it. Verify it at its own level "
+                       "where a test wouldn't be arbitrary, or add a verification item with technique `roll-up` "
+                       "if its children's verification covers it")
+            else:
+                gap = " yet"
             out.append(_f("T004", f"{item.id} has no verification item{gap}", item.id, item))
     return out
 
@@ -327,6 +358,25 @@ def _verification(spec: Spec) -> list[Finding]:
         for r in verifies:
             if r not in spec.items or spec.items[r].kind not in ("system", "constraint", "requirement"):
                 out.append(_f("T003", f"{vi.id} verifies {r}, which isn't a requirement", vi.id, vi))
+    # CHECK-32: a roll-up verifies a requirement through its children, so every child must be verified itself
+    verified_by = {}
+    for vi in spec.of_kind("vi"):
+        for r in vi.data.get("verifies") or []:
+            verified_by.setdefault(r, []).append(vi)
+    kids: dict[str, list[str]] = {}
+    for i in spec.of_kind("requirement"):
+        if i.data.get("traces_to"):
+            kids.setdefault(str(i.data["traces_to"]), []).append(i.id)
+    for vi in spec.of_kind("vi"):
+        if vi.data.get("technique") != "roll-up":
+            continue
+        for r in vi.data.get("verifies") or []:
+            if not kids.get(r):
+                out.append(_f("V004", f"{vi.id} verifies {r} by its children, but nothing refines {r}", vi.id, vi))
+            for child in kids.get(r, []):
+                if not verified_by.get(child) and not spec.items[child].data.get("verification_deferred"):
+                    out.append(_f("V004", f"{vi.id} verifies {r} by its children, but {child} has no verification "
+                                          f"item", vi.id, vi))
     return out
 
 

@@ -156,3 +156,12 @@
   tests:
     python:
     - tests/test_edit.py::test_intent_read_from_a_document_keeps_its_source_and_author
+- id: MODEL-V16
+  verifies:
+  - MODEL-34
+  method: test
+  technique: unit test
+  description: A lock recorded from the command line with a summary stores it in the lock's `said` field, which the checker accepts, not in the older `words` field.
+  tests:
+    python:
+    - tests/test_approvals.py::test_a_lock_recorded_with_a_summary_keeps_it_in_said

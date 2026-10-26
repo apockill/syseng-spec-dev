@@ -50,11 +50,11 @@ from syseng.model import Spec
 KIND_FILES = {"need": "needs.yaml", "requirement": "requirements.yaml", "system": "requirements.yaml",
               "constraint": "requirements.yaml", "vi": "verification.yaml", "decision": "decisions.yaml"}
 FIELDS = {
-    "need": {"text", "origin", "source", "quotes", "context", "intent", "basis", "why"},
+    "need": {"text", "origin", "source", "quotes", "context", "intent", "basis", "why", "allow"},
     "requirement": {"text", "origin", "traces_to", "derived", "why", "source", "quotes", "refines", "reworded",
-                    "allocation_note", "verification_deferred", "intent", "basis"},
+                    "allocation_note", "verification_deferred", "intent", "basis", "allow"},
     "system": {"kind", "text", "origin", "serves", "why", "source", "quotes", "refines", "reworded",
-               "allocation_note", "verification_deferred", "intent", "basis"},
+               "allocation_note", "verification_deferred", "intent", "basis", "allow"},
     "vi": {"verifies", "method", "technique", "description", "origin", "tests", "intent"},
     "decision": {"title", "decided_by", "elements", "requirements", "recorded", "status", "context",
                  "decision", "alternatives", "consequences", "intent", "basis"},

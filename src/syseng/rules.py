@@ -148,6 +148,9 @@ _RULES = [
          "A test nothing links to checks something the spec doesn't claim, or a requirement that's missing.",
          "Link it from the verification item whose requirement it checks, or add the requirement it shows is "
          "missing.", severity="todo"),
+    Rule("V004", "roll-up over an unverified child",
+         "A roll-up verifies a requirement by its children's verification, which holds only if every child is verified.",
+         "Verify the child, or verify the parent at its own level instead of by roll-up.", severity="todo"),
     Rule("R001", "stale Markdown view",
          "The review page replaced the Markdown views; one left behind shows a spec that no longer exists.",
          "Run `spec render`, which removes it, and `spec review` for the page."),
@@ -200,7 +203,7 @@ _RULES = [
 RULES = {r.code: r for r in _RULES}
 
 METHODS = ("test", "analysis", "demonstration", "inspection")
-TECHNIQUES = ("unit test", "integration test", "reasoning check", "manual")
+TECHNIQUES = ("unit test", "integration test", "reasoning check", "manual", "roll-up")
 
 # --- wording patterns -------------------------------------------------------------
 _QUOTED = re.compile(r'"[^"]*"')

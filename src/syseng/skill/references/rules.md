@@ -6,6 +6,8 @@ The wording rules (W…) come from INCOSE's *Guide to Writing Requirements*, cit
 
 Errors fail `spec check`. To-dos are listed by `spec check --todo` but don't fail it.
 
+The wording rules (W…) flag patterns that are usually wrong. When one doesn't apply to an item, because you know why the rule exists and this case is the exception, allow it on that item with the reason: `allow: [{rule: W011, why: "the requirement is about how the product writes pronouns"}]`. The reason is reviewed like any other text.
+
 ## Contents
 
 - Structure: S001, S002, S003, S004, S005, S006, S007, S008
@@ -13,7 +15,7 @@ Errors fail `spec check`. To-dos are listed by `spec check --todo` but don't fai
 - Attributes: A001, A002, A003, A004, A005, A006, A007, A008, A009, A010, F001
 - Conflicts: C001
 - Verification items: V001
-- Rendered views: V002, V003, R001
+- Rendered views: V002, V003, V004, R001
 - Wording: W001, W002, W003, W004, W005, W006, W007, W008, W009, W010, W011
 
 ## Structure
@@ -181,6 +183,10 @@ A verification item links a test that doesn't exist: the file is missing, or the
 <a id="v003"></a>
 ### V003: test no verification item links (to-do)
 A Python test in the implementation's tree that no verification item links, listed per file. It checks something the spec doesn't claim, or a requirement that's missing. Link it from the verification item whose requirement it checks, or add the requirement it shows is missing. Folders that are hidden, vendored (`node_modules`, `site-packages`) or hold app data (`state`) are skipped.
+
+<a id="v004"></a>
+### V004: roll-up over an unverified child (to-do)
+A verification item with technique `roll-up` verifies a requirement through the verification of the requirements that refine it, the way systems engineering verifies a higher-level requirement by analysis of its subordinate results. It holds only while every child is verified: verify the child, or verify the parent at its own level. Prefer a test at the parent's own level where one wouldn't be arbitrary.
 
 <a id="r001"></a>
 ### R001: stale Markdown view

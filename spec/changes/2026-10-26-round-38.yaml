@@ -1,0 +1,164 @@
+request: |-
+  Apply the engineer's overnight review answers: cut three prescriptive rules, linter-style overrides, verification by children, post-flight preflight, then merge
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-26'
+entries:
+- op: add
+  id: CHECK-31
+  at: 2026-10-26T08:08-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: When an item allows a wording rule with a recorded reason, the checker shall not report that rule for that item.
+    traces_to: SYS-7
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-26 08:08
+      context: Reviewing the overnight toolkit fixes, in particular the error for gendered pronouns.
+      said: Asked whether, like linters, there should be a way to override an error, for example when a requirement is about how the product itself writes pronouns; the rules exist to flag bad patterns to LLMs, and the engineer trusts LLMs, once told why a rule exists, to judge when it applies.
+      basis: stated
+      fingerprint: 489baac6f787
+- op: add
+  id: CHECK-32
+  at: 2026-10-26T08:08-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: When a requirement that other requirements refine has no verification item, the checker shall say how the to-do can be resolved, including verifying it by its children's verification.
+    traces_to: SYS-7
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-26 08:08
+      context: Reviewing whether fully decomposed system requirements should still need a verification item of their own.
+      said: Wants a way to say a requirement is verified by its children, or at least to keep it a to-do with the LLM told how to resolve it; verifying it at its own level is preferred when a test would not be arbitrary, and the convention should follow systems-engineering practice.
+      basis: stated
+      fingerprint: 7883d3928cec
+- op: add
+  id: CHECK-V18
+  at: 2026-10-26T08:08-07:00
+  reason: verifies CHECK-31.
+  after:
+    verifies:
+    - CHECK-31
+    method: test
+    technique: unit test
+    description: A wording finding disappears when the item allows that rule with a reason, and an allow entry without a reason is itself an error.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_an_item_can_allow_a_wording_rule_with_a_reason
+- op: add
+  id: CHECK-V19
+  at: 2026-10-26T08:08-07:00
+  reason: verifies CHECK-32.
+  after:
+    verifies:
+    - CHECK-32
+    method: test
+    technique: unit test
+    description: A parent with no verification item is told how many requirements refine it and that a roll-up is an option; a roll-up holds while every child is verified and becomes a to-do when one isn't.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_parent_without_verification_is_told_how_to_resolve_it
+      - tests/test_check_structure.py::test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified
+- op: add
+  id: REVIEW-38
+  at: 2026-10-26T08:08-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: The review page overview shall show the share of requirements whose verification links tests, beside the verification coverage.
+    traces_to: SYS-45
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-26 08:08
+      context: Reviewing the overnight toolkit fixes.
+      said: Strongly agrees with listing unlinked tests and with an honest coverage measure, and invited locking both in.
+      basis: stated
+      fingerprint: e30bb2497a97
+- op: modify
+  id: ONBOARD-8
+  at: 2026-10-26T08:08-07:00
+  reason: the engineer asked for it.
+  requested: true
+  before:
+    text: Before creating the spec, onboarding shall establish whether the repository publishes its directories or pushes its commits, and stop for the engineer when either would expose the spec.
+  after:
+    text: During onboarding, the agent shall establish whether the repository publishes its directories or pushes its commits, raise each way the spec would be exposed as the first open decision on the review page, and keep the spec unpublished until the engineer answers.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-26 08:08
+      context: Reviewing the overnight plan for the migration the engineer will keep, which asked the engineer to be reachable for a preflight.
+      said: Sees this as a post-flight step; once the digging and speccing is done, the agent hands over the review page as normal, taking special care that the items it highlights for approval come highest value first.
+      basis: stated
+      fingerprint: ac2a2c92bcd4
+  acks:
+    DR-71: its decision still holds; ONBOARD-8 now raises exposure as a post-flight decision instead of stopping, at the engineer's request.
+    ONBOARD-V1: its test now checks the post-flight wording.
+- op: modify
+  id: AGENT-71
+  at: 2026-10-26T08:08-07:00
+  reason: the engineer's answers on the prescriptive rules.
+  requested: true
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-26 08:08
+      context: Answering the overnight review's question on six prescriptive rules in the skill.
+      said: Cut the split point of about 30 requirements, splitting along test seams (which presumes tests exist, as only in a migration or code-first work, and risks letting implementation guide requirements), and the cap of about 15 questions; kept one decision record per design topic (asking that it be clear this applies to migrations, since a long project in normal development may rightly have very many decision records), the onboarding order, and grouping thin parts of the same shape.
+      basis: stated
+      fingerprint: a1639f58928d
+- op: add
+  id: REVIEW-V18
+  at: 2026-10-26T08:09-07:00
+  reason: verifies REVIEW-38.
+  after:
+    verifies:
+    - REVIEW-38
+    method: test
+    technique: unit test
+    description: A requirement verified only by a planned reasoning check counts toward verification coverage but not toward requirements with linked tests, and the overview lists both measures.
+    tests:
+      python:
+      - tests/test_review_page.py::test_the_overview_shows_requirements_with_linked_tests_beside_coverage
+- op: add
+  id: MODEL-V16
+  at: 2026-10-26T08:11-07:00
+  reason: spec lock still wrote the older `words` field, so every summarized lock failed the check (A009); found while recording the engineer's locks on CHECK-3 and REVIEW-38, whose two records were repaired.
+  after:
+    verifies:
+    - MODEL-34
+    method: test
+    technique: unit test
+    description: A lock recorded from the command line with a summary stores it in the lock's `said` field, which the checker accepts, not in the older `words` field.
+    tests:
+      python:
+      - tests/test_approvals.py::test_a_lock_recorded_with_a_summary_keeps_it_in_said
+- op: add
+  id: DR-74
+  at: 2026-10-26T08:11-07:00
+  reason: records the engineer's answers.
+  after:
+    title: Apply the engineer's overnight review
+    decided_by: engineer
+    elements:
+    - AGENT
+    - CHECK
+    - ONBOARD
+    - REVIEW
+    requirements: AGENT-71, CHECK-31, CHECK-32, ONBOARD-8, REVIEW-38
+    context: The engineer answered the overnight review page on the depth rules, six prescriptive rules, the toolkit fixes, system-level verification, the pre-migration steps and the merge.
+    decision: |-
+      - The depth rules are adopted (round 37 D4).
+      - Cut: the split point of about 30 requirements, splitting along test seams, and the cap of about 15 questions. Kept: one decision record per design topic (now scoped to values found in existing code), the onboarding order, and grouping thin parts of the same shape.
+      - Wording rules can be allowed per item with a reason (CHECK-31).
+      - A requirement can be verified by its children through a roll-up verification item, and the to-do for a parent says how to resolve it (CHECK-32).
+      - The preflight questions are raised post-flight, first on the review page, while the spec stays unpublished (ONBOARD-8).
+      - The unlinked-test list and the tested-coverage measure are locked by the engineer (CHECK-3, REVIEW-38).
+    alternatives: Keeping the numeric rules, which drove some convergence but presumed tests exist and fixed counts the engineer would rather not encode.
+    consequences: Element splitting and question counts are left to agents' judgment; the next migration shows whether counts stay close without them.
+    basis: derived
+decisions: []
+friction: []
+closed: '2026-10-26'

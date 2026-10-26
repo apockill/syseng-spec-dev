@@ -1,7 +1,7 @@
 request: Restructure the skill for progressive disclosure and fix the onboarding failure modes found in the three-agent trial
 mode: code-first
 target: python
-status: open
+status: closed
 opened: '2026-10-25'
 entries:
 - op: add
@@ -638,7 +638,10 @@ decisions:
     detail: Simpler to follow, but it ties spec size to how the code happens to be split, which is the coupling you want to avoid.
   - label: Adopt the rules and add a checker warning for constants
     detail: Same as the first option, plus a to-do from `spec check` for any requirement containing a number with a unit the engineer didn't state. Catches the commonest slip mechanically, at the price of some false alarms on legitimate limits.
-  status: open
+  status: resolved
+  chosen: Adopt the five rules; keep counts only as a smoke alarm
+  words: Approved the depth rules in the overnight review (answer A), cutting three prescriptive parts (B1-B3) and keeping three (B4-B6).
+  resolved: '2026-10-26'
 friction: []
 feedback:
 - n: F1
@@ -680,3 +683,4 @@ feedback:
   comment: Can you bring this up in conversation? Let's discuss this further.
   response: Discussed in the conversation, as you asked. D4 stays open until we settle it.
   responded: 2026-10-25T17:53-07:00
+closed: '2026-10-26'

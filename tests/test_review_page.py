@@ -294,3 +294,12 @@ def test_only_the_newest_changes_proposals_are_current(repo):
     data = pagedata.build(model.load(repo), ADA)
     assert data["meta"]["change"] == second.id                         # REVIEW-37
     assert [p["change"] for p in data["proposals"] if p["from"] != "computed"] == [first.id]
+
+
+def test_the_overview_shows_requirements_with_linked_tests_beside_coverage(spec):     # REVIEW-38
+    from syseng import health
+    spec.files["elements/CORE/verification.yaml"][0].update({"technique": "reasoning check", "tests": {}})
+    spec.write()
+    m = health.metrics(spec.load())
+    assert m["coverage"] > 0 and m["tested"] == 0           # a planned check counts as coverage, not as tested
+    assert any(key == "tested" for key, *_ in health.MEASURES)

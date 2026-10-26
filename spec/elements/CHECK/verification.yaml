@@ -178,3 +178,22 @@
   tests:
     python:
     - tests/test_check_structure.py::test_unittest_classes_count_as_tests_for_the_unlinked_list
+- id: CHECK-V18
+  verifies:
+  - CHECK-31
+  method: test
+  technique: unit test
+  description: A wording finding disappears when the item allows that rule with a reason, and an allow entry without a reason is itself an error.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_an_item_can_allow_a_wording_rule_with_a_reason
+- id: CHECK-V19
+  verifies:
+  - CHECK-32
+  method: test
+  technique: unit test
+  description: A parent with no verification item is told how many requirements refine it and that a roll-up is an option; a roll-up holds while every child is verified and becomes a to-do when one isn't.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_a_parent_without_verification_is_told_how_to_resolve_it
+    - tests/test_check_structure.py::test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified

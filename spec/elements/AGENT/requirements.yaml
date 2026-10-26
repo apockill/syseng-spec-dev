@@ -606,3 +606,10 @@
   traces_to: SYS-20
   basis: derived
   why: in the onboarding trial three agents wrote 226 to 445 requirements for the same code; backtests of 81 small samples showed these rules make agents agree on structure and counts (AGENT-70 states the principle).
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-26 08:08
+    context: Answering the overnight review's question on six prescriptive rules in the skill.
+    said: Cut the split point of about 30 requirements, splitting along test seams (which presumes tests exist, as only in a migration or code-first work, and risks letting implementation guide requirements), and the cap of about 15 questions; kept one decision record per design topic (asking that it be clear this applies to migrations, since a long project in normal development may rightly have very many decision records), the onboarding order, and grouping thin parts of the same shape.
+    basis: stated
+    fingerprint: a1639f58928d

@@ -67,7 +67,7 @@ What the engineer says becomes intent on the spec without an approval step; they
 1. **Depth follows intent.** Write what the engineer specified as deep as they went, in their terms, and never weaken it to match the code: a mismatch is an open decision. Write everything else at the level of behaviour someone relies on.
 2. **One requirement per feature** a user or another program would notice, even unasked (`basis: added`, or `derived` when a stated need implies it). Count features, not effects: polish serving a requirement you already have needs none of its own.
 3. **Exact values in a requirement** only if the engineer stated it, it's a safety limit, or a named consumer outside the element reads it.
-4. **Other values stay in the code.** A verification item names a value only when a test that exists, or that you're adding, checks it. At most one decision record per design topic, only when someone would ask why.
+4. **Other values stay in the code.** A verification item names a value only when a test that exists, or that you're adding, checks it. Values you find in existing code get at most one decision record per design topic, and only when someone would ask why; decisions you make while building each get their own.
 5. **Subjective qualities** ("beautiful") are needs the engineer verifies by review, not requirements.
 6. **A requirement you infer is derived:** cite the statement and propose it. When two designs would both satisfy the statement, ask instead of picking.
 7. **A requirement belongs to the element whose code does it;** a system constraint is never restated in an element.

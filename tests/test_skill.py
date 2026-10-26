@@ -120,7 +120,7 @@ def test_skill_teaches_the_onboarding_lessons_of_the_three_agent_trial():
     assert "Say where intent came from" in text and "source kind, path and author" in text  # AGENT-68
     onboarding = (init.SKILL / "references" / "onboarding.md").read_text()
     depth = (init.SKILL / "references" / "requirement-depth.md").read_text()
-    assert "## 1. Preflight" in onboarding and "stop and ask the engineer" in onboarding  # ONBOARD-8
+    assert "## 1. Preflight" in onboarding and "raise it as the first open decision" in onboarding  # ONBOARD-8
     assert "One requirement per feature" in text and "Most values end here" in depth      # ONBOARD-9
     assert "Never reword a requirement, and never narrow a safety rule" in depth          # ONBOARD-10
     assert "Run every automated check" in onboarding and "options with costs" in onboarding  # ONBOARD-3, ONBOARD-12

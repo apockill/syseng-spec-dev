@@ -77,10 +77,17 @@
   why: this follows from ONBOARD-2. Fixing things during onboarding would be steering you didn't ask for.
   basis: derived
 - id: ONBOARD-8
-  text: Before creating the spec, onboarding shall establish whether the repository publishes its directories or pushes its commits, and stop for the engineer when either would expose the spec.
+  text: During onboarding, the agent shall establish whether the repository publishes its directories or pushes its commits, raise each way the spec would be exposed as the first open decision on the review page, and keep the spec unpublished until the engineer answers.
   traces_to: SYS-23
   basis: added
   why: in the trial, the spec would have been served as a website and pushed by a commit hook, with the engineer's email and security findings in it.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-26 08:08
+    context: Reviewing the overnight plan for the migration the engineer will keep, which asked the engineer to be reachable for a preflight.
+    said: Sees this as a post-flight step; once the digging and speccing is done, the agent hands over the review page as normal, taking special care that the items it highlights for approval come highest value first.
+    basis: stated
+    fingerprint: ac2a2c92bcd4
 - id: ONBOARD-9
   text: Onboarding shall write one requirement per behaviour that a user, an operator or another element relies on, keeping constants the engineer didn't state in verification items or decision records.
   traces_to: SYS-23
