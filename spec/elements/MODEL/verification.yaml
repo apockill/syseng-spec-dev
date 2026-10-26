@@ -138,3 +138,12 @@
     - tests/test_levels.py::test_the_highest_level_applies
     - tests/test_levels.py::test_an_added_item_and_what_derives_from_it_count_as_added
     - tests/test_levels.py::test_an_invalid_basis_is_reported
+- id: MODEL-V14
+  verifies:
+  - MODEL-41
+  method: test
+  technique: unit test
+  description: An intent record defaults to a human conversation, accepts document, code comment, commit message and agent conversation sources, needs a path for a read source, and rejects unknown kinds.
+  tests:
+    python:
+    - tests/test_levels.py::test_intent_read_from_a_source_names_it

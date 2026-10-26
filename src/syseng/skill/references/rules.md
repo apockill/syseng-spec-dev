@@ -13,8 +13,8 @@ Errors fail `spec check`. To-dos are listed by `spec check --todo` but don't fai
 - Attributes: A001, A002, A003, A004, A005, A006, A007, A008, A009, A010, F001
 - Conflicts: C001
 - Verification items: V001
-- Rendered views: V002, R001
-- Wording: W001, W002, W003, W004, W005, W006, W007, W008, W009, W010
+- Rendered views: V002, V003, R001
+- Wording: W001, W002, W003, W004, W005, W006, W007, W008, W009, W010, W011
 
 ## Structure
 
@@ -178,6 +178,10 @@ A verification item needs:
 ### V002: linked test not found
 A verification item links a test that doesn't exist: the file is missing, or the file has no test by that name. A link is `path` or `path::name`, resolved against the implementation's root. In a Python file the name is a pytest test (`test_x`, or `TestThing::test_x`, with any `[parameters]` ignored). In a C++ file it's a GoogleTest (`Suite.Test`, declared with `TEST`, `TEST_F`, `TEST_P` or `TYPED_TEST`). In any other file, the name only has to appear in it. Fix the link, or remove it if the test is gone.
 
+<a id="v003"></a>
+### V003: test no verification item links (to-do)
+A Python test in the implementation's tree that no verification item links, listed per file. It checks something the spec doesn't claim, or a requirement that's missing. Link it from the verification item whose requirement it checks, or add the requirement it shows is missing. Folders that are hidden, vendored (`node_modules`, `site-packages`) or hold app data (`state`) are skipped.
+
 <a id="r001"></a>
 ### R001: stale Markdown view
 The review page replaced the generated Markdown views. A `requirements.md`, `decisions.md` or change-record `.md` left in spec/ shows a spec that no longer exists. `spec render` removes it; `spec review` writes the page.
@@ -245,3 +249,7 @@ A requirement says what must hold. How it's checked belongs in a verification it
 
 - ✗ The checker shall be verified by a unit test that…
 - ✓ The checker shall report each duplicate ID. *(The unit test lives in a verification item.)*
+
+<a id="w011"></a>
+### W011: gendered pronoun
+A need, a requirement or an intent record uses he, him, his, she, her or hers. Agents guess pronouns from names, and a wrong guess misgenders a real person in a record that lasts. Name the person or their role ("the engineer", "the operator") instead. Checked in needs, requirements, and the `said` and `context` of every intent record.

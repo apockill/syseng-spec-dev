@@ -31,7 +31,7 @@ Copy this into your notes and tick it off:
 Before `spec init` or any edit, find out:
 - **Where spec/ would be exposed.** Does the repository publish its directories (a web server serving top-level folders, a docs site)? Does a hook push commits on its own (look in `.git/hooks`)? Is the remote public? The spec will hold the engineer's name and email, and onboarding usually turns up security findings. If any of these would expose it, stop and ask the engineer before creating spec/ or committing.
 - **Who the human author is.** `spec status` says who records are attributed to. If it's an agent account, ask the engineer to set `git config syseng.author`. Don't set it from memory or guesswork.
-- **Who wrote the documents.** `git log --format='%an' -- README.md` and similar. Intent read from a document is the engineer's only where they wrote or directed it.
+- **Who wrote the documents.** `git log --format='%an' -- README.md` and similar. Intent read from a document is the engineer's only where they wrote or directed it (references/requirement-depth.md, part E).
 
 Then run `spec init` (or ask the engineer to) and open the change: `spec change start "Onboard <project>"`. In a repository with several languages or none at its root, set `implementations` in `spec/toolkit.yaml` by hand (references/schema.md).
 
@@ -46,16 +46,9 @@ Then write the system layer yourself, before any element requirement:
 
 The system layer is what the engineer reads. Keep it to what they'd recognize; one owner writes it, and helpers never add to it.
 
-## 3. Altitude: how detailed a requirement should be
+## 3. How deep to write
 
-Write one requirement per behaviour that a user, an operator or another element relies on. Not one per function, branch or test.
-
-- **Constants stay out of requirements.** Timeouts, retry counts, poll intervals and thresholds go in the verification item's description or a decision record, unless the engineer stated the number or it's a safety limit.
-  - Too deep: "When asked to power off, the supervisor shall stop the arm, wait 0.3 seconds and repeat the power-off up to 6 times until the arm reads unpowered."
-  - Right: "When asked to power off, the supervisor shall confirm the arm reads unpowered, and raise an alarm naming the e-stop when it doesn't."
-- **Size:** about 5 to 15 requirements per element. Past 30, the element needs children or the requirements are too fine.
-- **Where nothing can verify it** (no tests, hardware only), write fewer and coarser requirements, and raise the missing verification once, as a decision.
-- **Flow-down:** an element's requirement refines one of its parent's. When an element gets children, give it a few requirements of its own for them to refine, stated as what the element does as a whole, not as placeholders.
+Follow the rules in SKILL.md and references/requirement-depth.md: one requirement per feature, not per function or test; exact values only where the engineer stated them, a safety limit, or a named consumer needs them; repository-wide conventions as system constraints, never restated per element. Where nothing can verify a part (no tests, hardware only), raise the missing verification once, as a decision.
 
 ## 4. Drafting, alone or with helpers
 
@@ -63,7 +56,7 @@ Pilot one small element end to end first (requirements, verification items, `spe
 
 For a large project you may hand elements to helper agents. Then:
 - give each helper its own output directory, never a shared scratch folder;
-- give each the system layer, the altitude rule above and references/schema.md;
+- give each the system layer, SKILL.md's rules for how deep to write, references/requirement-depth.md and references/schema.md;
 - helpers propose parents and needs; only the owner adds them to the system layer;
 - pass on your constraints (what not to touch or run) word for word: helpers don't inherit them;
 - review each helper's batch yourself, and dry-run it, before applying it, not after the whole spec is in.
@@ -72,9 +65,7 @@ Link every existing test to a verification item. `spec check` doesn't list unlin
 
 ## 5. When the code only partly meets a requirement
 
-Keep the requirement as the project intends it, and raise an open decision naming the gap. Don't reword the requirement to match the code: that turns a bug into a spec. Never narrow a safety rule to fit the code.
-
-Reword only where your own draft was wrong about what the project intends (a misread number, a wrong condition), and say so in the reason.
+Keep the requirement as the project intends it and raise an open decision naming the gap (references/requirement-depth.md, part D). Reword only where your own draft misread what the project intends, and say so in the reason.
 
 ## 6. Verification and checks
 

@@ -12,7 +12,7 @@ MEASURES = [
     ("coverage", "Verification coverage", "up", True),
     ("unverified", "Requirements without verification", "down", True),
     ("tests", "Linked tests", "up", True),
-    ("stale", "Locked to an earlier version", "down", True),
+    ("stale", "Changed since a person gave it", "down", True),
     ("awaiting", "Waiting for your answer", "down", True),
     ("errors", "Checker errors", "down", True),
     ("todos", "Checker to-dos", "down", False),

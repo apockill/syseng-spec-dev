@@ -385,6 +385,92 @@ entries:
       said: Leans toward requirements proportional to observable behaviour, but cautions that a migration could fixate on every movement of an animation, so migrations need guardrails that suit the common case. Outside migration those guardrails are still the common case, but when a person calls out specifics, such as a letter that fades in and morphs into a logo, the agent should happily spec deep, with requirements under it about the morph, because speccing exists to give people surface to lock in, and what they leave unlocked is what gets tuned.
       basis: stated
       fingerprint: ee289508a96e
+- op: add
+  id: AGENT-71
+  at: 2026-10-25T22:23-07:00
+  reason: overnight iteration on the depth rules, as the engineer asked.
+  after:
+    text: The skill shall give agents rules for how deep to write requirements, covering which features get a requirement, where each value goes, inferred requirements, intent read from documents, code that falls short of intent, and splitting large elements.
+    traces_to: SYS-20
+    basis: derived
+    why: in the onboarding trial three agents wrote 226 to 445 requirements for the same code; backtests of 81 small samples showed these rules make agents agree on structure and counts (AGENT-70 states the principle).
+- op: add
+  id: AGENT-V17
+  at: 2026-10-25T22:23-07:00
+  reason: verifies the depth rules.
+  after:
+    verifies:
+    - AGENT-70
+    - AGENT-71
+    method: inspection
+    technique: unit test
+    description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or named-consumer cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
+    tests:
+      python:
+      - tests/test_skill.py::test_skill_teaches_how_deep_to_write_requirements
+- op: add
+  id: CHECK-V15
+  at: 2026-10-25T22:23-07:00
+  reason: verifies CHECK-30, built after round 2 as planned.
+  after:
+    verifies:
+    - CHECK-30
+    method: test
+    technique: unit test
+    description: A gendered pronoun in a requirement is an error naming the item; "they" and "the engineer" pass.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_gendered_pronoun_in_a_need_requirement_or_intent_record_is_an_error
+- op: add
+  id: CHECK-V16
+  at: 2026-10-25T22:23-07:00
+  reason: verifies CHECK-3, now built.
+  after:
+    verifies:
+    - CHECK-3
+    method: test
+    technique: unit test
+    description: Tests that no verification item links are listed per file, with their names, as a to-do.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_tests_no_verification_item_links_are_listed_per_file
+- op: add
+  id: MODEL-V14
+  at: 2026-10-25T22:23-07:00
+  reason: verifies MODEL-41, now built.
+  after:
+    verifies:
+    - MODEL-41
+    method: test
+    technique: unit test
+    description: An intent record defaults to a human conversation, accepts document, code comment, commit message and agent conversation sources, needs a path for a read source, and rejects unknown kinds.
+    tests:
+      python:
+      - tests/test_levels.py::test_intent_read_from_a_source_names_it
+- op: add
+  id: DR-72
+  at: 2026-10-25T22:23-07:00
+  reason: records the overnight toolkit fixes.
+  after:
+    title: Small fixes from the onboarding trial's friction lists
+    decided_by: agent
+    elements:
+    - CLI
+    - CHECK
+    - AGENT
+    requirements: CHECK-3, CHECK-30, MODEL-41
+    context: Every trial agent reported the same papercuts. The engineer allowed small toolkit fixes overnight alongside the skill work.
+    decision: |-
+      - `spec check` lists tests no verification item links (V003, a to-do), so agents stop writing their own scans.
+      - Gendered pronouns in needs, requirements and intent records are an error (W011).
+      - Intent records carry `source`, `source_path` and `source_author`.
+      - The guard ignores heredoc bodies and a `>` inside quotes, which it took for a redirection into spec/.
+      - Output piped to a reader that closes early (`| head`) ends quietly instead of with a BrokenPipe traceback.
+      - `spec init` guesses Python from test files when the root has no build file.
+      - The overview calls items changed since a person gave them "changed since a person gave it", not "locked to an earlier version", since most were never locked.
+    alternatives: Leaving them for later, which would have the next migration hit the same friction.
+    consequences: The next onboarding run measures the skill with these out of the way.
+    basis: derived
 decisions:
 - id: D1
   question: When an agent brings an existing project into the spec method ("onboarding"), should it run every check the toolkit has, as ONBOARD-3 records you asking for, or a smaller, fixed set?

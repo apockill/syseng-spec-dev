@@ -5,10 +5,12 @@ A link is `path`, a file, or `path::name`, a test in that file:
 - in a C++ file, a GoogleTest name, `Suite.Test`, declared with TEST, TEST_F, TEST_P or TYPED_TEST;
 - in any other file, the name only has to appear in it.
 
-Paths resolve against the implementation's root directory. Anything more, such as listing the tests no
-verification item links to, or running them, is left for later.
+Paths resolve against the implementation's root directory. `unlinked` lists the Python tests no link covers
+(CHECK-3); running tests is left for later.
 """
 
+import ast
+import os
 import re
 from pathlib import Path
 
@@ -44,3 +46,45 @@ def missing(base: Path, link: str, cache: dict[Path, str] | None = None) -> str 
             return f"{path} has no GoogleTest {name}"
         return None
     return None if name in text else f"{path} doesn't mention {name}"
+
+
+SKIP_DIRS = {"node_modules", "state", "__pycache__", "venv", "dist", "build", "site-packages"}
+
+
+def python_tests(base: Path) -> dict[str, list[str]]:
+    """Every pytest test under `base`, as {relative file: [node names]}; hidden and vendored folders are skipped."""
+    out: dict[str, list[str]] = {}
+    for dirpath, dirnames, filenames in os.walk(base):
+        dirnames[:] = sorted(d for d in dirnames if not d.startswith(".") and d not in SKIP_DIRS)
+        for name in sorted(filenames):
+            if not name.endswith(".py") or not (name.startswith("test_") or name.endswith("_test.py")):
+                continue
+            path = Path(dirpath) / name
+            try:
+                tree = ast.parse(path.read_text(errors="replace"))
+            except SyntaxError:
+                continue
+            names = []
+            for node in tree.body:
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test"):
+                    names.append(node.name)
+                elif isinstance(node, ast.ClassDef) and node.name.startswith("Test"):
+                    names += [f"{node.name}::{m.name}" for m in node.body
+                              if isinstance(m, (ast.FunctionDef, ast.AsyncFunctionDef)) and m.name.startswith("test")]
+            if names:
+                out[path.relative_to(base).as_posix()] = names
+    return out
+
+
+def unlinked(base: Path, links: list[str]) -> dict[str, list[str]]:
+    """The Python tests under `base` that no link names (a link to a whole file covers all of its tests)."""
+    whole = {link for link in links if "::" not in link}
+    named = {re.sub(r"\[.*\]$", "", link) for link in links if "::" in link}
+    out = {}
+    for file, names in python_tests(base).items():
+        if file in whole:
+            continue
+        missing_names = [n for n in names if f"{file}::{n}" not in named]
+        if missing_names:
+            out[file] = missing_names
+    return out

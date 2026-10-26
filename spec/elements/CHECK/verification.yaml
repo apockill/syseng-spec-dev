@@ -151,3 +151,21 @@
   tests:
     python:
     - tests/test_check_structure.py::test_requirement_above_the_leaves_that_nothing_refines_or_verifies_is_called_out
+- id: CHECK-V15
+  verifies:
+  - CHECK-30
+  method: test
+  technique: unit test
+  description: A gendered pronoun in a requirement is an error naming the item; "they" and "the engineer" pass.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_a_gendered_pronoun_in_a_need_requirement_or_intent_record_is_an_error
+- id: CHECK-V16
+  verifies:
+  - CHECK-3
+  method: test
+  technique: unit test
+  description: Tests that no verification item links are listed per file, with their names, as a to-do.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_tests_no_verification_item_links_are_listed_per_file

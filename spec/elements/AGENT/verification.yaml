@@ -161,3 +161,13 @@
   tests:
     python:
     - tests/test_skill.py::test_skill_puts_questions_for_the_engineer_on_a_rendered_page
+- id: AGENT-V17
+  verifies:
+  - AGENT-70
+  - AGENT-71
+  method: inspection
+  technique: unit test
+  description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or named-consumer cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_teaches_how_deep_to_write_requirements

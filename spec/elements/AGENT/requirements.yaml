@@ -601,3 +601,8 @@
     said: Leans toward requirements proportional to observable behaviour, but cautions that a migration could fixate on every movement of an animation, so migrations need guardrails that suit the common case. Outside migration those guardrails are still the common case, but when a person calls out specifics, such as a letter that fades in and morphs into a logo, the agent should happily spec deep, with requirements under it about the morph, because speccing exists to give people surface to lock in, and what they leave unlocked is what gets tuned.
     basis: stated
     fingerprint: ee289508a96e
+- id: AGENT-71
+  text: The skill shall give agents rules for how deep to write requirements, covering which features get a requirement, where each value goes, inferred requirements, intent read from documents, code that falls short of intent, and splitting large elements.
+  traces_to: SYS-20
+  basis: derived
+  why: in the onboarding trial three agents wrote 226 to 445 requirements for the same code; backtests of 81 small samples showed these rules make agents agree on structure and counts (AGENT-70 states the principle).

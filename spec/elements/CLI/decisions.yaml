@@ -182,3 +182,23 @@
     said: Wants the note removed; agents don't need to know how the package was installed or updated.
     basis: stated
     fingerprint: 2383f9e0cca8
+- id: DR-72
+  title: Small fixes from the onboarding trial's friction lists
+  decided_by: agent
+  elements:
+  - CLI
+  - CHECK
+  - AGENT
+  requirements: CHECK-3, CHECK-30, MODEL-41
+  context: Every trial agent reported the same papercuts. The engineer allowed small toolkit fixes overnight alongside the skill work.
+  decision: |-
+    - `spec check` lists tests no verification item links (V003, a to-do), so agents stop writing their own scans.
+    - Gendered pronouns in needs, requirements and intent records are an error (W011).
+    - Intent records carry `source`, `source_path` and `source_author`.
+    - The guard ignores heredoc bodies and a `>` inside quotes, which it took for a redirection into spec/.
+    - Output piped to a reader that closes early (`| head`) ends quietly instead of with a BrokenPipe traceback.
+    - `spec init` guesses Python from test files when the root has no build file.
+    - The overview calls items changed since a person gave them "changed since a person gave it", not "locked to an earlier version", since most were never locked.
+  alternatives: Leaving them for later, which would have the next migration hit the same friction.
+  consequences: The next onboarding run measures the skill with these out of the way.
+  basis: derived

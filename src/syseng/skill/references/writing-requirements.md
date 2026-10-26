@@ -16,12 +16,9 @@ System elements form a tree, one `parent` each, with the system at the root. Reu
 
 Place each requirement where the system's structure puts it, not where the engineer's request started. "Make a 3D game where the player's feet are purple" yields high-level requirements near the top and one detail deep in the tree (world → characters → player → model → textures). Each carries the intent its request expressed, and the detail sits under the textures.
 
-## Altitude
+## How deep
 
-One requirement per behaviour a user, an operator or another element relies on, not one per function or test. Constants (timeouts, retries, intervals, thresholds) go in verification descriptions or decision records, unless the engineer stated the number or it's a safety limit. About 5 to 15 requirements per element; past 30, split the element or coarsen the requirements.
-
-- Too deep: "The tool shall give up on a request after 30 seconds without progress."
-- Right: "The tool shall give up on a request that makes no progress, and say so."
+SKILL.md's rules, and references/requirement-depth.md for the rest: depth follows the engineer's intent, one requirement per noticeable feature, exact values only where stated, safety-critical or read by a named consumer.
 
 ## Wording
 

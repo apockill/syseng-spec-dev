@@ -163,3 +163,21 @@ def test_yaml_round_trip_keeps_prose_readable(tmp_path):
     text = path.read_text()
     assert "''" not in text and "\\" not in text
     assert yamlio.read(path)[0]["source"] == '"it\'s quoted: really"'
+
+
+def test_a_gendered_pronoun_in_a_need_requirement_or_intent_record_is_an_error(spec):   # CHECK-30
+    spec.files["elements/CORE/requirements.yaml"][0]["text"] = "The core shall stamp each widget his way."
+    spec.write()
+    found = [f for f in spec.findings() if f.code == "W011"]
+    assert found and found[0].item == "CORE-1" and found[0].severity == "error"
+    spec.files["elements/CORE/requirements.yaml"][0]["text"] = "The core shall stamp each widget."
+    spec.files["elements/SYS/needs.yaml"][0]["text"] = "The engineer needs widgets the way they like them."
+    spec.write()
+    assert "W011" not in spec.codes()                       # "they" and "the engineer" are fine
+
+
+def test_tests_no_verification_item_links_are_listed_per_file(spec):                   # CHECK-3
+    spec.files["elements/CORE/verification.yaml"][0]["tests"] = {"python": ["tests/test_core.py::test_stamp"]}
+    spec.write()
+    todo = [f.message for f in spec.findings() if f.code == "V003"]
+    assert todo == ["tests/test_core.py has 1 test no verification item links: test_other"]

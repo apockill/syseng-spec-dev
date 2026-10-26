@@ -113,8 +113,11 @@ On any item a person addressed. `spec edit` fills in `by`, `when` and `fingerpri
 ```
 intent:
   basis: stated              # or guided
-  context: What was being discussed and what prompted it; for a document, which one and who wrote it.
+  context: What was being discussed and what prompted it.
   said: A close third-person summary, never a quote.
+  source: human_conversation # the default; or agent_conversation, document, code_comment, commit_message
+  source_path: README.md     # required for document, code_comment and commit_message (a file, or a commit hash)
+  source_author: Ada <ada@example.com>   # who wrote the source, as `git log` shows it
 ```
 
 An item no person addressed carries `basis: derived` (something above needs it) or `basis: added` (your own idea), with `why:` saying which. A decision record takes `basis` but no `why`: its context and decision are the reasons.

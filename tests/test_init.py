@@ -214,3 +214,10 @@ def test_text_after_the_section_survives_a_refresh_unchanged():
     after = "\n## Our own notes\n\nKeep these.\n"
     text = init.merge_instructions("# Project\n") + after
     assert init.merge_instructions(text) == text                                       # CLI-10: other text unchanged
+
+
+def test_language_is_guessed_from_tests_when_the_root_has_no_build_file(tmp_path):
+    (tmp_path / "app" / "tests").mkdir(parents=True)
+    (tmp_path / "app" / "tests" / "test_x.py").write_text("def test_x():\n    pass\n")
+    assert init._guess_language(tmp_path) == ("python", "guessed from 1 Python test file")
+    assert init._guess_language(tmp_path / "app" / "tests" / "nothing")[0] == "main"

@@ -117,11 +117,12 @@ def test_skill_teaches_the_onboarding_lessons_of_the_three_agent_trial():
     text = _whole_skill()
     assert "Never infer pronouns from a name" in text                                   # AGENT-66
     assert "Never set it yourself from memory" in text                                   # AGENT-67
-    assert "A document isn't a statement" in text and "who wrote it" in text            # AGENT-68
+    assert "Say where intent came from" in text and "source kind, path and author" in text  # AGENT-68
     onboarding = (init.SKILL / "references" / "onboarding.md").read_text()
+    depth = (init.SKILL / "references" / "requirement-depth.md").read_text()
     assert "## 1. Preflight" in onboarding and "stop and ask the engineer" in onboarding  # ONBOARD-8
-    assert "## 3. Altitude" in onboarding and "Constants stay out of requirements" in onboarding  # ONBOARD-9
-    assert "Don't reword the requirement to match the code" in onboarding                # ONBOARD-10
+    assert "One requirement per feature" in text and "Most values end here" in depth      # ONBOARD-9
+    assert "Never reword a requirement, and never narrow a safety rule" in depth          # ONBOARD-10
     assert "Run every automated check" in onboarding and "options with costs" in onboarding  # ONBOARD-3, ONBOARD-12
     assert "isn't verification yet" in onboarding                                        # ONBOARD-11
 
@@ -130,3 +131,14 @@ def test_skill_puts_questions_for_the_engineer_on_a_rendered_page():           #
     text = _whole_skill()
     assert "goes on a rendered page" in text and "a reader with none of your context" in text
     assert "spec decide --replace" in text
+
+
+def test_skill_teaches_how_deep_to_write_requirements():                                # AGENT-70, AGENT-71
+    skill = (init.SKILL / "SKILL.md").read_text()
+    depth = (init.SKILL / "references" / "requirement-depth.md").read_text()
+    assert "**Depth follows intent.**" in skill and "as deep as they went" in skill
+    assert "Count features, not effects" in skill and "named consumer" in skill
+    assert "ask instead of picking" in skill and "never restated in an element" in skill
+    for part in ("## A. What counts as a noticeable feature", "## B. Where a value goes", "## C. Requirements you infer",
+                 "## D. Code that falls short", "## E. Intent read from documents", "## F. Splitting a big element"):
+        assert part in depth

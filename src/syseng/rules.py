@@ -144,6 +144,10 @@ _RULES = [
          "A verification item that points at a test that isn't there verifies nothing, and nobody notices.",
          "Fix the link to `path::name`, where the name is a pytest test (`test_x` or `TestThing::test_x`) or a "
          "GoogleTest (`Suite.Test`). If the test is gone, remove the link."),
+    Rule("V003", "test no verification item links",
+         "A test nothing links to checks something the spec doesn't claim, or a requirement that's missing.",
+         "Link it from the verification item whose requirement it checks, or add the requirement it shows is "
+         "missing.", severity="todo"),
     Rule("R001", "stale Markdown view",
          "The review page replaced the Markdown views; one left behind shows a spec that no longer exists.",
          "Run `spec render`, which removes it, and `spec review` for the page."),
@@ -188,6 +192,9 @@ _RULES = [
          "A requirement says what must hold. How it's checked belongs in a verification item, written separately.",
          "Delete the verification wording, and put it in a verification item.",
          "INCOSE R31"),
+    Rule("W011", "gendered pronoun",
+         "Pronouns guessed from a name misgender people; the spec talks about real people for years.",
+         "Name the person or their role (the engineer, the operator) instead of he, she, his or her."),
 ]
 RULES = {r.code: r for r in _RULES}
 

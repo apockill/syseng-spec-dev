@@ -273,3 +273,13 @@ def test_a_change_the_person_has_seen_on_a_review_stops_asking_but_stays_decayed
     assert "A003" not in [f.code for f in check.check(s) if f.item == "CORE-1"]   # DR-68: seen, so it stops asking
     assert levels.review.unanswered(s) == []
     assert levels.level_of(s, "CORE-1").given == levels.EXPLICIT                 # and stays locked to an earlier version
+
+
+def test_intent_read_from_a_source_names_it():                                          # MODEL-41
+    from syseng import records
+    base = {"basis": "guided", "context": "c", "said": "s"}
+    assert records.problems(records.IntentDraft, base) == []                            # human_conversation by default
+    assert records.problems(records.IntentDraft, {**base, "source": "code_comment"})    # needs source_path
+    assert records.problems(records.IntentDraft, {**base, "source": "document", "source_path": "README.md",
+                                                  "source_author": "ailex-agent"}) == []
+    assert records.problems(records.IntentDraft, {**base, "source": "rumour"})

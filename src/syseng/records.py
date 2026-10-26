@@ -9,7 +9,7 @@ record is reported with every other unfinished thing in one run (CHECK-1).
 import re
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
+from pydantic import model_validator, BaseModel, ConfigDict, ValidationError, field_validator
 
 PERSON = re.compile(r"^[^<>]*\S <[^<>@\s]+@[^<>@\s]+>$")  # Name <email>, as version control writes it
 WHEN = re.compile(r"^\d{4}-\d{2}-\d{2}( \d{2}:\d{2})?$")     # a date, and the time when it's known
@@ -33,6 +33,18 @@ class IntentDraft(BaseModel):
     said: str
     by: str | None = None
     when: str | None = None
+    # MODEL-41: where the intent came from; a person talking to an agent unless said otherwise
+    source: Literal["human_conversation", "agent_conversation", "document", "code_comment",
+                    "commit_message"] = "human_conversation"
+    source_path: str | None = None      # the document, file or commit the intent was read from
+    source_author: str | None = None    # who wrote that source, as version control records it
+
+    @model_validator(mode="after")
+    def _source(self):
+        if self.source in ("document", "code_comment", "commit_message"):
+            if not self.source_path:
+                raise ValueError(f"source {self.source} needs `source_path`: the file or commit it was read from")
+        return self
 
     @field_validator("context", "said")
     @classmethod

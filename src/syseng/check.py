@@ -6,6 +6,7 @@ mode: whether a branch lands is the engineer's call (CHECK-15, DR-31).
 """
 
 from dataclasses import dataclass
+import re
 from pathlib import Path
 
 from syseng import levels, records, render, review, testlinks
@@ -286,12 +287,25 @@ def _intent_findings(where, data: dict, iid: str) -> list[Finding]:
 
 
 # ---------------------------------------------------------------- wording
+_PRONOUN = re.compile(r"\b(he|him|his|himself|she|her|hers|herself)\b", re.I)
+
+
 def _wording(spec: Spec) -> list[Finding]:
     out = []
     for item in spec.requirements():
         text = str(item.data.get("text") or "")
         for issue in check_wording(text):
             out.append(Finding(issue.code, issue.message, item.id, item.file, item.line, text, issue.span))
+    # CHECK-30: no gendered pronoun in a need, a requirement or an intent record; name the person or their role
+    for item in spec.of_kind("need", "system", "constraint", "requirement", "decision", "vi"):
+        texts = [("text", str(item.data.get("text") or ""))] if item.kind != "decision" and item.kind != "vi" else []
+        for n, r in enumerate(levels.intent_records(item.data), 1):
+            texts += [(f"intent record {n} `{k}`", str(r.get(k) or "")) for k in ("said", "context")]
+        for where, text in texts:
+            m = _PRONOUN.search(text)
+            if m:
+                out.append(Finding("W011", f"{item.id} uses the pronoun '{m.group(0)}' in its {where}", item.id,
+                                   item.file, item.line, text, (m.start(), m.end())))
     return out
 
 
@@ -335,6 +349,15 @@ def _test_links(spec: Spec) -> list[Finding]:
                 problem = testlinks.missing(roots[impl], str(link), cache)
                 if problem:
                     out.append(_f("V002", f"{vi.id} links {link}, but {problem}", vi.id, vi))
+    for i in spec.config.get("implementations") or []:  # CHECK-3: tests no verification item links
+        if not isinstance(i, dict) or i.get("language") != "python" or i.get("name") not in roots:
+            continue
+        links = [str(link) for vi in spec.of_kind("vi")
+                 for link in ((vi.data.get("tests") or {}).get(i["name"]) or [])] if spec.of_kind("vi") else []
+        for file, names in testlinks.unlinked(roots[i["name"]], links).items():
+            shown = ", ".join(names[:8]) + (f" and {len(names) - 8} more" if len(names) > 8 else "")
+            out.append(Finding("V003", f"{file} has {len(names)} test{'s' if len(names) != 1 else ''} no "
+                                       f"verification item links: {shown}"))
     return out
 
 

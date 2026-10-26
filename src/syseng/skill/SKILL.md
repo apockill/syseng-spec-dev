@@ -16,6 +16,7 @@ Run the toolkit as `spec` from the repository root. `spec <command> --help` expl
 | Any change to a repository that has a spec | this file | 100 lines |
 | Bringing an existing project in | [references/onboarding.md](references/onboarding.md) | 100 lines |
 | Writing or editing needs, requirements, verification items | [references/writing-requirements.md](references/writing-requirements.md) | 80 lines |
+| How deep to write a requirement: features, values, inferred requirements, documents, gaps (beyond the rules below) | [references/requirement-depth.md](references/requirement-depth.md) | 90 lines |
 | The fields of each kind of item, with examples | [references/schema.md](references/schema.md) | 145 lines |
 | Handing over a review page, applying feedback, recording locks, raising conflicts | [references/review-and-locks.md](references/review-and-locks.md) | 75 lines |
 | Running the auditors and reasoning checks | [references/auditing.md](references/auditing.md) | 40 lines |
@@ -57,9 +58,20 @@ What the engineer says becomes intent on the spec without an approval step; they
 - **Summarize, never quote.** `said` is a close third-person summary: keep their hedges and strength, add nothing they didn't say, no double quotation marks.
 - **Their reasoning, not just their "yes".** Where they gave reasons, summarize the reasons.
 - **Context frames, it doesn't assert.** `context` says what was being discussed and what prompted the statement, and adds no claim they didn't make.
-- **A document isn't a statement.** What you read in a README, design note or commit is guided at most. Say in `context` which document it was read from and who wrote it (`git log` shows the author). When an agent's account wrote it and you can't tell whether the person directed it, ask the engineer before recording it as theirs.
+- **Say where intent came from.** What a person tells you is `source: human_conversation`. What you read in a document, code comment or commit counts as theirs only if they wrote or directed it; record its source kind, path and author (references/requirement-depth.md, part E).
 - **Place each requirement under the system element it constrains,** however high the request began.
 - **Connect to what's there.** When they ask for something existing items already account for, or restate one, name those items with their titles and add the request to them as intent.
+
+## How deep to write requirements
+
+1. **Depth follows intent.** Write what the engineer specified as deep as they went, in their terms, and never weaken it to match the code: a mismatch is an open decision. Write everything else at the level of behaviour someone relies on.
+2. **One requirement per feature** a user or another program would notice, even unasked (`basis: added`, or `derived` when a stated need implies it). Count features, not effects: polish serving a requirement you already have needs none of its own.
+3. **Exact values in a requirement** only if the engineer stated it, it's a safety limit, or a named consumer outside the element reads it.
+4. **Other values stay in the code.** A verification item names a value only when a test that exists, or that you're adding, checks it. At most one decision record per design topic, only when someone would ask why.
+5. **Subjective qualities** ("beautiful") are needs the engineer verifies by review, not requirements.
+6. **A requirement you infer is derived:** cite the statement and propose it. When two designs would both satisfy the statement, ask instead of picking.
+7. **A requirement belongs to the element whose code does it;** a system constraint is never restated in an element.
+8. For anything these don't settle, read references/requirement-depth.md.
 
 ## Editing the spec
 
