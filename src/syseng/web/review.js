@@ -901,7 +901,8 @@
     }));
     const fixes = [];
     for (const [id, s] of items) for (const [idx, f] of Object.entries(s.intent || {}))
-      fixes.push(`${label(id)}, intent record ${+idx + 1}: ` + (f.action === "remove" ? "not what was meant; remove it" : `meant: ${f.correction || "(see comment)"}`));
+      fixes.push(`${label(id)}, intent record ${+idx + 1}: ` + (f.action === "remove" ? "not what was meant; remove it"
+        : f.correction ? `meant: ${f.correction}` : "marked for correction, but no text was typed"));
     group("Intent to correct", fixes);
     group("Wording suggested", items.filter(([id, s]) => answeredWording(id, s)).map(([id, s]) => `${id}: ${s.wording}`));
     group("Comments", items.filter(([, s]) => s.comment).map(([id, s]) => `${label(id)}: ${s.comment}`));
@@ -946,7 +947,10 @@
     const n = items.length + decisions.length + (state.general ? 1 : 0);
     state.copied = [...new Set([...(state.copied || []), META.review])];
     save();
-    copy(text, n ? `Copied ${n} piece${n > 1 ? "s" : ""} of feedback. Paste it to your agent, or post it as your review.`
+    const blank = items.reduce((k, [, s]) => k + Object.values(s.intent || {})
+      .filter((f) => f.action === "correct" && !(f.correction || "").trim()).length, 0);  // REVIEW-39
+    copy(text, blank ? `Copied, but ${blank} correction${blank > 1 ? "s have" : " has"} no text: type what you meant in the box under "Correct", then copy again.`
+      : n ? `Copied ${n} piece${n > 1 ? "s" : ""} of feedback. Paste it to your agent, or post it as your review.`
       : "Copied an empty review: paste it to your agent to mark this one done.");
   }
   function showBlock(text) {  // when the browser won't copy, the block is shown to copy by hand

@@ -192,3 +192,9 @@
   tests:
     python:
     - tests/test_review_page.py::test_the_overview_shows_requirements_with_linked_tests_beside_coverage
+- id: REVIEW-V19
+  verifies:
+  - REVIEW-39
+  method: demonstration
+  technique: manual
+  description: On a generated review page, marking an intent record "Correct" without typing and pressing Copy feedback shows a message naming the corrections with no text, and the copied summary says no text was typed instead of pointing at a comment.

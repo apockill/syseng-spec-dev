@@ -337,3 +337,8 @@
     said: Strongly agrees with listing unlinked tests and with an honest coverage measure, and invited locking both in.
     basis: stated
     fingerprint: e30bb2497a97
+- id: REVIEW-39
+  text: When the person copies feedback that marks an intent record for correction without saying what they meant, the review page shall tell them which corrections have no text.
+  traces_to: SYS-45
+  basis: added
+  why: in review 0a959844be two corrections on SYS-34 arrived with no text and a "(see comment)" placeholder pointing at no comment, so the agent couldn't act on them.

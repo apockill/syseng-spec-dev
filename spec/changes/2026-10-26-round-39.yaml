@@ -1,0 +1,52 @@
+request: |-
+  Apply review 0a959844be: locks on SYS, SYS-34, SYS-45, SYS-46, SYS-48 and two intent corrections on SYS-34
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-26'
+entries:
+- op: add
+  id: REVIEW-39
+  at: 2026-10-26T09:17-07:00
+  reason: found applying review 0a959844be.
+  after:
+    text: When the person copies feedback that marks an intent record for correction without saying what they meant, the review page shall tell them which corrections have no text.
+    traces_to: SYS-45
+    basis: added
+    why: in review 0a959844be two corrections on SYS-34 arrived with no text and a "(see comment)" placeholder pointing at no comment, so the agent couldn't act on them.
+- op: add
+  id: REVIEW-V19
+  at: 2026-10-26T09:17-07:00
+  reason: the page script has no unit tests; a person checks it in a browser.
+  after:
+    verifies:
+    - REVIEW-39
+    method: demonstration
+    technique: manual
+    description: On a generated review page, marking an intent record "Correct" without typing and pressing Copy feedback shows a message naming the corrections with no text, and the copied summary says no text was typed instead of pointing at a comment.
+decisions: []
+friction: []
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-26T09:16-07:00
+  review: 0a959844be
+  id: SYS-34
+  kind: correction
+  record: 0
+  comment: (no text given)
+  response: |-
+    Your correction to SYS-34's first intent record (agreeing that it must be clear which items got explicit approval and which got approval by proxy) arrived with no text: the page sent '(see comment)' but there was no comment. I've fixed the page so it now warns when a correction is empty. Please mark it Correct again on the republished page and type what you meant.
+  responded: 2026-10-26T09:17-07:00
+- n: F2
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-26T09:16-07:00
+  review: 0a959844be
+  id: SYS-34
+  kind: correction
+  record: 1
+  comment: (no text given)
+  response: |-
+    Same for the second record (choosing the word 'delegated' for approval by proxy): no text arrived. Please type the correction on the republished page. If the point is that both still use the retired approval vocabulary, say so and I'll restate them in lock terms.
+  responded: 2026-10-26T09:17-07:00
+closed: '2026-10-26'
