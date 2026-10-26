@@ -110,3 +110,12 @@
   tests:
     python:
     - tests/test_decisions.py::test_an_overtaken_decision_is_withdrawn_with_a_reason
+- id: CHANGE-V12
+  verifies:
+  - CHANGE-22
+  method: test
+  technique: unit test
+  description: A decision checked with the dry-run option is reported valid and isn't recorded.
+  tests:
+    python:
+    - tests/test_decisions.py::test_a_decision_can_be_checked_without_recording_it

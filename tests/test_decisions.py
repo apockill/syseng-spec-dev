@@ -103,3 +103,15 @@ def test_an_overtaken_decision_is_withdrawn_with_a_reason(change):              
     assert d["status"] == "withdrawn" and d["withdrawn_because"].startswith("the engineer")
     with pytest.raises(changes.ChangeError, match="already withdrawn"):
         changes.withdraw(change, "D1", "again")
+
+
+def test_a_decision_can_be_checked_without_recording_it(spec, capsys):
+    from syseng import cli
+    spec.write()
+    changes.start(spec.load(), "Make better widgets", None, None, None)
+    path = spec.root.parent / "d.yaml"
+    import yaml
+    path.write_text(yaml.safe_dump(_decision()))
+    assert cli.main(["--spec", str(spec.root), "decide", "--dry-run", "--file", str(path)]) == 0
+    assert "nothing was written" in capsys.readouterr().out
+    assert not changes.current(spec.load()).data.get("decisions")

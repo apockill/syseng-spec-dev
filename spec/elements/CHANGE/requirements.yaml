@@ -161,3 +161,8 @@
   traces_to: SYS-16
   basis: added
   why: in the trial and in round 37, decisions were overtaken by the engineer's comments or later findings; without a way to withdraw them they linger on the review page as questions nobody needs to answer.
+- id: CHANGE-22
+  text: The toolkit shall let an agent check an open decision's form without recording it.
+  traces_to: SYS-16
+  basis: added
+  why: agents in the trial validated decisions by hand before filing them, since a filed decision is permanent until answered.

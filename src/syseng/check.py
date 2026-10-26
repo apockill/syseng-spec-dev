@@ -207,7 +207,7 @@ def _attributes(spec: Spec) -> list[Finding]:
         if origin is not None and origin not in ("engineer", "agent"):
             out.append(_f("A002", f"{item.id} has origin {origin!r}", item.id, item))
         elif origin is None and item.kind != "vi" and not item.data.get("intent") and not (
-                item.kind != "need" and (item.data.get("basis") or review.history(spec, item.id))):
+                item.data.get("basis") or (item.kind != "need" and review.history(spec, item.id))):
             out.append(_f("A002", f"{item.id} says neither who asked for it nor where it came from", item.id, item))
         if not item.data.get("text") and item.kind != "vi":
             out.append(_f("S007", f"{item.id} has no `text`", item.id, item))

@@ -181,3 +181,20 @@ def test_tests_no_verification_item_links_are_listed_per_file(spec):            
     spec.write()
     todo = [f.message for f in spec.findings() if f.code == "V003"]
     assert todo == ["tests/test_core.py has 1 test no verification item links: test_other"]
+
+
+def test_unittest_classes_count_as_tests_for_the_unlinked_list(spec):                   # CHECK-3
+    spec.write()
+    tests = spec.root.parent / "tests" / "test_core.py"
+    tests.write_text("import unittest\n\n\nclass AppsTest(unittest.TestCase):\n    def test_a(self):\n        pass\n")
+    todo = [f.message for f in spec.findings() if f.code == "V003"]
+    assert todo == ["tests/test_core.py has 1 test no verification item links: AppsTest::test_a"]
+
+
+def test_a_need_drafted_from_agent_documents_may_say_it_is_derived(spec):
+    need = spec.files["elements/SYS/needs.yaml"][0]
+    for k in ("origin", "source", "context"):
+        need.pop(k, None)
+    need.update({"basis": "derived", "why": "read from a README an agent account wrote"})
+    spec.write()
+    assert "A002" not in spec.codes()

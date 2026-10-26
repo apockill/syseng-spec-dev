@@ -241,7 +241,7 @@ These are exempt: "how many" (a quantity, not a vague amount), and capitalized w
 
 <a id="w009"></a>
 ### W009: language-specific name (INCOSE R31)
-Requirements describe behavior in terms any implementation can meet, so a Rust rebuild can follow them. Code spans, file names, snake_case or camelCase identifiers and call syntax belong in test links and related-code lists.
+Requirements describe behavior in terms any implementation can meet, so a Rust rebuild can follow them. Code spans, file names, snake_case or camelCase identifiers and call syntax belong in test links and related-code lists. An exact value another program depends on (a JSON field name, a file name in a format others read) is part of the requirement: put it in double quotes, and the check reads it as a quoted value.
 
 <a id="w010"></a>
 ### W010: requirement states its own test (INCOSE R31)

@@ -55,13 +55,13 @@ Follow the rules in SKILL.md and references/requirement-depth.md: one requiremen
 Pilot one small element end to end first (requirements, verification items, `spec edit`, `spec check`) to learn the format before scaling out.
 
 For a large project you may hand elements to helper agents. Then:
-- give each helper its own output directory, never a shared scratch folder;
+- give each helper its own output directory for its batch files, never a shared scratch folder, and have it report its findings and proposed decisions in its final message (some harnesses refuse report files from helpers);
 - give each the system layer, SKILL.md's rules for how deep to write, references/requirement-depth.md and references/schema.md;
 - helpers propose parents and needs; only the owner adds them to the system layer;
 - pass on your constraints (what not to touch or run) word for word: helpers don't inherit them;
 - review each helper's batch yourself, and dry-run it, before applying it, not after the whole spec is in.
 
-Link every existing test to a verification item. `spec check` doesn't list unlinked tests yet: list the test functions yourself and compare.
+Link every existing test to a verification item. `spec check --todo` lists each Python test no verification item links (V003).
 
 ## 5. When the code only partly meets a requirement
 

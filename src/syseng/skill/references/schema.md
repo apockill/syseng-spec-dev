@@ -15,7 +15,7 @@ Every add goes through `spec edit` as `- add: <kind>`; IDs are allocated for you
 
 ## need
 
-A need is an outcome the engineer wants, in their terms. Filed on the root element, numbered NEED-n.
+A need is an outcome the engineer wants, in their terms. Filed on the root element, numbered NEED-n. A need normally carries intent; one drafted only from documents an agent account wrote carries `basis: derived` and a `why:` instead, until the engineer confirms it.
 
 ```
 - add: need
@@ -68,6 +68,7 @@ Optional: `verification_deferred: <why>` marks a requirement as knowingly unveri
   reason: …
 ```
 
+- A verification item for a system requirement or constraint is filed on the root element: `element: SYS` (or whatever the root's ID is).
 - A **reasoning check** has no tests; its `description` is the prompt a fresh model answers pass or fail, naming the files or commands it judges.
 - A **manual** item says what a person does and observes. It isn't verification until someone has done it.
 - Describe only what the tests or prompt actually check. "Checks X" when the test checks half of X is the most common audit finding.

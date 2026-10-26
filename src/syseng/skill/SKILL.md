@@ -46,7 +46,7 @@ An item changed since its lock or intent record, and not kept, counts one level 
 4. **Work.** Code as you normally would.
 5. **Keep the spec in step, in the same change:** update the requirements and verification items the change affects, record a requirement (with `basis: added`) for each feature a user would notice that you add unasked, and a decision record for each design decision.
 6. **Check:** the project's tests, then `spec check`. Fix every error.
-7. **Audit:** fresh-context auditors review your spec updates (references/auditing.md).
+7. **Audit:** fresh-context auditors review your spec updates (references/auditing.md). During onboarding, offer them with their cost instead (references/onboarding.md).
 8. **Hand over** the review page and report in a few lines (references/review-and-locks.md).
 
 When the engineer asks for something quickly, say so as soon as it's usable, then finish the tests and spec. Where and how you sequence the work is up to you.

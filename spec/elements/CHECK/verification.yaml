@@ -169,3 +169,12 @@
   tests:
     python:
     - tests/test_check_structure.py::test_tests_no_verification_item_links_are_listed_per_file
+- id: CHECK-V17
+  verifies:
+  - CHECK-3
+  method: test
+  technique: unit test
+  description: A unittest class whose name doesn't start with Test still has its test methods listed as unlinked.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_unittest_classes_count_as_tests_for_the_unlinked_list

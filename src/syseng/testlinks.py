@@ -68,7 +68,8 @@ def python_tests(base: Path) -> dict[str, list[str]]:
             for node in tree.body:
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test"):
                     names.append(node.name)
-                elif isinstance(node, ast.ClassDef) and node.name.startswith("Test"):
+                elif isinstance(node, ast.ClassDef) and (node.name.startswith("Test") or any(
+                        (getattr(b, "attr", None) or getattr(b, "id", "")).endswith("TestCase") for b in node.bases)):
                     names += [f"{node.name}::{m.name}" for m in node.body
                               if isinstance(m, (ast.FunctionDef, ast.AsyncFunctionDef)) and m.name.startswith("test")]
             if names:

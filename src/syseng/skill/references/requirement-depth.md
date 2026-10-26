@@ -27,7 +27,7 @@ Decide per value; the first match wins.
 
 1. The engineer stated it → the requirement, exactly.
 2. A safety limit, or it guards an irreversible action → the requirement, exactly.
-3. A named consumer outside this element reads or parses it: another program, a script, a stored file format, another team. JSON field names, exit codes, file formats, command and flag names → the requirement, exactly. Options a UI happens to offer, animation timings and log text nobody parses don't count.
+3. A named consumer outside this element reads or parses it: another program, a script, a stored file format, another team. JSON field names, exit codes, file formats, command and flag names → the requirement, exactly, in double quotes ("node_id", "meta.json") so the wording check reads them as quoted values, not code names. Options a UI happens to offer, animation timings and log text nobody parses don't count.
 4. A test that exists, or that you are adding, checks the exact value → that verification item's description.
 5. Someone would ask "why this number?" and the answer isn't obvious → the one decision record for that design topic (a "motion timings" record, never one record per value).
 6. Otherwise → the code only. Most values end here.

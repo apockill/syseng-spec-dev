@@ -50,7 +50,7 @@ from syseng.model import Spec
 KIND_FILES = {"need": "needs.yaml", "requirement": "requirements.yaml", "system": "requirements.yaml",
               "constraint": "requirements.yaml", "vi": "verification.yaml", "decision": "decisions.yaml"}
 FIELDS = {
-    "need": {"text", "origin", "source", "quotes", "context", "intent"},
+    "need": {"text", "origin", "source", "quotes", "context", "intent", "basis", "why"},
     "requirement": {"text", "origin", "traces_to", "derived", "why", "source", "quotes", "refines", "reworded",
                     "allocation_note", "verification_deferred", "intent", "basis"},
     "system": {"kind", "text", "origin", "serves", "why", "source", "quotes", "refines", "reworded",
@@ -188,9 +188,14 @@ def apply_ops(root: Path, ops: list[Op], change_id: str, person: str = "", now: 
     if pending:  # each record is stamped with the item as it stands after the whole batch
         spec = model.load(root)
         for iid, recs in pending.items():
-            full = [{"by": r.get("by") or person, "when": r.get("when") or now, "context": r.get("context"),
-                     "said": r.get("said"), "basis": r.get("basis"), "fingerprint": _fingerprint(spec, iid)}
-                    for r in recs]
+            full = []
+            for r in recs:  # MODEL-41: a record read from a source is the source author's, unless it names someone
+                read = r.get("source") not in (None, "human_conversation", "agent_conversation")
+                rec = {"by": r.get("by") or (read and r.get("source_author")) or person, "when": r.get("when") or now,
+                       "context": r.get("context"), "said": r.get("said"), "basis": r.get("basis")}
+                rec.update({k: r[k] for k in ("source", "source_path", "source_author") if r.get(k)})
+                rec["fingerprint"] = _fingerprint(spec, iid)
+                full.append(rec)
             for rec in full:
                 wrong = records.problems(records.IntentRecord, rec)
                 if wrong:
@@ -222,6 +227,12 @@ def _add(spec: Spec, root: Path, op: Op) -> str:
         if op.id in spec.elements:
             raise EditError(f"system element {op.id} already exists")
         yamlio.write(root / "elements" / op.id / "element.yaml", {"id": op.id, **op.fields})
+        settings = root / "toolkit.yaml"  # a new element joins the order elements are listed in
+        config = yamlio.read(settings) if settings.exists() else None
+        if isinstance(config, dict) and isinstance(config.get("element_order"), list) \
+                and op.id not in config["element_order"]:
+            config["element_order"].append(op.id)
+            yamlio.write(settings, config)
         return op.id
     if kind in ("need", "system", "constraint"):
         element = _root_id(spec)

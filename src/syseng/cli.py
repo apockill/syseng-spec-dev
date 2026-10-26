@@ -298,7 +298,7 @@ def cmd_status(args) -> int:
         for cid, alt in pending:
             print(f"  {changes._label(spec, alt['id'])}, altered in {cid}. Keep it: `lock {alt['id']}`")
     waiting = [i for ch in changes.all_changes(spec) for p in ch.data.get("proposals") or [] for i in p.get("ids") or []
-               if review.kind_and_data(spec, i) and review.state_of(spec, i).state != review.APPROVED]
+               if review.kind_and_data(spec, i) and levels.level_of(spec, i).level != levels.EXPLICIT]
     if waiting:
         print(f"Proposed for locking: `lock {', '.join(dict.fromkeys(waiting))}`")
     print(checker.summarize(checker.check(spec)))
@@ -319,6 +319,18 @@ def cmd_decide(args) -> int:
             return 1
         render.write_views(model.load(spec.root))
         print(f"withdrew open decision {args.withdraw} in {c.id}")
+        return 0
+    if args.dry_run:  # validate against a copy of the change, write nothing
+        import copy
+        probe = copy.copy(c)
+        probe.data = copy.deepcopy(c.data)
+        probe.save = lambda: None
+        try:
+            did = changes.add_decision(probe, _read_doc(args) or {}, replace=args.replace)
+        except (changes.ChangeError, edit.EditError) as e:
+            print(f"spec decide: {e}")
+            return 1
+        print(f"dry run: decision {did} is valid; nothing was written")
         return 0
     try:
         did = changes.add_decision(c, _read_doc(args) or {}, replace=args.replace)
@@ -572,6 +584,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--replace", metavar="D<n>", help="rewrite this open decision of the open change in place")
     p.add_argument("--withdraw", metavar="D<n>", help="withdraw this open decision, overtaken by events (needs --reason)")
     p.add_argument("--reason", help="why the decision is withdrawn")
+    p.add_argument("--dry-run", action="store_true", help="check the decision without recording it")
     p.set_defaults(fn=cmd_decide)
     p = sub.add_parser("resolve", help="record the engineer's choice on open decisions")
     p.add_argument("ids", nargs="+")

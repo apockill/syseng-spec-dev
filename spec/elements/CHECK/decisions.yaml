@@ -83,3 +83,23 @@
     - Keeping it restores the full level; rolling it back makes the record match again. A further change while already decayed doesn't decay it further.
   alternatives: Keeping the full level until answered, which nags forever. Dropping the lock entirely, which loses that the person once locked it. Decaying with time, which says nothing about whether they saw the change.
   consequences: A stale lock still protects the item as stated intent, so a conflicting change still comes back to the person. The review page shows each changed item once, however many rounds changed it.
+- id: DR-73
+  title: Fixes from the round-3 migrations
+  decided_by: agent
+  elements:
+  - CHECK
+  - MODEL
+  - REVIEW
+  - AGENT
+  requirements: CHECK-3, MODEL-41, CHANGE-22
+  context: Both finished round-3 agents hit the same toolkit gaps while migrating the sites repository with the new skill.
+  decision: |-
+    - The unlinked-test list also reads unittest classes, whatever their names.
+    - spec edit keeps an intent record's source fields, and a record read from a source defaults to the source's author.
+    - A need may carry a basis (derived) and a why, for needs drafted only from agent-written documents.
+    - The overview adds "requirements with linked tests", since verification coverage counts planned checks that never ran.
+    - Adding an element appends it to the element order; spec decide gains --dry-run; spec status counts proposals the way the page does.
+    - The skill says to quote exact contract values ("node_id") so the code-name check reads them as values, files system-level verification items on the root element, has helpers report in their final message, and points the loop's audit step at onboarding's rule.
+  alternatives: Leaving them for the next round, which would hit the same gaps.
+  consequences: The next migration should find the unlinked list complete and the coverage figure honest.
+  basis: derived
