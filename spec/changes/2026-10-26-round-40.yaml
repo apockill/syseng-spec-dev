@@ -1,0 +1,45 @@
+request: Record the engineer's need for toolkit feedback to flow freely to them
+mode: code-first
+target: python
+status: open
+opened: '2026-10-26'
+entries:
+- op: add
+  id: NEED-30
+  at: 2026-10-26T09:36-07:00
+  reason: a new need the engineer stated.
+  requested: true
+  after:
+    text: The engineer needs the problems agents hit while using the toolkit in any project to reach the engineer freely and easily, including problems an agent works around without saying so.
+    context: The engineer wants to start using the toolkit seriously on other projects, beginning with the sites repository, and worries that an agent could be quietly struggling with the spec without anyone hearing about it. Ideas floated, none chosen yet - a feedback button, agents calling an API, people copying and pasting papercuts to send on, agents opening GitHub issues with their user's consent.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-26 09:36
+      context: Weighing whether to migrate the sites repository now.
+      said: One need for this project is that feedback flows freely and easily to the engineer, so that an agent having problems with the spec while working on another project doesn't go unnoticed; spitballed a feedback button, an API the AI pings, copy-pasted papercuts, and agents filing GitHub issues with their user's consent.
+      basis: stated
+      fingerprint: 2ebb6e593842
+- op: add
+  id: DR-75
+  at: 2026-10-26T14:54-07:00
+  reason: the engineer's decision.
+  requested: true
+  after:
+    title: Parallel agents are coordinated by orchestration, not by toolkit support, for now
+    decided_by: engineer
+    elements:
+    - CHANGE
+    requirements: CHANGE-1, CHANGE-2
+    context: In a repository where several agent sessions work at once, as in the sites repository, the toolkit allows one open change per repository, spec edit rewrites whole files without locking, and the done gate checks the whole spec, so parallel sessions block or overwrite each other.
+    decision: The toolkit keeps one open change per repository for now. Parallel work is coordinated by how agents are orchestrated, for example an orchestrator that owns the spec changes with implementers working under it on code. The engineer will find what works best while developing the sites repository and bring it back here.
+    alternatives: One open change per session with file locking and a done gate scoped to the session's own change, which the engineer judged too much overhead for now.
+    consequences: Agents running in parallel on one repository need an orchestrator that owns the open change; the toolkit's skill may later describe the patterns that work.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-26 14:54
+      context: Discussing what happens when several agent sessions work in one repository at once.
+      said: Parallel-change support may be wanted in future but is too much overhead for now; for now the answer is to be clever about orchestrating changes, with orchestrators changing specs and implementers working under them on code, and the engineer will learn the most effective ways by developing the sites repository and pass that knowledge back.
+      basis: stated
+      fingerprint: 50eab42f80f5
+decisions: []
+friction: []

@@ -113,3 +113,20 @@
     - Round 20's D1, resolved before this existed, was finished the same way by hand, with a note on each lock naming the decision.
   alternatives: Reading what an option does from its label, which breaks on the first unusual wording. Leaving keeps to the person item by item, which REVIEW-30 offers too but which makes a one-line answer impossible.
   consequences: Agents fill in the lists when they raise a conflict (the skill says so). An option without them still resolves the decision, and its items stay waiting.
+- id: DR-75
+  title: Parallel agents are coordinated by orchestration, not by toolkit support, for now
+  decided_by: engineer
+  elements:
+  - CHANGE
+  requirements: CHANGE-1, CHANGE-2
+  context: In a repository where several agent sessions work at once, as in the sites repository, the toolkit allows one open change per repository, spec edit rewrites whole files without locking, and the done gate checks the whole spec, so parallel sessions block or overwrite each other.
+  decision: The toolkit keeps one open change per repository for now. Parallel work is coordinated by how agents are orchestrated, for example an orchestrator that owns the spec changes with implementers working under it on code. The engineer will find what works best while developing the sites repository and bring it back here.
+  alternatives: One open change per session with file locking and a done gate scoped to the session's own change, which the engineer judged too much overhead for now.
+  consequences: Agents running in parallel on one repository need an orchestrator that owns the open change; the toolkit's skill may later describe the patterns that work.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-26 14:54
+    context: Discussing what happens when several agent sessions work in one repository at once.
+    said: Parallel-change support may be wanted in future but is too much overhead for now; for now the answer is to be clever about orchestrating changes, with orchestrators changing specs and implementers working under them on code, and the engineer will learn the most effective ways by developing the sites repository and pass that knowledge back.
+    basis: stated
+    fingerprint: 50eab42f80f5
