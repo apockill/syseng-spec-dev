@@ -44,7 +44,7 @@ GENERIC_NOTES = ADAPTERS / "generic" / "instructions.md"
 HOOK_MARK = ".syseng/hook"
 # Toolkit commands agents may run without asking (CLI-20). `lock` and `resolve` record a person's locks and
 # decisions, and `migrate` rewrites records, so they stay with the harness's permission prompt.
-_EVERYDAY = ("status", "check", "show", "render", "edit", "change", "decide", "propose", "friction")
+_EVERYDAY = ("status", "check", "show", "render", "edit", "change", "decide", "propose")
 ALLOWED = [f"Bash(spec {cmd} *)" for cmd in _EVERYDAY]
 _OURS = set(ALLOWED) | {f"Bash(.syseng/spec {cmd} *)" for cmd in _EVERYDAY}  # this and earlier setups' rules
 HOOKS = [  # (event, matcher, argument to the hook script)

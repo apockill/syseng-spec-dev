@@ -68,12 +68,6 @@ def test_view_shows_the_reason_beside_each_change(spec, change):
     assert "~~The core shall stamp each widget.~~ → The core shall stamp each widget twice." in text
 
 
-def test_friction_is_logged_with_a_proposal(spec, change):
-    changes.log_friction(change, "edited YAML by hand", "add `spec edit`")
-    text = changes.view(spec.load(), change)
-    assert "edited YAML by hand" in text and "add `spec edit`" in text
-
-
 def test_change_view_keeps_the_structure_of_multi_line_text(spec, change):
     change.data["entries"] = [{"op": "add", "id": "DR-1", "reason": "design",
                                "after": {"decision": "Three parts:\n- one\n- two"}}]

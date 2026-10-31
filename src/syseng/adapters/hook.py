@@ -72,8 +72,8 @@ def managed(path: Path) -> str | None:
                 f"shows the format). It shows each edit's context, asks for acknowledgments where they're "
                 f"needed, validates the result and logs your reason in the open change.")
     if head == "changes":
-        return (f"Change records are written by `{SPEC} change`, `{SPEC} decide`, `{SPEC} resolve` and "
-                f"`{SPEC} friction`, and `{SPEC} edit` logs every spec edit in them.")
+        return (f"Change records are written by `{SPEC} change`, `{SPEC} decide` and `{SPEC} resolve`, "
+                f"and `{SPEC} edit` logs every spec edit in them.")
     if head in ("locks.yaml", "approvals.yaml"):
         return (f"Only a person locks items. When they have locked named items, record it with "
                 f"`{SPEC} lock <IDs> --via <how>`, adding `--words` with a summary of what they said, never "

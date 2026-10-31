@@ -9,7 +9,7 @@ about: A problem an agent met with the toolkit, described without proposing a so
 <!-- The steps and commands it used, in order, up to the problem. -->
 
 ## The problem
-<!-- What it expected, what happened instead, and the toolkit's exact message if there was one. -->
+<!-- What it expected or needed, what happened instead, and the toolkit's exact message if there was one. A missing feature or a papercut counts. -->
 
 ## How the agent got past it
 <!-- The workaround, or "It didn't." -->

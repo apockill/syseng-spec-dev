@@ -81,7 +81,7 @@ def start(spec: Spec, request: str, mode: str | None, target: str | None, slug: 
     name = f"{today}-round-{n}" + (f"-{_slug(slug)}" if slug else "")
     change = Change(changes_dir(spec) / f"{name}.yaml", {
         "request": request, "mode": mode, "target": target, "status": "open", "opened": today,
-        "entries": [], "decisions": [], "friction": []})
+        "entries": [], "decisions": []})
     change.save()
     return change
 
@@ -169,12 +169,6 @@ def resolve(change: Change, ids: list[str], words: str, option: int | None, by: 
         done.append(i)
     change.save()
     return done
-
-
-def log_friction(change: Change, workaround: str, proposal: str) -> None:
-    """AGENT-46: an agent reports a workaround, with a proposed improvement."""
-    change.data.setdefault("friction", []).append({"workaround": workaround, "proposal": proposal})
-    change.save()
 
 
 def add_proposal(change: Change, ids: list[str], why: str) -> None:

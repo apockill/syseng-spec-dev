@@ -50,7 +50,7 @@ def test_skill_teaches_locks_without_a_ritual():
 
 def test_skill_invites_agents_to_improve_it():
     text = (init.SKILL / "SKILL.md").read_text()
-    assert "## Improving this skill" in text and "friction --workaround" in text
+    assert "## Improving this skill" in text and "references/reporting-problems.md" in text
 
 
 def test_every_command_the_skill_names_exists():

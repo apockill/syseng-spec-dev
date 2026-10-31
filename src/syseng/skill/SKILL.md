@@ -115,4 +115,4 @@ YAML
 
 ## Improving this skill
 
-If something makes you jump through hoops, log it with `spec friction --workaround "…" --proposal "…"` and propose the change. Offer to report any problem with the toolkit, even one you worked around, as an issue (references/reporting-problems.md). Nothing here is fixed, except that people control what gets locked.
+If something makes you jump through hoops, or the toolkit lacks something you needed, offer to report it, even if you worked around it (references/reporting-problems.md). Nothing here is fixed, except that people control what gets locked.

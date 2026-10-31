@@ -9,7 +9,6 @@
   spec edit [--dry-run] < edits.yaml        change the spec (CLI-5 to CLI-8)
   spec decide < decision.yaml               add an open decision with options (CHANGE-10)
   spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12)
-  spec friction --workaround … --proposal … report friction with the toolkit (AGENT-46)
   spec issue [FILE] --title … [--send CODE] report a problem as an issue, with consent (SYS-56)
   spec init [--harness NAME]                set up a repository in one step (SYS-5)
   spec migrate [--dry-run]                  move the spec to the current format, after agents convert words
@@ -380,18 +379,6 @@ def cmd_propose(args) -> int:
     return 0
 
 
-def cmd_friction(args) -> int:
-    spec = _load(args)
-    c = changes.current(spec)
-    if c is None:
-        print("spec friction: no change is open")
-        return 1
-    changes.log_friction(c, args.workaround, args.proposal)
-    render.write_views(model.load(spec.root))
-    print(f"logged in {c.id}; the engineer sees it in the change record")
-    return 0
-
-
 def cmd_issue(args) -> int:
     """CLI-29, CLI-33: a report goes out only with --send; without it, this shows what would go out."""
     if args.template:
@@ -629,10 +616,6 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--words", required=True, help="the engineer's words, as evidence")
     p.add_argument("--option", type=int, help="the option number chosen (default: the recommended one)")
     p.set_defaults(fn=cmd_resolve)
-    p = sub.add_parser("friction", help="report a workaround you needed, with a proposed improvement")
-    p.add_argument("--workaround", required=True)
-    p.add_argument("--proposal", required=True)
-    p.set_defaults(fn=cmd_friction)
     p = sub.add_parser("issue", help="report a problem with the toolkit as an issue, with the engineer's consent",
                        description=issue.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("file", nargs="?", help="the report, written from `spec issue --template`")

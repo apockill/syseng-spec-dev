@@ -1,12 +1,10 @@
 # Reporting a problem with the toolkit
 
-When the toolkit gets in your way, its maintainers can only fix what reaches them. Report anything that stopped you, confused you, or that you worked around without saying so: an error you couldn't act on, a rule that didn't fit, a step that took several tries.
-
-`spec friction` records a workaround in this project's change, for this engineer. A problem report goes to the toolkit's maintainers, as an issue.
+When the toolkit gets in your way, its maintainers can only fix what reaches them. Report anything that stopped you, confused you, slowed you down, or that you worked around without saying so: an error you couldn't act on, a rule that didn't fit, a step that took several tries, something you needed that the toolkit doesn't do. This is the one way to report these, and a report goes to the toolkit's maintainers as an issue.
 
 ## What a report is for
 
-Describe what happened so a maintainer can find the real problem. They may solve it differently from anything you'd think of, so don't propose a solution, not even as a hint. "The batch was refused twice with this message, and I couldn't tell which field was wrong" helps. "Add a `--field` flag" asks them to judge your fix without the problem behind it.
+Describe what happened so a maintainer can find the real problem. They may solve it differently from anything you'd think of, so don't propose a solution, not even as a hint. "The batch was refused twice with this message, and I couldn't tell which field was wrong" helps. A missing feature is reported the same way, as what you needed and why. "Add a `--field` flag" asks them to judge your fix without the problem behind it.
 
 ## Steps
 
