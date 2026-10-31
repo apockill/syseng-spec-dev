@@ -62,9 +62,20 @@ def test_the_git_backend_answers_each_operation(tmp_path):
     run("commit", "-q", "-m", "y")
     run("branch", "-q", "main-line", revision)
     assert git.resolve(tmp_path, "main-line")[0] == revision
+    run("branch", "-q", "main", revision)
+    assert git.trunk(tmp_path) == "main"
+    run("update-ref", "refs/remotes/origin/main", revision)
+    assert git.trunk(tmp_path) == "origin/main"
+    run("symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+    assert git.trunk(tmp_path) == "origin/main"
     (tmp_path / "gen").mkdir()
     git.ignore(tmp_path / "gen")
     git.ignore(tmp_path / "gen")
     assert (tmp_path / ".gitignore").read_text() == "gen/\n"
     with pytest.raises(vcs.VersionControlError):
         git.resolve(tmp_path, "nothing-here")
+
+
+def test_no_trunk_is_an_empty_answer(tmp_path):
+    subprocess.run(["git", "init", "-q", "-b", "side"], cwd=tmp_path, check=True)
+    assert vcs.backend(tmp_path).trunk(tmp_path) == ""

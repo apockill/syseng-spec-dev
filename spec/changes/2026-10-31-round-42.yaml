@@ -1,0 +1,304 @@
+request: State at the top of the review page what it compares against, default to trunk, and link a review page on every pull request
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-31'
+entries:
+- op: add
+  id: REVIEW-40
+  at: 2026-10-31T14:41-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: The review page shall state at its top the version it compares against, naming the version, its revision, how that was resolved, and the newer side.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Needs to know what a review page is diffing against; it isn't clear today and there's no way to know the tooling is respecting the expected base, so the page should state it.
+      basis: stated
+      fingerprint: d45886b2be03
+- op: add
+  id: REVIEW-41
+  at: 2026-10-31T14:41-07:00
+  reason: the engineer's expectation.
+  requested: true
+  after:
+    text: When a person names no base, the review page shall compare against the repository's trunk.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Would typically expect it to diff against trunk and state as such, or, for a stacked pull request, to say it is diffing against that pull request.
+      basis: stated
+      fingerprint: 22a3374f59ff
+- op: add
+  id: REVIEW-42
+  at: 2026-10-31T14:41-07:00
+  reason: the engineer's expectation.
+  requested: true
+  after:
+    text: When a person names a base, the review page shall compare against that base first.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: For a stacked change, expects the page to say it is diffing against whatever the pull request below it is.
+      basis: stated
+      fingerprint: 926abf8f2b39
+- op: add
+  id: REVIEW-43
+  at: 2026-10-31T14:41-07:00
+  reason: follows the engineer's request.
+  after:
+    text: When the page finds no version to compare against, the review page shall say so at its top.
+    traces_to: SYS-48
+    basis: derived
+    why: the engineer needs to know the comparison was respected, so a missing one can't pass silently.
+- op: modify
+  id: REVIEW-24
+  at: 2026-10-31T14:41-07:00
+  reason: the base comes first now; the last review stays one choice away.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 037991754455
+  fingerprint_after: 2cdc79f6723c
+  requested: true
+  before:
+    text: The review page shall show the differences against the person's last review, and against each other version named when the page was generated.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: |-
+        Round 18: planning how the review page shows the differences in the spec.
+      said: Asked whether the diff could compare against main or another commit.
+      basis: guided
+      fingerprint: 037991754455
+  after:
+    text: The review page shall show the differences against its base, and against the person's last review and each other version named when the page was generated.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: |-
+        Round 18: planning how the review page shows the differences in the spec.
+      said: Asked whether the diff could compare against main or another commit.
+      basis: guided
+      fingerprint: 037991754455
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Would typically expect it to diff against trunk.
+      basis: stated
+      fingerprint: 2cdc79f6723c
+  acks:
+    REVIEW-24: the engineer asked for it; the last review stays a choice.
+    REVIEW-V7: still holds.
+    DR-59: the comparison library is unchanged; the default base moves.
+- op: modify
+  id: REVIEW-32
+  at: 2026-10-31T14:41-07:00
+  reason: everything on the page now shares one stated base.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: fe62d522f563
+  fingerprint_after: 594a30d1d9e5
+  requested: true
+  before:
+    text: The review page shall open on an overview of the spec, giving the items added, changed and removed since the person's last review and each measure of the spec's health with its change since then, and marking each measure that got worse.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 16:20
+      context: Hearing that 128 requirements have no verification item, while deciding whether the toolkit is ready for another project.
+      said: Finds statistics like that really helpful. Wants the dashboard's landing page to open with a high-level overview, such as the numbers of changed, edited, new and deleted items, items without verification items, connections between things and tests written, presented cleanly without too much noise. Also wants measures of the project's health that degraded called out visually, for example when a change lowers verification coverage.
+      basis: stated
+      fingerprint: fe62d522f563
+  after:
+    text: The review page shall open on an overview of the spec, giving the items added, changed and removed since its base and each measure of the spec's health with its change since then.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 16:20
+      context: Hearing that 128 requirements have no verification item, while deciding whether the toolkit is ready for another project.
+      said: Finds statistics like that really helpful. Wants the dashboard's landing page to open with a high-level overview, such as the numbers of changed, edited, new and deleted items, items without verification items, connections between things and tests written, presented cleanly without too much noise. Also wants measures of the project's health that degraded called out visually, for example when a change lowers verification coverage.
+      basis: stated
+      fingerprint: fe62d522f563
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Would typically expect it to diff against trunk and state as such.
+      basis: stated
+      fingerprint: 594a30d1d9e5
+  acks:
+    REVIEW-32: the engineer asked for one stated base.
+    REVIEW-V14: still holds; the baseline is the base.
+    DR-69: the overview still leads; its comparison follows the base.
+- op: modify
+  id: REVIEW-33
+  at: 2026-10-31T14:41-07:00
+  reason: everything on the page now shares one stated base.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 5ad478570d49
+  fingerprint_after: f1b8f9d39b8d
+  requested: true
+  before:
+    text: Wherever the review page shows an item that changed since the person's last review, it shall mark the item as new or as edited, naming the kind of edit.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 16:10
+      context: Reviewing the agent's recommended items on the review page, several shown as locked to an earlier version.
+      said: When the AI asks them to review something it isn't always clear whether the item was edited or added, and they want that made clear.
+      basis: stated
+      fingerprint: 5ad478570d49
+  after:
+    text: Wherever the review page shows an item that changed since its base, it shall mark the item as new or as edited, naming the kind of edit.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-22 16:10
+      context: Reviewing the agent's recommended items on the review page, several shown as locked to an earlier version.
+      said: When the AI asks them to review something it isn't always clear whether the item was edited or added, and they want that made clear.
+      basis: stated
+      fingerprint: 5ad478570d49
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Would typically expect it to diff against trunk and state as such.
+      basis: stated
+      fingerprint: f1b8f9d39b8d
+  acks:
+    REVIEW-33: the engineer asked for one stated base.
+    REVIEW-V16: still holds.
+- op: modify
+  id: VCS-1
+  at: 2026-10-31T14:41-07:00
+  reason: the review page's default base needs the trunk.
+  before:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, reads a setting, gives the repository's address, and keeps generated files out of version control.
+  after:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, names the trunk, reads a setting, gives the repository's address, and keeps generated files out of version control.
+  acks:
+    VCS-V1: its test gains the trunk.
+- op: add
+  id: AGENT-76
+  at: 2026-10-31T14:41-07:00
+  reason: the engineer can't review a pull request without one.
+  requested: true
+  after:
+    text: For each pull request that changes the spec, the agent shall publish a review page compared against the pull request's base and link it at the top of the pull request.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how a pull request is meant to be reviewed when no review page is linked on it.
+      said: Asked how they are supposed to review a pull request with no review page linked on it.
+      basis: stated
+      fingerprint: 343bed57f59a
+- op: add
+  id: REVIEW-V20
+  at: 2026-10-31T14:43-07:00
+  reason: covers the stated base.
+  after:
+    verifies:
+    - REVIEW-40
+    - REVIEW-43
+    method: test
+    technique: unit test
+    description: The generated page has the comparison in its header and carries the version, revision and how it was resolved; with nothing to compare against, the data says so and the page's script has the message. How it looks is not tested.
+    tests:
+      python:
+      - tests/test_review_base.py::test_the_page_states_its_base_at_the_top
+      - tests/test_review_base.py::test_the_page_says_when_it_found_nothing_to_compare_against
+- op: add
+  id: REVIEW-V21
+  at: 2026-10-31T14:43-07:00
+  reason: covers the default.
+  after:
+    verifies:
+    - REVIEW-41
+    method: test
+    technique: unit test
+    description: With no base named, a branch's page compares against the trunk's merge base, and the overview uses the same base.
+    tests:
+      python:
+      - tests/test_review_base.py::test_with_no_base_named_the_page_compares_against_the_trunk
+- op: add
+  id: REVIEW-V22
+  at: 2026-10-31T14:43-07:00
+  reason: covers a named base.
+  after:
+    verifies:
+    - REVIEW-42
+    method: test
+    technique: unit test
+    description: A stacked branch's page, given the branch below it, shows only what changed since that branch.
+    tests:
+      python:
+      - tests/test_review_base.py::test_a_stacked_change_compares_against_the_base_it_names
+- op: modify
+  id: REVIEW-V7
+  at: 2026-10-31T14:43-07:00
+  reason: covers the last review as a choice.
+  before:
+    tests:
+      python:
+      - tests/test_review_page.py::test_the_page_is_one_offline_file_with_every_section_in_order
+      - tests/test_review_page.py::test_the_review_command_writes_the_page_beside_the_hook_ignored_by_version_control
+      - tests/test_review_page.py::test_the_page_lists_conflicts_first_and_proposes_items_to_lock_with_reasons
+      - tests/test_render.py::test_render_removes_the_markdown_views_and_writes_the_page
+  after:
+    tests:
+      python:
+      - tests/test_review_page.py::test_the_review_command_writes_the_page_beside_the_hook_ignored_by_version_control
+      - tests/test_review_base.py::test_the_persons_last_review_stays_a_choice
+- op: modify
+  id: VCS-V1
+  at: 2026-10-31T14:43-07:00
+  reason: adds the trunk.
+  before:
+    tests:
+      python:
+      - tests/test_vcs.py::test_the_git_backend_answers_each_operation
+      - tests/test_vcs.py::test_nothing_outside_the_backend_calls_git
+  after:
+    tests:
+      python:
+      - tests/test_vcs.py::test_the_git_backend_answers_each_operation
+      - tests/test_vcs.py::test_nothing_outside_the_backend_calls_git
+      - tests/test_vcs.py::test_no_trunk_is_an_empty_answer
+- op: add
+  id: AGENT-V20
+  at: 2026-10-31T14:43-07:00
+  reason: covers the guidance.
+  after:
+    verifies:
+    - AGENT-76
+    method: test
+    technique: unit test
+    description: The skill's guidance gives every pull request that changes the spec its own page against its base, linked at the top. Whether agents follow it isn't tested.
+    tests:
+      python:
+      - tests/test_skill.py::test_every_pull_request_gets_a_review_page_against_its_base
+- op: modify
+  id: REVIEW-V7
+  at: 2026-10-31T14:44-07:00
+  reason: keeps the links the last edit dropped by mistake, with the new one.
+  before:
+    tests:
+      python:
+      - tests/test_review_page.py::test_the_review_command_writes_the_page_beside_the_hook_ignored_by_version_control
+      - tests/test_review_base.py::test_the_persons_last_review_stays_a_choice
+  after:
+    tests:
+      python:
+      - tests/test_review_page.py::test_the_page_is_one_offline_file_with_every_section_in_order
+      - tests/test_review_page.py::test_the_review_command_writes_the_page_beside_the_hook_ignored_by_version_control
+      - tests/test_review_page.py::test_the_page_lists_conflicts_first_and_proposes_items_to_lock_with_reasons
+      - tests/test_render.py::test_render_removes_the_markdown_views_and_writes_the_page
+      - tests/test_review_base.py::test_the_persons_last_review_stays_a_choice
+decisions: []
+closed: '2026-10-31'

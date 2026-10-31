@@ -526,8 +526,10 @@ def cmd_review(args) -> int:
     awaiting = len(data["awaiting"]["decisions"]) + len(data["awaiting"]["alterations"])
     print(f"wrote {out}")
     print(f"  open it: file://{out.resolve()}")
-    print(f"  {awaiting} awaiting a decision, {len(data['changes'][0]['items']) if data['changes'] else 0} items changed "
-          f"since {data['changes'][0]['older']['label'] if data['changes'] else 'the last review'}, "
+    compared = data["meta"]["compared"]
+    print(f"  compared against {compared['label']} at {compared['short']}" if compared
+          else "  compared against nothing: no base was found. Name one with --against")
+    print(f"  {awaiting} awaiting a decision, {len(data['changes'][0]['items']) if data['changes'] else 0} items changed, "
           f"{len(data['captured'])} intent records captured, {len(data['proposals'])} proposed for locking")
     return 0
 
@@ -729,7 +731,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("review", help="generate the review page (or print one of its sections)",
                        description=pagedata.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--against", action="append", metavar="REV",
-                   help="also compare against this branch, tag or commit; repeat for several")
+                   help="compare against this branch, tag or commit, in place of the trunk; repeat to offer more")
     p.add_argument("--person", help="who the page is for, as Name <email> (default: the person this machine records)")
     p.add_argument("--out", help="where to write the page (default: .syseng/review.html)")
     p.add_argument("--results-dir", help="where test results are kept; default .syseng/results")

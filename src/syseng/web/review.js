@@ -480,7 +480,7 @@
     const words = { added: "added", removed: "removed", meaning: "changed", reworded: "reworded", moved: "moved", intent: "intent only", details: "details only" };
     const kinds = { need: "needs", system: "system requirements", constraint: "constraints", requirement: "requirements", vi: "verification items", decision: "decisions", element: "elements" };
     const counts = Object.entries(o.changes || {});
-    box.append(h("div", { class: "since" }, h("span", { class: "small" }, `Since ${o.since || "the last commit"}`),
+    box.append(h("div", { class: "since" }, h("span", { class: "small" }, `Since ${o.since || "nothing: no base was found"}`),
       counts.length ? counts.map(([c, n]) => h("span", { class: "cls cls-" + c }, `${n} ${words[c] || c}`)) : h("span", { class: "small" }, "nothing changed"),
       Object.keys(o.by_kind || {}).length ? h("span", { class: "small muted kinds" }, Object.entries(o.by_kind).map(([k, cs]) =>
         `${kinds[k] || k}: ${Object.entries(cs).map(([c, n]) => `${n} ${words[c] || c}`).join(", ")}`).join(" · ")) : null));
@@ -823,6 +823,11 @@
     document.getElementById("person").replaceChildren(icon("user", "sm"), inp);
     document.getElementById("repo").textContent = META.repository;
     document.getElementById("when").textContent = `${META.generated} · ${META.revision.slice(0, 7)}${META.dirty ? " + uncommitted" : ""}`;
+    // what everything on this page is measured against (REVIEW-40, REVIEW-43)
+    const cmp = META.compared, bar = document.getElementById("compared");
+    bar.classList.toggle("none", !cmp);
+    bar.textContent = cmp ? `Comparing ${cmp.newer} against ${cmp.label} at ${cmp.short}` + (cmp.note && !cmp.note.endsWith(cmp.short) ? ` (${cmp.note})` : "")
+      : "Compared against nothing: no base was found, so nothing here is marked as changed.";
     const t = document.getElementById("theme");
     const changed = Object.values(CHANGE).filter((c) => c.cls !== "added").length;
     t.before(h("button", { class: "act diffs" + (diffAll ? " on" : ""), id: "diffs", type: "button", "aria-pressed": diffAll,
@@ -898,7 +903,7 @@
     const L = [];
     const group = (title, list) => { if (list.length) { L.push(`${title}:`); list.forEach((x) => L.push(`- ${x}`)); L.push(""); } };
     L.push(`## Spec review by ${who}`, "");
-    L.push(`Review ${META.review} of ${META.repository} at ${META.revision.slice(0, 7)}${META.dirty ? " with uncommitted changes" : ""}, made ${META.generated}.`, "");
+    L.push(`Review ${META.review} of ${META.repository} at ${META.revision.slice(0, 7)}${META.dirty ? " with uncommitted changes" : ""}, made ${META.generated}, compared against ${META.compared ? `${META.compared.label} at ${META.compared.short}` : "nothing"}.`, "");
     group("Locked", items.filter(([, s]) => s.lock === true).map(([id]) => label(id)));
     group("Unlocked", items.filter(([, s]) => s.lock === false).map(([id]) => label(id)));
     group("Kept", items.filter(([, s]) => s.alteration === "keep").map(([id]) => label(id)));

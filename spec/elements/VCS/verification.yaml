@@ -9,6 +9,7 @@
     python:
     - tests/test_vcs.py::test_the_git_backend_answers_each_operation
     - tests/test_vcs.py::test_nothing_outside_the_backend_calls_git
+    - tests/test_vcs.py::test_no_trunk_is_an_empty_answer
 - id: VCS-V2
   verifies:
   - VCS-2

@@ -155,3 +155,9 @@ def test_problem_reports_need_consent_general_terms_and_no_solution():
 def test_agents_ask_for_a_reader_before_writing_their_own():
     text = (init.SKILL / "references" / "test-results.md").read_text()
     assert "offer to ask for one with a problem report" in text and "before writing a conversion of your own" in text
+
+
+def test_every_pull_request_gets_a_review_page_against_its_base():
+    text = (init.SKILL / "references" / "review-and-locks.md").read_text()
+    assert "Every pull request that changes the spec gets its own page" in text
+    assert "`spec review --against <its base branch>`" in text and "linked at the top of its description" in text

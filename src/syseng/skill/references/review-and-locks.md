@@ -38,9 +38,11 @@ An ordinary open decision is the same without `kind`, `keeps` and `rolls_back`. 
 
 ## Handing over the review page
 
-Run `spec review` (add `--against main` on a branch). Where your harness can publish a private web page, as Claude's artifacts do, publish it there and give the person the link, on the pull request too when there is one. Otherwise give the file's location. Don't publish when your instructions confine you to the machine or a sandbox.
+Run `spec review`. It compares against the trunk unless you name a base, and states its base at the top of the page. For a pull request, name the pull request's own base, so a stacked pull request compares against the one beneath it: `spec review --against <its base branch>`.
 
-The page shows, in order: the conflicts and decisions awaiting the person, your responses to their last feedback, what changed since their last review, the intent you captured, the items most worth locking, the system as a graph, and the full spec. Everything on it is available to you too: `spec review --section <awaiting|responses|changes|captured|proposals|graph|items>`, and `spec diff`.
+Where your harness can publish a private web page, as Claude's artifacts do, publish it there and give the person the link. Otherwise give the file's location. **Every pull request that changes the spec gets its own page, linked at the top of its description:** the person reviews it there, so a pull request without one can't be reviewed. Publish a new page when the branch changes, and say what it compares against beside the link. Don't publish when your instructions confine you to the machine or a sandbox.
+
+The page shows, in order: the conflicts and decisions awaiting the person, your responses to their last feedback, what changed since the base, the intent you captured, the items most worth locking, the system as a graph, and the full spec. Everything on it is available to you too: `spec review --section <awaiting|responses|changes|captured|proposals|graph|items>`, and `spec diff`.
 
 ## Reporting
 

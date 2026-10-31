@@ -61,6 +61,15 @@ class Git(Backend):
             raise VersionControlError(f"{label!r} names no branch, tag or commit here")
         return rev, self.short(repo, rev)
 
+    def trunk(self, repo):
+        declared = _quiet(repo, "symbolic-ref", "--short", "refs/remotes/origin/HEAD")
+        if declared:
+            return declared
+        for name in ("origin/main", "origin/master", "main", "master"):
+            if _exists(repo, f"refs/remotes/{name}") or _exists(repo, f"refs/heads/{name}"):
+                return name
+        return ""
+
     def extract(self, repo, revision, path, into):
         try:
             data = subprocess.run(["git", "archive", "--format=tar", revision, path], cwd=repo, capture_output=True,

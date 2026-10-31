@@ -38,6 +38,10 @@ class Backend(ABC):
         to its base with `newer`, the current revision when that's None."""
 
     @abstractmethod
+    def trunk(self, repo: Path) -> str:
+        """A label for the line of work everything lands on, or "" when there's no telling."""
+
+    @abstractmethod
     def extract(self, repo: Path, revision: str, path: str, into: Path) -> None:
         """Copies `path`, relative to the repository's top, as it was at a revision into a directory."""
 

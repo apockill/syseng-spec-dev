@@ -127,20 +127,31 @@ def responses(spec: Spec, person: str) -> list[dict]:
 
 
 # ---------------------------------------------------------------- what changed
-def change_sets(spec: Spec, person: str, against: list[str]) -> list[dict]:
-    out = []
+def _since_review(spec: Spec, person: str) -> dict | None:
     try:
-        first = diff.since_review(spec, person, inspect=health.metrics)
+        d = diff.since_review(spec, person, inspect=health.metrics)
     except diff.DiffError:
-        try:
-            first = diff.between(spec, "HEAD", inspect=health.metrics)
-            first.older.note = (first.older.note + "; " if first.older.note else "") + "no review sent back yet"
-        except diff.DiffError:
-            first = None
-    for d in [first] + [_safe_between(spec, a) for a in against]:
-        if d is not None:
-            out.append({**d.to_data(), "measured": d.inspected})
-    return out
+        return None
+    return {**d.to_data(), "measured": d.inspected}
+
+
+def change_sets(spec: Spec, person: str, against: list[str]) -> list[dict]:
+    """The comparisons the page offers. The first is the page's base, the one everything on it is measured against:
+    the base the person named, otherwise the trunk (REVIEW-41, REVIEW-42); then the person's last review."""
+    repo = spec.repo_root()
+    named = against or [t for t in [vcs.backend(repo).trunk(repo)] if t]
+    out = [{**d.to_data(), "measured": d.inspected} for d in (_safe_between(spec, a) for a in named) if d is not None]
+    review = _since_review(spec, person)
+    return out + [review] if review else out
+
+
+def _compared(repo, sets: list[dict]) -> dict | None:
+    """What the page says at its top it compares against (REVIEW-40), or None when it found nothing (REVIEW-43)."""
+    if not sets:
+        return None
+    older, newer = sets[0]["older"], sets[0]["newer"]
+    return {"label": older["label"], "revision": older["revision"], "note": older["note"], "newer": newer["label"],
+            "short": vcs.backend(repo).short(repo, older["revision"])}
 
 
 def overview(spec: Spec, person: str, sets: list[dict]) -> dict:
@@ -149,7 +160,7 @@ def overview(spec: Spec, person: str, sets: list[dict]) -> dict:
     first = sets[0] if sets else None
     was, source = None, None
     last = diff.last_review(spec, person)
-    if last:  # what the person's last page showed, when this machine kept it
+    if last and first and first["older"]["label"] == "your last review":  # what that page showed, if kept here
         import json
         snap = spec.repo_root() / ".syseng" / "reviews" / f"{last.get('review')}.json"
         if snap.exists():
@@ -164,7 +175,7 @@ def overview(spec: Spec, person: str, sets: list[dict]) -> dict:
 
 def _safe_between(spec: Spec, label: str):
     try:
-        return diff.between(spec, label)
+        return diff.between(spec, label, inspect=health.metrics)
     except diff.DiffError:
         return None
 
@@ -245,7 +256,7 @@ def build(spec: Spec, person: str, against: list[str] | None = None) -> dict:
     data = {
         "meta": {"review": hashlib.sha256(f"{revision}{now}{person}".encode()).hexdigest()[:10], "person": person,
                  "generated": now, "revision": revision, "dirty": dirty, "repository": repo.name,
-                 "levels": list(levels.ORDER),
+                 "levels": list(levels.ORDER), "compared": _compared(repo, sets),
                  "change": _newest_change(spec),  # the agent's current recommendations are this change's (REVIEW-37)
                  "applied": [r.get("review") for r in levels.reviews(spec) if r.get("by") == person]},
         "overview": overview(spec, person, sets),
