@@ -1,0 +1,288 @@
+request: Link existing tests the coverage audit found, and settle how system requirements are verified
+mode: code-first
+target: python
+status: open
+opened: '2026-10-31'
+entries:
+- op: modify
+  id: MODEL-V10
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
+      - tests/test_approvals.py::test_approve_command_records_fingerprint_and_words
+  after:
+    tests:
+      python:
+      - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
+      - tests/test_approvals.py::test_approve_command_records_fingerprint_and_words
+      - tests/test_approvals.py::test_approve_refuses_unknown_ids
+      - tests/test_edit.py::test_test_link_changes_are_logged_and_shown
+- op: modify
+  id: CHECK-V1
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_one_run_reports_every_problem
+      - tests/test_check_structure.py::test_malformed_file_is_reported_without_crashing
+  after:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_one_run_reports_every_problem
+      - tests/test_check_structure.py::test_malformed_file_is_reported_without_crashing
+      - tests/test_check_structure.py::test_valid_spec_has_no_errors
+- op: modify
+  id: AGENT-V4
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_hooks.py::test_approvals_that_name_items_by_id_are_read
+      - tests/test_hooks.py::test_approvals_that_need_interpreting_are_not_read
+      - tests/test_hooks.py::test_lines_that_approve_no_items_are_ignored
+      - tests/test_hooks.py::test_chat_approval_is_recorded_without_the_engineers_words
+      - tests/test_hooks.py::test_approval_on_any_line_of_a_longer_message
+      - tests/test_hooks.py::test_quoted_lines_are_not_approvals
+      - tests/test_hooks.py::test_described_exceptions_record_nothing
+      - tests/test_hooks.py::test_lgtm_is_not_an_approval
+      - tests/test_hooks.py::test_pasted_text_is_not_the_engineers_approval
+  after:
+    tests:
+      python:
+      - tests/test_hooks.py::test_approvals_that_name_items_by_id_are_read
+      - tests/test_hooks.py::test_approvals_that_need_interpreting_are_not_read
+      - tests/test_hooks.py::test_lines_that_approve_no_items_are_ignored
+      - tests/test_hooks.py::test_chat_approval_is_recorded_without_the_engineers_words
+      - tests/test_hooks.py::test_approval_on_any_line_of_a_longer_message
+      - tests/test_hooks.py::test_quoted_lines_are_not_approvals
+      - tests/test_hooks.py::test_described_exceptions_record_nothing
+      - tests/test_hooks.py::test_lgtm_is_not_an_approval
+      - tests/test_hooks.py::test_pasted_text_is_not_the_engineers_approval
+      - tests/test_hooks.py::test_unknown_ids_record_nothing
+      - tests/test_skill.py::test_skill_teaches_locks_without_a_ritual
+- op: modify
+  id: CLI-V5
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_init.py::test_init_sets_up_an_empty_repository
+      - tests/test_init.py::test_init_says_when_spec_is_not_on_the_path
+      - tests/test_init.py::test_init_removes_the_launcher_earlier_setups_wrote
+      - tests/test_init.py::test_antigravity_gets_the_skill_without_claude_code_glue
+      - tests/test_init.py::test_existing_spec_is_left_alone
+  after:
+    tests:
+      python:
+      - tests/test_init.py::test_init_sets_up_an_empty_repository
+      - tests/test_init.py::test_init_says_when_spec_is_not_on_the_path
+      - tests/test_init.py::test_init_removes_the_launcher_earlier_setups_wrote
+      - tests/test_init.py::test_antigravity_gets_the_skill_without_claude_code_glue
+      - tests/test_init.py::test_existing_spec_is_left_alone
+      - tests/test_init.py::test_language_is_guessed_from_tests_when_the_root_has_no_build_file
+- op: modify
+  id: CHECK-V2
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_messages.py::test_error_explains_rule
+  after:
+    tests:
+      python:
+      - tests/test_messages.py::test_error_explains_rule
+      - tests/test_messages.py::test_every_rule_is_explained_in_the_rules_page
+      - tests/test_messages.py::test_rule_links_prefer_the_installed_rules_page
+      - tests/test_wording.py::test_issue_spans_point_at_the_offending_words
+- op: modify
+  id: CHECK-V5
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_levels.py::test_each_item_gets_the_level_its_records_give_it
+      - tests/test_levels.py::test_the_highest_level_applies
+      - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
+      - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
+  after:
+    tests:
+      python:
+      - tests/test_levels.py::test_each_item_gets_the_level_its_records_give_it
+      - tests/test_levels.py::test_the_highest_level_applies
+      - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
+      - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
+      - tests/test_results.py::test_a_need_marked_derived_does_not_count_as_a_persons_word
+- op: modify
+  id: VCS-V1
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_vcs.py::test_the_git_backend_answers_each_operation
+      - tests/test_vcs.py::test_nothing_outside_the_backend_calls_git
+      - tests/test_vcs.py::test_no_trunk_is_an_empty_answer
+  after:
+    tests:
+      python:
+      - tests/test_vcs.py::test_the_git_backend_answers_each_operation
+      - tests/test_vcs.py::test_nothing_outside_the_backend_calls_git
+      - tests/test_vcs.py::test_no_trunk_is_an_empty_answer
+      - tests/test_results.py::test_results_stay_out_of_version_control_and_can_live_elsewhere
+- op: add
+  id: CHANGE-V13
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - CHANGE-1
+    method: test
+    technique: unit test
+    description: A change records its spec-first mode, and in that mode a change to what a person stated waits for the person.
+    tests:
+      python:
+      - tests/test_edit.py::test_spec_first_mode_is_recorded
+      - tests/test_levels.py::test_spec_first_refuses_to_change_what_a_person_stated
+- op: add
+  id: CHANGE-V14
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - CHANGE-2
+    method: test
+    technique: unit test
+    description: A change defaults to code-first, goes ahead, and the done check asks for the conflict.
+    tests:
+      python:
+      - tests/test_edit.py::test_change_defaults_to_code_first_and_the_primary_target
+      - tests/test_levels.py::test_code_first_goes_ahead_and_the_done_check_asks_for_the_conflict
+- op: add
+  id: MODEL-V19
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - MODEL-7
+    method: test
+    technique: unit test
+    description: Named implementations need no language, and a name the settings do not list is refused.
+    tests:
+      python:
+      - tests/test_results.py::test_status_counts_each_implementation_separately
+      - tests/test_results.py::test_results_are_kept_per_implementation
+      - tests/test_testlinks.py::test_the_checker_reports_broken_links_and_unknown_implementations
+- op: add
+  id: MODEL-V20
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - MODEL-8
+    method: test
+    technique: unit test
+    description: An item links tests per implementation, and each implementation is counted apart.
+    tests:
+      python:
+      - tests/test_results.py::test_status_counts_each_implementation_separately
+      - tests/test_testlinks.py::test_the_checker_reports_broken_links_and_unknown_implementations
+- op: add
+  id: REVIEW-V26
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - REVIEW-2
+    method: test
+    technique: unit test
+    description: The page renders the differences from a named revision to the working tree, and states that revision.
+    tests:
+      python:
+      - tests/test_review_base.py::test_a_stacked_change_compares_against_the_base_it_names
+      - tests/test_review_base.py::test_the_page_states_its_base_at_the_top
+- op: add
+  id: SYS-V13
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - SYS-13
+    method: test
+    technique: unit test
+    description: The status command reports the whole product from recorded results, with nobody present.
+    tests:
+      python:
+      - tests/test_results.py::test_status_counts_each_implementation_separately
+      - tests/test_results.py::test_the_status_prints_for_people
+- op: add
+  id: SYS-V14
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - SYS-18
+    method: test
+    technique: unit test
+    description: A conflict stops nothing while it awaits an answer, and the merge check never fails over locks.
+    tests:
+      python:
+      - tests/test_levels.py::test_code_first_goes_ahead_and_the_done_check_asks_for_the_conflict
+      - tests/test_approvals.py::test_merge_check_never_fails_because_of_approvals
+- op: add
+  id: VERIFY-V14
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - VERIFY-2
+    method: test
+    technique: unit test
+    description: Results for tests and verdicts for reasoning items all set an item's status.
+    tests:
+      python:
+      - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+      - tests/test_results.py::test_a_verdict_is_a_result_named_by_the_item
+- op: add
+  id: VERIFY-V15
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - VERIFY-12
+    method: test
+    technique: unit test
+    description: The status command and the review page's overview show the product's health.
+    tests:
+      python:
+      - tests/test_results.py::test_the_status_prints_for_people
+      - tests/test_review_page.py::test_the_page_opens_on_the_overview_and_agents_can_read_it
+decisions:
+- id: D1
+  kind: conflict
+  question: Can a system requirement be verified by its children alone, when a test of its own would be arbitrary? DR-23, which you locked, says no.
+  importance: This decides what to do with 28 of the 120 unverified requirements, and whether coverage moves from about 67% to about 76% cheaply or takes many new system tests. DR-23 and MODEL-32 say each system requirement gets its own verification in addition to its children's. In round 38 you asked for a way to say a requirement is verified by its children, preferring its own verification where a test wouldn't be arbitrary, and CHECK-32 records that. The two now disagree, and I added five system roll-ups (SYS-V8 to SYS-V12) without noticing they break DR-23, so those are affected too.
+  involves:
+  - DR-23
+  - MODEL-32
+  options:
+  - label: Own verification where it means something, roll-up otherwise
+    recommended: true
+    detail: |-
+      MODEL-32 and DR-23 change to say a system requirement gets its own verification where a test of it wouldn't be arbitrary, and otherwise rolls up from its children, which the checker holds honest (V004: every child must be verified). Example: SYS-33 (what a lock records) rolls up from MODEL-34 and CLI-12, since a separate test would repeat theirs, while SYS-13 (a full run's report) keeps its own. 10 roll-ups are ready now, and 18 more wait for their children. What follows: a system requirement can pass with no end-to-end check. Standard systems-engineering practice accepts verification by analysis of lower-level results, but integration faults between children can slip through, so the important ones should still get their own.
+    keeps:
+    - DR-23
+    - MODEL-32
+  - label: Keep the rule - every system requirement gets its own verification
+    detail: DR-23 stands. Each of the system requirements needs an end-to-end test or demonstration, and the five roll-ups I added become to-dos again. Stronger against integration faults, but about 36 unverified system requirements each need a test, many repeating their children's. Coverage stays near 67% until those are written.
+    rolls_back:
+    - DR-23
+    - MODEL-32
+  status: open

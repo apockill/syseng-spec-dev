@@ -8,6 +8,7 @@
     python:
     - tests/test_check_structure.py::test_one_run_reports_every_problem
     - tests/test_check_structure.py::test_malformed_file_is_reported_without_crashing
+    - tests/test_check_structure.py::test_valid_spec_has_no_errors
 - id: CHECK-V2
   verifies:
   - CHECK-2
@@ -18,6 +19,9 @@
   tests:
     python:
     - tests/test_messages.py::test_error_explains_rule
+    - tests/test_messages.py::test_every_rule_is_explained_in_the_rules_page
+    - tests/test_messages.py::test_rule_links_prefer_the_installed_rules_page
+    - tests/test_wording.py::test_issue_spans_point_at_the_offending_words
 - id: CHECK-V3
   verifies:
   - CHECK-17
@@ -54,6 +58,7 @@
     - tests/test_levels.py::test_the_highest_level_applies
     - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
     - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
+    - tests/test_results.py::test_a_need_marked_derived_does_not_count_as_a_persons_word
 - id: CHECK-V6
   verifies:
   - CHECK-20

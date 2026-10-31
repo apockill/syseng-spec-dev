@@ -102,6 +102,8 @@
     python:
     - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
     - tests/test_approvals.py::test_approve_command_records_fingerprint_and_words
+    - tests/test_approvals.py::test_approve_refuses_unknown_ids
+    - tests/test_edit.py::test_test_link_changes_are_logged_and_shown
 - id: MODEL-V11
   verifies:
   - MODEL-30
@@ -185,3 +187,24 @@
   tests:
     python:
     - tests/test_review_history.py::test_a_review_records_what_the_person_did
+- id: MODEL-V19
+  verifies:
+  - MODEL-7
+  method: test
+  technique: unit test
+  description: Named implementations need no language, and a name the settings do not list is refused.
+  tests:
+    python:
+    - tests/test_results.py::test_status_counts_each_implementation_separately
+    - tests/test_results.py::test_results_are_kept_per_implementation
+    - tests/test_testlinks.py::test_the_checker_reports_broken_links_and_unknown_implementations
+- id: MODEL-V20
+  verifies:
+  - MODEL-8
+  method: test
+  technique: unit test
+  description: An item links tests per implementation, and each implementation is counted apart.
+  tests:
+    python:
+    - tests/test_results.py::test_status_counts_each_implementation_separately
+    - tests/test_testlinks.py::test_the_checker_reports_broken_links_and_unknown_implementations

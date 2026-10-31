@@ -51,6 +51,7 @@
     - tests/test_init.py::test_init_removes_the_launcher_earlier_setups_wrote
     - tests/test_init.py::test_antigravity_gets_the_skill_without_claude_code_glue
     - tests/test_init.py::test_existing_spec_is_left_alone
+    - tests/test_init.py::test_language_is_guessed_from_tests_when_the_root_has_no_build_file
 - id: CLI-V6
   verifies:
   - CLI-10
