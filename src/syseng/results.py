@@ -13,7 +13,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import quote
 
-from syseng import levels, readers, vcs
+from syseng import levels, readers, review, vcs
 from syseng.model import Spec
 
 PASSING, FAILING, NOT_RUN, NOT_IMPLEMENTED = "passing", "failing", "not yet run", "not implemented"
@@ -133,18 +133,20 @@ def _rollup(spec: Spec, vi, implementation: str, found: dict, index: _Index, don
     """A roll-up is as good as what verifies the requirements under it, and a child with nothing verifying it counts
     as not run. It takes no verdict of its own: its children decide."""
     done[vi.id] = (NOT_RUN, "", [], "")  # a roll-up that reaches itself adds nothing
-    seen = []
+    seen, failed = [], []
     for r in vi.data.get("verifies") or []:
         for child in spec.requirements():
             if child.data.get("traces_to") != r:
                 continue
             below = [v for v in spec.of_kind("vi") if child.id in (v.data.get("verifies") or []) and v.id != vi.id]
-            seen += [_status(spec, v, implementation, found, index, done) for v in below] or [(NOT_RUN, "", [], "")]
+            statuses = [_status(spec, v, implementation, found, index, done) for v in below]
+            seen += statuses or [(NOT_RUN, "", [], "")]
+            failed += [v.id for v, s in zip(below, statuses) if s[0] == FAILING]
     words = {s[0] for s in seen}
     status = (FAILING if FAILING in words else NOT_RUN if NOT_RUN in words or not seen
               else NOT_IMPLEMENTED if NOT_IMPLEMENTED in words else PASSING)
     tested = max((s for s in seen if s[3]), key=lambda s: _moment(s[3]), default=(NOT_RUN, "", [], ""))
-    return status, tested[1], [], tested[3]
+    return status, tested[1], sorted(set(failed)), tested[3]
 
 
 def _status(spec: Spec, vi, implementation: str, found: dict, index: _Index, done: dict) -> tuple:
@@ -195,16 +197,43 @@ def unlinked(spec: Spec, implementation: str) -> list[str]:
     return sorted(every - linked)
 
 
-def report(spec: Spec) -> dict:
+def _above(spec: Spec, requirement: str, full: bool) -> tuple[list[str], int]:
+    """What sits above a requirement in the trace, nearest first: a person's direction (explicit and stated items), or
+    everything when `full`. Also how many were left out, so a reader knows there's more (VERIFY-30, VERIFY-32)."""
+    seen, frontier, chain = {requirement}, [requirement], []
+    while frontier:
+        frontier = [p for f in frontier for p in review.parents(spec, f) if p not in seen and p in spec.items]
+        seen.update(frontier)
+        chain += frontier
+    shown = [i for i in chain if full or levels.level_of(spec, i).level in (levels.EXPLICIT, levels.STATED)]
+    return shown, len(chain) - len(shown)
+
+
+def _trace(spec: Spec, row: dict, context: dict, full: bool) -> dict:
+    """A failing item with what it checks and what stands above it. Texts go in `context`, once each (VERIFY-31)."""
+    trace = []
+    for r in row["verifies"]:
+        above, left_out = _above(spec, r, full)
+        trace.append({"requirement": r, "above": above, "left_out": left_out})
+        for i in [r, *above]:
+            if i in spec.items:
+                context.setdefault(i, {"level": levels.level_of(spec, i).level, "text": spec.items[i].data.get("text", "")})
+    return {**row, "checks": spec.items[row["id"]].data.get("description", ""), "trace": trace}
+
+
+def report(spec: Spec, full_trace: bool = False) -> dict:
     """Everything `spec results status` and the review page show."""
     out = {}
     for i in implementations(spec):
         name = i["name"]
         items = rows(spec, name)
+        context: dict[str, dict] = {}
+        failing = sorted((asdict(r) for r in items if r.status == FAILING),
+                         key=lambda r: levels.ORDER.index(r["level"]))
         out[name] = {"primary": bool(i.get("primary")),
                      "counts": {s: sum(1 for r in items if r.status == s) for s in STATUSES},
-                     "failing": sorted((asdict(r) for r in items if r.status == FAILING),
-                                       key=lambda r: levels.ORDER.index(r["level"])),
+                     "failing": [_trace(spec, r, context, full_trace) for r in failing],
+                     "context": context,
                      "not_run_locked": [asdict(r) for r in items if r.status == NOT_RUN and r.locked],
                      "items": [asdict(r) for r in items],
                      "unlinked": unlinked(spec, name)}

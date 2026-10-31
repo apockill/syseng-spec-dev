@@ -63,7 +63,7 @@ def intent_records(data: dict) -> list[dict]:
 
 def _legacy_stated(kind: str, data: dict) -> bool:
     """Older fields that carry a person's words or decision (DR-61's transitional mapping)."""
-    return (kind == "need" or data.get("origin") == "engineer" or bool(data.get("quotes"))
+    return (kind == "need" and data.get("basis") != DERIVED or data.get("origin") == "engineer" or bool(data.get("quotes"))
             or (kind == "decision" and data.get("decided_by") == "engineer"))
 
 

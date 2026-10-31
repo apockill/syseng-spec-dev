@@ -8,6 +8,12 @@
     said: Named software unit tests, reasoning tests and integration tests.
     basis: guided
     fingerprint: 5f78246dc555
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:47
+    context: Reviewing an alteration on the review page (review fb0f2a5e79).
+    said: Kept the item as it now reads.
+    basis: guided
+    fingerprint: 6dd5acabf5b5
 - id: VERIFY-4
   text: After results are recorded, the status command shall report each verification item's status.
   traces_to: SYS-10
@@ -24,6 +30,12 @@
     said: Kept the item as it now reads.
     basis: stated
     fingerprint: 31720a5893b1
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:47
+    context: Reviewing an alteration on the review page (review fb0f2a5e79).
+    said: Kept the item as it now reads.
+    basis: guided
+    fingerprint: 198717f41184
 - id: VERIFY-5
   text: The toolkit shall derive each verification item's status in each implementation from recorded results, as not implemented, not yet run, passing or failing.
   traces_to: SYS-9
@@ -181,3 +193,28 @@
   traces_to: SYS-57
   basis: derived
   why: these items have no tests, and their verdicts need the same way in (D1).
+- id: VERIFY-30
+  text: For each failing verification item, the status command shall show what the item checks, the text of each requirement it verifies, and the text of the explicit and stated items above those requirements in the trace.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:48
+    context: Commenting on VERIFY-4 while reviewing the status command.
+    said: Reporting should be friendly to LLMs by going up the requirement tree, to surface possibly broken requirements. An LLM that sees only a failing verification item may just fix that item; one that also sees the parent requirements, or maybe all locked requirements along the chain, may realize an important requirement has broken, change approach or requirements, and flag it to the user. Prefers the latter, while staying token efficient by pulling in only relevant information.
+    basis: stated
+    fingerprint: ddf2a00d587e
+- id: VERIFY-31
+  text: The status command shall show each requirement's text once in a report, even when more than one failing item reaches it.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:48
+    context: Commenting on VERIFY-4 while reviewing the status command.
+    said: Wants to stay token efficient where possible, pulling in only relevant information.
+    basis: guided
+    fingerprint: '520945854509'
+- id: VERIFY-32
+  text: When asked for the full trace, the status command shall show every item above a failing verification item's requirements.
+  traces_to: SYS-57
+  basis: derived
+  why: the engineer was unsure between all parents and locked ones, so the default stays small and the rest is one flag away.

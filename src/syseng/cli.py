@@ -463,8 +463,16 @@ def _results_add(spec, args) -> int:
     return 0
 
 
+def _traced(iid: str, context: dict, shown: set[str]) -> str:
+    """An item for the failure report: its text the first time, then only its ID (VERIFY-31)."""
+    item = context[iid]
+    first = iid not in shown
+    shown.add(iid)
+    return f"{iid} ({item['level']}): {item['text']}" if first else f"{iid} ({item['level']}), shown above"
+
+
 def _results_status(spec, args) -> int:
-    data = results.report(spec)
+    data = results.report(spec, args.full_trace)
     if args.json:
         print(json.dumps(data, indent=1))
     else:
@@ -474,9 +482,21 @@ def _results_status(spec, args) -> int:
         for name, d in data.items():
             print(f"{name:<20}" + "".join(f"{d['counts'][s]:>17}" for s in results.STATUSES))
         for name, d in data.items():
+            shown: set[str] = set()
             for r in d["failing"]:
-                print(f"\nFAILING {r['id']} ({name}), verifies {', '.join(r['verifies'])} ({r['level']}), last tested "
-                      f"in {short(r['last_tested'])}: {', '.join(r['failed'])}")
+                print(f"\nFAILING {r['id']} ({name}), last tested in {short(r['last_tested'])}: "
+                      f"{', '.join(r['failed'])}")
+                print(f"  checks: {r['checks']}")
+                for t in r["trace"]:
+                    print(f"  verifies {_traced(t['requirement'], d['context'], shown)}")
+                    for i in t["above"]:
+                        print(f"    above: {_traced(i, d['context'], shown)}")
+                    if t["left_out"]:
+                        print(f"    and {t['left_out']} more above, which no person stated (--full-trace shows them)")
+            if any(c["level"] in ("explicit", "stated") for c in d["context"].values()):
+                print("\nA person's direction is in these traces. Before changing a test or a requirement, work out "
+                      "whether that direction still holds. If it doesn't, that's a conflict to raise, not a test to "
+                      "fix.")
             for r in d["not_run_locked"]:
                 print(f"not run {r['id']} ({name}), verifies locked {', '.join(r['verifies'])}")
             if d["unlinked"]:
@@ -709,6 +729,7 @@ def build_parser() -> argparse.ArgumentParser:
     q.set_defaults(fn=cmd_results)
     q = steps.add_parser("status", help="each implementation's health; fails when a verification item is failing")
     q.add_argument("--all", action="store_true", help="list every verification item")
+    q.add_argument("--full-trace", action="store_true", help="show everything above a failing item's requirements")
     q.add_argument("--json", action="store_true")
     q.add_argument("--results-dir", help="where results are kept; default .syseng/results")
     q.set_defaults(fn=cmd_results)
