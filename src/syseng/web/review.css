@@ -316,3 +316,8 @@ dialog pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--
 
 .compared { padding: 6px 16px; font-size: 12.5px; border-top: 1px solid var(--border); overflow-wrap: anywhere; }
 .compared.none { color: var(--st-critical); }
+
+.round { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.round .work { margin: 6px 0; }
+.round .then { margin-top: 8px; }
+button.linkish { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }

@@ -830,3 +830,15 @@
     said: Suggested maybe making this extensible with an interface, implementing it for git, so that supporting another system later is a matter of adding an implementation.
     basis: guided
     fingerprint: e09784ed7a2d
+- id: SYS-60
+  kind: system
+  text: Each review page shall show the rounds of review since its base, with what each round decided and what changed after it.
+  serves:
+  - NEED-32
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 15:03
+    context: Describing how a review runs over several pages.
+    said: Needs a way to see the timeline of review rounds and gauge roughly the changes made between them.
+    basis: stated
+    fingerprint: cfc6e41ad0b7

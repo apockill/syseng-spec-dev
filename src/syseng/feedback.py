@@ -169,7 +169,7 @@ def apply(spec: Spec, block: records.FeedbackBlock) -> Report:
         entries.append({"n": fid, "by": person, "at": now, "review": block.review, **f, "response": None})
         report.to_answer.append(fid + (f" ({f['id']})" if f.get("id") else ""))
     change.save()
-    _record_review(spec, block, now)
+    _record_review(spec, block, now, report)
     return report
 
 
@@ -213,13 +213,15 @@ def _remove_intent(spec: Spec, iid: str, fix: records.IntentFix, person: str, re
     return result.applied
 
 
-def _record_review(spec: Spec, block: records.FeedbackBlock, now: str) -> None:
-    """MODEL-39: who reviewed, when, and on which version. A page made from uncommitted work also keeps the
-    fingerprints of what it showed, from the local snapshot when there is one."""
+def _record_review(spec: Spec, block: records.FeedbackBlock, now: str, report: Report) -> None:
+    """MODEL-39: who reviewed, when, and on which version, and MODEL-43: what they did. A page made from uncommitted
+    work also keeps the fingerprints of what it showed, from the local snapshot when there is one."""
     path = spec.root / "reviews.yaml"
     reviews = (yamlio.read(path) or []) if path.exists() else []
     entry = {"review": block.review, "by": block.by, "at": now, "generated": block.generated,
              "revision": block.revision, "dirty": block.dirty}
+    did = {"locked": report.locked, "unlocked": report.unlocked, "kept": report.kept, "decided": report.resolved}
+    entry["did"] = {k: list(v) for k, v in did.items() if v}
     if block.dirty:
         snap = spec.root.parent / ".syseng" / "reviews" / f"{block.review}.json"
         if snap.exists():

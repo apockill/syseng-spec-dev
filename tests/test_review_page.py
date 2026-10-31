@@ -214,7 +214,7 @@ def test_since_a_review_of_uncommitted_work_shows_only_what_changed_after_it(rep
 # ---------------------------------------------------------------- round 24: one place for what's for you
 def test_the_first_tab_holds_what_awaits_the_person_then_the_agents_recommendations(repo):
     names = re.search(r"const names = \{(.*?)\};", JS).group(1)                            # REVIEW-20: by signal
-    assert re.findall(r"(\w+): \"", names) == ["awaiting", "altered", "captured", "changes", "items"]
+    assert re.findall(r"(\w+): \"", names) == ["awaiting", "altered", "captured", "changes", "history", "items"]
     for_you = JS[JS.index("function renderForYou()"):JS.index("function subItem(")]
     assert for_you.index("Recommended by the agent") < for_you.index("Decisions waiting") < for_you.index("Answers to your feedback")
     assert "Lock all" in JS and "Earlier recommendations, still unlocked" in JS

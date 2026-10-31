@@ -176,3 +176,12 @@
     - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
     - tests/test_results.py::test_identifiers_from_junit_match_links_of_either_form
     - tests/test_results.py::test_parametrized_results_match_a_bare_link
+- id: MODEL-V18
+  verifies:
+  - MODEL-43
+  method: test
+  technique: unit test
+  description: Applying feedback records what the review locked in its review record.
+  tests:
+    python:
+    - tests/test_review_history.py::test_a_review_records_what_the_person_did

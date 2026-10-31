@@ -228,3 +228,36 @@
   tests:
     python:
     - tests/test_review_base.py::test_a_stacked_change_compares_against_the_base_it_names
+- id: REVIEW-V23
+  verifies:
+  - REVIEW-44
+  - REVIEW-20
+  method: test
+  technique: unit test
+  description: Rounds since the base come in time order with what each did and said, and survive a squash; a review recorded before details were kept is shown as such; agents can read the same history. How the tab looks is not tested.
+  tests:
+    python:
+    - tests/test_review_history.py::test_rounds_come_in_order_with_what_each_did_and_said
+    - tests/test_review_history.py::test_only_reviews_since_the_base_are_this_lines_rounds
+    - tests/test_review_history.py::test_rounds_survive_a_squash_that_removes_their_commits
+    - tests/test_review_history.py::test_an_older_review_without_details_is_said_to_be_so
+    - tests/test_review_history.py::test_agents_can_read_the_history
+- id: REVIEW-V24
+  verifies:
+  - REVIEW-45
+  method: test
+  technique: unit test
+  description: Work appears before the first review and between the rounds it happened in, with its size, ordering times across offsets.
+  tests:
+    python:
+    - tests/test_review_history.py::test_work_shows_between_the_rounds_it_happened_in
+    - tests/test_review_history.py::test_offsets_are_respected_when_ordering
+- id: REVIEW-V25
+  verifies:
+  - REVIEW-46
+  method: test
+  technique: unit test
+  description: The page's script has the tab and the message for when nothing is recommended. Its display is not tested.
+  tests:
+    python:
+    - tests/test_review_history.py::test_the_page_has_the_tab_and_nothing_recommended_says_what_happened

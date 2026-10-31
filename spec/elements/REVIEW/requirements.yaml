@@ -150,7 +150,7 @@
     fingerprint: 39dfccf49e4d
 - id: REVIEW-20
   text: |-
-    The review page shall show tabs ordered from most to least signal: the items agents recommend, each with its reason, together with the decisions awaiting the person and the responses to their feedback; the alterations to items they gave; the intent captured since their last review; the differences since then; and the full spec.
+    The review page shall show tabs ordered from most to least signal: the items agents recommend, each with its reason, together with the decisions awaiting the person and the responses to their feedback; the alterations to items they gave; the intent captured since their last review; the differences since then; the rounds of review; and the full spec.
   traces_to: SYS-45
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -172,6 +172,12 @@
     said: Didn't see the Recommended by the agent section at all, and wants it at the top. Wants tabs instead of one giant page, with the leftmost tab the most important, expecting to rarely visit the second or third tabs, which get more mechanical and carry less signal.
     basis: stated
     fingerprint: 8547216f2e5b
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 15:06
+    context: Describing how a review runs over several pages.
+    said: Suggested a tab showing the rounds of review, while saying the point is traceability.
+    basis: stated
+    fingerprint: 3d34e67c9055
 - id: REVIEW-21
   text: The graph shall lay out the system elements as a tree with their requirements inside them.
   traces_to: SYS-45
@@ -395,3 +401,28 @@
   traces_to: SYS-48
   basis: derived
   why: the engineer needs to know the comparison was respected, so a missing one can't pass silently.
+- id: REVIEW-44
+  text: For each round of review since its base, the review page shall show when it was and who sent it, what they locked, kept and decided, and their comments with the agent's responses.
+  traces_to: SYS-60
+  basis: derived
+  why: this is what makes a round recognizable a day or two later.
+- id: REVIEW-45
+  text: Between rounds of review, the review page shall show each change made, with what was asked and how many items it added, changed and removed.
+  traces_to: SYS-60
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 15:03
+    context: Describing how a review runs over several pages.
+    said: Wants to gauge roughly the changes made between rounds of review.
+    basis: stated
+    fingerprint: b597c60a1da0
+- id: REVIEW-46
+  text: When nothing is recommended, the review page shall say how many rounds of review have happened since its base and when the last one was.
+  traces_to: SYS-60
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 15:03
+    context: Describing how a review runs over several pages.
+    said: Seeing nothing recommended with no clarity on the work so far can be disconcerting.
+    basis: stated
+    fingerprint: 967d4368f53e

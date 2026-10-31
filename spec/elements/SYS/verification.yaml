@@ -83,3 +83,9 @@
   method: analysis
   technique: roll-up
   description: Verified through its children's verification.
+- id: SYS-V12
+  verifies:
+  - SYS-60
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
