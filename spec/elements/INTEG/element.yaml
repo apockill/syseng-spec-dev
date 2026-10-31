@@ -3,5 +3,5 @@ title: Integration-test technique
 parent: VERIFY
 depends_on:
 - REASON
-purpose: Runs a verification item's declared commands, checks their results, and can have a reasoning check judge the output.
+purpose: Integration tests, which the project's tools run and report through result readers.
 related_code: {}

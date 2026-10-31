@@ -18,3 +18,15 @@
     said: Wants to move fast and to decide when expensive checks run, so they run only on request, while cheap checks run after every change.
     basis: stated
     fingerprint: 2f9c3f82b590
+- id: DR-76
+  title: Readers and version-control backends are modules found by name
+  decided_by: agent
+  elements:
+  - VERIFY
+  - VCS
+  requirements: SYS-58, SYS-59
+  context: The engineer wants new formats and version-control systems added easily, and prefers a reader requested through an issue to parsers written per project.
+  decision: Each reader is a file in syseng/readers and each backend a file in syseng/vcs. The package lists its modules, and a format or backend is chosen by module name, so adding one is adding one file. Readers own how test identifiers are built. An outcome given with --id joins its step, while a report replaces it.
+  alternatives: A registry to edit, which breaks the no-change rule. Plugins installed from outside the toolkit, which the engineer's preference for shared readers doesn't need yet.
+  consequences: A reader or backend ships with the toolkit, so a private system's backend needs a toolkit release or a fork until plugins exist.
+  basis: derived

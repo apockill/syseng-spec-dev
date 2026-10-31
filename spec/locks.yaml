@@ -41,6 +41,14 @@
   - 2026-10-11-round-10-cli-editing D1
   text: The checker shall report each test that no verification item links to.
   said: In the overnight review the engineer strongly agreed with listing unlinked tests and the honest coverage measure, and invited locking both in with their direct approval.
+- id: CHECK-4
+  fingerprint: 303ebb1bb4e4
+  locked_at: 2026-10-31T12:10-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 1
+  review: 9a3fdfb9fb
+  text: The checker shall report each verification-item link to a test or file that does not exist.
 - id: CHECK-V14
   fingerprint: 7180cb162341
   locked_at: 2026-10-22T16:00-07:00
@@ -832,6 +840,14 @@
   text: The toolkit shall run expensive verification only when the engineer requests it.
   migrated_from: 7fd9ad8a3c55
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: SYS-12
+  fingerprint: 5673a6ea4d7f
+  locked_at: 2026-10-31T12:10-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  review: 9a3fdfb9fb
+  text: The toolkit shall run expensive verification only when the engineer requests it.
+  note: kept under D1
 - id: SYS-13
   fingerprint: 9afaf723ca4d
   locked_at: '2026-10-11'
@@ -840,6 +856,14 @@
   text: When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
   migrated_from: ff42db86caa1
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: SYS-13
+  fingerprint: 9afaf723ca4d
+  locked_at: 2026-10-31T12:10-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  review: 9a3fdfb9fb
+  text: When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
+  note: kept under D1
 - id: SYS-14
   fingerprint: 548591ff0ebb
   locked_at: '2026-10-11'

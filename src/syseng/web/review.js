@@ -497,6 +497,15 @@
     // the intent mix: how the needs and requirements split across the levels (one ordinal ramp)
     const mix = o.now.mix, total = Object.values(mix).reduce((a, b) => a + b, 0) || 1;
     const before = (o.was || {}).mix || {};
+    // what the pipeline's results say, and what hasn't been run: above all, what verifies a locked requirement (VERIFY-27)
+    const verification = Object.entries(o.verification || {});
+    box.append(h("div", { class: "verification" }, h("div", { class: "small" }, "Verification status, from test results"),
+      h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Implementation"), ["passing", "failing", "not yet run", "not implemented"].map((s) => h("th", {}, s)))),
+        h("tbody", {}, verification.map(([name, v]) => h("tr", {}, h("td", {}, name),
+          ["passing", "failing", "not yet run", "not implemented"].map((s) => h("td", { class: "num" }, String(v.counts[s]))))))),
+      verification.map(([name, v]) => v.not_run_locked.length ? h("details", {}, h("summary", { class: "small" },
+        `${name}: ${v.not_run_locked.length} not run, verifying locked requirements`),
+        h("ul", { class: "small" }, v.not_run_locked.map((r) => h("li", {}, idButton(r.id), ", verifying ", r.verifies.map(idButton))))) : null)));
     box.append(h("div", { class: "mix" }, h("div", { class: "small" }, "Intent mix of needs and requirements"),
       h("div", { class: "mixbar", role: "img", "aria-label": LEVELS.map((l) => `${mix[l]} ${l}`).join(", ") },
         LEVELS.filter((l) => mix[l]).map((l) => h("span", { class: `seg lv-${l}`, style: `flex:${mix[l]}`,

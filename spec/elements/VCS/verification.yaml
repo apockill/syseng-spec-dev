@@ -1,0 +1,32 @@
+- id: VCS-V1
+  verifies:
+  - VCS-1
+  - VCS-3
+  method: test
+  technique: unit test
+  description: The git backend answers each of the interface's operations, and nothing outside the backends calls git.
+  tests:
+    python:
+    - tests/test_vcs.py::test_the_git_backend_answers_each_operation
+    - tests/test_vcs.py::test_nothing_outside_the_backend_calls_git
+- id: VCS-V2
+  verifies:
+  - VCS-2
+  method: test
+  technique: unit test
+  description: A revision name with unusual characters is stored and shown unchanged. Whether code elsewhere compares revisions is otherwise unchecked.
+  tests:
+    python:
+    - tests/test_results.py::test_a_revision_is_never_parsed
+- id: VCS-V3
+  verifies:
+  - VCS-4
+  method: test
+  technique: unit test
+  description: Git is the default, the settings choose a backend, an unknown one is named with what exists, and a new backend module is found.
+  tests:
+    python:
+    - tests/test_vcs.py::test_git_is_the_default_backend
+    - tests/test_vcs.py::test_the_settings_choose_the_backend
+    - tests/test_vcs.py::test_a_new_backend_is_found_without_changing_anything_else
+    - tests/test_results.py::test_an_unknown_backend_is_reported_without_a_traceback

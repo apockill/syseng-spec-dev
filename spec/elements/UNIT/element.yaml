@@ -3,5 +3,5 @@ title: Unit-test technique
 parent: VERIFY
 depends_on:
 - LANG
-purpose: Runs a verification item's linked unit tests in each implementation, through that implementation's language adapter.
+purpose: Unit tests, which the project's tools run and report through result readers.
 related_code: {}

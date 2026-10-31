@@ -127,7 +127,7 @@ def test_an_edit_refuses_an_intent_record_without_a_basis(spec):
 # ---------------------------------------------------------------- who (SYS-43, CLI-11, DR-56)
 def test_the_person_comes_from_the_toolkit_setting_first(tmp_path, monkeypatch):
     answers = {"syseng.author": "Ada <ada@example.com>", "user.name": "agent-bot", "user.email": "bot@example.com"}
-    monkeypatch.setattr(people, "_git", lambda repo, key: answers.get(key, ""))
+    monkeypatch.setattr(people, "_setting", lambda repo, key: answers.get(key, ""))
     assert people.person(tmp_path) == ("Ada <ada@example.com>", "git config syseng.author")
     answers["syseng.author"] = ""
     monkeypatch.setenv("SYSENG_AUTHOR", "Grace <grace@example.com>")

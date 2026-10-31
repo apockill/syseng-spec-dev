@@ -20,6 +20,7 @@ Run the toolkit as `spec` from the repository root. `spec <command> --help` expl
 | The fields of each kind of item, with examples | [references/schema.md](references/schema.md) | 145 lines |
 | Handing over a review page, applying feedback, recording locks, raising conflicts | [references/review-and-locks.md](references/review-and-locks.md) | 75 lines |
 | Running the auditors and reasoning checks | [references/auditing.md](references/auditing.md) | 40 lines |
+| Taking in test results, reading verification status, adding a result format | [references/test-results.md](references/test-results.md) | 45 lines |
 | Reporting a problem with the toolkit | [references/reporting-problems.md](references/reporting-problems.md) | 30 lines |
 | A checker finding you don't understand | [references/rules.md](references/rules.md) (find the code in its contents) | 250 lines |
 
@@ -46,7 +47,7 @@ An item changed since its lock or intent record, and not kept, counts one level 
 3. **Look for conflicts** with explicit and stated items in the affected elements, the elements that depend on them, and above them in the trace. Spec-first: raise each before building. Code-first: build, then raise each with rolling back among the options. No conflict: just build. See references/review-and-locks.md.
 4. **Work.** Code as you normally would.
 5. **Keep the spec in step, in the same change:** update the requirements and verification items the change affects, record a requirement (with `basis: added`) for each feature a user would notice that you add unasked, and a decision record for each design decision.
-6. **Check:** the project's tests, then `spec check`. Fix every error.
+6. **Check:** the project's tests, then `spec check`. Fix every error. Where the project records test results, `spec results status` lists what's failing, what you changed included (references/test-results.md).
 7. **Audit:** fresh-context auditors review your spec updates (references/auditing.md). During onboarding, offer them with their cost instead (references/onboarding.md).
 8. **Hand over** the review page and report in a few lines (references/review-and-locks.md).
 

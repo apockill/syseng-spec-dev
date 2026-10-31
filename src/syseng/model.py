@@ -76,6 +76,8 @@ class Spec:
     nested_element_files: list[Path] = field(default_factory=list)
     repo: Path | None = None  # set when the spec is a scratch copy of one inside this repository
 
+    results_dir: Path | None = None  # where test results are, when not the default (see results.py)
+
     def repo_root(self) -> Path:
         """The repository the spec describes, where test links resolve."""
         return self.repo or self.root.parent

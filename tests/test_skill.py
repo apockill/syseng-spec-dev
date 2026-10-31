@@ -150,3 +150,8 @@ def test_problem_reports_need_consent_general_terms_and_no_solution():
                    "full text", "worked around", "Rewrite everything in general terms"):
         assert phrase in text
     assert "reporting-problems.md" in (init.SKILL / "SKILL.md").read_text()
+
+
+def test_agents_ask_for_a_reader_before_writing_their_own():
+    text = (init.SKILL / "references" / "test-results.md").read_text()
+    assert "offer to ask for one with a problem report" in text and "before writing a conversion of your own" in text

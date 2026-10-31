@@ -11,30 +11,27 @@ agent, so the person comes first from a setting of their own:
 
 import getpass
 import os
-import subprocess
 from pathlib import Path
+
+from syseng import vcs
 
 SETTING = "syseng.author"
 ENV = "SYSENG_AUTHOR"
 
 
-def _git(repo: Path, key: str) -> str:
-    try:
-        return subprocess.run(["git", "config", key], cwd=repo, capture_output=True, text=True,
-                              timeout=10).stdout.strip()
-    except (OSError, subprocess.TimeoutExpired):
-        return ""
+def _setting(repo: Path, key: str) -> str:
+    return vcs.backend(repo).setting(repo, key)
 
 
 def person(repo: Path) -> tuple[str, str]:
     """The person to record, and where that came from."""
-    setting = _git(repo, SETTING)
+    setting = _setting(repo, SETTING)
     if setting:
         return setting, f"git config {SETTING}"
     env = os.environ.get(ENV, "").strip()
     if env:
         return env, f"${ENV}"
-    name, email = _git(repo, "user.name"), _git(repo, "user.email")
+    name, email = _setting(repo, "user.name"), _setting(repo, "user.email")
     if name or email:
         return (f"{name} <{email}>" if name and email else name or email), "git config user.name and user.email"
     return getpass.getuser(), "the login name"
@@ -42,4 +39,4 @@ def person(repo: Path) -> tuple[str, str]:
 
 def is_set(repo: Path) -> bool:
     """Whether the person has a setting of their own, rather than falling back to version control's user."""
-    return bool(_git(repo, SETTING) or os.environ.get(ENV, "").strip())
+    return bool(_setting(repo, SETTING) or os.environ.get(ENV, "").strip())

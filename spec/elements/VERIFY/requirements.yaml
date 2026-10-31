@@ -1,6 +1,5 @@
 - id: VERIFY-2
-  text: |-
-    The runner shall support three techniques in its first release: unit test, integration test and reasoning check.
+  text: The toolkit shall take in results from unit tests, integration tests and reasoning checks.
   traces_to: SYS-10
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -9,18 +8,8 @@
     said: Named software unit tests, reasoning tests and integration tests.
     basis: guided
     fingerprint: 5f78246dc555
-- id: VERIFY-3
-  text: The runner shall run independent verification items in parallel.
-  traces_to: SYS-10
-  intent:
-  - by: Alex Thiele <alex.g.thiele@gmail.com>
-    when: '2026-10-11'
-    context: Date approximate (rounds 1 to 11). Describing how verification items are run.
-    said: Described the skill as having a tool for running them in parallel and reporting back.
-    basis: stated
-    fingerprint: 60235cdf8dcf
 - id: VERIFY-4
-  text: After each run, the runner shall report each verification item's result.
+  text: After results are recorded, the status command shall report each verification item's status.
   traces_to: SYS-10
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -29,9 +18,14 @@
     said: Described the skill as having a tool for running them in parallel and reporting back.
     basis: stated
     fingerprint: 31720a5893b1
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:10
+    context: Reviewing an alteration on the review page (review 9a3fdfb9fb).
+    said: Kept the item as it now reads.
+    basis: stated
+    fingerprint: 31720a5893b1
 - id: VERIFY-5
-  text: |-
-    The runner shall derive each verification item's status in each implementation: not implemented, not yet run, passing or failing.
+  text: The toolkit shall derive each verification item's status in each implementation from recorded results, as not implemented, not yet run, passing or failing.
   traces_to: SYS-9
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -40,8 +34,14 @@
     said: Wants the specs to mark in some way what has been implemented yet and what has not, for example so tests aren't expected to pass where verification items have perhaps been specified but not implemented.
     basis: guided
     fingerprint: 27d7dbc97fb4
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Discussing how verification results should reach the toolkit.
+    said: Wants the toolkit to take in results rather than take over the job of the test runner.
+    basis: stated
+    fingerprint: aac1829305c0
 - id: VERIFY-8
-  text: When an expensive-tier item fails, the runner shall add the failure to the change's open decisions.
+  text: When an expensive-tier item fails, the toolkit shall add the failure to the change's open decisions.
   traces_to: SYS-16
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -60,16 +60,6 @@
     said: Wants the run to come back with, among other things, an AI summary of the health of the code.
     basis: stated
     fingerprint: 8b2e7df2aefb
-- id: VERIFY-14
-  text: When the engineer requests verification of a change, the runner shall include the verification items of every system element that depends, directly or indirectly, on an element the change touched.
-  traces_to: SYS-10
-  intent:
-  - by: Alex Thiele <alex.g.thiele@gmail.com>
-    when: '2026-10-11'
-    context: Date approximate (round 8). Answering Q24, about a shared system element, such as a general utility, that RENDER and PHYSICS both depend on; see DR-8.
-    said: Wants a change to the general utility, when they ask for a comprehensive verification, to trigger the verification items of RENDER and PHYSICS.
-    basis: guided
-    fingerprint: 3489ec816f40
 - id: VERIFY-13
   text: The health summary shall list each system element's verification status, each change the run made with its reason, each item changed since a person gave it, and each requirement without verification.
   traces_to: SYS-13
@@ -77,12 +67,117 @@
     what you'd want to know on returning: what's broken, what agents changed while you were away, and what's waiting for you.
   basis: derived
 - id: VERIFY-15
-  text: The runner shall run each model-judged verification item without the conversation or the spec that produced the work it checks.
+  text: The toolkit shall have each model-judged verification item judged without the conversation or the spec that produced the work it checks.
   traces_to: SYS-11
   basis: derived
   why: the reasoning check's isolation (REASON-2, REASON-5) is the runner's independence requirement for any technique a model judges, so it belongs at the runner's level for the techniques to refine.
 - id: VERIFY-16
-  text: For a requirement the toolkit judges important, the runner shall judge each model-judged verification item more than once.
+  text: For a requirement the toolkit judges important, the toolkit shall have each model-judged verification item judged more than once.
   traces_to: SYS-24
   basis: derived
   why: one sample from a nondeterministic judge tells little; how many runs, and how they combine, is the technique's (REASON-4).
+- id: VERIFY-17
+  text: When given result reports with their format, implementation and step, the results command shall record each test's outcome, when it ran and the revision it ran on.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Describing a CI pipeline that runs tests, exports results and points a spec command at them.
+    said: Ingesting results may take several commands or one pointing at all of them.
+    basis: stated
+    fingerprint: 72beac21d5ff
+- id: VERIFY-18
+  text: When a step reports results again for the same implementation and revision, the results command shall replace that step's earlier results for that revision.
+  traces_to: SYS-57
+  basis: derived
+  why: the command is run again for later steps and for retries, so a retry must not count twice.
+- id: VERIFY-19
+  text: When a step produces no report, the results command shall record an outcome given for a named test.
+  traces_to: SYS-57
+  basis: derived
+  why: infrastructure steps in the engineer's pipeline may give only an exit status.
+- id: VERIFY-20
+  text: Each test's status shall follow its newest recorded result.
+  traces_to: SYS-57
+  basis: derived
+  why: expensive steps run less often than cheap ones, so results from different revisions are combined.
+- id: VERIFY-21
+  text: The status command shall name, for each verification item, the revision in which it was last tested.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Discussing how to show results from older revisions.
+    said: Ideally it would state the exact node where testing last happened, such as the commit, saying last tested in that revision rather than a count of commits; the LLM can work out how old that is if needed.
+    basis: stated
+    fingerprint: 62ddf0c2b86b
+- id: VERIFY-22
+  text: The status command shall show, for each implementation, how many verification items have each status.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Describing a pipeline that ends by inspecting verification items.
+    said: At the end you inspect your verification items and see how the system's health is; one implementation might be fine and working while another is in progress.
+    basis: stated
+    fingerprint: 4db418d2d7f8
+- id: VERIFY-23
+  text: The status command shall list failing verification items by the level of intent of the requirements they verify, highest first.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Describing CI that checks results against the spec and uses them as a to-do list.
+    said: The check can be used as a to-do list for updating the spec, bringing changed requirements to the user if they are important or if locked requirements had to change.
+    basis: guided
+    fingerprint: 18789250a511
+- id: VERIFY-24
+  text: The status command shall list each test in the results that no verification item links.
+  traces_to: SYS-57
+  basis: derived
+  why: this finds unlinked tests in any language, where the source scan reads only Python.
+- id: VERIFY-25
+  text: The results command shall include readers for JUnit XML, for pytest's JUnit XML and for a documented format of one result per line.
+  traces_to: SYS-58
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Reacting to a proposed simple line-by-line result format, and to JUnit XML as the common export.
+    said: Accepted the line-by-line format and prefers obeying existing test standards over making up the toolkit's own format.
+    basis: stated
+    fingerprint: da8252496c19
+- id: VERIFY-26
+  text: When given a format it has no reader for, the results command shall name the formats it reads and suggest asking for a reader through a problem report.
+  traces_to: SYS-58
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+    said: Would rather users open a GitHub issue asking for a reader than hand-roll parsers for the same thing all over the place.
+    basis: stated
+    fingerprint: c188d19e6712
+- id: VERIFY-27
+  text: The review page's overview shall show how many verification items have not been run, listing those that verify locked requirements.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:12
+    context: Answering what should fail a CI pipeline, unsure of the choice and that it may change over time.
+    said: Worried about not hearing about locked requirements that haven't been run. Maybe for now the health check on the dashboard should say what tests haven't been run, so it's clearly surfaced where the spec's health sits and they can choose to run everything or not sit at a low percentage of covered verification items.
+    basis: stated
+    fingerprint: 01ef2bc39aef
+- id: VERIFY-28
+  text: The status command shall exit with failure when a verification item is failing, and otherwise with success.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:12
+    context: Answering what should fail a CI pipeline.
+    said: Chose failing only for now, unsure and expecting it may change over time.
+    basis: guided
+    fingerprint: 83ff62ea759f
+- id: VERIFY-29
+  text: A reasoning check's or manual item's verdict shall be recorded as a result named by the verification item's ID.
+  traces_to: SYS-57
+  basis: derived
+  why: these items have no tests, and their verdicts need the same way in (D1).
