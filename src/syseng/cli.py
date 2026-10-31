@@ -10,6 +10,7 @@
   spec decide < decision.yaml               add an open decision with options (CHANGE-10)
   spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12)
   spec friction --workaround … --proposal … report friction with the toolkit (AGENT-46)
+  spec issue [FILE] --title … [--send CODE] report a problem as an issue, with consent (SYS-56)
   spec init [--harness NAME]                set up a repository in one step (SYS-5)
   spec migrate [--dry-run]                  move the spec to the current format, after agents convert words
   spec diff [OLDER] [NEWER] [--since-review] [--format text|yaml]   what changed in the spec (SYS-48)
@@ -26,8 +27,8 @@ import re
 import sys
 from pathlib import Path
 
-from syseng import (changes, diff, edit, feedback, fingerprint, init, levels, migrate, model, page, pagedata, people,
-                    render, review, yamlio)
+from syseng import (changes, diff, edit, feedback, fingerprint, init, issue, levels, migrate, model, page, pagedata,
+                    people, render, review, yamlio)
 from syseng import check as checker
 
 
@@ -391,6 +392,43 @@ def cmd_friction(args) -> int:
     return 0
 
 
+def cmd_issue(args) -> int:
+    """CLI-29, CLI-33: a report goes out only with --send; without it, this shows what would go out."""
+    if args.template:
+        print(issue.TEMPLATE, end="")
+        return 0
+    if not args.file or not args.title:
+        print("spec issue: give --template, or a report file and --title (start from `spec issue --template`)")
+        return 1
+    try:
+        text = Path(args.file).read_text()
+    except OSError as e:
+        print(f"spec issue: can't read the report: {e}")
+        return 1
+    title, out = issue.full_title(args.title), issue.body(text, issue.toolkit_version())
+    wrong = issue.problems(text)
+    leaks = issue.leaks(f"{title}\n{out}", people.person(Path.cwd())[0], issue.remote_of(Path.cwd()))
+    wrong += [f"it contains {leak}" for leak in leaks]
+    if wrong:
+        print("spec issue: nothing was sent. Rewrite the report in general terms:")
+        print("\n".join(f"- {w}" for w in wrong))
+        return 1
+    shown = issue.code(title, out)
+    if args.send != shown:
+        if args.send:
+            print("spec issue: nothing was sent: this isn't the text that code was shown for.\n")
+        print(f"Would open an issue on the public repository {issue.REPOSITORY}. Show the engineer this exact text, "
+              f"and add --send {shown} only once they agree:\n\nTitle: {title}\n\n{out}", end="")
+        return 1 if args.send else 0
+    try:
+        print(f"sent: {issue.send(title, out)}")
+    except RuntimeError as e:
+        print(f"spec issue: nothing was sent: {e}. Give the engineer this text to file by hand:\n\n"
+              f"Title: {title}\n\n{out}", end="")
+        return 1
+    return 0
+
+
 def cmd_diff(args) -> int:
     """CLI-26: the spec differences between two versions, for agents (the review page renders the same data)."""
     spec = _load(args)
@@ -595,6 +633,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--workaround", required=True)
     p.add_argument("--proposal", required=True)
     p.set_defaults(fn=cmd_friction)
+    p = sub.add_parser("issue", help="report a problem with the toolkit as an issue, with the engineer's consent",
+                       description=issue.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("file", nargs="?", help="the report, written from `spec issue --template`")
+    p.add_argument("--title", help="a short title, free of anything specific to the project")
+    p.add_argument("--template", action="store_true", help="print the report's template")
+    p.add_argument("--send", metavar="CODE", help="send it, with the code the preview gave; only after the engineer agreed")
+    p.set_defaults(fn=cmd_issue)
     p = sub.add_parser("diff", help="what changed in the spec between two versions (default: HEAD to the working tree)",
                        description=diff.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("older", nargs="?", help="a branch (compared at its merge base), tag or commit; default HEAD")

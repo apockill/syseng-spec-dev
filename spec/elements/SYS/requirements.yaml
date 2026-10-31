@@ -782,3 +782,15 @@
     said: Chose to keep spec/ as the default and make the location configurable.
     basis: stated
     fingerprint: 3672fbb445c9
+- id: SYS-56
+  kind: system
+  text: With the engineer's consent, the toolkit shall let an agent report a problem it met with the toolkit as an issue on the toolkit's own repository.
+  serves:
+  - NEED-30
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 11:16
+    context: Choosing a first step for getting agents' problems with the toolkit back to the engineer, from ideas floated earlier.
+    said: GitHub issues filed with the user's consent seem a good first step and should be set up now.
+    basis: stated
+    fingerprint: 263feba6dee3

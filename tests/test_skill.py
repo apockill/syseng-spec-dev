@@ -142,3 +142,11 @@ def test_skill_teaches_how_deep_to_write_requirements():                        
     for part in ("## A. What counts as a noticeable feature", "## B. Where a value goes", "## C. Requirements you infer",
                  "## D. Code that falls short", "## E. Intent read from documents", "## F. Splitting a big element"):
         assert part in depth
+
+
+def test_problem_reports_need_consent_general_terms_and_no_solution():
+    text = (init.SKILL / "references" / "reporting-problems.md").read_text()
+    for phrase in ("don't propose a solution", "repository is public", "ask whether to send it", "Only if they agree",
+                   "full text", "worked around", "Rewrite everything in general terms"):
+        assert phrase in text
+    assert "reporting-problems.md" in (init.SKILL / "SKILL.md").read_text()

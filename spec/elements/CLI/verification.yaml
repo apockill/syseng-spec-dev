@@ -207,3 +207,50 @@
   tests:
     python:
     - tests/test_init.py::test_a_toolkit_installed_with_nix_is_linked_through_the_profile
+- id: CLI-V19
+  verifies:
+  - CLI-29
+  - CLI-30
+  method: test
+  technique: unit test
+  description: The printed template has the four sections, and it matches the form on the toolkit's repository.
+  tests:
+    python:
+    - tests/test_issue.py::test_template_prints_the_sections_and_matches_the_github_form
+- id: CLI-V20
+  verifies:
+  - CLI-31
+  method: test
+  technique: unit test
+  description: A report with an empty section or a section of its own is refused, and nothing is sent.
+  tests:
+    python:
+    - tests/test_issue.py::test_an_empty_section_is_refused
+    - tests/test_issue.py::test_a_section_of_its_own_is_refused
+    - tests/test_issue.py::test_only_the_template_s_sections_pass
+- id: CLI-V21
+  verifies:
+  - CLI-32
+  method: test
+  technique: unit test
+  description: Email addresses, absolute paths, the author's name and the repository's address are found, and any of them stops a send.
+  tests:
+    python:
+    - tests/test_issue.py::test_leaks_are_found
+    - tests/test_issue.py::test_absolute_paths_are_found_under_any_root
+    - tests/test_issue.py::test_the_repository_is_found_from_any_form_of_remote
+    - tests/test_issue.py::test_a_leak_split_by_a_comment_stops_the_send
+    - tests/test_issue.py::test_a_leak_stops_the_send
+- id: CLI-V22
+  verifies:
+  - CLI-33
+  method: test
+  technique: unit test
+  description: Without a code nothing is sent and the text and code are shown; with the code, the title and text passed to the GitHub CLI are those shown; a report edited after its preview is not sent; a failed send prints the text; a missing file is reported.
+  tests:
+    python:
+    - tests/test_issue.py::test_without_send_it_shows_the_text_and_sends_nothing
+    - tests/test_issue.py::test_send_sends_exactly_what_the_preview_showed
+    - tests/test_issue.py::test_a_report_edited_after_its_preview_is_not_sent
+    - tests/test_issue.py::test_a_failed_send_prints_the_text_for_the_engineer
+    - tests/test_issue.py::test_a_missing_report_file_is_reported

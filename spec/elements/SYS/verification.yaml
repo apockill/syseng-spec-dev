@@ -59,3 +59,9 @@
   tests:
     python:
     - tests/test_review.py::test_no_importance_score_is_stored
+- id: SYS-V8
+  verifies:
+  - SYS-56
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification. The real send to GitHub has not been exercised.
