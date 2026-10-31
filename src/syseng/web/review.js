@@ -379,7 +379,7 @@
     el.append(h("h3", { class: "subhead" }, icon("lock", "sm"), "Recommended by the agent"));
     const rounds = DATA.history.rounds;  // nothing to do isn't the same as nothing done (REVIEW-46)
     if (!judged.length) el.append(h("div", { class: "empty" }, "Nothing recommended right now.", rounds.length ? [
-      ` This has been through ${rounds.length} round${rounds.length === 1 ? "" : "s"} of review, the last on ${rounds[rounds.length - 1].at}. `,
+      ` This has been through ${rounds.length} round${rounds.length === 1 ? "" : "s"} of review, the last on ${when(rounds[rounds.length - 1].at)}. `,
       h("button", { type: "button", class: "linkish", onclick: () => showTab("history") }, "See the review history")] : null));
     const groups = [];
     for (const p of judged) {  // one recommendation can name several items: its reason shows once
@@ -779,6 +779,8 @@
   });
 
   // 7. the full spec
+  const when = (at) => String(at).slice(0, 16).replace("T", " ");
+
   // The rounds of review since this page's base, and what changed around them (SYS-60)
   function renderHistory() {
     const el = block("history", "Review history", "compare", `The rounds of review since ${META.compared ? META.compared.label : "the start"}, oldest first, and what changed between them.`);
@@ -790,7 +792,7 @@
     const words = { locked: "Locked", unlocked: "Unlocked", kept: "Kept", decided: "Decided" };
     for (const r of rounds) {
       const did = Object.entries(r.did || {});
-      el.append(h("div", { class: "round" }, h("h3", { class: "subhead" }, `Round ${r.n}`, h("span", { class: "small muted" }, ` ${r.at}, ${r.by}`)),
+      el.append(h("div", { class: "round" }, h("h3", { class: "subhead" }, `Round ${r.n}`, h("span", { class: "small muted" }, ` ${when(r.at)}, ${r.by}`)),
         did.map(([k, list]) => h("div", { class: "small" }, `${words[k] || k}: `, list.map((x) => ITEMS[x] ? [idButton(x), " "] : `${x} `))),
         r.did ? null : h("div", { class: "small muted" }, "What this review locked and kept wasn't recorded then."),
         r.comments.map((c) => h("div", { class: "work" }, h("div", {}, c.id && ITEMS[c.id] ? [idButton(c.id), " "] : null, c.comment),
