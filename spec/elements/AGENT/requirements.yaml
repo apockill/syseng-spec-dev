@@ -659,3 +659,13 @@
     said: Asked how they are supposed to review a pull request with no review page linked on it.
     basis: stated
     fingerprint: 343bed57f59a
+- id: AGENT-77
+  text: Where a project's tests can run, the agent shall record their results before generating a review page.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 15:43
+    context: Asking why every review page showed zero passing and everything not yet run.
+    said: Asked why the table on all these reviews hadn't been filled in.
+    basis: guided
+    fingerprint: 93c1d21b3406

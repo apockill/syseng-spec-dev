@@ -149,3 +149,12 @@
   tests:
     python:
     - tests/test_results.py::test_items_no_person_stated_stay_out_unless_asked_for
+- id: VERIFY-V14
+  verifies:
+  - VERIFY-33
+  method: test
+  technique: unit test
+  description: The status data says whether results are recorded, and the page's script has the message for when none are.
+  tests:
+    python:
+    - tests/test_results.py::test_the_report_says_whether_results_are_recorded

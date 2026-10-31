@@ -191,3 +191,12 @@
   tests:
     python:
     - tests/test_skill.py::test_every_pull_request_gets_a_review_page_against_its_base
+- id: AGENT-V21
+  verifies:
+  - AGENT-77
+  method: test
+  technique: unit test
+  description: The handover guidance tells agents to record test results before generating the page.
+  tests:
+    python:
+    - tests/test_skill.py::test_handover_records_results_first

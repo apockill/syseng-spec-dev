@@ -165,4 +165,4 @@ def test_every_pull_request_gets_a_review_page_against_its_base():
 
 def test_handover_records_results_first():
     text = (init.SKILL / "references" / "review-and-locks.md").read_text()
-    assert text.index("record their results first") < text.index("Then run `spec review`")
+    assert text.index("record their results first") < text.index("Run `spec review`")

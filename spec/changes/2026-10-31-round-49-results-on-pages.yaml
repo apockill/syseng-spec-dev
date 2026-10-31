@@ -1,0 +1,62 @@
+request: Say when a review page has no test results, and record results before handing over
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-31'
+entries:
+- op: add
+  id: VERIFY-33
+  at: 2026-10-31T15:43-07:00
+  reason: an empty table looked like a health report.
+  after:
+    text: When no results are recorded for an implementation, the review page shall say so in place of counting its items as not run.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 15:43
+      context: Asking why every review page showed zero passing and everything not yet run.
+      said: Asked why the table on all these reviews showed nothing but not yet run, and why it hadn't been filled in.
+      basis: guided
+      fingerprint: c4882100a809
+- op: add
+  id: AGENT-77
+  at: 2026-10-31T15:43-07:00
+  reason: nothing told agents to record results before handing over.
+  after:
+    text: Where a project's tests can run, the agent shall record their results before generating a review page.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 15:43
+      context: Asking why every review page showed zero passing and everything not yet run.
+      said: Asked why the table on all these reviews hadn't been filled in.
+      basis: guided
+      fingerprint: 93c1d21b3406
+- op: add
+  id: VERIFY-V14
+  at: 2026-10-31T15:43-07:00
+  reason: covers the message.
+  after:
+    verifies:
+    - VERIFY-33
+    method: test
+    technique: unit test
+    description: The status data says whether results are recorded, and the page's script has the message for when none are.
+    tests:
+      python:
+      - tests/test_results.py::test_the_report_says_whether_results_are_recorded
+- op: add
+  id: AGENT-V21
+  at: 2026-10-31T15:43-07:00
+  reason: covers the guidance.
+  after:
+    verifies:
+    - AGENT-77
+    method: test
+    technique: unit test
+    description: The handover guidance tells agents to record test results before generating the page.
+    tests:
+      python:
+      - tests/test_skill.py::test_handover_records_results_first
+decisions: []
+closed: '2026-10-31'

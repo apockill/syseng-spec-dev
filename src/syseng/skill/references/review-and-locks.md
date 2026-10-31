@@ -38,7 +38,9 @@ An ordinary open decision is the same without `kind`, `keeps` and `rolls_back`. 
 
 ## Handing over the review page
 
-Where the project's tests can run, record their results first (references/test-results.md), or the page has no health to show. Then run `spec review`. It compares against the trunk unless you name a base, and states its base at the top of the page. For a pull request, name the pull request's own base, so a stacked pull request compares against the one beneath it: `spec review --against <its base branch>`.
+Where the project's tests can run, record their results first (references/test-results.md), or the page has no health to show.
+
+Run `spec review`. It compares against the trunk unless you name a base, and states its base at the top of the page. For a pull request, name the pull request's own base, so a stacked pull request compares against the one beneath it: `spec review --against <its base branch>`.
 
 Where your harness can publish a private web page, as Claude's artifacts do, publish it there and give the person the link. Otherwise give the file's location. **Every pull request that changes the spec gets its own page, linked at the top of its description:** the person reviews it there, so a pull request without one can't be reviewed. Publish a new page when the branch changes, and say what it compares against beside the link. Don't publish when your instructions confine you to the machine or a sandbox.
 

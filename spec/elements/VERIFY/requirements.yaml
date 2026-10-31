@@ -218,3 +218,13 @@
   traces_to: SYS-57
   basis: derived
   why: the engineer was unsure between all parents and locked ones, so the default stays small and the rest is one flag away.
+- id: VERIFY-33
+  text: When no results are recorded for an implementation, the review page shall say so in place of counting its items as not run.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 15:43
+    context: Asking why every review page showed zero passing and everything not yet run.
+    said: Asked why the table on all these reviews showed nothing but not yet run, and why it hadn't been filled in.
+    basis: guided
+    fingerprint: c4882100a809
