@@ -140,3 +140,13 @@
   - LANG-2
   note: |-
     LANG-2, in 2026-10-31-round-41: D1, readers replace language adapters.
+- element: CLI
+  ids:
+  - CLI-V21
+  note: |-
+    CLI-V21, in 2026-10-31-round-41-pr4-review: the check it verified is removed.
+- element: CLI
+  ids:
+  - CLI-32
+  note: |-
+    CLI-32, in 2026-10-31-round-41-pr4-review: the engineer found it too prescriptive; they approve the report's text themselves, so what's in it is up to them.

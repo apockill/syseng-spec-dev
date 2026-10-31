@@ -1,0 +1,78 @@
+request: Apply the engineer's review of the problem-report change
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-31'
+entries:
+- op: remove
+  id: CLI-V21
+  at: 2026-10-31T14:52-07:00
+  reason: the check it verified is removed.
+  before:
+    verifies:
+    - CLI-32
+    method: test
+    technique: unit test
+    description: Email addresses, absolute paths, the author's name and the repository's address are found, and any of them stops a send.
+    tests:
+      python:
+      - tests/test_issue.py::test_leaks_are_found
+      - tests/test_issue.py::test_absolute_paths_are_found_under_any_root
+      - tests/test_issue.py::test_the_repository_is_found_from_any_form_of_remote
+      - tests/test_issue.py::test_a_leak_split_by_a_comment_stops_the_send
+      - tests/test_issue.py::test_a_leak_stops_the_send
+- op: remove
+  id: CLI-32
+  at: 2026-10-31T14:52-07:00
+  reason: the engineer found it too prescriptive; they approve the report's text themselves, so what's in it is up to them.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 88531a4a0c71
+  fingerprint_after: null
+  before:
+    text: The CLI shall refuse to send a problem report that contains an email address, an absolute path, the name of the recorded author, or the address of the repository at hand.
+    traces_to: SYS-56
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Saying what the issue template should contain.
+      said: The report should be generified, without leaking information.
+      basis: guided
+      fingerprint: 88531a4a0c71
+  acks:
+    CLI-32: the engineer asked for its removal
+- op: modify
+  id: AGENT-V6
+  at: 2026-10-31T14:52-07:00
+  reason: the engineer found the wording confusing.
+  before:
+    description: The skill has a section that invites agents to improve it, and that section points to reporting problems.
+  after:
+    description: The skill has a section that invites agents to improve it, and that section links to the reference explaining how to report a problem with the toolkit.
+- op: modify
+  id: SYS-V8
+  at: 2026-10-31T14:52-07:00
+  reason: unchanged by this review.
+decisions: []
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-31T14:52-07:00
+  review: fed12f23a3
+  id: CLI-32
+  kind: comment
+  comment: "Feels too perscriptive. THe user is already going to approve the report, its up to them. "
+  response: Removed. The command no longer scans reports; what's in one is up to the engineer, who sees the full text before it's sent. Agents are still told to write in general terms (AGENT-73). The check for empty and extra sections stays for now, because it backs your rule against prescribing a solution.
+  responded: 2026-10-31T14:53-07:00
+- n: F2
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-31T14:52-07:00
+  review: fed12f23a3
+  id: AGENT-V6
+  kind: comment
+  comment: This wording is super confusing lol. Points to what?
+  response: |-
+    Fixed: it now says the section links to the reference explaining how to report a problem with the toolkit.
+  responded: 2026-10-31T14:53-07:00
+closed: '2026-10-31'

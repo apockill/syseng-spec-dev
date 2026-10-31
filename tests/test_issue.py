@@ -4,8 +4,6 @@ import re
 import subprocess
 from pathlib import Path
 
-import pytest
-
 from syseng import cli, issue
 
 REPO = Path(__file__).resolve().parent.parent
@@ -66,44 +64,10 @@ def test_only_the_template_s_sections_pass():
     assert issue.problems(GOOD.replace("\n", "\r\n")) == []
 
 
-def test_leaks_are_found():
-    text = "Mail ada@example.com about /home/ada/app, ~/app and Ada Lovelace's fork of Acme/rocket."
-    found = issue.leaks(text, "Ada Lovelace", "git@github.com:acme/rocket.git")
-    assert found == ["email address ada@example.com", "absolute path on line 1", "the author's name, Ada",
-                     "the author's name, Lovelace", "this repository's address, acme/rocket"]
-    assert issue.leaks(GOOD + "See spec/toolkit.yaml, src/a/b.py and https://example.test/a/b", "Ada Lovelace", "") == []
-
-
-@pytest.mark.parametrize("path", ["/data/app/x", "/Volumes/a/b", "C:\\Users\\ada", "file:///srv/x"])
-def test_absolute_paths_are_found_under_any_root(path):
-    assert issue.leaks(f"see {path}", "", "")
-
-
-@pytest.mark.parametrize("remote", ["ssh://git@github.com:22/acme/rocket.git", "https://github.com/acme/rocket/"])
-def test_the_repository_is_found_from_any_form_of_remote(remote):
-    assert issue.leaks("a fork of acme/rocket", "", remote)
-
-
-def test_a_leak_split_by_a_comment_stops_the_send(tmp_path, capsys, monkeypatch):
-    calls = _sent(monkeypatch)
-    path = _report(tmp_path, GOOD.replace("a web app's spec", "ada@ex<!-- -->ample.com"))
-    assert cli.main(["issue", str(path), "--title", "Refused batch"]) == 1
-    assert "email address" in capsys.readouterr().out
-    assert calls == []
-
-
 def _code(path, capsys):
     cli.main(["issue", str(path), "--title", "Refused batch"])
     out = capsys.readouterr().out
     return out, re.search(r"--send (\w+)", out)[1]
-
-
-def test_a_leak_stops_the_send(tmp_path, capsys, monkeypatch):
-    calls = _sent(monkeypatch)
-    path = _report(tmp_path, GOOD.replace("a web app's spec", "/var/lib/app"))
-    assert cli.main(["issue", str(path), "--title", "Refused batch", "--send", "anything"]) == 1
-    assert "nothing was sent" in capsys.readouterr().out
-    assert calls == []
 
 
 def test_without_send_it_shows_the_text_and_sends_nothing(tmp_path, capsys, monkeypatch):

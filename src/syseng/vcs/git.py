@@ -75,9 +75,6 @@ class Git(Backend):
     def setting(self, repo, key):
         return _quiet(repo, "config", key)
 
-    def address(self, repo):
-        return _quiet(repo, "remote", "get-url", "origin")
-
     def ignore(self, path):
         listing = path.parent / ".gitignore"
         entry = path.name + "/" if path.is_dir() else path.name

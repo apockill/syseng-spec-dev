@@ -232,16 +232,6 @@
     said: The report must not prescribe a solution; the goal is enough context to avoid an XY problem.
     basis: guided
     fingerprint: 2206d433f911
-- id: CLI-32
-  text: The CLI shall refuse to send a problem report that contains an email address, an absolute path, the name of the recorded author, or the address of the repository at hand.
-  traces_to: SYS-56
-  intent:
-  - by: Alex Thiele <alex.g.thiele@gmail.com>
-    when: 2026-10-31 11:16
-    context: Saying what the issue template should contain.
-    said: The report should be generified, without leaking information.
-    basis: guided
-    fingerprint: 88531a4a0c71
 - id: CLI-33
   text: The CLI shall send a problem report only when given the code its preview showed for that exact text.
   traces_to: SYS-56
