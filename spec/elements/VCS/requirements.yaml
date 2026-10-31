@@ -1,5 +1,5 @@
 - id: VCS-1
-  text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, reads a setting, gives the repository's address, and keeps generated files out of version control.
+  text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, reads a setting, and keeps generated files out of version control.
   traces_to: SYS-59
   basis: derived
   why: these are the operations the toolkit uses today.

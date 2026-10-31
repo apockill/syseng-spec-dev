@@ -1,0 +1,18 @@
+request: Drop the repository address from the version-control interface, now nothing uses it
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-31'
+entries:
+- op: modify
+  id: VCS-1
+  at: 2026-10-31T14:53-07:00
+  reason: only the problem report's leak check needed the address, and the engineer had that removed.
+  before:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, reads a setting, gives the repository's address, and keeps generated files out of version control.
+  after:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, reads a setting, and keeps generated files out of version control.
+  acks:
+    VCS-V1: its test no longer covers the address
+decisions: []
+closed: '2026-10-31'
