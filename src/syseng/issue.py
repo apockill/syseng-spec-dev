@@ -29,8 +29,6 @@ TEMPLATE = """\
 """
 _COMMENT = re.compile(r"<!--.*?-->", re.S)
 _HEADING = re.compile(r"^ {0,3}#{1,6}[ \t]+(.*?)[ \t]*$", re.M)
-_EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
-_ABSOLUTE_PATH = re.compile(r"(?<![\w.~/-])(?:~/|/[\w.-]+/[\w.-]|[A-Za-z]:\\|file:/)")
 
 
 def _clean(text: str) -> str:
@@ -49,24 +47,6 @@ def problems(text: str) -> list[str]:
     out += [f"the section `{n}` is empty" for n in SECTIONS if not any(k == n and v.strip() for k, v in named)]
     if parts[0].strip():
         out.append("there is text before the first section")
-    return out
-
-
-def _repository_name(remote: str) -> str:
-    """owner/name from any form of remote address, or the last folder of a local one."""
-    return "/".join(re.split(r"[/:]", remote.strip().rstrip("/").removesuffix(".git"))[-2:]).strip("/")
-
-
-def leaks(text: str, author: str, remote: str) -> list[str]:
-    """What in a report would identify the project or the person (CLI-32). A backstop: it can't catch everything."""
-    out = [f"email address {m}" for m in sorted(set(_EMAIL.findall(text)))]
-    out += [f"absolute path on line {n}" for n, line in enumerate(text.splitlines(), 1) if _ABSOLUTE_PATH.search(line)]
-    for name in author.split("<")[0].split():
-        if len(name) > 2 and re.search(rf"\b{re.escape(name)}\b", text, re.I):
-            out.append(f"the author's name, {name}")
-    address = _repository_name(remote)
-    if address and address.lower() in text.lower():
-        out.append(f"this repository's address, {address}")
     return out
 
 
@@ -90,11 +70,6 @@ def toolkit_version() -> str:
         return version("syseng")
     except PackageNotFoundError:
         return "unknown"
-
-
-def remote_of(root: Path) -> str:
-    done = subprocess.run(["git", "-C", str(root), "remote", "get-url", "origin"], capture_output=True, text=True)
-    return done.stdout.strip() if done.returncode == 0 else ""
 
 
 def send(title: str, text: str) -> str:

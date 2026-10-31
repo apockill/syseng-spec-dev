@@ -65,7 +65,7 @@
   - AGENT-45
   method: inspection
   technique: unit test
-  description: The skill has a section that invites agents to improve it, and that section points to reporting problems.
+  description: The skill has a section that invites agents to improve it, and that section links to the reference explaining how to report a problem with the toolkit.
   tests:
     python:
     - tests/test_skill.py::test_skill_invites_agents_to_improve_it

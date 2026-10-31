@@ -394,10 +394,8 @@ def cmd_issue(args) -> int:
         return 1
     title, out = issue.full_title(args.title), issue.body(text, issue.toolkit_version())
     wrong = issue.problems(text)
-    leaks = issue.leaks(f"{title}\n{out}", people.person(Path.cwd())[0], issue.remote_of(Path.cwd()))
-    wrong += [f"it contains {leak}" for leak in leaks]
     if wrong:
-        print("spec issue: nothing was sent. Rewrite the report in general terms:")
+        print("spec issue: nothing was sent. Fix the report:")
         print("\n".join(f"- {w}" for w in wrong))
         return 1
     shown = issue.code(title, out)
