@@ -1,7 +1,7 @@
 request: Take in test results from separate pipeline steps through extensible readers, and reach version control through an interface
 mode: spec-first
 target: python
-status: open
+status: closed
 opened: '2026-10-31'
 entries:
 - op: add
@@ -1394,3 +1394,4 @@ feedback:
   response: |-
     Went with failing only for now, and it stays easy to change. For your worry: the review page's overview now shows how many verification items haven't been run, how many of those verify locked requirements, and lists them (VERIFY-27), and spec results status prints the same. So a low number is visible and you can decide what to run.
   responded: 2026-10-31T12:11-07:00
+closed: '2026-10-31'
