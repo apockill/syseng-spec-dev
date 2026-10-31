@@ -205,7 +205,7 @@
   - REVIEW-43
   method: test
   technique: unit test
-  description: The generated page has the comparison in its header and carries the version, revision and how it was resolved; with nothing to compare against, the data says so and the page's script has the message. How it looks is not tested.
+  description: The generated page has the comparison in its header and carries the version, revision and how it was resolved; with nothing to compare against, the data says so and the page's script has the message.
   tests:
     python:
     - tests/test_review_base.py::test_the_page_states_its_base_at_the_top
