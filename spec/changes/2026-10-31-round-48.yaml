@@ -1,0 +1,8 @@
+request: Say when a review page has no test results, and record results before handing over
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-31'
+entries: []
+decisions: []
+closed: '2026-10-31'
