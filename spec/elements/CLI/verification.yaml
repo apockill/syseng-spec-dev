@@ -228,19 +228,6 @@
     - tests/test_issue.py::test_an_empty_section_is_refused
     - tests/test_issue.py::test_a_section_of_its_own_is_refused
     - tests/test_issue.py::test_only_the_template_s_sections_pass
-- id: CLI-V21
-  verifies:
-  - CLI-32
-  method: test
-  technique: unit test
-  description: Email addresses, absolute paths, the author's name and the repository's address are found, and any of them stops a send.
-  tests:
-    python:
-    - tests/test_issue.py::test_leaks_are_found
-    - tests/test_issue.py::test_absolute_paths_are_found_under_any_root
-    - tests/test_issue.py::test_the_repository_is_found_from_any_form_of_remote
-    - tests/test_issue.py::test_a_leak_split_by_a_comment_stops_the_send
-    - tests/test_issue.py::test_a_leak_stops_the_send
 - id: CLI-V22
   verifies:
   - CLI-33

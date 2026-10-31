@@ -50,10 +50,6 @@ class Backend(ABC):
         """A setting from version control's configuration, or ""."""
 
     @abstractmethod
-    def address(self, repo: Path) -> str:
-        """Where the repository is hosted, or ""."""
-
-    @abstractmethod
     def ignore(self, path: Path) -> None:
         """Keeps a generated file or folder out of version control."""
 
