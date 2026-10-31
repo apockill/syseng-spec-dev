@@ -1,7 +1,6 @@
 id: LANG
-title: Language adapters
+title: Languages
 parent: SYS
 depends_on: []
-purpose: |-
-  The adapters hold everything specific to a programming language: finding tests, running them, and reading their source.
+purpose: Nothing is specific to a language now that readers take in results; kept until the toolkit can remove an element.
 related_code: {}

@@ -15,21 +15,12 @@ Sections, in the page's order (REVIEW-20):
 
 import datetime
 import hashlib
-import subprocess
 from pathlib import Path
 
-from syseng import changes, diff, health, levels, review
+from syseng import changes, diff, health, levels, results, review, vcs
 from syseng.model import Spec
 
 SECTIONS = ("overview", "awaiting", "responses", "changes", "captured", "proposals", "graph", "items")
-
-
-def _git(repo: Path, *args: str) -> str:
-    try:
-        run = subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True, timeout=30)
-        return run.stdout.strip() if run.returncode == 0 else ""
-    except (OSError, subprocess.TimeoutExpired):
-        return ""
 
 
 def decision_fingerprint(d: dict) -> str:
@@ -168,7 +159,7 @@ def overview(spec: Spec, person: str, sets: list[dict]) -> dict:
         was, source = first.get("measured"), f"the spec at {first['older']['label']}"
     return {"now": now, "was": was, "against": source, "measures": health.compare(now, was),
             "changes": first["counts"] if first else {}, "by_kind": first.get("by_kind", {}) if first else {},
-            "since": first["older"]["label"] if first else None}
+            "since": first["older"]["label"] if first else None, "verification": results.report(spec)}
 
 
 def _safe_between(spec: Spec, label: str):
@@ -247,8 +238,8 @@ def _beneath(spec: Spec) -> dict[str, set[str]]:
 # ---------------------------------------------------------------- everything
 def build(spec: Spec, person: str, against: list[str] | None = None) -> dict:
     repo = spec.repo_root()
-    revision = _git(repo, "rev-parse", "HEAD")
-    dirty = bool(_git(repo, "status", "--porcelain", "--", str(spec.root)))
+    version_control = vcs.backend(repo)
+    revision, dirty = version_control.revision(repo), version_control.differs(repo, spec.root)
     now = datetime.datetime.now().astimezone().isoformat(timespec="minutes")
     sets = change_sets(spec, person, against or [])
     data = {

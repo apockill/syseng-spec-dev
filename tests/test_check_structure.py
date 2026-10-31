@@ -1,6 +1,6 @@
 """Structure, trace and attribute checks (MODEL, SYS-6, CHECK-1)."""
 
-from syseng import check, yamlio
+from syseng import check, testlinks, yamlio
 
 
 def test_valid_spec_has_no_errors(spec):
@@ -228,3 +228,8 @@ def test_a_parent_without_verification_is_told_how_to_resolve_it(spec):         
     spec.write()
     msg = next(f.message for f in spec.findings() if f.code == "T004" and f.item == "SYS-1")
     assert "1 requirement refine it" in msg and "roll-up" in msg
+
+
+def test_only_links_that_name_a_file_are_looked_up():
+    assert testlinks.names_file("tests/test_x.py::test_y") and testlinks.names_file("tests/test_x.py")
+    assert not testlinks.names_file("//backend/api:stop_test") and not testlinks.names_file("infra/apply")

@@ -4,7 +4,7 @@ Each measure says which direction is better, so a comparison can mark the ones t
 `spec review --section overview` prints the same numbers for agents (SYS-47).
 """
 
-from syseng import levels, review
+from syseng import levels, results, review
 from syseng.model import Spec
 
 # key, label, which direction is better ("up", "down", or None when it isn't better either way), shown as a tile
@@ -13,6 +13,9 @@ MEASURES = [
     ("tested", "Requirements with linked tests", "up", True),
     ("unverified", "Requirements without verification", "down", True),
     ("tests", "Linked tests", "up", True),
+    ("failing", "Verification items failing", "down", False),
+    ("not_run", "Verification items not run", "down", False),
+    ("not_run_locked", "Not run, verifying locked requirements", "down", False),
     ("stale", "Changed since a person gave it", "down", True),
     ("awaiting", "Waiting for your answer", "down", True),
     ("errors", "Checker errors", "down", True),
@@ -40,6 +43,7 @@ def metrics(spec: Spec) -> dict:
     findings = check.check(spec)
     ids = list(spec.items) + list(spec.elements)
     lv = {i: levels.level_of(spec, i) for i in ids}
+    tested = results.rows(spec, results.primary(spec)) if results.implementations(spec) else []
     mix = {name: 0 for name in levels.ORDER}  # the readable layers: needs and requirements
     for item in spec.of_kind("need") + reqs:
         mix[lv[item.id].level] += 1
@@ -50,6 +54,9 @@ def metrics(spec: Spec) -> dict:
                                    for r in (v.data.get("verifies") or [])} & {r.id for r in reqs})
                         / len(reqs), 1) if reqs else 100.0,
         "unverified": unverified,
+        "failing": sum(1 for r in tested if r.status == results.FAILING),
+        "not_run": sum(1 for r in tested if r.status == results.NOT_RUN),
+        "not_run_locked": sum(1 for r in tested if r.status == results.NOT_RUN and r.locked),
         "tests": sum(len(links or []) for v in vis for links in (v.data.get("tests") or {}).values()),
         "stale": sum(1 for x in lv.values() if x.stale),
         "awaiting": len(review.unanswered(spec)) + sum(

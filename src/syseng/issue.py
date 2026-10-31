@@ -92,11 +92,6 @@ def toolkit_version() -> str:
         return "unknown"
 
 
-def remote_of(root: Path) -> str:
-    done = subprocess.run(["git", "-C", str(root), "remote", "get-url", "origin"], capture_output=True, text=True)
-    return done.stdout.strip() if done.returncode == 0 else ""
-
-
 def send(title: str, text: str) -> str:
     """Open the issue and return its address (CLI-33)."""
     if shutil.which("gh") is None:

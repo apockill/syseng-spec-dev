@@ -16,14 +16,11 @@ Reading an older version never touches the working tree (DIFF-1): it's extracted
 control into a temporary directory.
 """
 
-import io
-import subprocess
-import tarfile
 import tempfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from syseng import changes, fingerprint, levels, model, review
+from syseng import changes, fingerprint, levels, model, review, vcs
 from syseng.model import Spec
 
 ADDED, REMOVED, MOVED, MEANING, REWORDED, INTENT, DETAILS = (
@@ -45,63 +42,24 @@ class Version:
     note: str = ""        # how the label was resolved, such as "merge base of main and HEAD"
 
 
-def _git(repo: Path, *args: str) -> str:
-    try:
-        run = subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True, timeout=30)
-    except (OSError, subprocess.TimeoutExpired) as e:
-        raise DiffError(f"can't run git: {e}") from e
-    if run.returncode != 0:
-        raise DiffError(run.stderr.strip() or f"git {' '.join(args)} failed")
-    return run.stdout.strip()
-
-
-def _exists(repo: Path, ref: str) -> bool:
-    try:
-        _git(repo, "rev-parse", "--verify", "--quiet", ref)
-        return True
-    except DiffError:
-        return False
-
-
-def _branch(repo: Path, name: str) -> tuple[str | None, str]:
-    """The ref a branch name means, and a note when it was only found on a remote. HEAD, tags and commits
-    aren't branches, so a name that resolves as one of those first isn't looked for on a remote."""
-    for ref in (f"refs/heads/{name}", f"refs/remotes/{name}"):
-        if _exists(repo, ref):
-            return ref, ""
-    if name != "HEAD" and not _exists(repo, f"{name}^{{commit}}") and _exists(repo, f"refs/remotes/origin/{name}"):
-        return f"refs/remotes/origin/{name}", f"{name} exists only as origin/{name}; compared with that"
-    return None, ""
-
-
 def resolve(repo: Path, label: str, newer: str | None = None) -> Version:
-    """The revision a label names. A branch resolves to its merge base with the newer side (DIFF-2)."""
-    ref, note = _branch(repo, label)
-    if ref:
-        base = _git(repo, "merge-base", ref, newer or "HEAD")
-        short = _git(repo, "rev-parse", "--short", base)
-        return Version(label, base, "; ".join(n for n in (note, f"merge base of {label} and {newer or 'HEAD'}, "
-                                                               f"{short}") if n))
+    """The revision a label names. A branch resolves to its base with the newer side (DIFF-2)."""
     try:
-        rev = _git(repo, "rev-parse", "--verify", "--quiet", f"{label}^{{commit}}")
-    except DiffError:
-        raise DiffError(f"{label!r} names no branch, tag or commit here") from None
-    return Version(label, rev, _git(repo, "rev-parse", "--short", rev))
+        revision, note = vcs.backend(repo).resolve(repo, label, newer)
+    except vcs.VersionControlError as e:
+        raise DiffError(str(e)) from None
+    return Version(label, revision, note)
 
 
 def load_at(spec_root: Path, revision: str, into: Path) -> Spec:
     """The spec as it was at a revision, extracted into a temporary directory (DIFF-1)."""
-    repo = Path(_git(spec_root, "rev-parse", "--show-toplevel"))
-    rel = spec_root.resolve().relative_to(repo.resolve()).as_posix()
+    version_control = vcs.backend(spec_root)
     try:
-        data = subprocess.run(["git", "archive", "--format=tar", revision, rel], cwd=repo, capture_output=True,
-                              timeout=60)
-    except (OSError, subprocess.TimeoutExpired) as e:
-        raise DiffError(f"can't read the spec at {revision}: {e}") from e
-    if data.returncode != 0:
-        raise DiffError(f"the spec didn't exist at {revision[:12]}: {data.stderr.decode().strip()}")
-    with tarfile.open(fileobj=io.BytesIO(data.stdout)) as tar:
-        tar.extractall(into, filter="data")
+        repo = version_control.root(spec_root)
+        rel = spec_root.resolve().relative_to(repo.resolve()).as_posix()
+        version_control.extract(repo, revision, rel, into)
+    except vcs.VersionControlError as e:
+        raise DiffError(str(e)) from None
     spec = model.load(into / rel)
     spec.repo = repo
     return spec

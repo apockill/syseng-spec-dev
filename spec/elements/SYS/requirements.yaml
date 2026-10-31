@@ -104,7 +104,7 @@
     basis: stated
     fingerprint: 5673a6ea4d7f
 - id: SYS-13
-  text: When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
+  text: After a full run of the engineer's pipeline, the toolkit shall report the verification status of the whole product without the engineer present.
   kind: system
   serves:
   - NEED-7

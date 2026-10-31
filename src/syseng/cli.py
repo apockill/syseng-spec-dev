@@ -9,6 +9,7 @@
   spec edit [--dry-run] < edits.yaml        change the spec (CLI-5 to CLI-8)
   spec decide < decision.yaml               add an open decision with options (CHANGE-10)
   spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12)
+  spec results add|status                    take in test results, report verification status (SYS-57)
   spec issue [FILE] --title … [--send CODE] report a problem as an issue, with consent (SYS-56)
   spec init [--harness NAME]                set up a repository in one step (SYS-5)
   spec migrate [--dry-run]                  move the spec to the current format, after agents convert words
@@ -27,7 +28,7 @@ import sys
 from pathlib import Path
 
 from syseng import (changes, diff, edit, feedback, fingerprint, init, issue, levels, migrate, model, page, pagedata,
-                    people, render, review, yamlio)
+                    people, readers, render, results, review, vcs, yamlio)
 from syseng import check as checker
 
 
@@ -394,7 +395,7 @@ def cmd_issue(args) -> int:
         return 1
     title, out = issue.full_title(args.title), issue.body(text, issue.toolkit_version())
     wrong = issue.problems(text)
-    leaks = issue.leaks(f"{title}\n{out}", people.person(Path.cwd())[0], issue.remote_of(Path.cwd()))
+    leaks = issue.leaks(f"{title}\n{out}", people.person(Path.cwd())[0], vcs.backend(Path.cwd()).address(Path.cwd()))
     wrong += [f"it contains {leak}" for leak in leaks]
     if wrong:
         print("spec issue: nothing was sent. Rewrite the report in general terms:")
@@ -414,6 +415,79 @@ def cmd_issue(args) -> int:
               f"Title: {title}\n\n{out}", end="")
         return 1
     return 0
+
+
+def cmd_results(args) -> int:
+    """SYS-57: take in one pipeline step's results, or report each verification item's status."""
+    spec = _load(args)
+    spec.results_dir = Path(args.results_dir) if args.results_dir else None
+    return _results_add(spec, args) if args.action == "add" else _results_status(spec, args)
+
+
+def _results_add(spec, args) -> int:
+    named = {i["name"]: i for i in results.implementations(spec)}
+    implementation = args.implementation or results.primary(spec)
+    if implementation not in named:
+        print(f"spec results: no implementation {implementation!r}; toolkit.yaml names: {', '.join(named)}")
+        return 1
+    if bool(args.files) == bool(args.id):
+        print("spec results add: give report files, or --id with --outcome for a step with no report")
+        return 1
+    if args.id and not args.outcome:
+        print("spec results add: --id needs --outcome")
+        return 1
+    repo = spec.repo_root()
+    revision = args.revision or vcs.backend(repo).revision(repo)
+    if not revision:
+        print("spec results add: can't tell the current revision; name it with --revision")
+        return 1
+    tests = {args.id: args.outcome} if args.id else {}
+    if args.ran_at:
+        try:
+            datetime.datetime.fromisoformat(args.ran_at)
+        except ValueError:
+            print(f"spec results add: --ran-at {args.ran_at!r} isn't an ISO date and time")
+            return 1
+    root = repo / str(named[implementation].get("root") or ".")
+    try:
+        for file in args.files:
+            for name, outcome in readers.read(args.format, Path(file), root).items():
+                readers.merge(tests, name, outcome)
+    except readers.ReaderError as e:
+        print(f"spec results: {e}")
+        return 1
+    if not tests:
+        print(f"spec results: no test results in {', '.join(args.files)}, so nothing was recorded")
+        return 1
+    results.record(spec, implementation, args.step, revision, tests, args.ran_at, add=bool(args.id))
+    print(f"recorded {len(tests)} result{'s' if len(tests) != 1 else ''} for {implementation}, step {args.step}, "
+          f"revision {vcs.backend(repo).short(repo, revision)}")
+    return 0
+
+
+def _results_status(spec, args) -> int:
+    data = results.report(spec)
+    if args.json:
+        print(json.dumps(data, indent=1))
+    else:
+        repo = spec.repo_root()
+        short = lambda rev: vcs.backend(repo).short(repo, rev) if rev else "never"
+        print(f"{'implementation':<20}" + "".join(f"{s:>17}" for s in results.STATUSES))
+        for name, d in data.items():
+            print(f"{name:<20}" + "".join(f"{d['counts'][s]:>17}" for s in results.STATUSES))
+        for name, d in data.items():
+            for r in d["failing"]:
+                print(f"\nFAILING {r['id']} ({name}), verifies {', '.join(r['verifies'])} ({r['level']}), last tested "
+                      f"in {short(r['last_tested'])}: {', '.join(r['failed'])}")
+            for r in d["not_run_locked"]:
+                print(f"not run {r['id']} ({name}), verifies locked {', '.join(r['verifies'])}")
+            if d["unlinked"]:
+                print(f"{len(d['unlinked'])} test{'s' if len(d['unlinked']) != 1 else ''} in {name}'s results no "
+                      f"verification item links: {', '.join(d['unlinked'])}")
+            if args.all:
+                for r in d["items"]:
+                    print(f"  {r['id']:<14} {r['status']:<16} last tested in {short(r['last_tested'])}")
+    return 1 if any(d["failing"] for d in data.values()) else 0
 
 
 def cmd_diff(args) -> int:
@@ -437,6 +511,8 @@ def cmd_diff(args) -> int:
 def cmd_review(args) -> int:
     """CLI-25, CLI-24: the review page in one command, or any of its sections for an agent."""
     spec = _load(args)
+    if getattr(args, "results_dir", None):
+        spec.results_dir = Path(args.results_dir)
     who = args.person or people.person(spec.repo_root())[0]
     data = pagedata.build(spec, who, args.against or [])
     if args.section:
@@ -515,10 +591,10 @@ def cmd_migrate(args) -> int:
 
 
 def _repo_root(start: Path) -> Path:
-    for d in [start, *start.parents]:
-        if (d / ".git").exists():
-            return d
-    return start
+    try:
+        return vcs.backend(start).root(start)
+    except vcs.VersionControlError:
+        return start
 
 
 def cmd_init(args) -> int:
@@ -616,6 +692,26 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--words", required=True, help="the engineer's words, as evidence")
     p.add_argument("--option", type=int, help="the option number chosen (default: the recommended one)")
     p.set_defaults(fn=cmd_resolve)
+    p = sub.add_parser("results", help="take in test results from pipeline steps, and report verification status",
+                       description=results.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    steps = p.add_subparsers(dest="action", required=True)
+    q = steps.add_parser("add", help="record one step's results; run again for each later step")
+    q.add_argument("files", nargs="*", help="the step's report files")
+    q.add_argument("--step", required=True, help="the pipeline step's name, such as unit or infra")
+    q.add_argument("--format", default="junit", help=f"the reports' format: {', '.join(readers.names())}")
+    q.add_argument("--implementation", help="default: the primary implementation")
+    q.add_argument("--revision", help="the revision tested; default: version control's current one")
+    q.add_argument("--id", help="for a step with no report, or a verdict: the test's identifier, or a verification "
+                                "item's ID")
+    q.add_argument("--outcome", choices=("pass", "fail"), help="the outcome for --id")
+    q.add_argument("--ran-at", help="when the tests ran, as an ISO date and time; default: now")
+    q.add_argument("--results-dir", help="where results are kept; default .syseng/results")
+    q.set_defaults(fn=cmd_results)
+    q = steps.add_parser("status", help="each implementation's health; fails when a verification item is failing")
+    q.add_argument("--all", action="store_true", help="list every verification item")
+    q.add_argument("--json", action="store_true")
+    q.add_argument("--results-dir", help="where results are kept; default .syseng/results")
+    q.set_defaults(fn=cmd_results)
     p = sub.add_parser("issue", help="report a problem with the toolkit as an issue, with the engineer's consent",
                        description=issue.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("file", nargs="?", help="the report, written from `spec issue --template`")
@@ -636,6 +732,7 @@ def build_parser() -> argparse.ArgumentParser:
                    help="also compare against this branch, tag or commit; repeat for several")
     p.add_argument("--person", help="who the page is for, as Name <email> (default: the person this machine records)")
     p.add_argument("--out", help="where to write the page (default: .syseng/review.html)")
+    p.add_argument("--results-dir", help="where test results are kept; default .syseng/results")
     p.add_argument("--section", choices=list(pagedata.SECTIONS), help="print this section instead of writing the page")
     p.add_argument("--format", choices=["text", "yaml"], default="text")
     p.set_defaults(fn=cmd_review)
@@ -671,6 +768,9 @@ def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
     try:
         return args.fn(args)
+    except vcs.VersionControlError as e:
+        print(f"spec: {e}")
+        return 1
     except BrokenPipeError:  # the reader went away, as with `spec show X | head`: not an error
         import os
         os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())

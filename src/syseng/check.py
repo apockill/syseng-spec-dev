@@ -396,11 +396,11 @@ def _test_links(spec: Spec) -> list[Finding]:
                                       f"implementation", vi.id, vi))
                 continue
             for link in links or []:
-                problem = testlinks.missing(roots[impl], str(link), cache)
+                problem = testlinks.names_file(str(link)) and testlinks.missing(roots[impl], str(link), cache)
                 if problem:
                     out.append(_f("V002", f"{vi.id} links {link}, but {problem}", vi.id, vi))
     for i in spec.config.get("implementations") or []:  # CHECK-3: tests no verification item links
-        if not isinstance(i, dict) or i.get("language") != "python" or i.get("name") not in roots:
+        if not isinstance(i, dict) or i.get("language", "python") != "python" or i.get("name") not in roots:
             continue
         links = [str(link) for vi in spec.of_kind("vi")
                  for link in ((vi.data.get("tests") or {}).get(i["name"]) or [])] if spec.of_kind("vi") else []

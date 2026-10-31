@@ -173,3 +173,12 @@
   tests:
     python:
     - tests/test_skill.py::test_problem_reports_need_consent_general_terms_and_no_solution
+- id: AGENT-V19
+  verifies:
+  - AGENT-75
+  method: test
+  technique: unit test
+  description: The skill's guidance tells agents to ask for a reader before writing a conversion. Whether agents follow it isn't tested.
+  tests:
+    python:
+    - tests/test_skill.py::test_agents_ask_for_a_reader_before_writing_their_own

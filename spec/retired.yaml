@@ -95,3 +95,48 @@
   - AGENT-46
   note: |-
     AGENT-46, in 2026-10-26-round-40: the engineer wants one path for feedback, so AGENT-72 replaces this. Its proposed improvement also contradicted AGENT-74.
+- element: VERIFY
+  ids:
+  - VERIFY-3
+  note: |-
+    VERIFY-3, in 2026-10-31-round-41: D1, parallel runs are the pipeline's job.
+- element: VERIFY
+  ids:
+  - VERIFY-14
+  note: |-
+    VERIFY-14, in 2026-10-31-round-41: D1, choosing what to run is the pipeline's job.
+- element: INTEG
+  ids:
+  - INTEG-1
+  note: |-
+    INTEG-1, in 2026-10-31-round-41: D1, running commands is the pipeline's job.
+- element: INTEG
+  ids:
+  - INTEG-2
+  note: |-
+    INTEG-2, in 2026-10-31-round-41: D1, follows INTEG-1.
+- element: INTEG
+  ids:
+  - INTEG-3
+  note: |-
+    INTEG-3, in 2026-10-31-round-41: D1, follows INTEG-1.
+- element: UNIT
+  ids:
+  - UNIT-1
+  note: |-
+    UNIT-1, in 2026-10-31-round-41: D1, the pipeline runs tests.
+- element: LANG
+  ids:
+  - LANG-3
+  note: |-
+    LANG-3, in 2026-10-31-round-41: D1, readers replace language adapters.
+- element: LANG
+  ids:
+  - LANG-4
+  note: |-
+    LANG-4, in 2026-10-31-round-41: D1, readers replace language adapters.
+- element: LANG
+  ids:
+  - LANG-2
+  note: |-
+    LANG-2, in 2026-10-31-round-41: D1, readers replace language adapters.

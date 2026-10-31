@@ -216,9 +216,10 @@ select.cmp { background: var(--surface-1); border: 1px solid var(--border); bord
 .mixbar { display: flex; gap: 2px; height: 14px; border-radius: 4px; overflow: hidden; margin: 6px 0 8px; }
 .mixbar .seg { min-width: 3px; }
 .mix .legend { margin: 0; }
-.allmeasures table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 8px; }
-.allmeasures th, .allmeasures td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); }
-.allmeasures td.num, .allmeasures th:not(:first-child) { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.allmeasures table, .verification table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 8px; }
+.allmeasures th, .allmeasures td, .verification th, .verification td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+.verification { margin-top: 12px; overflow-x: auto; }
+.allmeasures td.num, .allmeasures th:not(:first-child), .verification td.num, .verification th:not(:first-child) { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .allmeasures tr.worse td { color: var(--st-critical); }
 .subhead { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 22px 0 8px; color: var(--text-primary); }
 .why-agent { border-left: 2px solid var(--accent); padding-left: 10px; }
