@@ -15,7 +15,7 @@
   - VCS-2
   method: test
   technique: unit test
-  description: A revision name with unusual characters is stored and shown unchanged. Whether code elsewhere compares revisions is otherwise unchecked.
+  description: A revision name with unusual characters is stored and shown unchanged.
   tests:
     python:
     - tests/test_results.py::test_a_revision_is_never_parsed
