@@ -794,3 +794,39 @@
     said: GitHub issues filed with the user's consent seem a good first step and should be set up now.
     basis: stated
     fingerprint: 263feba6dee3
+- id: SYS-57
+  kind: system
+  text: The toolkit shall derive each verification item's status in each implementation from test results given to it.
+  serves:
+  - NEED-31
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Discussing how verification results should reach the toolkit.
+    said: Wants a system that doesn't take over the job of the test runner but is easy to integrate with a test runner or CI, by taking in exported test results and using them to inspect verification items.
+    basis: stated
+    fingerprint: 2cd5df169cb7
+- id: SYS-58
+  kind: system
+  text: Adding a reader for a test-result format shall require no change to the toolkit's existing code.
+  serves:
+  - NEED-31
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+    said: Wants the system extensible so that new readers are easy to add, and would rather users open a GitHub issue asking for a reader than hand-roll their own parsers for the same thing everywhere.
+    basis: stated
+    fingerprint: ff704df901ab
+- id: SYS-59
+  kind: system
+  text: Adding support for a version-control system shall require no change to the toolkit's existing code.
+  serves:
+  - NEED-3
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Discussing how tied the toolkit is to git, given a monorepo at the engineer's work that identifies changes by CL.
+    said: Suggested maybe making this extensible with an interface, implementing it for git, so that supporting another system later is a matter of adding an implementation.
+    basis: guided
+    fingerprint: e09784ed7a2d

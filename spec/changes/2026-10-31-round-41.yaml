@@ -1,0 +1,409 @@
+request: Take in test results from separate pipeline steps through extensible readers, and reach version control through an interface
+mode: spec-first
+target: python
+status: open
+opened: '2026-10-31'
+entries:
+- op: add
+  id: SYS-57
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's design direction for NEED-31.
+  requested: true
+  after:
+    kind: system
+    text: The toolkit shall derive each verification item's status in each implementation from test results given to it.
+    serves:
+    - NEED-31
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how verification results should reach the toolkit.
+      said: Wants a system that doesn't take over the job of the test runner but is easy to integrate with a test runner or CI, by taking in exported test results and using them to inspect verification items.
+      basis: stated
+      fingerprint: 2cd5df169cb7
+- op: add
+  id: SYS-58
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    kind: system
+    text: Adding a reader for a test-result format shall require no change to the toolkit's existing code.
+    serves:
+    - NEED-31
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+      said: Wants the system extensible so that new readers are easy to add, and would rather users open a GitHub issue asking for a reader than hand-roll their own parsers for the same thing everywhere.
+      basis: stated
+      fingerprint: ff704df901ab
+- op: add
+  id: SYS-59
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's suggestion, hedged, so guided.
+  after:
+    kind: system
+    text: Adding support for a version-control system shall require no change to the toolkit's existing code.
+    serves:
+    - NEED-3
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how tied the toolkit is to git, given a monorepo at the engineer's work that identifies changes by CL.
+      said: Suggested maybe making this extensible with an interface, implementing it for git, so that supporting another system later is a matter of adding an implementation.
+      basis: guided
+      fingerprint: e09784ed7a2d
+- op: add
+  id: VCS
+  at: 2026-10-31T12:03-07:00
+  reason: SYS-59 needs a home.
+  after:
+    title: Reaches version control through one interface
+    parent: SYS
+    purpose: Everything the toolkit needs from version control, behind one interface with a backend per system.
+- op: add
+  id: VCS-1
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-59.
+  after:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, and reads a setting.
+    traces_to: SYS-59
+    basis: derived
+    why: these are the operations the toolkit uses today.
+- op: add
+  id: VCS-2
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-59.
+  after:
+    text: The toolkit shall compare revision names only for equality.
+    traces_to: SYS-59
+    basis: derived
+    why: a commit hash and a CL number share no order or arithmetic.
+- op: add
+  id: VCS-3
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer named it.
+  requested: true
+  after:
+    text: The toolkit shall include a version-control backend for git.
+    traces_to: SYS-59
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how tied the toolkit is to git.
+      said: An interface, with one implementation for git.
+      basis: stated
+      fingerprint: f3048fc3040c
+- op: add
+  id: VCS-4
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-59.
+  after:
+    text: The toolkit shall use the version-control backend the repository's toolkit settings name, git by default.
+    traces_to: SYS-59
+    basis: derived
+    why: a backend added later has to be selectable.
+- op: add
+  id: VERIFY-17
+  at: 2026-10-31T12:03-07:00
+  reason: the core of SYS-57.
+  requested: true
+  after:
+    text: When given result reports with their format, implementation and step, the results command shall record each test's outcome, when it ran and the revision it ran on.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Describing a CI pipeline that runs tests, exports results and points a spec command at them.
+      said: Ingesting results may take several commands or one pointing at all of them.
+      basis: stated
+      fingerprint: 72beac21d5ff
+- op: add
+  id: VERIFY-18
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-57.
+  after:
+    text: When a step reports results again for the same implementation and revision, the results command shall replace that step's earlier results for that revision.
+    traces_to: SYS-57
+    basis: derived
+    why: the command is run again for later steps and for retries, so a retry must not count twice.
+- op: add
+  id: VERIFY-19
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-57.
+  after:
+    text: When a step produces no report, the results command shall record an outcome given for a named test.
+    traces_to: SYS-57
+    basis: derived
+    why: infrastructure steps in the engineer's pipeline may give only an exit status.
+- op: add
+  id: VERIFY-20
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-57.
+  after:
+    text: Each test's status shall follow its newest recorded result.
+    traces_to: SYS-57
+    basis: derived
+    why: expensive steps run less often than cheap ones, so results from different revisions are combined.
+- op: add
+  id: VERIFY-21
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer specified it.
+  requested: true
+  after:
+    text: The status command shall name, for each verification item, the revision in which it was last tested.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how to show results from older revisions.
+      said: Ideally it would state the exact node where testing last happened, such as the commit, saying last tested in that revision rather than a count of commits; the LLM can work out how old that is if needed.
+      basis: stated
+      fingerprint: 62ddf0c2b86b
+- op: add
+  id: VERIFY-22
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's scenario.
+  requested: true
+  after:
+    text: The status command shall show, for each implementation, how many verification items have each status.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Describing a pipeline that ends by inspecting verification items.
+      said: At the end you inspect your verification items and see how the system's health is; one implementation might be fine and working while another is in progress.
+      basis: stated
+      fingerprint: 4db418d2d7f8
+- op: add
+  id: VERIFY-23
+  at: 2026-10-31T12:03-07:00
+  reason: puts what the engineer cares about first.
+  after:
+    text: The status command shall list failing verification items by the level of intent of the requirements they verify, highest first.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Describing CI that checks results against the spec and uses them as a to-do list.
+      said: The check can be used as a to-do list for updating the spec, bringing changed requirements to the user if they are important or if locked requirements had to change.
+      basis: guided
+      fingerprint: 18789250a511
+- op: add
+  id: VERIFY-24
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-57.
+  after:
+    text: The status command shall list each test in the results that no verification item links.
+    traces_to: SYS-57
+    basis: derived
+    why: this finds unlinked tests in any language, where the source scan reads only Python.
+- op: add
+  id: VERIFY-25
+  at: 2026-10-31T12:03-07:00
+  reason: the first readers.
+  requested: true
+  after:
+    text: The results command shall include readers for JUnit XML, for pytest's JUnit XML and for a documented format of one result per line.
+    traces_to: SYS-58
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposed simple line-by-line result format, and to JUnit XML as the common export.
+      said: Accepted the line-by-line format and prefers obeying existing test standards over making up the toolkit's own format.
+      basis: stated
+      fingerprint: da8252496c19
+- op: add
+  id: VERIFY-26
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's preference.
+  requested: true
+  after:
+    text: When given a format it has no reader for, the results command shall name the formats it reads and suggest asking for a reader through a problem report.
+    traces_to: SYS-58
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+      said: Would rather users open a GitHub issue asking for a reader than hand-roll parsers for the same thing all over the place.
+      basis: stated
+      fingerprint: c188d19e6712
+- op: add
+  id: AGENT-75
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's preference, for agents.
+  requested: true
+  after:
+    text: When a project's test tool has no reader, the agent shall offer to ask for one through a problem report before writing a conversion of its own.
+    traces_to: SYS-58
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+      said: Would rather users open a GitHub issue asking for a reader than hand-roll parsers for the same thing all over the place.
+      basis: stated
+      fingerprint: d1b7fa4fc8ae
+- op: add
+  id: MODEL-42
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer agreed.
+  requested: true
+  after:
+    text: A verification item's test link shall be the identifier the test's results report.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposal that a test link becomes an opaque identifier, whatever string the results report.
+      said: Agreed, and said they hadn't liked making up the toolkit's own format for tests; standardizing on and obeying standards sounds good.
+      basis: stated
+      fingerprint: 33ab94dc67e0
+- op: add
+  id: CHECK-33
+  at: 2026-10-31T12:03-07:00
+  reason: follows from identifiers being opaque.
+  after:
+    text: The checker shall look up in the source only those test links that name a file.
+    traces_to: SYS-57
+    basis: derived
+    why: a build target or a step's name has no source file to find.
+- op: modify
+  id: MODEL-7
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer redefined an implementation.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: f93b94d95665
+  fingerprint_after: b2aecfcb407d
+  requested: true
+  before:
+    text: The spec shall name each implementation of the product, with its language.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how the spec relates to the code that realizes it.
+      said: Said a spec could be marked as implemented in a named implementation with its language, such as C++, or as having no implementations.
+      basis: stated
+      fingerprint: f93b94d95665
+  after:
+    text: The spec shall name each implementation of the product, a whole working system that can span languages, frameworks and providers.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how the spec relates to the code that realizes it.
+      said: Said a spec could be marked as implemented in a named implementation with its language, such as C++, or as having no implementations.
+      basis: stated
+      fingerprint: f93b94d95665
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reviewing the proposal that an implementation becomes a name and a root, with language optional.
+      said: Wants it clear that an implementation is not a language but a holistic process, system or entire working architecture.
+      basis: stated
+      fingerprint: b2aecfcb407d
+  acks:
+    MODEL-7: the engineer redefined it in this conversation.
+- op: modify
+  id: VERIFY-5
+  at: 2026-10-31T12:03-07:00
+  reason: there is no runner in this design.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 27d7dbc97fb4
+  fingerprint_after: aac1829305c0
+  requested: true
+  before:
+    text: |-
+      The runner shall derive each verification item's status in each implementation: not implemented, not yet run, passing or failing.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how the spec relates to what has been built.
+      said: Wants the specs to mark in some way what has been implemented yet and what has not, for example so tests aren't expected to pass where verification items have perhaps been specified but not implemented.
+      basis: guided
+      fingerprint: 27d7dbc97fb4
+  after:
+    text: The toolkit shall derive each verification item's status in each implementation from recorded results, as not implemented, not yet run, passing or failing.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how the spec relates to what has been built.
+      said: Wants the specs to mark in some way what has been implemented yet and what has not, for example so tests aren't expected to pass where verification items have perhaps been specified but not implemented.
+      basis: guided
+      fingerprint: 27d7dbc97fb4
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how verification results should reach the toolkit.
+      said: Wants the toolkit to take in results rather than take over the job of the test runner.
+      basis: stated
+      fingerprint: aac1829305c0
+  acks:
+    VERIFY-5: the engineer asked for results to come in from outside; the four statuses stay.
+decisions:
+- id: D1
+  kind: conflict
+  question: Should the toolkit stop running tests itself and only read their results, which changes SYS-12 and SYS-13, requirements you locked?
+  importance: This is the design's foundation. Today's spec describes a built-in runner, which was never built. You've now said the toolkit shouldn't take over the test runner's job, and that reverses items you locked or stated, so it needs your explicit choice. Everything else in this round depends on it.
+  involves:
+  - SYS-12
+  - SYS-13
+  - VERIFY-3
+  - VERIFY-4
+  - INTEG-1
+  - LANG-2
+  - CHECK-4
+  options:
+  - label: Read results; the project's own pipeline runs the tests
+    recommended: true
+    detail: |-
+      The test tools or CI run the tests, and spec results reads what they report. What changes: SYS-12 and SYS-13 say verification runs when the engineer's pipeline runs it, and the toolkit reports on it. VERIFY-3 (run in parallel) and INTEG-1 (run declared commands) are removed, because that becomes the pipeline's job. VERIFY-4 becomes reporting from results. LANG-2 (C++ and Python adapters), with the requirements under it, gives way to result readers. CHECK-4 keeps checking links that name a file; other links are checked against results. Example: pytest in CI, then spec results add, then spec results status. Reasoning checks are unaffected: agents still run them, and their verdicts arrive as results.
+    keeps:
+    - SYS-12
+    - SYS-13
+    - VERIFY-3
+    - VERIFY-4
+    - INTEG-1
+    - LANG-2
+    - CHECK-4
+  - label: Do both - read results, and also keep a built-in runner on the roadmap
+    detail: |-
+      Results come in as above, and the runner requirements stay as a future plan. Your locks stay intact, but the spec keeps about 15 requirements for something you've said you don't want, and they stay in the unverified count. Example: a later agent reads VERIFY-3 and builds a parallel runner.
+    rolls_back:
+    - SYS-12
+    - SYS-13
+    - VERIFY-3
+    - VERIFY-4
+    - INTEG-1
+    - LANG-2
+    - CHECK-4
+  status: open
+- id: D2
+  question: Where should recorded test results be kept?
+  importance: Results arrive from several pipeline steps and must survive until the final status command. Where they live decides whether results are shared between people and machines, and whether they clutter version control. It needs settling before the command is built.
+  involves:
+  - VERIFY-17
+  options:
+  - label: A folder ignored by version control, which CI can point elsewhere
+    recommended: true
+    detail: |-
+      Results go in a folder such as .syseng/results/, one file per implementation, revision and step, and a --results-dir option moves it. CI jobs on separate machines share a folder or pass it along as a build artifact. Nothing is committed, so results cause no merge conflicts or noise in pull requests. What follows: a fresh clone starts with no results, so status says not yet run until a pipeline's results are fetched.
+  - label: Commit the results in the repository
+    detail: |-
+      Everyone sees the same results after a pull, and history keeps them. But every test run changes committed files, so branches conflict constantly, and CI must commit back to the repository. Example: two pull requests both touching a results file on every run.
+  status: open
+- id: D3
+  question: What should make the final status command fail a CI pipeline?
+  importance: This decides how strict the toolkit is in a pipeline. Too strict blocks work on results nobody could have produced yet; too loose lets real failures pass. The exit code is what CI acts on.
+  involves:
+  - SYS-57
+  options:
+  - label: Fail only when a verification item is failing
+    recommended: true
+    detail: |-
+      A failed linked test fails the pipeline. Items not yet run or not implemented are listed as to-dos and don't fail it. This suits a migration: a second implementation that's in progress shows many not-implemented items without turning CI red. An option could tighten it later.
+  - label: Also fail when an item that verifies a locked requirement hasn't been run
+    detail: |-
+      Stricter protection for what you locked: the pipeline fails unless those items have results. But any repository with a skipped step, or with expensive steps that run nightly, fails on ordinary pull requests unless older results count, so this one needs tuning per project.
+  status: open

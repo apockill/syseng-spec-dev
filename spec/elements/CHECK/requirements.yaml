@@ -265,3 +265,8 @@
     said: Wants a way to say a requirement is verified by its children, or at least to keep it a to-do with the LLM told how to resolve it; verifying it at its own level is preferred when a test would not be arbitrary, and the convention should follow systems-engineering practice.
     basis: stated
     fingerprint: 7883d3928cec
+- id: CHECK-33
+  text: The checker shall look up in the source only those test links that name a file.
+  traces_to: SYS-57
+  basis: derived
+  why: a build target or a step's name has no source file to find.

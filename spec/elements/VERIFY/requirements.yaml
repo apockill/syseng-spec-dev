@@ -30,8 +30,7 @@
     basis: stated
     fingerprint: 31720a5893b1
 - id: VERIFY-5
-  text: |-
-    The runner shall derive each verification item's status in each implementation: not implemented, not yet run, passing or failing.
+  text: The toolkit shall derive each verification item's status in each implementation from recorded results, as not implemented, not yet run, passing or failing.
   traces_to: SYS-9
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -40,6 +39,12 @@
     said: Wants the specs to mark in some way what has been implemented yet and what has not, for example so tests aren't expected to pass where verification items have perhaps been specified but not implemented.
     basis: guided
     fingerprint: 27d7dbc97fb4
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Discussing how verification results should reach the toolkit.
+    said: Wants the toolkit to take in results rather than take over the job of the test runner.
+    basis: stated
+    fingerprint: aac1829305c0
 - id: VERIFY-8
   text: When an expensive-tier item fails, the runner shall add the failure to the change's open decisions.
   traces_to: SYS-16
@@ -86,3 +91,83 @@
   traces_to: SYS-24
   basis: derived
   why: one sample from a nondeterministic judge tells little; how many runs, and how they combine, is the technique's (REASON-4).
+- id: VERIFY-17
+  text: When given result reports with their format, implementation and step, the results command shall record each test's outcome, when it ran and the revision it ran on.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Describing a CI pipeline that runs tests, exports results and points a spec command at them.
+    said: Ingesting results may take several commands or one pointing at all of them.
+    basis: stated
+    fingerprint: 72beac21d5ff
+- id: VERIFY-18
+  text: When a step reports results again for the same implementation and revision, the results command shall replace that step's earlier results for that revision.
+  traces_to: SYS-57
+  basis: derived
+  why: the command is run again for later steps and for retries, so a retry must not count twice.
+- id: VERIFY-19
+  text: When a step produces no report, the results command shall record an outcome given for a named test.
+  traces_to: SYS-57
+  basis: derived
+  why: infrastructure steps in the engineer's pipeline may give only an exit status.
+- id: VERIFY-20
+  text: Each test's status shall follow its newest recorded result.
+  traces_to: SYS-57
+  basis: derived
+  why: expensive steps run less often than cheap ones, so results from different revisions are combined.
+- id: VERIFY-21
+  text: The status command shall name, for each verification item, the revision in which it was last tested.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Discussing how to show results from older revisions.
+    said: Ideally it would state the exact node where testing last happened, such as the commit, saying last tested in that revision rather than a count of commits; the LLM can work out how old that is if needed.
+    basis: stated
+    fingerprint: 62ddf0c2b86b
+- id: VERIFY-22
+  text: The status command shall show, for each implementation, how many verification items have each status.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Describing a pipeline that ends by inspecting verification items.
+    said: At the end you inspect your verification items and see how the system's health is; one implementation might be fine and working while another is in progress.
+    basis: stated
+    fingerprint: 4db418d2d7f8
+- id: VERIFY-23
+  text: The status command shall list failing verification items by the level of intent of the requirements they verify, highest first.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Describing CI that checks results against the spec and uses them as a to-do list.
+    said: The check can be used as a to-do list for updating the spec, bringing changed requirements to the user if they are important or if locked requirements had to change.
+    basis: guided
+    fingerprint: 18789250a511
+- id: VERIFY-24
+  text: The status command shall list each test in the results that no verification item links.
+  traces_to: SYS-57
+  basis: derived
+  why: this finds unlinked tests in any language, where the source scan reads only Python.
+- id: VERIFY-25
+  text: The results command shall include readers for JUnit XML, for pytest's JUnit XML and for a documented format of one result per line.
+  traces_to: SYS-58
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Reacting to a proposed simple line-by-line result format, and to JUnit XML as the common export.
+    said: Accepted the line-by-line format and prefers obeying existing test standards over making up the toolkit's own format.
+    basis: stated
+    fingerprint: da8252496c19
+- id: VERIFY-26
+  text: When given a format it has no reader for, the results command shall name the formats it reads and suggest asking for a reader through a problem report.
+  traces_to: SYS-58
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+    said: Would rather users open a GitHub issue asking for a reader than hand-roll parsers for the same thing all over the place.
+    basis: stated
+    fingerprint: c188d19e6712
