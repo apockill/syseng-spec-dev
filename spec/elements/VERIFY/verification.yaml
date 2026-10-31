@@ -107,7 +107,7 @@
   - VERIFY-27
   method: test
   technique: unit test
-  description: The not-run counts appear in the health measures and in the data the page's overview renders, with the items verifying locked requirements listed. How the page displays it is not tested.
+  description: The not-run counts appear in the health measures and in the data the page's overview renders, with the items verifying locked requirements listed.
   tests:
     python:
     - tests/test_results.py::test_not_run_items_verifying_locked_requirements_are_listed

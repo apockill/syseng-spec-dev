@@ -1,0 +1,77 @@
+request: Apply the engineer's review of the stated-base change
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-31'
+entries:
+- op: modify
+  id: AGENT-V20
+  at: 2026-10-31T15:07-07:00
+  reason: the engineer asked to drop the sentence on what isn't tested.
+  before:
+    description: The skill's guidance gives every pull request that changes the spec its own page against its base, linked at the top. Whether agents follow it isn't tested.
+  after:
+    description: The skill's guidance gives every pull request that changes the spec its own page against its base, linked at the top.
+- op: modify
+  id: AGENT-V19
+  at: 2026-10-31T15:07-07:00
+  reason: the same sentence, the engineer's reasoning applies.
+  before:
+    description: The skill's guidance tells agents to ask for a reader before writing a conversion. Whether agents follow it isn't tested.
+  after:
+    description: The skill's guidance tells agents to ask for a reader before writing a conversion.
+- op: modify
+  id: AGENT-V18
+  at: 2026-10-31T15:07-07:00
+  reason: the same sentence, the engineer's reasoning applies.
+  before:
+    description: The skill's guidance contains the instructions to report even what was worked around, to show the full text and ask, to write in general terms for a public repository, and not to propose a solution. Whether agents follow them isn't tested.
+  after:
+    description: The skill's guidance contains the instructions to report even what was worked around, to show the full text and ask, to write in general terms for a public repository, and not to propose a solution.
+- op: modify
+  id: REVIEW-V20
+  at: 2026-10-31T15:07-07:00
+  reason: the same kind of sentence, the engineer's reasoning applies.
+  before:
+    description: The generated page has the comparison in its header and carries the version, revision and how it was resolved; with nothing to compare against, the data says so and the page's script has the message. How it looks is not tested.
+  after:
+    description: The generated page has the comparison in its header and carries the version, revision and how it was resolved; with nothing to compare against, the data says so and the page's script has the message.
+- op: modify
+  id: VERIFY-V9
+  at: 2026-10-31T15:07-07:00
+  reason: the same kind of sentence, the engineer's reasoning applies.
+  before:
+    description: The not-run counts appear in the health measures and in the data the page's overview renders, with the items verifying locked requirements listed. How the page displays it is not tested.
+  after:
+    description: The not-run counts appear in the health measures and in the data the page's overview renders, with the items verifying locked requirements listed.
+- op: modify
+  id: VCS-V2
+  at: 2026-10-31T15:07-07:00
+  reason: the same kind of sentence, the engineer's reasoning applies.
+  before:
+    description: A revision name with unusual characters is stored and shown unchanged. Whether code elsewhere compares revisions is otherwise unchecked.
+  after:
+    description: A revision name with unusual characters is stored and shown unchanged.
+- op: modify
+  id: SYS-V8
+  at: 2026-10-31T15:07-07:00
+  reason: the same kind of sentence, the engineer's reasoning applies.
+  before:
+    description: Verified through its children's verification. The real send to GitHub has not been exercised.
+  after:
+    description: Verified through its children's verification.
+decisions: []
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-31T15:07-07:00
+  review: 6fab0daf3a
+  id: AGENT-V20
+  kind: comment
+  comment: |-
+    > Whether agents follow it isn't tested.
+
+    Not sure if this is necessary, why explicitly state that? If you remove that text, I'm ok with locking this. Maybe in hte future we will test it, who knows, but why restrict that arbitrarily rn?
+  response: Removed that sentence from AGENT-V20, and the same kind of sentence from the other verification items that had one (AGENT-V18, AGENT-V19, REVIEW-V20, VERIFY-V9, VCS-V2, SYS-V8). Locked AGENT-V20, as you said you were ok with.
+  responded: 2026-10-31T15:07-07:00
+closed: '2026-10-31'
