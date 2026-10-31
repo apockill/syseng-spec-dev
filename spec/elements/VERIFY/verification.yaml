@@ -1,0 +1,123 @@
+- id: VERIFY-V1
+  verifies:
+  - VERIFY-17
+  - VERIFY-19
+  method: test
+  technique: unit test
+  description: Report files, several in one command, and outcomes given by hand are recorded with step, revision and time, per implementation, and combine across steps in any order. The revision defaults to version control's current one, and an empty report records nothing.
+  tests:
+    python:
+    - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+    - tests/test_results.py::test_several_reports_in_one_command
+    - tests/test_results.py::test_results_are_kept_per_implementation
+    - tests/test_results.py::test_a_record_keeps_the_step_revision_time_and_outcomes
+    - tests/test_results.py::test_the_revision_defaults_to_version_controls_current_one
+    - tests/test_results.py::test_an_empty_report_records_nothing_and_keeps_what_was_there
+    - tests/test_results.py::test_a_bad_ran_at_is_refused
+    - tests/test_results.py::test_a_corrupt_results_file_is_skipped_with_a_warning
+- id: VERIFY-V2
+  verifies:
+  - VERIFY-18
+  method: test
+  technique: unit test
+  description: Reporting a step again on the same revision replaces its earlier results, while outcomes given one at a time join their step.
+  tests:
+    python:
+    - tests/test_results.py::test_a_retry_replaces_its_step
+    - tests/test_results.py::test_verdicts_given_one_at_a_time_share_a_step
+- id: VERIFY-V3
+  verifies:
+  - VERIFY-20
+  - VERIFY-21
+  method: test
+  technique: unit test
+  description: The newest result by when it ran decides, an older result still counts, a skip counts as not run, a file that can't be imported fails its linked tests, and an item names the revision it was last tested in.
+  tests:
+    python:
+    - tests/test_results.py::test_a_results_newest_outcome_decides_and_names_where_it_was_last_tested
+    - tests/test_results.py::test_an_older_result_still_counts
+    - tests/test_results.py::test_a_skip_counts_as_not_run
+    - tests/test_results.py::test_when_tests_ran_decides_not_when_they_were_added
+    - tests/test_results.py::test_a_file_that_cannot_be_imported_fails_its_linked_tests
+- id: VERIFY-V4
+  verifies:
+  - VERIFY-5
+  - VERIFY-22
+  - VERIFY-4
+  method: test
+  technique: unit test
+  description: Each implementation gets counts of the four statuses, and the status command prints them with each item's status. A roll-up follows its children, is not passing with an unverified child, and takes no verdict of its own.
+  tests:
+    python:
+    - tests/test_results.py::test_status_counts_each_implementation_separately
+    - tests/test_results.py::test_the_status_prints_for_people
+    - tests/test_results.py::test_a_roll_up_follows_its_children
+    - tests/test_results.py::test_a_roll_up_with_an_unverified_child_is_not_passing
+    - tests/test_results.py::test_a_verdict_cannot_override_a_roll_ups_failing_child
+    - tests/test_results.py::test_a_roll_up_over_a_parent_and_its_child_terminates
+- id: VERIFY-V5
+  verifies:
+  - VERIFY-23
+  - VERIFY-28
+  method: test
+  technique: unit test
+  description: Failures are listed by level of intent, and the command fails only when an item is failing.
+  tests:
+    python:
+    - tests/test_results.py::test_failures_are_listed_by_level_of_intent_and_fail_the_command
+    - tests/test_results.py::test_a_retry_replaces_its_step
+- id: VERIFY-V6
+  verifies:
+  - VERIFY-24
+  method: test
+  technique: unit test
+  description: Tests in the results that no item links are listed; a test covered by a link to its file, or a verdict, is not.
+  tests:
+    python:
+    - tests/test_results.py::test_tests_nothing_links_are_listed
+    - tests/test_results.py::test_a_link_to_a_file_covers_its_tests
+    - tests/test_results.py::test_skipped_tests_nothing_links_are_listed_in_full
+- id: VERIFY-V7
+  verifies:
+  - VERIFY-25
+  method: test
+  technique: unit test
+  description: Each reader turns its format into identifiers and outcomes, and a bad report is named.
+  tests:
+    python:
+    - tests/test_results.py::test_junit_identifiers_and_outcomes
+    - tests/test_results.py::test_pytest_junit_gives_node_ids_and_a_parametrized_test_its_worst_outcome
+    - tests/test_results.py::test_jsonl_reads_one_result_per_line_and_says_which_line_is_wrong
+    - tests/test_results.py::test_invalid_xml_is_reported
+    - tests/test_results.py::test_a_new_reader_is_found_without_changing_anything_else
+    - tests/test_results.py::test_googletests_notrun_counts_as_skipped
+    - tests/test_results.py::test_a_namespaced_report_is_read
+    - tests/test_results.py::test_a_binary_report_is_named
+- id: VERIFY-V8
+  verifies:
+  - VERIFY-26
+  method: test
+  technique: unit test
+  description: An unknown format names the readers and the way to ask for one.
+  tests:
+    python:
+    - tests/test_results.py::test_an_unknown_format_names_the_readers_and_the_way_to_ask
+- id: VERIFY-V9
+  verifies:
+  - VERIFY-27
+  method: test
+  technique: unit test
+  description: The not-run counts appear in the health measures and in the data the page's overview renders, with the items verifying locked requirements listed.
+  tests:
+    python:
+    - tests/test_results.py::test_not_run_items_verifying_locked_requirements_are_listed
+    - tests/test_results.py::test_the_review_page_overview_carries_the_status
+- id: VERIFY-V10
+  verifies:
+  - VERIFY-29
+  method: test
+  technique: unit test
+  description: A verdict recorded under a verification item's ID sets that item's status.
+  tests:
+    python:
+    - tests/test_results.py::test_a_verdict_is_a_result_named_by_the_item

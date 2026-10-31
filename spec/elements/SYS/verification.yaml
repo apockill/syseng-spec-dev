@@ -64,4 +64,22 @@
   - SYS-56
   method: analysis
   technique: roll-up
-  description: Verified through its children's verification. The real send to GitHub has not been exercised.
+  description: Verified through its children's verification.
+- id: SYS-V9
+  verifies:
+  - SYS-59
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V10
+  verifies:
+  - SYS-57
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V11
+  verifies:
+  - SYS-58
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.

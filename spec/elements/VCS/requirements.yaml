@@ -1,0 +1,25 @@
+- id: VCS-1
+  text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, names the trunk, reads a setting, and keeps generated files out of version control.
+  traces_to: SYS-59
+  basis: derived
+  why: these are the operations the toolkit uses today.
+- id: VCS-2
+  text: The toolkit shall compare revision names only for equality.
+  traces_to: SYS-59
+  basis: derived
+  why: a commit hash and a CL number share no order or arithmetic.
+- id: VCS-3
+  text: The toolkit shall include a version-control backend for git.
+  traces_to: SYS-59
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Discussing how tied the toolkit is to git.
+    said: An interface, with one implementation for git.
+    basis: stated
+    fingerprint: f3048fc3040c
+- id: VCS-4
+  text: The toolkit shall use the version-control backend the repository's toolkit settings name, git by default.
+  traces_to: SYS-59
+  basis: derived
+  why: a backend added later has to be selectable.

@@ -5,6 +5,7 @@ A link is `path`, a file, or `path::name`, a test in that file:
 - in a C++ file, a GoogleTest name, `Suite.Test`, declared with TEST, TEST_F, TEST_P or TYPED_TEST;
 - in any other file, the name only has to appear in it.
 
+Any other link is an identifier the test results report (MODEL-42), which this leaves to `spec results status`.
 Paths resolve against the implementation's root directory. `unlinked` lists the Python tests no link covers
 (CHECK-3); running tests is left for later.
 """
@@ -15,7 +16,15 @@ import re
 from pathlib import Path
 
 CPP_SUFFIXES = {".cc", ".cpp", ".cxx", ".c++"}
+SOURCE_SUFFIXES = CPP_SUFFIXES | {".py", ".js", ".jsx", ".ts", ".tsx", ".go", ".rs", ".java", ".rb", ".sh"}
 _GTEST = r"\b(?:TEST|TEST_F|TEST_P|TYPED_TEST|TYPED_TEST_P)\s*\(\s*{suite}\s*,\s*{test}\s*\)"
+
+
+def names_file(link: str) -> bool:
+    """Whether a link points into the source. A build target or a step's name doesn't (CHECK-33)."""
+    path = link.partition("::")[0]
+    return not link.startswith("//") and ("::" in link or "/" in path and bool(Path(path).suffix)
+                                          or Path(path).suffix in SOURCE_SUFFIXES)
 
 
 def missing(base: Path, link: str, cache: dict[Path, str] | None = None) -> str | None:

@@ -67,6 +67,7 @@ Optional: `verification_deferred: <why>` marks a requirement as knowingly unveri
   description: A command built from a route sends that route's request and prints its JSON reply.
   tests:
     python: [tests/test_box.py::test_route_command]   # key: the implementation's name in toolkit.yaml
+                                                      # value: the identifier the test's results report
   reason: …
 ```
 
@@ -146,6 +147,7 @@ Add `kind: conflict`, and `keeps:` / `rolls_back:` per option, for a conflict wi
 ## settings (`spec/toolkit.yaml`)
 
 Edited by hand; `spec edit` doesn't cover it.
-- `implementations`: each with `name`, `language`, `root` and one `primary: true`. The `name` is the key under each verification item's `tests`.
+- `implementations`: each with `name`, `root` and one `primary: true`, and `language` where one language covers it. An implementation is a whole working system, which can span languages, frameworks and providers. The `name` is the key under each verification item's `tests`.
+- `version_control`: the backend to use, `git` by default.
 - `element_order`: the order elements are listed in.
 - `flow_down: enforced` makes a requirement that skips a level an error.

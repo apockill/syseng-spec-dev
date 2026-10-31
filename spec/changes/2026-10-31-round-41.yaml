@@ -1,0 +1,1397 @@
+request: Take in test results from separate pipeline steps through extensible readers, and reach version control through an interface
+mode: spec-first
+target: python
+status: closed
+opened: '2026-10-31'
+entries:
+- op: add
+  id: SYS-57
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's design direction for NEED-31.
+  requested: true
+  after:
+    kind: system
+    text: The toolkit shall derive each verification item's status in each implementation from test results given to it.
+    serves:
+    - NEED-31
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how verification results should reach the toolkit.
+      said: Wants a system that doesn't take over the job of the test runner but is easy to integrate with a test runner or CI, by taking in exported test results and using them to inspect verification items.
+      basis: stated
+      fingerprint: 2cd5df169cb7
+- op: add
+  id: SYS-58
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    kind: system
+    text: Adding a reader for a test-result format shall require no change to the toolkit's existing code.
+    serves:
+    - NEED-31
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+      said: Wants the system extensible so that new readers are easy to add, and would rather users open a GitHub issue asking for a reader than hand-roll their own parsers for the same thing everywhere.
+      basis: stated
+      fingerprint: ff704df901ab
+- op: add
+  id: SYS-59
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's suggestion, hedged, so guided.
+  after:
+    kind: system
+    text: Adding support for a version-control system shall require no change to the toolkit's existing code.
+    serves:
+    - NEED-3
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how tied the toolkit is to git, given a monorepo at the engineer's work that identifies changes by CL.
+      said: Suggested maybe making this extensible with an interface, implementing it for git, so that supporting another system later is a matter of adding an implementation.
+      basis: guided
+      fingerprint: e09784ed7a2d
+- op: add
+  id: VCS
+  at: 2026-10-31T12:03-07:00
+  reason: SYS-59 needs a home.
+  after:
+    title: Reaches version control through one interface
+    parent: SYS
+    purpose: Everything the toolkit needs from version control, behind one interface with a backend per system.
+- op: add
+  id: VCS-1
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-59.
+  after:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, and reads a setting.
+    traces_to: SYS-59
+    basis: derived
+    why: these are the operations the toolkit uses today.
+- op: add
+  id: VCS-2
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-59.
+  after:
+    text: The toolkit shall compare revision names only for equality.
+    traces_to: SYS-59
+    basis: derived
+    why: a commit hash and a CL number share no order or arithmetic.
+- op: add
+  id: VCS-3
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer named it.
+  requested: true
+  after:
+    text: The toolkit shall include a version-control backend for git.
+    traces_to: SYS-59
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how tied the toolkit is to git.
+      said: An interface, with one implementation for git.
+      basis: stated
+      fingerprint: f3048fc3040c
+- op: add
+  id: VCS-4
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-59.
+  after:
+    text: The toolkit shall use the version-control backend the repository's toolkit settings name, git by default.
+    traces_to: SYS-59
+    basis: derived
+    why: a backend added later has to be selectable.
+- op: add
+  id: VERIFY-17
+  at: 2026-10-31T12:03-07:00
+  reason: the core of SYS-57.
+  requested: true
+  after:
+    text: When given result reports with their format, implementation and step, the results command shall record each test's outcome, when it ran and the revision it ran on.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Describing a CI pipeline that runs tests, exports results and points a spec command at them.
+      said: Ingesting results may take several commands or one pointing at all of them.
+      basis: stated
+      fingerprint: 72beac21d5ff
+- op: add
+  id: VERIFY-18
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-57.
+  after:
+    text: When a step reports results again for the same implementation and revision, the results command shall replace that step's earlier results for that revision.
+    traces_to: SYS-57
+    basis: derived
+    why: the command is run again for later steps and for retries, so a retry must not count twice.
+- op: add
+  id: VERIFY-19
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-57.
+  after:
+    text: When a step produces no report, the results command shall record an outcome given for a named test.
+    traces_to: SYS-57
+    basis: derived
+    why: infrastructure steps in the engineer's pipeline may give only an exit status.
+- op: add
+  id: VERIFY-20
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-57.
+  after:
+    text: Each test's status shall follow its newest recorded result.
+    traces_to: SYS-57
+    basis: derived
+    why: expensive steps run less often than cheap ones, so results from different revisions are combined.
+- op: add
+  id: VERIFY-21
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer specified it.
+  requested: true
+  after:
+    text: The status command shall name, for each verification item, the revision in which it was last tested.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how to show results from older revisions.
+      said: Ideally it would state the exact node where testing last happened, such as the commit, saying last tested in that revision rather than a count of commits; the LLM can work out how old that is if needed.
+      basis: stated
+      fingerprint: 62ddf0c2b86b
+- op: add
+  id: VERIFY-22
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's scenario.
+  requested: true
+  after:
+    text: The status command shall show, for each implementation, how many verification items have each status.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Describing a pipeline that ends by inspecting verification items.
+      said: At the end you inspect your verification items and see how the system's health is; one implementation might be fine and working while another is in progress.
+      basis: stated
+      fingerprint: 4db418d2d7f8
+- op: add
+  id: VERIFY-23
+  at: 2026-10-31T12:03-07:00
+  reason: puts what the engineer cares about first.
+  after:
+    text: The status command shall list failing verification items by the level of intent of the requirements they verify, highest first.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Describing CI that checks results against the spec and uses them as a to-do list.
+      said: The check can be used as a to-do list for updating the spec, bringing changed requirements to the user if they are important or if locked requirements had to change.
+      basis: guided
+      fingerprint: 18789250a511
+- op: add
+  id: VERIFY-24
+  at: 2026-10-31T12:03-07:00
+  reason: part of SYS-57.
+  after:
+    text: The status command shall list each test in the results that no verification item links.
+    traces_to: SYS-57
+    basis: derived
+    why: this finds unlinked tests in any language, where the source scan reads only Python.
+- op: add
+  id: VERIFY-25
+  at: 2026-10-31T12:03-07:00
+  reason: the first readers.
+  requested: true
+  after:
+    text: The results command shall include readers for JUnit XML, for pytest's JUnit XML and for a documented format of one result per line.
+    traces_to: SYS-58
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposed simple line-by-line result format, and to JUnit XML as the common export.
+      said: Accepted the line-by-line format and prefers obeying existing test standards over making up the toolkit's own format.
+      basis: stated
+      fingerprint: da8252496c19
+- op: add
+  id: VERIFY-26
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's preference.
+  requested: true
+  after:
+    text: When given a format it has no reader for, the results command shall name the formats it reads and suggest asking for a reader through a problem report.
+    traces_to: SYS-58
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+      said: Would rather users open a GitHub issue asking for a reader than hand-roll parsers for the same thing all over the place.
+      basis: stated
+      fingerprint: c188d19e6712
+- op: add
+  id: AGENT-75
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer's preference, for agents.
+  requested: true
+  after:
+    text: When a project's test tool has no reader, the agent shall offer to ask for one through a problem report before writing a conversion of its own.
+    traces_to: SYS-58
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+      said: Would rather users open a GitHub issue asking for a reader than hand-roll parsers for the same thing all over the place.
+      basis: stated
+      fingerprint: d1b7fa4fc8ae
+- op: add
+  id: MODEL-42
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer agreed.
+  requested: true
+  after:
+    text: A verification item's test link shall be the identifier the test's results report.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reacting to a proposal that a test link becomes an opaque identifier, whatever string the results report.
+      said: Agreed, and said they hadn't liked making up the toolkit's own format for tests; standardizing on and obeying standards sounds good.
+      basis: stated
+      fingerprint: 33ab94dc67e0
+- op: add
+  id: CHECK-33
+  at: 2026-10-31T12:03-07:00
+  reason: follows from identifiers being opaque.
+  after:
+    text: The checker shall look up in the source only those test links that name a file.
+    traces_to: SYS-57
+    basis: derived
+    why: a build target or a step's name has no source file to find.
+- op: modify
+  id: MODEL-7
+  at: 2026-10-31T12:03-07:00
+  reason: the engineer redefined an implementation.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: f93b94d95665
+  fingerprint_after: b2aecfcb407d
+  requested: true
+  before:
+    text: The spec shall name each implementation of the product, with its language.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how the spec relates to the code that realizes it.
+      said: Said a spec could be marked as implemented in a named implementation with its language, such as C++, or as having no implementations.
+      basis: stated
+      fingerprint: f93b94d95665
+  after:
+    text: The spec shall name each implementation of the product, a whole working system that can span languages, frameworks and providers.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how the spec relates to the code that realizes it.
+      said: Said a spec could be marked as implemented in a named implementation with its language, such as C++, or as having no implementations.
+      basis: stated
+      fingerprint: f93b94d95665
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Reviewing the proposal that an implementation becomes a name and a root, with language optional.
+      said: Wants it clear that an implementation is not a language but a holistic process, system or entire working architecture.
+      basis: stated
+      fingerprint: b2aecfcb407d
+  acks:
+    MODEL-7: the engineer redefined it in this conversation.
+- op: modify
+  id: VERIFY-5
+  at: 2026-10-31T12:03-07:00
+  reason: there is no runner in this design.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 27d7dbc97fb4
+  fingerprint_after: aac1829305c0
+  requested: true
+  before:
+    text: |-
+      The runner shall derive each verification item's status in each implementation: not implemented, not yet run, passing or failing.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how the spec relates to what has been built.
+      said: Wants the specs to mark in some way what has been implemented yet and what has not, for example so tests aren't expected to pass where verification items have perhaps been specified but not implemented.
+      basis: guided
+      fingerprint: 27d7dbc97fb4
+  after:
+    text: The toolkit shall derive each verification item's status in each implementation from recorded results, as not implemented, not yet run, passing or failing.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how the spec relates to what has been built.
+      said: Wants the specs to mark in some way what has been implemented yet and what has not, for example so tests aren't expected to pass where verification items have perhaps been specified but not implemented.
+      basis: guided
+      fingerprint: 27d7dbc97fb4
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:03
+      context: Discussing how verification results should reach the toolkit.
+      said: Wants the toolkit to take in results rather than take over the job of the test runner.
+      basis: stated
+      fingerprint: aac1829305c0
+  acks:
+    VERIFY-5: the engineer asked for results to come in from outside; the four statuses stay.
+- op: modify
+  id: VERIFY-3
+  at: 2026-10-31T12:10-07:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how verification items are run.
+      said: Described the skill as having a tool for running them in parallel and reporting back.
+      basis: stated
+      fingerprint: 60235cdf8dcf
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how verification items are run.
+      said: Described the skill as having a tool for running them in parallel and reporting back.
+      basis: stated
+      fingerprint: 60235cdf8dcf
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:10
+      context: Reviewing an alteration on the review page (review 9a3fdfb9fb).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 60235cdf8dcf
+- op: modify
+  id: VERIFY-4
+  at: 2026-10-31T12:10-07:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how verification items are run.
+      said: Described the skill as having a tool for running them in parallel and reporting back.
+      basis: stated
+      fingerprint: 31720a5893b1
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how verification items are run.
+      said: Described the skill as having a tool for running them in parallel and reporting back.
+      basis: stated
+      fingerprint: 31720a5893b1
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:10
+      context: Reviewing an alteration on the review page (review 9a3fdfb9fb).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 31720a5893b1
+- op: modify
+  id: INTEG-1
+  at: 2026-10-31T12:10-07:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+      said: Described an integration test as a combination of running some commands and perhaps reasoning about them.
+      basis: stated
+      fingerprint: 8ce24899f508
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+      said: Described an integration test as a combination of running some commands and perhaps reasoning about them.
+      basis: stated
+      fingerprint: 8ce24899f508
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:10
+      context: Reviewing an alteration on the review page (review 9a3fdfb9fb).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 8ce24899f508
+- op: modify
+  id: LANG-2
+  at: 2026-10-31T12:10-07:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing which programming languages the toolkit supports.
+      said: Said the command-line interface the model uses would support C++ to start with.
+      basis: stated
+      fingerprint: 3de2e3c66d30
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing which programming languages the toolkit supports.
+      said: Said Python should also be one of the languages supported as a top priority (P0).
+      basis: stated
+      fingerprint: 3de2e3c66d30
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing which programming languages the toolkit supports.
+      said: Said the command-line interface the model uses would support C++ to start with.
+      basis: stated
+      fingerprint: 3de2e3c66d30
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing which programming languages the toolkit supports.
+      said: Said Python should also be one of the languages supported as a top priority (P0).
+      basis: stated
+      fingerprint: 3de2e3c66d30
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:10
+      context: Reviewing an alteration on the review page (review 9a3fdfb9fb).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 3de2e3c66d30
+- op: modify
+  id: CHECK-4
+  at: 2026-10-31T12:10-07:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the messages the linter gives an agent when it runs at the end of its work.
+      said: Gave as an example a message that some tests are referenced in verification items but don't exist.
+      basis: stated
+      fingerprint: 303ebb1bb4e4
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-17 23:07
+      context: Deciding what the toolkit needs before a first real project.
+      said: Said the toolkit doesn't need to be a test-running framework, but probably should have some simple verification that the tests exist. Suggested starting simple, perhaps just checking that the file or test name exists, and adding requirements later; everything else is to be decided and scoped later.
+      basis: stated
+      fingerprint: 303ebb1bb4e4
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Rounds 1 to 11, date approximate. Opening brief for the toolkit, describing the messages the linter gives an agent when it runs at the end of its work.
+      said: Gave as an example a message that some tests are referenced in verification items but don't exist.
+      basis: stated
+      fingerprint: 303ebb1bb4e4
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-17 23:07
+      context: Deciding what the toolkit needs before a first real project.
+      said: Said the toolkit doesn't need to be a test-running framework, but probably should have some simple verification that the tests exist. Suggested starting simple, perhaps just checking that the file or test name exists, and adding requirements later; everything else is to be decided and scoped later.
+      basis: stated
+      fingerprint: 303ebb1bb4e4
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:10
+      context: Reviewing an alteration on the review page (review 9a3fdfb9fb).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 303ebb1bb4e4
+- op: modify
+  id: SYS-13
+  at: 2026-10-31T12:12-07:00
+  reason: D1, the project's pipeline runs the tests and the toolkit reports on them.
+  raised:
+  - a person locked it
+  - a person stated or guided it
+  level: explicit
+  fingerprint_before: 9afaf723ca4d
+  fingerprint_after: a07e920e0b45
+  conflict: D1
+  before:
+    text: When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
+  after:
+    text: After a full run of the engineer's pipeline, the toolkit shall report the verification status of the whole product without the engineer present.
+  acks:
+    SYS-13: the engineer chose this in D1.
+    AGENT-22: still holds; agents fix what a full run finds, now from the status list.
+    VERIFY-12: still holds; the status command produces the summary.
+    VERIFY-13: still holds; not built in full, stays a to-do.
+- op: modify
+  id: VERIFY-2
+  at: 2026-10-31T12:12-07:00
+  reason: D1, there is no runner.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 5f78246dc555
+  fingerprint_after: 6dd5acabf5b5
+  before:
+    text: |-
+      The runner shall support three techniques in its first release: unit test, integration test and reasoning check.
+  after:
+    text: The toolkit shall take in results from unit tests, integration tests and reasoning checks.
+  acks:
+    VERIFY-2: D1; the same three techniques, now as results.
+    INTEG-1: D1 option named it for removal.
+    INTEG-2: depends on INTEG-1, removed under D1.
+    REASON-1: unchanged; reasoning checks stay.
+    REASON-3: unchanged; a verdict is what gets recorded.
+    UNIT-1: D1, the requirements under the adapters give way.
+- op: modify
+  id: VERIFY-4
+  at: 2026-10-31T12:12-07:00
+  reason: D1, reporting comes from results.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 31720a5893b1
+  fingerprint_after: 198717f41184
+  conflict: D1
+  before:
+    text: After each run, the runner shall report each verification item's result.
+  after:
+    text: After results are recorded, the status command shall report each verification item's status.
+  acks:
+    VERIFY-4: D1 said it becomes reporting from results.
+- op: modify
+  id: VERIFY-8
+  at: 2026-10-31T12:12-07:00
+  reason: D1, there is no runner.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: bf6a1576db57
+  fingerprint_after: 7ddc5bfc0f3e
+  rewording: true
+  before:
+    text: When an expensive-tier item fails, the runner shall add the failure to the change's open decisions.
+  after:
+    text: When an expensive-tier item fails, the toolkit shall add the failure to the change's open decisions.
+  acks:
+    VERIFY-8: wording only; the toolkit replaces the runner as subject.
+- op: modify
+  id: VERIFY-15
+  at: 2026-10-31T12:12-07:00
+  reason: D1, there is no runner.
+  rewording: true
+  before:
+    text: The runner shall run each model-judged verification item without the conversation or the spec that produced the work it checks.
+  after:
+    text: The toolkit shall have each model-judged verification item judged without the conversation or the spec that produced the work it checks.
+  acks:
+    REASON-2: unchanged.
+    REASON-5: unchanged.
+- op: modify
+  id: VERIFY-16
+  at: 2026-10-31T12:12-07:00
+  reason: D1, there is no runner.
+  rewording: true
+  before:
+    text: For a requirement the toolkit judges important, the runner shall judge each model-judged verification item more than once.
+  after:
+    text: For a requirement the toolkit judges important, the toolkit shall have each model-judged verification item judged more than once.
+  acks:
+    REASON-4: unchanged.
+- op: remove
+  id: VERIFY-3
+  at: 2026-10-31T12:12-07:00
+  reason: D1, parallel runs are the pipeline's job.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 60235cdf8dcf
+  fingerprint_after: null
+  conflict: D1
+  before:
+    text: The runner shall run independent verification items in parallel.
+    traces_to: SYS-10
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing how verification items are run.
+      said: Described the skill as having a tool for running them in parallel and reporting back.
+      basis: stated
+      fingerprint: 60235cdf8dcf
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:10
+      context: Reviewing an alteration on the review page (review 9a3fdfb9fb).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 60235cdf8dcf
+  acks:
+    VERIFY-3: D1 option named it for removal.
+- op: remove
+  id: VERIFY-14
+  at: 2026-10-31T12:12-07:00
+  reason: D1, choosing what to run is the pipeline's job.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 3489ec816f40
+  fingerprint_after: null
+  before:
+    text: When the engineer requests verification of a change, the runner shall include the verification items of every system element that depends, directly or indirectly, on an element the change touched.
+    traces_to: SYS-10
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (round 8). Answering Q24, about a shared system element, such as a general utility, that RENDER and PHYSICS both depend on; see DR-8.
+      said: Wants a change to the general utility, when they ask for a comprehensive verification, to trigger the verification items of RENDER and PHYSICS.
+      basis: guided
+      fingerprint: 3489ec816f40
+  acks:
+    VERIFY-14: the same reason as VERIFY-3 under D1; flagged in my report.
+- op: remove
+  id: INTEG-1
+  at: 2026-10-31T12:12-07:00
+  reason: D1, running commands is the pipeline's job.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 8ce24899f508
+  fingerprint_after: null
+  conflict: D1
+  before:
+    text: An integration-test item shall run its declared commands.
+    traces_to: VERIFY-2
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+      said: Described an integration test as a combination of running some commands and perhaps reasoning about them.
+      basis: stated
+      fingerprint: 8ce24899f508
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:10
+      context: Reviewing an alteration on the review page (review 9a3fdfb9fb).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 8ce24899f508
+  acks:
+    INTEG-1: D1 option named it for removal.
+- op: remove
+  id: INTEG-2
+  at: 2026-10-31T12:12-07:00
+  reason: D1, follows INTEG-1.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: d66b8eb24e15
+  fingerprint_after: null
+  before:
+    text: Where an integration-test item declares a reasoning step, the technique shall judge the commands' output with a reasoning check.
+    traces_to: VERIFY-2
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+      said: Described an integration test as a combination of running some commands and perhaps reasoning about them.
+      basis: guided
+      fingerprint: d66b8eb24e15
+  acks:
+    INTEG-2: depends on INTEG-1, removed under D1.
+- op: remove
+  id: INTEG-3
+  at: 2026-10-31T12:12-07:00
+  reason: D1, follows INTEG-1.
+  before:
+    text: An integration-test item shall pass only when each command's exit status and output meet the item's declared expectations.
+    traces_to: VERIFY-2
+    why: without declared expectations, "passed" only means "didn't crash".
+    basis: derived
+- op: remove
+  id: UNIT-1
+  at: 2026-10-31T12:12-07:00
+  reason: D1, the pipeline runs tests.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: f1a4fe48a702
+  fingerprint_after: null
+  before:
+    text: The unit-test technique shall run a verification item's linked tests through the language adapter of each implementation that has them.
+    traces_to: VERIFY-2
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing the kinds of verification (then called modalities) the toolkit should offer.
+      said: Described one modality as software unit tests, which can be written in the supported languages.
+      basis: guided
+      fingerprint: f1a4fe48a702
+  acks:
+    UNIT-1: D1, the requirements under the adapters give way.
+- op: remove
+  id: LANG-3
+  at: 2026-10-31T12:12-07:00
+  reason: D1, readers replace language adapters.
+  before:
+    text: |-
+      Each adapter shall provide three operations: list a repository's tests, run a chosen set of tests, and return a named test's source.
+    traces_to: SYS-22
+    why: these are the minimum that CHECK-3, CHECK-9 and UNIT-1 need. Coverage collection can come later.
+    basis: derived
+- op: remove
+  id: LANG-4
+  at: 2026-10-31T12:12-07:00
+  reason: D1, readers replace language adapters.
+  before:
+    text: The first-release adapters shall support GoogleTest for C++ and pytest for Python.
+    traces_to: SYS-22
+    why: each is the most common framework in its language.
+    basis: derived
+- op: remove
+  id: LANG-2
+  at: 2026-10-31T12:12-07:00
+  reason: D1, readers replace language adapters.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 3de2e3c66d30
+  fingerprint_after: null
+  conflict: D1
+  before:
+    text: The toolkit shall include adapters for C++ and Python.
+    traces_to: SYS-22
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing which programming languages the toolkit supports.
+      said: Said the command-line interface the model uses would support C++ to start with.
+      basis: stated
+      fingerprint: 3de2e3c66d30
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (rounds 1 to 11). Describing which programming languages the toolkit supports.
+      said: Said Python should also be one of the languages supported as a top priority (P0).
+      basis: stated
+      fingerprint: 3de2e3c66d30
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:10
+      context: Reviewing an alteration on the review page (review 9a3fdfb9fb).
+      said: Kept the item as it now reads.
+      basis: stated
+      fingerprint: 3de2e3c66d30
+  acks:
+    LANG-2: D1 option named it.
+- op: modify
+  id: VERIFY
+  at: 2026-10-31T12:12-07:00
+  reason: D1, there is no runner.
+  before:
+    title: Runs verification items and tracks their status
+    purpose: The runner executes verification items by technique and tier, and tracks each item's status in each implementation.
+  after:
+    title: Tracks verification status from test results
+    purpose: Takes in test results from the project's pipeline and tracks each verification item's status in each implementation.
+  acks:
+    CHECK: unaffected.
+    CLI: unaffected.
+    INTEG: left with no requirements for now; the toolkit can't remove an element.
+    REASON: unaffected.
+    REVIEW: gains VERIFY-27's overview.
+    UNIT: left with no requirements for now; the toolkit can't remove an element.
+- op: add
+  id: VERIFY-27
+  at: 2026-10-31T12:12-07:00
+  reason: the engineer's concern in D3.
+  requested: true
+  after:
+    text: The review page's overview shall show how many verification items have not been run, listing those that verify locked requirements.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:12
+      context: Answering what should fail a CI pipeline, unsure of the choice and that it may change over time.
+      said: Worried about not hearing about locked requirements that haven't been run. Maybe for now the health check on the dashboard should say what tests haven't been run, so it's clearly surfaced where the spec's health sits and they can choose to run everything or not sit at a low percentage of covered verification items.
+      basis: stated
+      fingerprint: 01ef2bc39aef
+- op: add
+  id: VERIFY-28
+  at: 2026-10-31T12:12-07:00
+  reason: D3.
+  after:
+    text: The status command shall exit with failure when a verification item is failing, and otherwise with success.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 12:12
+      context: Answering what should fail a CI pipeline.
+      said: Chose failing only for now, unsure and expecting it may change over time.
+      basis: guided
+      fingerprint: 83ff62ea759f
+- op: add
+  id: VERIFY-29
+  at: 2026-10-31T12:12-07:00
+  reason: reasoning checks stay and report as results.
+  after:
+    text: A reasoning check's or manual item's verdict shall be recorded as a result named by the verification item's ID.
+    traces_to: SYS-57
+    basis: derived
+    why: these items have no tests, and their verdicts need the same way in (D1).
+- op: modify
+  id: VCS-1
+  at: 2026-10-31T12:12-07:00
+  reason: the leak check needs the address.
+  before:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, and reads a setting.
+  after:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, reads a setting, and gives the repository's address.
+- op: modify
+  id: UNIT
+  at: 2026-10-31T12:17-07:00
+  reason: D1, the toolkit runs no tests.
+  before:
+    purpose: Runs a verification item's linked unit tests in each implementation, through that implementation's language adapter.
+  after:
+    purpose: Unit tests, which the project's tools run and report through result readers.
+- op: modify
+  id: INTEG
+  at: 2026-10-31T12:17-07:00
+  reason: D1, the toolkit runs no tests.
+  before:
+    purpose: Runs a verification item's declared commands, checks their results, and can have a reasoning check judge the output.
+  after:
+    purpose: Integration tests, which the project's tools run and report through result readers.
+- op: modify
+  id: LANG
+  at: 2026-10-31T12:17-07:00
+  reason: D1, readers replace language adapters.
+  before:
+    title: Language adapters
+    purpose: |-
+      The adapters hold everything specific to a programming language: finding tests, running them, and reading their source.
+  after:
+    title: Languages
+    purpose: Nothing is specific to a language now that readers take in results; kept until the toolkit can remove an element.
+  acks:
+    CHECK: unaffected; LANG stays only because elements cannot be removed
+    VERIFY: unaffected, same reason
+- op: add
+  id: VCS-V1
+  at: 2026-10-31T12:17-07:00
+  reason: covers the interface.
+  after:
+    verifies:
+    - VCS-1
+    - VCS-3
+    method: test
+    technique: unit test
+    description: The git backend answers each of the interface's operations, and nothing outside the backends calls git.
+    tests:
+      python:
+      - tests/test_vcs.py::test_the_git_backend_answers_each_operation
+      - tests/test_vcs.py::test_nothing_outside_the_backend_calls_git
+- op: add
+  id: VCS-V2
+  at: 2026-10-31T12:17-07:00
+  reason: covers opaque names, as far as a test can.
+  after:
+    verifies:
+    - VCS-2
+    method: test
+    technique: unit test
+    description: A revision name with unusual characters is stored and shown unchanged. Whether code elsewhere compares revisions is otherwise unchecked.
+    tests:
+      python:
+      - tests/test_results.py::test_a_revision_is_never_parsed
+- op: add
+  id: VCS-V3
+  at: 2026-10-31T12:17-07:00
+  reason: covers choosing a backend.
+  after:
+    verifies:
+    - VCS-4
+    method: test
+    technique: unit test
+    description: Git is the default, the settings choose a backend, an unknown one is named with what exists, and a new backend module is found.
+    tests:
+      python:
+      - tests/test_vcs.py::test_git_is_the_default_backend
+      - tests/test_vcs.py::test_the_settings_choose_the_backend
+      - tests/test_vcs.py::test_a_new_backend_is_found_without_changing_anything_else
+- op: add
+  id: SYS-V9
+  at: 2026-10-31T12:17-07:00
+  reason: its children cover it.
+  after:
+    verifies:
+    - SYS-59
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V10
+  at: 2026-10-31T12:17-07:00
+  reason: its children cover it.
+  after:
+    verifies:
+    - SYS-57
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V11
+  at: 2026-10-31T12:17-07:00
+  reason: its children cover it.
+  after:
+    verifies:
+    - SYS-58
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: VERIFY-V1
+  at: 2026-10-31T12:17-07:00
+  reason: covers taking results in.
+  after:
+    verifies:
+    - VERIFY-17
+    - VERIFY-19
+    method: test
+    technique: unit test
+    description: Report files, several in one command, and outcomes given by hand are recorded with revision and step, per implementation, and combine across steps in any order.
+    tests:
+      python:
+      - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+      - tests/test_results.py::test_several_reports_in_one_command
+      - tests/test_results.py::test_results_are_kept_per_implementation
+- op: add
+  id: VERIFY-V2
+  at: 2026-10-31T12:17-07:00
+  reason: covers retries.
+  after:
+    verifies:
+    - VERIFY-18
+    method: test
+    technique: unit test
+    description: Reporting a step again on the same revision replaces its earlier results.
+    tests:
+      python:
+      - tests/test_results.py::test_a_retry_replaces_its_step
+- op: add
+  id: VERIFY-V3
+  at: 2026-10-31T12:17-07:00
+  reason: covers older results.
+  after:
+    verifies:
+    - VERIFY-20
+    - VERIFY-21
+    method: test
+    technique: unit test
+    description: The newest result decides, an older result still counts, a skip counts as not run, and an item names the revision it was last tested in.
+    tests:
+      python:
+      - tests/test_results.py::test_a_results_newest_outcome_decides_and_names_where_it_was_last_tested
+      - tests/test_results.py::test_an_older_result_still_counts
+      - tests/test_results.py::test_a_skip_counts_as_not_run
+- op: add
+  id: VERIFY-V4
+  at: 2026-10-31T12:17-07:00
+  reason: covers the health table.
+  after:
+    verifies:
+    - VERIFY-5
+    - VERIFY-22
+    - VERIFY-4
+    method: test
+    technique: unit test
+    description: Each implementation gets counts of the four statuses, and the status command prints them with each item's status.
+    tests:
+      python:
+      - tests/test_results.py::test_status_counts_each_implementation_separately
+      - tests/test_results.py::test_the_status_prints_for_people
+- op: add
+  id: VERIFY-V5
+  at: 2026-10-31T12:17-07:00
+  reason: covers the failure list and exit code.
+  after:
+    verifies:
+    - VERIFY-23
+    - VERIFY-28
+    method: test
+    technique: unit test
+    description: Failures are listed by level of intent, and the command fails only when an item is failing.
+    tests:
+      python:
+      - tests/test_results.py::test_failures_are_listed_by_level_of_intent_and_fail_the_command
+      - tests/test_results.py::test_a_retry_replaces_its_step
+- op: add
+  id: VERIFY-V6
+  at: 2026-10-31T12:17-07:00
+  reason: covers unlinked tests.
+  after:
+    verifies:
+    - VERIFY-24
+    method: test
+    technique: unit test
+    description: Tests in the results that no item links are listed; a test covered by a link to its file, or a verdict, is not.
+    tests:
+      python:
+      - tests/test_results.py::test_tests_nothing_links_are_listed
+      - tests/test_results.py::test_a_link_to_a_file_covers_its_tests
+- op: add
+  id: VERIFY-V7
+  at: 2026-10-31T12:17-07:00
+  reason: covers the readers.
+  after:
+    verifies:
+    - VERIFY-25
+    method: test
+    technique: unit test
+    description: Each reader turns its format into identifiers and outcomes, and a bad report is named.
+    tests:
+      python:
+      - tests/test_results.py::test_junit_identifiers_and_outcomes
+      - tests/test_results.py::test_pytest_junit_gives_node_ids_and_a_parametrized_test_its_worst_outcome
+      - tests/test_results.py::test_jsonl_reads_one_result_per_line_and_says_which_line_is_wrong
+      - tests/test_results.py::test_invalid_xml_is_reported
+      - tests/test_results.py::test_a_new_reader_is_found_without_changing_anything_else
+- op: add
+  id: VERIFY-V8
+  at: 2026-10-31T12:17-07:00
+  reason: covers the message.
+  after:
+    verifies:
+    - VERIFY-26
+    method: test
+    technique: unit test
+    description: An unknown format names the readers and the way to ask for one.
+    tests:
+      python:
+      - tests/test_results.py::test_an_unknown_format_names_the_readers_and_the_way_to_ask
+- op: add
+  id: VERIFY-V9
+  at: 2026-10-31T12:17-07:00
+  reason: covers the dashboard's data.
+  after:
+    verifies:
+    - VERIFY-27
+    method: test
+    technique: unit test
+    description: The not-run counts appear in the health measures and in the data the page's overview renders, with the items verifying locked requirements listed. How the page displays it is not tested.
+    tests:
+      python:
+      - tests/test_results.py::test_not_run_items_verifying_locked_requirements_are_listed
+      - tests/test_results.py::test_the_review_page_overview_carries_the_status
+- op: add
+  id: VERIFY-V10
+  at: 2026-10-31T12:17-07:00
+  reason: covers verdicts.
+  after:
+    verifies:
+    - VERIFY-29
+    method: test
+    technique: unit test
+    description: A verdict recorded under a verification item's ID sets that item's status.
+    tests:
+      python:
+      - tests/test_results.py::test_a_verdict_is_a_result_named_by_the_item
+- op: add
+  id: MODEL-V17
+  at: 2026-10-31T12:17-07:00
+  reason: covers opaque links.
+  after:
+    verifies:
+    - MODEL-42
+    method: test
+    technique: unit test
+    description: Links that are build targets or step names match results by identifier.
+    tests:
+      python:
+      - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+- op: add
+  id: CHECK-V20
+  at: 2026-10-31T12:17-07:00
+  reason: covers the narrowed lookup.
+  after:
+    verifies:
+    - CHECK-33
+    method: test
+    technique: unit test
+    description: Only links that name a file are looked up in the source.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_only_links_that_name_a_file_are_looked_up
+      - tests/test_results.py::test_a_link_that_names_no_file_is_left_to_results
+- op: modify
+  id: VCS-1
+  at: 2026-10-31T12:26-07:00
+  reason: the audit found ignore files written outside the backend.
+  before:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, reads a setting, and gives the repository's address.
+  after:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, reads a setting, gives the repository's address, and keeps generated files out of version control.
+  acks:
+    VCS-V1: its test now covers the new operation and finding a base
+- op: modify
+  id: VERIFY-V1
+  at: 2026-10-31T12:26-07:00
+  reason: the audit found the description claimed more than the tests checked.
+  before:
+    description: Report files, several in one command, and outcomes given by hand are recorded with revision and step, per implementation, and combine across steps in any order.
+    tests:
+      python:
+      - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+      - tests/test_results.py::test_several_reports_in_one_command
+      - tests/test_results.py::test_results_are_kept_per_implementation
+  after:
+    description: Report files, several in one command, and outcomes given by hand are recorded with step, revision and time, per implementation, and combine across steps in any order. The revision defaults to version control's current one, and an empty report records nothing.
+    tests:
+      python:
+      - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+      - tests/test_results.py::test_several_reports_in_one_command
+      - tests/test_results.py::test_results_are_kept_per_implementation
+      - tests/test_results.py::test_a_record_keeps_the_step_revision_time_and_outcomes
+      - tests/test_results.py::test_the_revision_defaults_to_version_controls_current_one
+      - tests/test_results.py::test_an_empty_report_records_nothing_and_keeps_what_was_there
+      - tests/test_results.py::test_a_bad_ran_at_is_refused
+      - tests/test_results.py::test_a_corrupt_results_file_is_skipped_with_a_warning
+- op: modify
+  id: VERIFY-V2
+  at: 2026-10-31T12:26-07:00
+  reason: the audit found verdicts replacing each other.
+  before:
+    description: Reporting a step again on the same revision replaces its earlier results.
+    tests:
+      python:
+      - tests/test_results.py::test_a_retry_replaces_its_step
+  after:
+    description: Reporting a step again on the same revision replaces its earlier results, while outcomes given one at a time join their step.
+    tests:
+      python:
+      - tests/test_results.py::test_a_retry_replaces_its_step
+      - tests/test_results.py::test_verdicts_given_one_at_a_time_share_a_step
+- op: modify
+  id: VERIFY-V3
+  at: 2026-10-31T12:26-07:00
+  reason: adds the audit's cases.
+  before:
+    description: The newest result decides, an older result still counts, a skip counts as not run, and an item names the revision it was last tested in.
+    tests:
+      python:
+      - tests/test_results.py::test_a_results_newest_outcome_decides_and_names_where_it_was_last_tested
+      - tests/test_results.py::test_an_older_result_still_counts
+      - tests/test_results.py::test_a_skip_counts_as_not_run
+  after:
+    description: The newest result by when it ran decides, an older result still counts, a skip counts as not run, a file that can't be imported fails its linked tests, and an item names the revision it was last tested in.
+    tests:
+      python:
+      - tests/test_results.py::test_a_results_newest_outcome_decides_and_names_where_it_was_last_tested
+      - tests/test_results.py::test_an_older_result_still_counts
+      - tests/test_results.py::test_a_skip_counts_as_not_run
+      - tests/test_results.py::test_when_tests_ran_decides_not_when_they_were_added
+      - tests/test_results.py::test_a_file_that_cannot_be_imported_fails_its_linked_tests
+- op: modify
+  id: VERIFY-V4
+  at: 2026-10-31T12:26-07:00
+  reason: adds the audit's cases.
+  before:
+    description: Each implementation gets counts of the four statuses, and the status command prints them with each item's status.
+    tests:
+      python:
+      - tests/test_results.py::test_status_counts_each_implementation_separately
+      - tests/test_results.py::test_the_status_prints_for_people
+  after:
+    description: Each implementation gets counts of the four statuses, and the status command prints them with each item's status. A roll-up follows its children, is not passing with an unverified child, and takes no verdict of its own.
+    tests:
+      python:
+      - tests/test_results.py::test_status_counts_each_implementation_separately
+      - tests/test_results.py::test_the_status_prints_for_people
+      - tests/test_results.py::test_a_roll_up_follows_its_children
+      - tests/test_results.py::test_a_roll_up_with_an_unverified_child_is_not_passing
+      - tests/test_results.py::test_a_verdict_cannot_override_a_roll_ups_failing_child
+      - tests/test_results.py::test_a_roll_up_over_a_parent_and_its_child_terminates
+- op: modify
+  id: VERIFY-V6
+  at: 2026-10-31T12:26-07:00
+  reason: adds the audit's case.
+  before:
+    tests:
+      python:
+      - tests/test_results.py::test_tests_nothing_links_are_listed
+      - tests/test_results.py::test_a_link_to_a_file_covers_its_tests
+  after:
+    tests:
+      python:
+      - tests/test_results.py::test_tests_nothing_links_are_listed
+      - tests/test_results.py::test_a_link_to_a_file_covers_its_tests
+      - tests/test_results.py::test_skipped_tests_nothing_links_are_listed_in_full
+- op: modify
+  id: VERIFY-V7
+  at: 2026-10-31T12:26-07:00
+  reason: adds the audit's cases.
+  before:
+    tests:
+      python:
+      - tests/test_results.py::test_junit_identifiers_and_outcomes
+      - tests/test_results.py::test_pytest_junit_gives_node_ids_and_a_parametrized_test_its_worst_outcome
+      - tests/test_results.py::test_jsonl_reads_one_result_per_line_and_says_which_line_is_wrong
+      - tests/test_results.py::test_invalid_xml_is_reported
+      - tests/test_results.py::test_a_new_reader_is_found_without_changing_anything_else
+  after:
+    tests:
+      python:
+      - tests/test_results.py::test_junit_identifiers_and_outcomes
+      - tests/test_results.py::test_pytest_junit_gives_node_ids_and_a_parametrized_test_its_worst_outcome
+      - tests/test_results.py::test_jsonl_reads_one_result_per_line_and_says_which_line_is_wrong
+      - tests/test_results.py::test_invalid_xml_is_reported
+      - tests/test_results.py::test_a_new_reader_is_found_without_changing_anything_else
+      - tests/test_results.py::test_googletests_notrun_counts_as_skipped
+      - tests/test_results.py::test_a_namespaced_report_is_read
+      - tests/test_results.py::test_a_binary_report_is_named
+- op: modify
+  id: MODEL-V17
+  at: 2026-10-31T12:26-07:00
+  reason: adds the audit's cases.
+  before:
+    description: Links that are build targets or step names match results by identifier.
+    tests:
+      python:
+      - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+  after:
+    description: Links that are build targets, step names or JUnit names match results by identifier, including parametrized cases and a GoogleTest link naming its file.
+    tests:
+      python:
+      - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+      - tests/test_results.py::test_identifiers_from_junit_match_links_of_either_form
+      - tests/test_results.py::test_parametrized_results_match_a_bare_link
+- op: modify
+  id: VCS-V3
+  at: 2026-10-31T12:26-07:00
+  reason: adds the audit's case.
+  before:
+    tests:
+      python:
+      - tests/test_vcs.py::test_git_is_the_default_backend
+      - tests/test_vcs.py::test_the_settings_choose_the_backend
+      - tests/test_vcs.py::test_a_new_backend_is_found_without_changing_anything_else
+  after:
+    tests:
+      python:
+      - tests/test_vcs.py::test_git_is_the_default_backend
+      - tests/test_vcs.py::test_the_settings_choose_the_backend
+      - tests/test_vcs.py::test_a_new_backend_is_found_without_changing_anything_else
+      - tests/test_results.py::test_an_unknown_backend_is_reported_without_a_traceback
+- op: add
+  id: AGENT-V19
+  at: 2026-10-31T12:26-07:00
+  reason: covers the guidance.
+  after:
+    verifies:
+    - AGENT-75
+    method: test
+    technique: unit test
+    description: The skill's guidance tells agents to ask for a reader before writing a conversion. Whether agents follow it isn't tested.
+    tests:
+      python:
+      - tests/test_skill.py::test_agents_ask_for_a_reader_before_writing_their_own
+- op: add
+  id: DR-76
+  at: 2026-10-31T12:26-07:00
+  reason: records the design of SYS-58 and SYS-59.
+  after:
+    title: Readers and version-control backends are modules found by name
+    decided_by: agent
+    elements:
+    - VERIFY
+    - VCS
+    requirements: SYS-58, SYS-59
+    context: The engineer wants new formats and version-control systems added easily, and prefers a reader requested through an issue to parsers written per project.
+    decision: Each reader is a file in syseng/readers and each backend a file in syseng/vcs. The package lists its modules, and a format or backend is chosen by module name, so adding one is adding one file. Readers own how test identifiers are built. An outcome given with --id joins its step, while a report replaces it.
+    alternatives: A registry to edit, which breaks the no-change rule. Plugins installed from outside the toolkit, which the engineer's preference for shared readers doesn't need yet.
+    consequences: A reader or backend ships with the toolkit, so a private system's backend needs a toolkit release or a fork until plugins exist.
+    basis: derived
+decisions:
+- id: D1
+  kind: conflict
+  question: Should the toolkit stop running tests itself and only read their results, which changes SYS-12 and SYS-13, requirements you locked?
+  importance: This is the design's foundation. Today's spec describes a built-in runner, which was never built. You've now said the toolkit shouldn't take over the test runner's job, and that reverses items you locked or stated, so it needs your explicit choice. Everything else in this round depends on it.
+  involves:
+  - SYS-12
+  - SYS-13
+  - VERIFY-3
+  - VERIFY-4
+  - INTEG-1
+  - LANG-2
+  - CHECK-4
+  options:
+  - label: Read results; the project's own pipeline runs the tests
+    recommended: true
+    detail: |-
+      The test tools or CI run the tests, and spec results reads what they report. What changes: SYS-12 and SYS-13 say verification runs when the engineer's pipeline runs it, and the toolkit reports on it. VERIFY-3 (run in parallel) and INTEG-1 (run declared commands) are removed, because that becomes the pipeline's job. VERIFY-4 becomes reporting from results. LANG-2 (C++ and Python adapters), with the requirements under it, gives way to result readers. CHECK-4 keeps checking links that name a file; other links are checked against results. Example: pytest in CI, then spec results add, then spec results status. Reasoning checks are unaffected: agents still run them, and their verdicts arrive as results.
+    keeps:
+    - SYS-12
+    - SYS-13
+    - VERIFY-3
+    - VERIFY-4
+    - INTEG-1
+    - LANG-2
+    - CHECK-4
+  - label: Do both - read results, and also keep a built-in runner on the roadmap
+    detail: |-
+      Results come in as above, and the runner requirements stay as a future plan. Your locks stay intact, but the spec keeps about 15 requirements for something you've said you don't want, and they stay in the unverified count. Example: a later agent reads VERIFY-3 and builds a parallel runner.
+    rolls_back:
+    - SYS-12
+    - SYS-13
+    - VERIFY-3
+    - VERIFY-4
+    - INTEG-1
+    - LANG-2
+    - CHECK-4
+  status: resolved
+  chosen: Read results; the project's own pipeline runs the tests
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose Read results; the project's own pipeline runs the tests on the review page (summary)
+  resolved: '2026-10-31'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+- id: D2
+  question: Where should recorded test results be kept?
+  importance: Results arrive from several pipeline steps and must survive until the final status command. Where they live decides whether results are shared between people and machines, and whether they clutter version control. It needs settling before the command is built.
+  involves:
+  - VERIFY-17
+  options:
+  - label: A folder ignored by version control, which CI can point elsewhere
+    recommended: true
+    detail: |-
+      Results go in a folder such as .syseng/results/, one file per implementation, revision and step, and a --results-dir option moves it. CI jobs on separate machines share a folder or pass it along as a build artifact. Nothing is committed, so results cause no merge conflicts or noise in pull requests. What follows: a fresh clone starts with no results, so status says not yet run until a pipeline's results are fetched.
+  - label: Commit the results in the repository
+    detail: |-
+      Everyone sees the same results after a pull, and history keeps them. But every test run changes committed files, so branches conflict constantly, and CI must commit back to the repository. Example: two pull requests both touching a results file on every run.
+  status: resolved
+  chosen: A folder ignored by version control, which CI can point elsewhere
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose A folder ignored by version control, which CI can point elsewhere on the review page (summary)
+  resolved: '2026-10-31'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+- id: D3
+  question: What should make the final status command fail a CI pipeline?
+  importance: This decides how strict the toolkit is in a pipeline. Too strict blocks work on results nobody could have produced yet; too loose lets real failures pass. The exit code is what CI acts on.
+  involves:
+  - SYS-57
+  options:
+  - label: Fail only when a verification item is failing
+    recommended: true
+    detail: |-
+      A failed linked test fails the pipeline. Items not yet run or not implemented are listed as to-dos and don't fail it. This suits a migration: a second implementation that's in progress shows many not-implemented items without turning CI red. An option could tighten it later.
+  - label: Also fail when an item that verifies a locked requirement hasn't been run
+    detail: |-
+      Stricter protection for what you locked: the pipeline fails unless those items have results. But any repository with a skipped step, or with expensive steps that run nightly, fails on ordinary pull requests unless older results count, so this one needs tuning per project.
+  status: resolved
+  chosen: Fail only when a verification item is failing
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose Fail only when a verification item is failing on the review page (summary)
+  resolved: '2026-10-31'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-10-31T12:10-07:00
+  review: 9a3fdfb9fb
+  decision: 2026-10-31-round-41 D3
+  kind: comment
+  comment: Not sure I want to choose here yet. I'm not sure I feel strongly, this might change over time. However I'm worried about not hearing about locked requirements that haven't been run. Maybe for now the health check on the dashboard should tell me what tests haven't been run. That way at least it's clearly surfaced where the spec health sits, and I can choose to say 'hey this is an important thing, let's run all the test, or let's not sit at "20% covered vers". I'm not sure.
+  response: |-
+    Went with failing only for now, and it stays easy to change. For your worry: the review page's overview now shows how many verification items haven't been run, how many of those verify locked requirements, and lists them (VERIFY-27), and spec results status prints the same. So a low number is visible and you can decide what to run.
+  responded: 2026-10-31T12:11-07:00
+closed: '2026-10-31'

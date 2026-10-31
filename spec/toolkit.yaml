@@ -18,6 +18,7 @@ element_order:
 - CLI
 - ONBOARD
 - AGENT
+- VCS
 harnesses:
 - claude-code
 - hermes

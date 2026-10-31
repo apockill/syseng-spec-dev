@@ -165,3 +165,14 @@
   tests:
     python:
     - tests/test_approvals.py::test_a_lock_recorded_with_a_summary_keeps_it_in_said
+- id: MODEL-V17
+  verifies:
+  - MODEL-42
+  method: test
+  technique: unit test
+  description: Links that are build targets, step names or JUnit names match results by identifier, including parametrized cases and a GoogleTest link naming its file.
+  tests:
+    python:
+    - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+    - tests/test_results.py::test_identifiers_from_junit_match_links_of_either_form
+    - tests/test_results.py::test_parametrized_results_match_a_bare_link

@@ -194,7 +194,7 @@
   why: a review can take a while and a reload shouldn't lose it, but feedback already applied would otherwise be sent again with the next block.
   basis: derived
 - id: REVIEW-24
-  text: The review page shall show the differences against the person's last review, and against each other version named when the page was generated.
+  text: The review page shall show the differences against its base, and against the person's last review and each other version named when the page was generated.
   traces_to: SYS-48
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -204,6 +204,12 @@
     said: Asked whether the diff could compare against main or another commit.
     basis: guided
     fingerprint: 037991754455
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:41
+    context: Asking how to tell what a given review page is comparing against.
+    said: Would typically expect it to diff against trunk.
+    basis: stated
+    fingerprint: 2cdc79f6723c
 - id: REVIEW-25
   text: The review page shall show each intent record captured since the person's last review, with a control to correct or remove it.
   traces_to: SYS-44
@@ -278,7 +284,7 @@
     basis: stated
     fingerprint: c9f91b54ced0
 - id: REVIEW-32
-  text: The review page shall open on an overview of the spec, giving the items added, changed and removed since the person's last review and each measure of the spec's health with its change since then, and marking each measure that got worse.
+  text: The review page shall open on an overview of the spec, giving the items added, changed and removed since its base and each measure of the spec's health with its change since then.
   traces_to: SYS-45
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -287,8 +293,14 @@
     said: Finds statistics like that really helpful. Wants the dashboard's landing page to open with a high-level overview, such as the numbers of changed, edited, new and deleted items, items without verification items, connections between things and tests written, presented cleanly without too much noise. Also wants measures of the project's health that degraded called out visually, for example when a change lowers verification coverage.
     basis: stated
     fingerprint: fe62d522f563
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:41
+    context: Asking how to tell what a given review page is comparing against.
+    said: Would typically expect it to diff against trunk and state as such.
+    basis: stated
+    fingerprint: 594a30d1d9e5
 - id: REVIEW-33
-  text: Wherever the review page shows an item that changed since the person's last review, it shall mark the item as new or as edited, naming the kind of edit.
+  text: Wherever the review page shows an item that changed since its base, it shall mark the item as new or as edited, naming the kind of edit.
   traces_to: SYS-48
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -297,6 +309,12 @@
     said: When the AI asks them to review something it isn't always clear whether the item was edited or added, and they want that made clear.
     basis: stated
     fingerprint: 5ad478570d49
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:41
+    context: Asking how to tell what a given review page is comparing against.
+    said: Would typically expect it to diff against trunk and state as such.
+    basis: stated
+    fingerprint: f1b8f9d39b8d
 - id: REVIEW-34
   text: When the person turns on an edited item's diff, the review page shall show that item's differences inline.
   traces_to: SYS-48
@@ -342,3 +360,38 @@
   traces_to: SYS-45
   basis: added
   why: in review 0a959844be two corrections on SYS-34 arrived with no text and a "(see comment)" placeholder pointing at no comment, so the agent couldn't act on them.
+- id: REVIEW-40
+  text: The review page shall state at its top the version it compares against, naming the version, its revision, how that was resolved, and the newer side.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:41
+    context: Asking how to tell what a given review page is comparing against.
+    said: Needs to know what a review page is diffing against; it isn't clear today and there's no way to know the tooling is respecting the expected base, so the page should state it.
+    basis: stated
+    fingerprint: d45886b2be03
+- id: REVIEW-41
+  text: When a person names no base, the review page shall compare against the repository's trunk.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:41
+    context: Asking how to tell what a given review page is comparing against.
+    said: Would typically expect it to diff against trunk and state as such, or, for a stacked pull request, to say it is diffing against that pull request.
+    basis: stated
+    fingerprint: 22a3374f59ff
+- id: REVIEW-42
+  text: When a person names a base, the review page shall compare against that base first.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:41
+    context: Asking how to tell what a given review page is comparing against.
+    said: For a stacked change, expects the page to say it is diffing against whatever the pull request below it is.
+    basis: stated
+    fingerprint: 926abf8f2b39
+- id: REVIEW-43
+  text: When the page finds no version to compare against, the review page shall say so at its top.
+  traces_to: SYS-48
+  basis: derived
+  why: the engineer needs to know the comparison was respected, so a missing one can't pass silently.

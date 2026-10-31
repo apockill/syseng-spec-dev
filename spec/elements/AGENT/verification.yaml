@@ -169,7 +169,25 @@
   - AGENT-74
   method: test
   technique: unit test
-  description: The skill's guidance contains the instructions to report even what was worked around, to show the full text and ask, to write in general terms for a public repository, and not to propose a solution. Whether agents follow them isn't tested.
+  description: The skill's guidance contains the instructions to report even what was worked around, to show the full text and ask, to write in general terms for a public repository, and not to propose a solution.
   tests:
     python:
     - tests/test_skill.py::test_problem_reports_need_consent_general_terms_and_no_solution
+- id: AGENT-V19
+  verifies:
+  - AGENT-75
+  method: test
+  technique: unit test
+  description: The skill's guidance tells agents to ask for a reader before writing a conversion.
+  tests:
+    python:
+    - tests/test_skill.py::test_agents_ask_for_a_reader_before_writing_their_own
+- id: AGENT-V20
+  verifies:
+  - AGENT-76
+  method: test
+  technique: unit test
+  description: The skill's guidance gives every pull request that changes the spec its own page against its base, linked at the top.
+  tests:
+    python:
+    - tests/test_skill.py::test_every_pull_request_gets_a_review_page_against_its_base

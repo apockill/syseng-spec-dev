@@ -197,3 +197,13 @@
     python:
     - tests/test_check_structure.py::test_a_parent_without_verification_is_told_how_to_resolve_it
     - tests/test_check_structure.py::test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified
+- id: CHECK-V20
+  verifies:
+  - CHECK-33
+  method: test
+  technique: unit test
+  description: Only links that name a file are looked up in the source.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_only_links_that_name_a_file_are_looked_up
+    - tests/test_results.py::test_a_link_that_names_no_file_is_left_to_results

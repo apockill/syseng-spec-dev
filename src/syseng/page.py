@@ -7,6 +7,8 @@ from the network, so it works offline, from a plain file, and for a private spec
 import json
 from pathlib import Path
 
+from syseng import vcs
+
 WEB = Path(__file__).resolve().parent / "web"
 
 
@@ -32,9 +34,7 @@ def write(data: dict, out: Path, snapshots: Path) -> Path:
     (snapshots / f"{data['meta']['review']}.json").write_text(json.dumps(data, ensure_ascii=False, default=str))
     for old in sorted(snapshots.glob("*.json"), key=lambda p: p.stat().st_mtime)[:-20]:
         old.unlink()
-    ignore = out.parent / ".gitignore"
-    wanted = [out.name, snapshots.name + "/"]
-    have = ignore.read_text().splitlines() if ignore.exists() else []
-    if any(w not in have for w in wanted):
-        ignore.write_text("\n".join(dict.fromkeys(have + wanted)) + "\n")
+    version_control = vcs.backend(out.parent)
+    version_control.ignore(out)
+    version_control.ignore(snapshots)
     return out

@@ -639,3 +639,23 @@
     said: The report should not prescribe a solution; the goal is enough context to avoid an XY problem.
     basis: stated
     fingerprint: f16f0cb9d4b8
+- id: AGENT-75
+  text: When a project's test tool has no reader, the agent shall offer to ask for one through a problem report before writing a conversion of its own.
+  traces_to: SYS-58
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Reacting to a proposed simple line-by-line result format as the fallback for unsupported tools.
+    said: Would rather users open a GitHub issue asking for a reader than hand-roll parsers for the same thing all over the place.
+    basis: stated
+    fingerprint: d1b7fa4fc8ae
+- id: AGENT-76
+  text: For each pull request that changes the spec, the agent shall publish a review page compared against the pull request's base and link it at the top of the pull request.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 14:41
+    context: Asking how a pull request is meant to be reviewed when no review page is linked on it.
+    said: Asked how they are supposed to review a pull request with no review page linked on it.
+    basis: stated
+    fingerprint: 343bed57f59a

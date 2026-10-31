@@ -75,6 +75,7 @@
     - tests/test_review_page.py::test_the_review_command_writes_the_page_beside_the_hook_ignored_by_version_control
     - tests/test_review_page.py::test_the_page_lists_conflicts_first_and_proposes_items_to_lock_with_reasons
     - tests/test_render.py::test_render_removes_the_markdown_views_and_writes_the_page
+    - tests/test_review_base.py::test_the_persons_last_review_stays_a_choice
 - id: REVIEW-V8
   verifies:
   - SYS-46
@@ -198,3 +199,32 @@
   method: demonstration
   technique: manual
   description: On a generated review page, marking an intent record "Correct" without typing and pressing Copy feedback shows a message naming the corrections with no text, and the copied summary says no text was typed instead of pointing at a comment.
+- id: REVIEW-V20
+  verifies:
+  - REVIEW-40
+  - REVIEW-43
+  method: test
+  technique: unit test
+  description: The generated page has the comparison in its header and carries the version, revision and how it was resolved; with nothing to compare against, the data says so and the page's script has the message.
+  tests:
+    python:
+    - tests/test_review_base.py::test_the_page_states_its_base_at_the_top
+    - tests/test_review_base.py::test_the_page_says_when_it_found_nothing_to_compare_against
+- id: REVIEW-V21
+  verifies:
+  - REVIEW-41
+  method: test
+  technique: unit test
+  description: With no base named, a branch's page compares against the trunk's merge base, and the overview uses the same base.
+  tests:
+    python:
+    - tests/test_review_base.py::test_with_no_base_named_the_page_compares_against_the_trunk
+- id: REVIEW-V22
+  verifies:
+  - REVIEW-42
+  method: test
+  technique: unit test
+  description: A stacked branch's page, given the branch below it, shows only what changed since that branch.
+  tests:
+    python:
+    - tests/test_review_base.py::test_a_stacked_change_compares_against_the_base_it_names

@@ -49,7 +49,7 @@
     basis: guided
     fingerprint: 5a8a6077fb25
 - id: MODEL-7
-  text: The spec shall name each implementation of the product, with its language.
+  text: The spec shall name each implementation of the product, a whole working system that can span languages, frameworks and providers.
   traces_to: SYS-9
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -58,6 +58,12 @@
     said: Said a spec could be marked as implemented in a named implementation with its language, such as C++, or as having no implementations.
     basis: stated
     fingerprint: f93b94d95665
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Reviewing the proposal that an implementation becomes a name and a root, with language optional.
+    said: Wants it clear that an implementation is not a language but a holistic process, system or entire working architecture.
+    basis: stated
+    fingerprint: b2aecfcb407d
 - id: MODEL-8
   text: Each verification item shall link to its tests separately for each implementation.
   traces_to: SYS-9
@@ -335,3 +341,13 @@
     said: Wants each intent record to say where it came from, more specifically than conversation versus document, so that sources can later count for more or less; a code comment may count differently from a document; conversation should say human conversation, and an agent answering a migrating agent's questions on the engineer's behalf should be tracked separately, as an agent conversation, counting low.
     basis: stated
     fingerprint: 62d75b8f1074
+- id: MODEL-42
+  text: A verification item's test link shall be the identifier the test's results report.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 12:03
+    context: Reacting to a proposal that a test link becomes an opaque identifier, whatever string the results report.
+    said: Agreed, and said they hadn't liked making up the toolkit's own format for tests; standardizing on and obeying standards sounds good.
+    basis: stated
+    fingerprint: 33ab94dc67e0
