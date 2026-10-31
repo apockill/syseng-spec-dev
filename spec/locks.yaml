@@ -1,20 +1,3 @@
-- id: SYS
-  fingerprint: 395a73f004d8
-  locked_at: 2026-10-26T09:16-07:00
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  via: page
-  batch: 5
-  review: 0a959844be
-  text: |-
-    The toolkit: the system as a whole: A reusable systems-engineering toolkit: a command-line tool, one portable skill and optional adapters for agent harnesses. It lets one engineer direct AI agents on a large codebase by reading requirements instead of code.
-- id: AGENT-V20
-  fingerprint: 8f52eaeb8434
-  locked_at: 2026-10-31T15:07-07:00
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  via: page
-  batch: 1
-  said: Said they are OK with locking this once the sentence about what isn't tested is removed.
-  text: The skill's guidance gives every pull request that changes the spec its own page against its base, linked at the top.
 - id: AGENT-76
   fingerprint: 343bed57f59a
   locked_at: 2026-10-31T15:07-07:00
@@ -23,6 +6,14 @@
   batch: 3
   review: 6fab0daf3a
   text: For each pull request that changes the spec, the agent shall publish a review page compared against the pull request's base and link it at the top of the pull request.
+- id: AGENT-V20
+  fingerprint: 8f52eaeb8434
+  locked_at: 2026-10-31T15:07-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 1
+  said: Said they are OK with locking this once the sentence about what isn't tested is removed.
+  text: The skill's guidance gives every pull request that changes the spec its own page against its base, linked at the top.
 - id: CHANGE-13
   fingerprint: d0754061b7ad
   locked_at: 2026-10-17T22:49-07:00
@@ -39,6 +30,23 @@
   batch: 4
   review: 8b5e84e04f
   text: An item shall count as locked, written or decided by the engineer when its level of intent is explicit, stated or guided.
+- id: CHECK-14
+  fingerprint: d6397a381791
+  locked_at: 2026-10-17T23:00-07:00
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  batch: 1
+  text: The checker shall report each item whose content no longer matches the fingerprint of its latest lock.
+  migrated_from: edd78f0eb7a1
+  note: approver not recorded with an email address; the migration filled in the person running it
+- id: CHECK-29
+  fingerprint: d1147fe87204
+  locked_at: 2026-10-22T16:00-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 4
+  review: 8b5e84e04f
+  text: The checker shall report each requirement on a system element with sub-elements that has neither a verification item nor a requirement refining it, saying that it is neither decomposed nor verified.
 - id: CHECK-3
   fingerprint: 1dda8445bab1
   locked_at: 2026-10-26T08:09-07:00
@@ -57,15 +65,6 @@
   batch: 1
   review: 9a3fdfb9fb
   text: The checker shall report each verification-item link to a test or file that does not exist.
-- id: CHECK-14
-  fingerprint: d6397a381791
-  locked_at: 2026-10-17T23:00-07:00
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  batch: 1
-  text: The checker shall report each item whose content no longer matches the fingerprint of its latest lock.
-  migrated_from: edd78f0eb7a1
-  note: approver not recorded with an email address; the migration filled in the person running it
 - id: CHECK-V14
   fingerprint: 7180cb162341
   locked_at: 2026-10-22T16:00-07:00
@@ -74,14 +73,6 @@
   batch: 4
   review: 8b5e84e04f
   text: A requirement on an element with sub-elements that nothing refines or verifies is reported as neither decomposed nor verified; a refined one and a leaf element's one get the plain to-do.
-- id: CHECK-29
-  fingerprint: d1147fe87204
-  locked_at: 2026-10-22T16:00-07:00
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  via: page
-  batch: 4
-  review: 8b5e84e04f
-  text: The checker shall report each requirement on a system element with sub-elements that has neither a verification item nor a requirement refining it, saying that it is neither decomposed nor verified.
 - id: DR-1
   fingerprint: 0b72ae3a99ed
   locked_at: '2026-10-11'
@@ -90,105 +81,6 @@
   text: |-
     The CLI is the product, the method is one portable skill, and harness glue is optional: the Python CLI holds all the logic. The method ships as one Agent Skill in the open SKILL.md format, which Claude Code, Antigravity and most other harnesses read. A harness can also get thin glue that calls the CLI; the setup command writes that glue into the repository. There is no plugin.
   migrated_from: 1c3566d6d5b0
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: DR-2
-  fingerprint: 5dc4e3b79986
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: |-
-    Store the spec as YAML, and take edits as a YAML batch on standard input: spec files are YAML. To make several edits, an agent writes them as one small YAML document and pipes it into a single CLI command, usually as a heredoc. That avoids passing each field as a command-line argument.
-  migrated_from: 656ec1f2e9dd
-  note: given via chat (round 5); approver not recorded; the migration filled in the person running it
-- id: DR-3
-  fingerprint: 8080e42e27e9
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: |-
-    Refuse direct edits to spec files with a pre-tool hook: a Claude Code PreToolUse hook refuses agents' file edits under the spec directory. Its refusal names the CLI command to use instead.
-  migrated_from: 122b902a0707
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: DR-4
-  fingerprint: 56ea6a8485b5
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: |-
-    Run the checker from a stop hook: a Claude Code Stop hook runs the checker when the agent tries to finish, and blocks with the findings. It blocks at most once per turn, so a mid-task question to the engineer still gets through.
-  migrated_from: a714eed29f4b
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: DR-5
-  fingerprint: acff6fb7da9a
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: |-
-    Lock records store a fingerprint and the locked content: each lock stores the item's fingerprint and the locked text itself.
-  migrated_from: 6dc3ea774c82
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: DR-5
-  fingerprint: 97a13b95c661
-  locked_at: 2026-10-22T16:14-07:00
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  via: page
-  batch: 6
-  review: 1d91756866
-  text: |-
-    Lock records store a fingerprint and the locked content: each lock stores the item's fingerprint and the locked text itself.
-- id: DR-6
-  fingerprint: 46ae340c7a65
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: |-
-    Record chat approvals from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. The agent never records approvals.
-  migrated_from: 320e75aa3368
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: DR-6
-  fingerprint: 1b9f55351fd2
-  locked_at: 2026-10-21T15:36-07:00
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  via: page
-  review: c168d24951
-  text: |-
-    Record chat locks from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
-  note: kept an alteration
-- id: DR-6
-  fingerprint: 76399fb22d76
-  locked_at: 2026-10-22T16:14-07:00
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  via: page
-  batch: 6
-  review: 1d91756866
-  text: |-
-    Record chat locks from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, with a summary of what the engineer said and the channel.
-- id: DR-7
-  fingerprint: 0a155d6d4c67
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: |-
-    Run reasoning checks in an isolated subagent that can't see the spec: use a custom, non-fork subagent. Its definition sets `omitClaudeMd`, so CLAUDE.md and AGENTS.md don't load. It has no shell tool. It carries its own hook that refuses reads under the spec directory and drops spec hits from search results.
-  migrated_from: 1602b8e7daa4
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: DR-8
-  fingerprint: a5f0a5050a81
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: |-
-    A decomposition tree plus a separate dependency graph: "part of" is a tree, so each system element has one parent. "Uses" is a separate graph that must have no cycles.
-  migrated_from: 01e339b8f646
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: DR-9
-  fingerprint: 327ecce4e67a
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: |-
-    Wording rules from INCOSE plus EARS patterns: use the mechanically checkable subset of INCOSE's Guide to Writing Requirements: one "shall"; no vague terms, escape clauses or open-ended endings; no test or implementation vocabulary. Add the EARS sentence patterns.
-  migrated_from: de09a707460a
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: DR-10
   fingerprint: ad10adf7bf72
@@ -289,6 +181,15 @@
     Named acknowledgments only for edits with impact: an edit that touches locked or depended-upon items needs an acknowledgment of each affected item, by name, with a one-line note. Other edits apply at once.
   migrated_from: 289652d39732
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: DR-2
+  fingerprint: 5dc4e3b79986
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: |-
+    Store the spec as YAML, and take edits as a YAML batch on standard input: spec files are YAML. To make several edits, an agent writes them as one small YAML document and pipes it into a single CLI command, usually as a heredoc. That avoids passing each field as a command-line argument.
+  migrated_from: 656ec1f2e9dd
+  note: given via chat (round 5); approver not recorded; the migration filled in the person running it
 - id: DR-20
   fingerprint: 9762ee4a7ccb
   locked_at: '2026-10-11'
@@ -378,6 +279,15 @@
     Fingerprints cover an item's meaning, and migration carried locks over: A fingerprint is a hash of an item's meaning fields, which vary by kind: - requirement: its text; - need: its text and context; - decision record: its title, status, context, decision, alternatives and consequences; - verification item: its description, method, technique and the requirements it verifies; - system element: its title, purpose, parent and dependencies. Before migrating, every old fingerprint was checked against the Markdown, and all 69 matched. The locks were then re-fingerprinted, with each old value kept as `migrated_from`.
   migrated_from: 0ad3211b3da6
   note: given via chat (menu, round 9); approver not recorded; the migration filled in the person running it
+- id: DR-3
+  fingerprint: 8080e42e27e9
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: |-
+    Refuse direct edits to spec files with a pre-tool hook: a Claude Code PreToolUse hook refuses agents' file edits under the spec directory. Its refusal names the CLI command to use instead.
+  migrated_from: 122b902a0707
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: DR-30
   fingerprint: b2101ae530ef
   locked_at: '2026-10-11'
@@ -471,6 +381,15 @@
   text: |-
     The change log records every changed field, not just meaning: Each log entry records the fields that changed, before and after, test links included. Meaning-only comparison is kept for deciding when acknowledgments are needed.
   note: given via chat (menu, round 10); approver not recorded; the migration filled in the person running it
+- id: DR-4
+  fingerprint: 56ea6a8485b5
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: |-
+    Run the checker from a stop hook: a Claude Code Stop hook runs the checker when the agent tries to finish, and blocks with the findings. It blocks at most once per turn, so a mid-task question to the engineer still gets through.
+  migrated_from: a714eed29f4b
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: DR-44
   fingerprint: 412d2ff133b9
   locked_at: 2026-10-17T22:23-07:00
@@ -543,6 +462,24 @@
   review: 8b5e84e04f
   text: |-
     Alterations to the engineer's items are flagged when logged, and answered by a lock or rollback: When an edit changes the meaning of such an item, the change log records why it counts (locked, their words, their decision) and the item's fingerprints before and after. Before applying it, the CLI asks the agent to acknowledge it. The alteration stays listed in the change record, and as a to-do, until the engineer locks the item as it now is (kept), or it's back to its earlier content (rolled back). A removed item is listed but can't be kept by a lock.
+- id: DR-5
+  fingerprint: acff6fb7da9a
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: |-
+    Lock records store a fingerprint and the locked content: each lock stores the item's fingerprint and the locked text itself.
+  migrated_from: 6dc3ea774c82
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: DR-5
+  fingerprint: 97a13b95c661
+  locked_at: 2026-10-22T16:14-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 6
+  review: 1d91756866
+  text: |-
+    Lock records store a fingerprint and the locked content: each lock stores the item's fingerprint and the locked text itself.
 - id: DR-54
   fingerprint: 023ffa8b8424
   locked_at: 2026-10-21T15:51-07:00
@@ -570,6 +507,33 @@
   review: 0547dce3ed
   text: |-
     A conflict with an explicit or stated item is raised with options, before building in spec-first mode and once built in code-first mode: - A request conflicts with an item when it can't be met without changing that item's meaning, or when it makes the item impossible to meet. - For each request, the agent compares it with the explicit and stated items in the elements it affects, in the elements that depend on those, and above them in the trace (AGENT-61). - A conflict becomes an open decision that names the conflicting items and offers options (reword, edit, add, change, roll back, or drop part of the request), one recommended, each showing the new text it would give the items. It heads the review page, and the agent says in chat that it's there, with enough to answer in chat. - **Spec-first mode:** the conflict is raised before building. The CLI refuses an edit that changes the text of an explicit or stated item unless the edit names a conflict a person resolved for that item, adds the person's own request for the change as an intent record, or is declared a rewording. - **Code-first mode:** the change is built, and the spec, committed with the code, is updated with it. When the agent marks the change done, the checker reports each altered explicit or stated item that no conflict names, so the agent must raise each one with options, rolling back included. - A declared rewording is shown on the review page as one, for the person to check. The refusal and the done check are guardrails against forgetting, not a security boundary. - Alterations that match what the chosen option showed count as kept, and the choice is recorded as stated intent on those items, with the person's identity.
+- id: DR-6
+  fingerprint: 46ae340c7a65
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: |-
+    Record chat approvals from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit approval, the hook records it against the items as they were last shown. The agent never records approvals.
+  migrated_from: 320e75aa3368
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: DR-6
+  fingerprint: 1b9f55351fd2
+  locked_at: 2026-10-21T15:36-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  review: c168d24951
+  text: |-
+    Record chat locks from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, quoting the engineer's words and naming the channel.
+  note: kept an alteration
+- id: DR-6
+  fingerprint: 76399fb22d76
+  locked_at: 2026-10-22T16:14-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 6
+  review: 1d91756866
+  text: |-
+    Record chat locks from the engineer's own message: a Claude Code UserPromptSubmit hook reads the engineer's message. When the message is an explicit lock, the hook records it against the items as they were last shown. Locks the hook can't read, such as a choice in the harness's question menu or an explicit "<ID> LGTM", are recorded by the agent, with a summary of what the engineer said and the channel.
 - id: DR-62
   fingerprint: 7592f405900b
   locked_at: 2026-10-21T16:16-07:00
@@ -579,6 +543,33 @@
   review: d8f8cc4091
   text: |-
     What a person says becomes intent without an approval step, and locks stay a person's own act: - When a person says what they want, in conversation or in a page comment, the agent adds an intent record to each item the words directly express: stated when the words alone say what the item requires, guided when the person's choice or constraint fixed it. When unsure, the lower level (AGENT-63). A restatement of an existing item is a stated intent record, not an approval. - The review page shows what was captured since the person's last review, to correct or remove. - A lock (the explicit level) is a person's own act: a page control, the terminal, or a lock line in chat, which the prompt hook still reads as a shortcut. - Records made mechanically, by the prompt hook or from a feedback block, hold no words: the person, the channel, the IDs and the fingerprints. - A feedback block names its reviewer, carries fingerprints, and reads on its own as review notes (SYS-53). The person pastes it to the agent, or posts it on a pull request as their review, and the agent applies it with the CLI (D2). The block, not the machine applying it, names who gave each lock; where the block was posted is the evidence of who wrote it.
+- id: DR-7
+  fingerprint: 0a155d6d4c67
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: |-
+    Run reasoning checks in an isolated subagent that can't see the spec: use a custom, non-fork subagent. Its definition sets `omitClaudeMd`, so CLAUDE.md and AGENTS.md don't load. It has no shell tool. It carries its own hook that refuses reads under the spec directory and drops spec hits from search results.
+  migrated_from: 1602b8e7daa4
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: DR-8
+  fingerprint: a5f0a5050a81
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: |-
+    A decomposition tree plus a separate dependency graph: "part of" is a tree, so each system element has one parent. "Uses" is a separate graph that must have no cycles.
+  migrated_from: 01e339b8f646
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: DR-9
+  fingerprint: 327ecce4e67a
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: |-
+    Wording rules from INCOSE plus EARS patterns: use the mechanically checkable subset of INCOSE's Guide to Writing Requirements: one "shall"; no vague terms, escape clauses or open-ended endings; no test or implementation vocabulary. Add the EARS sentence patterns.
+  migrated_from: de09a707460a
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: NEED-1
   fingerprint: f4d032821275
   locked_at: '2026-10-11'
@@ -586,70 +577,6 @@
   by: Alex Thiele <alex.g.thiele@gmail.com>
   text: The engineer needs to keep intellectual control of a product of 100,000+ lines of code by reading its requirements, and only occasionally its verification items.
   migrated_from: ae99c89eba84
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: NEED-2
-  fingerprint: e6075d038a36
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The engineer needs agents to surface the questions that spec work raises, so the engineer gets more chances to steer.
-  migrated_from: 26cdcde64ef3
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: NEED-3
-  fingerprint: 4b59906ae6a0
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The engineer needs to reuse the toolkit across unrelated projects.
-  migrated_from: faf3a3e85925
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: NEED-4
-  fingerprint: 4f923c2ad874
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The engineer needs the V&V documentation to be enough to rebuild the product in another language.
-  migrated_from: 5db11719abb6
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: NEED-5
-  fingerprint: a2be556c6d6f
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The engineer needs the process to cost the main agent little attention.
-  migrated_from: 6fb6c195747d
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: NEED-6
-  fingerprint: 6ce64f8ee788
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The engineer needs to choose, per change, between specifying first and building first.
-  migrated_from: 1cf82c4ca4fd
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: NEED-7
-  fingerprint: 9536aea52e2e
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The engineer needs to develop quickly, running the full verification only occasionally and without supervising it.
-  migrated_from: 920f7c60fc92
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: NEED-8
-  fingerprint: 682676a9ce0e
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The engineer needs the reasoning behind each decision to stay available to future agents and to the engineer.
-  migrated_from: a2f99cfcbb7a
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: NEED-9
-  fingerprint: bd89e0ab426b
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The engineer needs verification that isn't weakened by the agents whose work it checks.
-  migrated_from: 3db712f74d63
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: NEED-10
   fingerprint: df5feea8324b
@@ -744,6 +671,14 @@
   text: The engineer needs agents making large changes to weigh each item by the human attention it received.
   migrated_from: 1013794c1640
   note: given via chat (pasted reply, confirmed in a typed message); approver not recorded; the migration filled in the person running it
+- id: NEED-2
+  fingerprint: e6075d038a36
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The engineer needs agents to surface the questions that spec work raises, so the engineer gets more chances to steer.
+  migrated_from: 26cdcde64ef3
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: NEED-20
   fingerprint: a1b82906c13e
   locked_at: '2026-10-17'
@@ -816,6 +751,62 @@
   batch: 8
   review: c168d24951
   text: The engineer needs each change reviewed at the level of its spec rather than its code, by its author or by another reviewer, with the review kept where the change is reviewed.
+- id: NEED-3
+  fingerprint: 4b59906ae6a0
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The engineer needs to reuse the toolkit across unrelated projects.
+  migrated_from: faf3a3e85925
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: NEED-4
+  fingerprint: 4f923c2ad874
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The engineer needs the V&V documentation to be enough to rebuild the product in another language.
+  migrated_from: 5db11719abb6
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: NEED-5
+  fingerprint: a2be556c6d6f
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The engineer needs the process to cost the main agent little attention.
+  migrated_from: 6fb6c195747d
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: NEED-6
+  fingerprint: 6ce64f8ee788
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The engineer needs to choose, per change, between specifying first and building first.
+  migrated_from: 1cf82c4ca4fd
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: NEED-7
+  fingerprint: 9536aea52e2e
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The engineer needs to develop quickly, running the full verification only occasionally and without supervising it.
+  migrated_from: 920f7c60fc92
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: NEED-8
+  fingerprint: 682676a9ce0e
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The engineer needs the reasoning behind each decision to stay available to future agents and to the engineer.
+  migrated_from: a2f99cfcbb7a
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: NEED-9
+  fingerprint: bd89e0ab426b
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The engineer needs verification that isn't weakened by the agents whose work it checks.
+  migrated_from: 3db712f74d63
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: REVIEW-32
   fingerprint: 594a30d1d9e5
   locked_at: 2026-10-31T15:07-07:00
@@ -840,6 +831,15 @@
   batch: 2
   text: The review page overview shall show the share of requirements whose verification links tests, beside the verification coverage.
   said: In the overnight review the engineer strongly agreed with listing unlinked tests and the honest coverage measure, and invited locking both in with their direct approval.
+- id: SYS
+  fingerprint: 395a73f004d8
+  locked_at: 2026-10-26T09:16-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: 0a959844be
+  text: |-
+    The toolkit: the system as a whole: A reusable systems-engineering toolkit: a command-line tool, one portable skill and optional adapters for agent harnesses. It lets one engineer direct AI agents on a large codebase by reading requirements instead of code.
 - id: SYS-1
   fingerprint: d9c7fec31355
   locked_at: '2026-10-11'
@@ -847,68 +847,6 @@
   by: Alex Thiele <alex.g.thiele@gmail.com>
   text: The toolkit's skills, subagent definitions, code and documentation shall contain no references to a specific host project.
   migrated_from: b0181ec0906f
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: SYS-2
-  fingerprint: fb2184e16954
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: This repository shall pass the toolkit's checker against its own spec.
-  migrated_from: 349cf23360af
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: SYS-3
-  fingerprint: 6ed42849e461
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The toolkit shall be implemented in Python.
-  migrated_from: 582d505f8475
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: SYS-4
-  fingerprint: feff1bd8072e
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The toolkit shall read every project-specific setting from the host repository.
-  migrated_from: e5596f1f8221
-  note: given via chat (round 5); approver not recorded; the migration filled in the person running it
-- id: SYS-5
-  fingerprint: 59043e2721cb
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The toolkit shall set up a host repository for use in one step.
-  migrated_from: 1e779de31649
-  note: given via chat (round 5); approver not recorded; the migration filled in the person running it
-- id: SYS-6
-  fingerprint: dd3ce1d1acac
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The spec shall trace each requirement to the need or requirement it serves, or mark it as derived.
-  migrated_from: ce8a90ff6b69
-  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
-- id: SYS-7
-  fingerprint: 17860781fc49
-  locked_at: '2026-10-11'
-  via: menu
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The toolkit shall prevent an agent from reporting a change as done until every spec update the change requires is done.
-  note: given via chat (menu, round 9); approver not recorded; the migration filled in the person running it
-- id: SYS-8
-  fingerprint: 445f824cedfd
-  locked_at: '2026-10-11'
-  via: menu
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The spec shall describe the product's requirements and verification independently of programming language.
-  note: given via chat (menu, round 9); approver not recorded; the migration filled in the person running it
-- id: SYS-9
-  fingerprint: c24ca1f45203
-  locked_at: '2026-10-11'
-  via: chat
-  by: Alex Thiele <alex.g.thiele@gmail.com>
-  text: The toolkit shall track, for each implementation, which requirements it satisfies.
-  migrated_from: 5083c59f3792
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: SYS-10
   fingerprint: a5f7c233ac82
@@ -1022,6 +960,14 @@
   text: The toolkit shall keep the reasoning behind each decision about a system element with that element.
   migrated_from: f03aa0771f56
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: SYS-2
+  fingerprint: fb2184e16954
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: This repository shall pass the toolkit's checker against its own spec.
+  migrated_from: 349cf23360af
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: SYS-20
   fingerprint: f7f14a8c11e8
   locked_at: '2026-10-11'
@@ -1100,6 +1046,14 @@
   by: Alex Thiele <alex.g.thiele@gmail.com>
   text: The toolkit shall state the outcomes it needs from agents, leaving the means to each agent and its harness.
   migrated_from: c1aa914d68c0
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: SYS-3
+  fingerprint: 6ed42849e461
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The toolkit shall be implemented in Python.
+  migrated_from: 582d505f8475
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
 - id: SYS-30
   fingerprint: c149cd86e35d
@@ -1190,6 +1144,14 @@
   text: Before an agent changes an item, the toolkit shall show the agent whether the engineer locked, wrote or decided the item, and the discussion behind it.
   migrated_from: c23a013c5544
   note: pasted review, sent 2026-10-17 22:12; the engineer's typed message 'Okay, let's start wrapping up this round.' asked to act on it; approver not recorded with an email address; the migration filled in the person running it
+- id: SYS-4
+  fingerprint: feff1bd8072e
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The toolkit shall read every project-specific setting from the host repository.
+  migrated_from: e5596f1f8221
+  note: given via chat (round 5); approver not recorded; the migration filled in the person running it
 - id: SYS-40
   fingerprint: ecc4b86f8ec3
   locked_at: 2026-10-17T22:23-07:00
@@ -1266,6 +1228,14 @@
   batch: 3
   review: d8f8cc4091
   text: When a request conflicts with an item at the explicit or stated level, the toolkit shall bring the conflict to a person with the conflicting items and options to resolve it, before building in spec-first mode and once built in code-first mode.
+- id: SYS-5
+  fingerprint: 59043e2721cb
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The toolkit shall set up a host repository for use in one step.
+  migrated_from: 1e779de31649
+  note: given via chat (round 5); approver not recorded; the migration filled in the person running it
 - id: SYS-50
   fingerprint: ea6dc0e6b5bc
   locked_at: 2026-10-21T16:16-07:00
@@ -1274,3 +1244,41 @@
   batch: 3
   review: d8f8cc4091
   text: The spec shall trace each requirement on a system element to a requirement of that element's parent.
+- id: SYS-6
+  fingerprint: dd3ce1d1acac
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The spec shall trace each requirement to the need or requirement it serves, or mark it as derived.
+  migrated_from: ce8a90ff6b69
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: SYS-7
+  fingerprint: 17860781fc49
+  locked_at: '2026-10-11'
+  via: menu
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The toolkit shall prevent an agent from reporting a change as done until every spec update the change requires is done.
+  note: given via chat (menu, round 9); approver not recorded; the migration filled in the person running it
+- id: SYS-8
+  fingerprint: 445f824cedfd
+  locked_at: '2026-10-11'
+  via: menu
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The spec shall describe the product's requirements and verification independently of programming language.
+  note: given via chat (menu, round 9); approver not recorded; the migration filled in the person running it
+- id: SYS-9
+  fingerprint: c24ca1f45203
+  locked_at: '2026-10-11'
+  via: chat
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  text: The toolkit shall track, for each implementation, which requirements it satisfies.
+  migrated_from: 5083c59f3792
+  note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: VERIFY-31
+  fingerprint: '520945854509'
+  locked_at: 2026-10-31T15:18-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 1
+  review: db4b473b64
+  text: The status command shall show each requirement's text once in a report, even when more than one failing item reaches it.
