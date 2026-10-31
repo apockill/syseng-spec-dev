@@ -403,5 +403,32 @@ entries:
       said: Wants spec results extensible to other formats, for example through a format option, so results from a monorepo's own build system can be added. An implementation may not be tied to a language, since it can span many languages, frameworks and cloud providers, and a second implementation may be a migration target on a different cloud and stack. Ingesting results may take several commands or one pointing at all of them; the command should be runnable again for later steps, so a pipeline can run expensive infrastructure steps, then cheap unit tests, then frontend tests, and at the end inspect the verification items for system health while the LLM works from there.
       basis: stated
       fingerprint: f0af8a28db22
+- op: modify
+  id: NEED-31
+  at: 2026-10-31T11:52-07:00
+  reason: the engineer sharpened what an implementation is.
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:41
+      context: Discussing how the toolkit should take in test results instead of running tests itself.
+      said: Wants spec results extensible to other formats, for example through a format option, so results from a monorepo's own build system can be added. An implementation may not be tied to a language, since it can span many languages, frameworks and cloud providers, and a second implementation may be a migration target on a different cloud and stack. Ingesting results may take several commands or one pointing at all of them; the command should be runnable again for later steps, so a pipeline can run expensive infrastructure steps, then cheap unit tests, then frontend tests, and at the end inspect the verification items for system health while the LLM works from there.
+      basis: stated
+      fingerprint: f0af8a28db22
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:41
+      context: Discussing how the toolkit should take in test results instead of running tests itself.
+      said: Wants spec results extensible to other formats, for example through a format option, so results from a monorepo's own build system can be added. An implementation may not be tied to a language, since it can span many languages, frameworks and cloud providers, and a second implementation may be a migration target on a different cloud and stack. Ingesting results may take several commands or one pointing at all of them; the command should be runnable again for later steps, so a pipeline can run expensive infrastructure steps, then cheap unit tests, then frontend tests, and at the end inspect the verification items for system health while the LLM works from there.
+      basis: stated
+      fingerprint: f0af8a28db22
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:52
+      context: Reviewing the proposal that an implementation becomes a name and a root, with language optional.
+      said: Wants it clear that an implementation is not a language but a holistic process, system or entire working architecture; one implementation might be fine and working while another is in progress. Also prefers standardizing on and obeying existing test standards over making up the toolkit's own format for tests.
+      basis: stated
+      fingerprint: f0af8a28db22
 decisions: []
 friction: []
