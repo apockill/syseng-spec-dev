@@ -362,7 +362,8 @@ def test_a_roll_up_follows_its_children(repo, capsys):
     row = _by_id(_status(capsys)[1])["SYS-V4"]
     assert row["status"] == results.PASSING and row["last_tested"] == "r1"
     _add("--step", "u", "--id", "//api:one_test", "--outcome", "fail", revision="r2")
-    assert _by_id(_status(capsys)[1])["SYS-V4"]["status"] == results.FAILING
+    row = _by_id(_status(capsys)[1])["SYS-V4"]
+    assert row["status"] == results.FAILING and row["failed"] == ["SYS-V1"]
 
 
 def test_a_roll_up_with_an_unverified_child_is_not_passing(repo, capsys):

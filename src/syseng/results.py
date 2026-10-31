@@ -133,18 +133,20 @@ def _rollup(spec: Spec, vi, implementation: str, found: dict, index: _Index, don
     """A roll-up is as good as what verifies the requirements under it, and a child with nothing verifying it counts
     as not run. It takes no verdict of its own: its children decide."""
     done[vi.id] = (NOT_RUN, "", [], "")  # a roll-up that reaches itself adds nothing
-    seen = []
+    seen, failed = [], []
     for r in vi.data.get("verifies") or []:
         for child in spec.requirements():
             if child.data.get("traces_to") != r:
                 continue
             below = [v for v in spec.of_kind("vi") if child.id in (v.data.get("verifies") or []) and v.id != vi.id]
-            seen += [_status(spec, v, implementation, found, index, done) for v in below] or [(NOT_RUN, "", [], "")]
+            statuses = [_status(spec, v, implementation, found, index, done) for v in below]
+            seen += statuses or [(NOT_RUN, "", [], "")]
+            failed += [v.id for v, s in zip(below, statuses) if s[0] == FAILING]
     words = {s[0] for s in seen}
     status = (FAILING if FAILING in words else NOT_RUN if NOT_RUN in words or not seen
               else NOT_IMPLEMENTED if NOT_IMPLEMENTED in words else PASSING)
     tested = max((s for s in seen if s[3]), key=lambda s: _moment(s[3]), default=(NOT_RUN, "", [], ""))
-    return status, tested[1], [], tested[3]
+    return status, tested[1], sorted(set(failed)), tested[3]
 
 
 def _status(spec: Spec, vi, implementation: str, found: dict, index: _Index, done: dict) -> tuple:
