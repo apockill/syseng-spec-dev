@@ -1,0 +1,225 @@
+request: Show the rounds of review a pull request has been through on its review page
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-31'
+entries:
+- op: add
+  id: NEED-32
+  at: 2026-10-31T15:03-07:00
+  reason: the engineer stated this need.
+  requested: true
+  after:
+    text: The engineer needs to see, on a new review page, the rounds of review a pull request has been through and roughly what changed between them.
+    context: Reviewing a pull request takes several rounds. After a day or two, a person forgets what rounds went into it, and a page that says nothing is recommended, with no sign of the work so far, is disconcerting.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 15:03
+      context: Describing how a review runs over several pages, each generated new, ending on a page with nothing recommended.
+      said: At the last step, if a day or two has passed, a person has forgotten what rounds of review went into the pull request, and seeing nothing recommended with no clarity on the work so far can be disconcerting. Needs traceability, so that when a completely new page is generated for the same pull request there is a way to see the timeline and gauge roughly what changed between rounds. Suggested a tab, while saying that's less the point than the traceability.
+      basis: stated
+      fingerprint: bb27bfc40ce8
+- op: add
+  id: SYS-60
+  at: 2026-10-31T15:03-07:00
+  reason: serves NEED-32.
+  requested: true
+  after:
+    kind: system
+    text: Each review page shall show the rounds of review since its base, with what each round decided and what changed after it.
+    serves:
+    - NEED-32
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 15:03
+      context: Describing how a review runs over several pages.
+      said: Needs a way to see the timeline of review rounds and gauge roughly the changes made between them.
+      basis: stated
+      fingerprint: cfc6e41ad0b7
+- op: add
+  id: REVIEW-44
+  at: 2026-10-31T15:03-07:00
+  reason: part of SYS-60.
+  after:
+    text: For each round of review since its base, the review page shall show when it was and who sent it, what they locked, kept and decided, and their comments with the agent's responses.
+    traces_to: SYS-60
+    basis: derived
+    why: this is what makes a round recognizable a day or two later.
+- op: add
+  id: REVIEW-45
+  at: 2026-10-31T15:03-07:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: Between rounds of review, the review page shall show each change made, with what was asked and how many items it added, changed and removed.
+    traces_to: SYS-60
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 15:03
+      context: Describing how a review runs over several pages.
+      said: Wants to gauge roughly the changes made between rounds of review.
+      basis: stated
+      fingerprint: b597c60a1da0
+- op: add
+  id: REVIEW-46
+  at: 2026-10-31T15:03-07:00
+  reason: the engineer named this moment.
+  requested: true
+  after:
+    text: When nothing is recommended, the review page shall say how many rounds of review have happened since its base and when the last one was.
+    traces_to: SYS-60
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 15:03
+      context: Describing how a review runs over several pages.
+      said: Seeing nothing recommended with no clarity on the work so far can be disconcerting.
+      basis: stated
+      fingerprint: 967d4368f53e
+- op: add
+  id: MODEL-43
+  at: 2026-10-31T15:03-07:00
+  reason: part of SYS-60.
+  after:
+    text: Each review record shall list what the person locked, unlocked, kept and decided in that review.
+    traces_to: SYS-60
+    basis: derived
+    why: the page can't show afterwards what no record kept.
+- op: modify
+  id: REVIEW-20
+  at: 2026-10-31T15:06-07:00
+  reason: adds the tab.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 8547216f2e5b
+  fingerprint_after: 3d34e67c9055
+  requested: true
+  before:
+    text: |-
+      The review page shall show tabs ordered from most to least signal: the items agents recommend, each with its reason, together with the decisions awaiting the person and the responses to their feedback; the alterations to items they gave; the intent captured since their last review; the differences since then; and the full spec.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: |-
+        Round 18: setting out the review journey the toolkit should support, and the page that replaces the generated Markdown views.
+      said: Described a page that highlights what a person specified directly, shows a graph of the requirement tree and a list of the items most useful to lock in, and, once later features are built, also shows the differences.
+      basis: guided
+      fingerprint: 4e4417d9ee88
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:25
+      context: Using the review page, which had what awaited them under Your decision and the agents' recommendations under Worth locking.
+      said: Found the page unclear about which section is the high-signal one, the items to lock or look at and give feedback on, and asked which section holds what the agent recommends they look at.
+      basis: stated
+      fingerprint: 1b8153ee1486
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:45
+      context: Using the review page, whose For you tab put the agent's recommendations below nine items awaiting an answer.
+      said: Didn't see the Recommended by the agent section at all, and wants it at the top. Wants tabs instead of one giant page, with the leftmost tab the most important, expecting to rarely visit the second or third tabs, which get more mechanical and carry less signal.
+      basis: stated
+      fingerprint: 8547216f2e5b
+  after:
+    text: |-
+      The review page shall show tabs ordered from most to least signal: the items agents recommend, each with its reason, together with the decisions awaiting the person and the responses to their feedback; the alterations to items they gave; the intent captured since their last review; the differences since then; the rounds of review; and the full spec.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-21'
+      context: |-
+        Round 18: setting out the review journey the toolkit should support, and the page that replaces the generated Markdown views.
+      said: Described a page that highlights what a person specified directly, shows a graph of the requirement tree and a list of the items most useful to lock in, and, once later features are built, also shows the differences.
+      basis: guided
+      fingerprint: 4e4417d9ee88
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:25
+      context: Using the review page, which had what awaited them under Your decision and the agents' recommendations under Worth locking.
+      said: Found the page unclear about which section is the high-signal one, the items to lock or look at and give feedback on, and asked which section holds what the agent recommends they look at.
+      basis: stated
+      fingerprint: 1b8153ee1486
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-21 15:45
+      context: Using the review page, whose For you tab put the agent's recommendations below nine items awaiting an answer.
+      said: Didn't see the Recommended by the agent section at all, and wants it at the top. Wants tabs instead of one giant page, with the leftmost tab the most important, expecting to rarely visit the second or third tabs, which get more mechanical and carry less signal.
+      basis: stated
+      fingerprint: 8547216f2e5b
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 15:06
+      context: Describing how a review runs over several pages.
+      said: Suggested a tab showing the rounds of review, while saying the point is traceability.
+      basis: stated
+      fingerprint: 3d34e67c9055
+  acks:
+    REVIEW-20: the engineer suggested the tab
+    REVIEW-V7: still holds
+    REVIEW-V11: still holds, with one tab more
+    DR-68: unaffected
+    DR-60: unaffected
+    DR-66: one tab more
+- op: add
+  id: MODEL-V18
+  at: 2026-10-31T15:06-07:00
+  reason: covers the record.
+  after:
+    verifies:
+    - MODEL-43
+    method: test
+    technique: unit test
+    description: Applying feedback records what the review locked in its review record.
+    tests:
+      python:
+      - tests/test_review_history.py::test_a_review_records_what_the_person_did
+- op: add
+  id: REVIEW-V23
+  at: 2026-10-31T15:06-07:00
+  reason: covers the rounds.
+  after:
+    verifies:
+    - REVIEW-44
+    - REVIEW-20
+    method: test
+    technique: unit test
+    description: Rounds since the base come in time order with what each did and said, and survive a squash; a review recorded before details were kept is shown as such; agents can read the same history. How the tab looks is not tested.
+    tests:
+      python:
+      - tests/test_review_history.py::test_rounds_come_in_order_with_what_each_did_and_said
+      - tests/test_review_history.py::test_only_reviews_since_the_base_are_this_lines_rounds
+      - tests/test_review_history.py::test_rounds_survive_a_squash_that_removes_their_commits
+      - tests/test_review_history.py::test_an_older_review_without_details_is_said_to_be_so
+      - tests/test_review_history.py::test_agents_can_read_the_history
+- op: add
+  id: REVIEW-V24
+  at: 2026-10-31T15:06-07:00
+  reason: covers the work between rounds.
+  after:
+    verifies:
+    - REVIEW-45
+    method: test
+    technique: unit test
+    description: Work appears before the first review and between the rounds it happened in, with its size, ordering times across offsets.
+    tests:
+      python:
+      - tests/test_review_history.py::test_work_shows_between_the_rounds_it_happened_in
+      - tests/test_review_history.py::test_offsets_are_respected_when_ordering
+- op: add
+  id: REVIEW-V25
+  at: 2026-10-31T15:06-07:00
+  reason: covers the message.
+  after:
+    verifies:
+    - REVIEW-46
+    method: test
+    technique: unit test
+    description: The page's script has the tab and the message for when nothing is recommended. Its display is not tested.
+    tests:
+      python:
+      - tests/test_review_history.py::test_the_page_has_the_tab_and_nothing_recommended_says_what_happened
+- op: add
+  id: SYS-V12
+  at: 2026-10-31T15:06-07:00
+  reason: its children cover it.
+  after:
+    verifies:
+    - SYS-60
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+decisions: []
+closed: '2026-10-31'

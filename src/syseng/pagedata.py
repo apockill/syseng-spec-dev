@@ -15,12 +15,13 @@ Sections, in the page's order (REVIEW-20):
 
 import datetime
 import hashlib
+import tempfile
 from pathlib import Path
 
 from syseng import changes, diff, health, levels, results, review, vcs
 from syseng.model import Spec
 
-SECTIONS = ("overview", "awaiting", "responses", "changes", "captured", "proposals", "graph", "items")
+SECTIONS = ("overview", "awaiting", "responses", "changes", "captured", "proposals", "graph", "items", "history")
 
 
 def decision_fingerprint(d: dict) -> str:
@@ -173,6 +174,62 @@ def overview(spec: Spec, person: str, sets: list[dict]) -> dict:
             "since": first["older"]["label"] if first else None, "verification": results.report(spec)}
 
 
+def _known_at_base(spec: Spec, sets: list[dict]) -> tuple[set[str], set[str]]:
+    """The reviews and change records already at the page's base: what's new is this line of work's."""
+    revision = sets[0]["older"]["revision"] if sets else None
+    if not revision:
+        return set(), set()
+    with tempfile.TemporaryDirectory() as tmp:
+        try:
+            old = diff.load_at(spec.root, revision, Path(tmp) / "old")
+        except diff.DiffError:
+            return set(), set()
+        return {str(r.get("review")) for r in levels.reviews(old)}, {c.id for c in changes.all_changes(old)}
+
+
+def _work(entries: list[tuple], after: str | None, before: str | None) -> list[dict]:
+    """What the agent did between two moments, a line per change record, with rough sizes (REVIEW-45)."""
+    out: dict[str, dict] = {}
+    for moment, change, entry in entries:
+        if (after and moment <= after) or (before and moment >= before):
+            continue
+        row = out.setdefault(change.id, {"change": change.id, "request": change.data.get("request", ""),
+                                         "added": 0, "changed": 0, "removed": 0, "ids": []})
+        row[{"add": "added", "remove": "removed"}.get(entry.get("op"), "changed")] += 1
+        if entry.get("id") not in row["ids"]:
+            row["ids"].append(entry.get("id"))
+    return list(out.values())
+
+
+def _moment(when) -> str:
+    """A date and time as a sortable UTC string: records carry their own offsets."""
+    try:
+        return datetime.datetime.fromisoformat(str(when)).astimezone(datetime.UTC).isoformat()
+    except ValueError:
+        return ""
+
+
+def history(spec: Spec, sets: list[dict]) -> dict:
+    """The rounds of review since the page's base, and what changed around them (SYS-60). Everything comes from the
+    spec's own records, so it survives a squash, which removes the commits a review was made from."""
+    reviews_there, changes_there = _known_at_base(spec, sets)
+    all_changes = changes.all_changes(spec)
+    entries = [(_moment(e.get("at")), c, e) for c in all_changes if c.id not in changes_there
+               for e in c.data.get("entries") or []]
+    entries = sorted((x for x in entries if x[0]), key=lambda x: x[0])
+    said = [f for c in all_changes for f in c.data.get("feedback") or []]
+    rounds = sorted((r for r in levels.reviews(spec) if str(r.get("review")) not in reviews_there),
+                    key=lambda r: _moment(r.get("at")))
+    out = []
+    for n, r in enumerate(rounds):
+        comments = [{"id": f.get("id"), "comment": f.get("comment", ""), "response": f.get("response", "")}
+                    for f in said if f.get("review") == r.get("review")]
+        following = _moment(rounds[n + 1].get("at")) if n + 1 < len(rounds) else None
+        out.append({"n": n + 1, "review": r.get("review"), "by": r.get("by"), "at": r.get("at"),
+                    "did": r.get("did"), "comments": comments, "then": _work(entries, _moment(r.get("at")), following)})
+    return {"before": _work(entries, None, _moment(rounds[0].get("at")) if rounds else None), "rounds": out}
+
+
 def _safe_between(spec: Spec, label: str):
     try:
         return diff.between(spec, label, inspect=health.metrics)
@@ -268,6 +325,7 @@ def build(spec: Spec, person: str, against: list[str] | None = None) -> dict:
         "graph": graph(spec),
         "items": items(spec),
     }
+    data["history"] = history(spec, sets)
     return data
 
 
@@ -279,8 +337,22 @@ def _label(data: dict, iid: str) -> str:
     return f"{iid} ({' '.join(words[:9])}{'…' if len(words) > 9 else ''})" if words else iid
 
 
+def _work_lines(rows: list[dict], indent: str) -> list[str]:
+    return [f"{indent}{r['request']}: {r['added']} added, {r['changed']} changed, {r['removed']} removed" for r in rows]
+
+
 def section_text(data: dict, name: str) -> str:
     lines: list[str] = []
+    if name == "history":
+        h = data["history"]
+        lines += _work_lines(h["before"], "before any review: ")
+        for r in h["rounds"]:
+            lines.append(f"round {r['n']}: {r['by']}, {r['at']} (review {r['review']})")
+            for what, ids in (r.get("did") or {}).items():
+                lines.append(f"  {what}: {', '.join(ids)}")
+            lines += [f"  comment on {c['id'] or 'the page'}: {c['comment']}" for c in r["comments"]]
+            lines += _work_lines(r["then"], "  then: ")
+        return "\n".join(lines or ["no rounds of review since the base"]) + "\n"
     if name == "overview":
         o = data["overview"]
         if o["since"]:

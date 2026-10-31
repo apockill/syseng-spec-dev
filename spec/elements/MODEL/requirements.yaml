@@ -351,3 +351,8 @@
     said: Agreed, and said they hadn't liked making up the toolkit's own format for tests; standardizing on and obeying standards sounds good.
     basis: stated
     fingerprint: 33ab94dc67e0
+- id: MODEL-43
+  text: Each review record shall list what the person locked, unlocked, kept and decided in that review.
+  traces_to: SYS-60
+  basis: derived
+  why: the page can't show afterwards what no record kept.

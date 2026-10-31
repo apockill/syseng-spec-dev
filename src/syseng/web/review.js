@@ -377,7 +377,10 @@
     const latest = META.change;  // proposals from older changes are earlier recommendations (REVIEW-37)
     const judged = all.filter((p) => p.change === latest && ITEMS[p.id]);
     el.append(h("h3", { class: "subhead" }, icon("lock", "sm"), "Recommended by the agent"));
-    if (!judged.length) el.append(h("div", { class: "empty" }, "Nothing recommended right now."));
+    const rounds = DATA.history.rounds;  // nothing to do isn't the same as nothing done (REVIEW-46)
+    if (!judged.length) el.append(h("div", { class: "empty" }, "Nothing recommended right now.", rounds.length ? [
+      ` This has been through ${rounds.length} round${rounds.length === 1 ? "" : "s"} of review, the last on ${when(rounds[rounds.length - 1].at)}. `,
+      h("button", { type: "button", class: "linkish", onclick: () => showTab("history") }, "See the review history")] : null));
     const groups = [];
     for (const p of judged) {  // one recommendation can name several items: its reason shows once
       const g = groups.find((x) => x.why === p.why);
@@ -776,6 +779,28 @@
   });
 
   // 7. the full spec
+  const when = (at) => String(at).slice(0, 16).replace("T", " ");
+
+  // The rounds of review since this page's base, and what changed around them (SYS-60)
+  function renderHistory() {
+    const el = block("history", "Review history", "compare", `The rounds of review since ${META.compared ? META.compared.label : "the start"}, oldest first, and what changed between them.`);
+    const size = (r) => [["added", r.added], ["changed", r.changed], ["removed", r.removed]].filter(([, n]) => n).map(([w, n]) => `${n} ${w}`).join(", ");
+    const work = (rows) => rows.map((r) => h("div", { class: "work" }, h("div", {}, r.request), h("div", { class: "small muted" }, size(r))));
+    const { before, rounds } = DATA.history;
+    if (!rounds.length && !before.length) el.append(h("div", { class: "empty" }, "No rounds of review since the base yet."));
+    if (before.length) el.append(h("div", { class: "round" }, h("h3", { class: "subhead" }, rounds.length ? "Before the first review" : "Work so far, not reviewed yet"), work(before)));
+    const words = { locked: "Locked", unlocked: "Unlocked", kept: "Kept", decided: "Decided" };
+    for (const r of rounds) {
+      const did = Object.entries(r.did || {});
+      el.append(h("div", { class: "round" }, h("h3", { class: "subhead" }, `Round ${r.n}`, h("span", { class: "small muted" }, ` ${when(r.at)}, ${r.by}`)),
+        did.map(([k, list]) => h("div", { class: "small" }, `${words[k] || k}: `, list.map((x) => ITEMS[x] ? [idButton(x), " "] : `${x} `))),
+        r.did ? null : h("div", { class: "small muted" }, "What this review locked and kept wasn't recorded then."),
+        r.comments.map((c) => h("div", { class: "work" }, h("div", {}, c.id && ITEMS[c.id] ? [idButton(c.id), " "] : null, c.comment),
+          c.response ? h("div", { class: "small muted" }, `Answered: ${c.response}`) : h("div", { class: "small muted" }, "Not answered yet."))),
+        r.then.length ? h("div", { class: "small then" }, "Then the agent made:") : null, work(r.then)));
+    }
+  }
+
   function renderItems() {
     const el = block("items", "The full spec", "list", "Every item, grouped by system element. Verification items are hidden until you ask for them.");
     const q = h("input", { type: "search", placeholder: "Search IDs and text", "aria-label": "Search" });
@@ -844,9 +869,9 @@
     const judged = recs.filter((p) => p.change === META.change).length;
     const counts = { awaiting: judged + DATA.awaiting.decisions.length,
       altered: DATA.awaiting.alterations.length, captured: DATA.captured.length,
-      changes: DATA.changes.length ? DATA.changes[0].items.length : 0, items: Object.keys(ITEMS).length };
+      changes: DATA.changes.length ? DATA.changes[0].items.length : 0, history: DATA.history.rounds.length, items: Object.keys(ITEMS).length };
     // most signal on the left; the further right, the more mechanical (REVIEW-20)
-    const names = { awaiting: "For you", altered: "Your items, changed", captured: "Captured intent", changes: "What changed", items: "Full spec" };
+    const names = { awaiting: "For you", altered: "Your items, changed", captured: "Captured intent", changes: "What changed", history: "Review history", items: "Full spec" };
     const nav = document.getElementById("nav");
     for (const k of Object.keys(names)) nav.append(h("button", { type: "button", "data-tab": k, onclick: () => showTab(k) }, names[k],
       h("span", { class: "n" + ((k === "awaiting" || k === "altered") && counts[k] ? " hot" : "") }, counts[k])));
@@ -998,6 +1023,7 @@
   renderYourItems();
   renderCaptured();
   renderChanges();
+  renderHistory();
   renderItems();
   document.body.append(bar);
   renderBar();

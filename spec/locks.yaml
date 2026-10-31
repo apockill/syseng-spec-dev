@@ -759,6 +759,14 @@
   text: The engineer needs to reuse the toolkit across unrelated projects.
   migrated_from: faf3a3e85925
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: NEED-32
+  fingerprint: bb27bfc40ce8
+  locked_at: 2026-10-31T15:20-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 1
+  review: 8806fc60af
+  text: The engineer needs to see, on a new review page, the rounds of review a pull request has been through and roughly what changed between them.
 - id: NEED-4
   fingerprint: 4f923c2ad874
   locked_at: '2026-10-11'

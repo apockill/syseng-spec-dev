@@ -368,3 +368,13 @@
     said: Wants it clear that an implementation is not a language but a holistic process, system or entire working architecture; one implementation might be fine and working while another is in progress. Also prefers standardizing on and obeying existing test standards over making up the toolkit's own format for tests.
     basis: stated
     fingerprint: f0af8a28db22
+- id: NEED-32
+  text: The engineer needs to see, on a new review page, the rounds of review a pull request has been through and roughly what changed between them.
+  context: Reviewing a pull request takes several rounds. After a day or two, a person forgets what rounds went into it, and a page that says nothing is recommended, with no sign of the work so far, is disconcerting.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 15:03
+    context: Describing how a review runs over several pages, each generated new, ending on a page with nothing recommended.
+    said: At the last step, if a day or two has passed, a person has forgotten what rounds of review went into the pull request, and seeing nothing recommended with no clarity on the work so far can be disconcerting. Needs traceability, so that when a completely new page is generated for the same pull request there is a way to see the timeline and gauge roughly what changed between rounds. Suggested a tab, while saying that's less the point than the traceability.
+    basis: stated
+    fingerprint: bb27bfc40ce8
