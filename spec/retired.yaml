@@ -85,3 +85,23 @@
   - MODEL-14
   note: |-
     MODEL-14, in 2026-10-21-round-20-migrate-to-intent: the origin field is retired; how directly a person asked for an item is now its level of intent (SYS-42), recorded by MODEL-37 and MODEL-38. Its intent records move to MODEL-38.
+- element: AGENT
+  ids:
+  - AGENT-V7
+  note: |-
+    AGENT-V7, in 2026-10-26-round-40: the command it tested is gone; AGENT-V18 covers reporting problems.
+- element: AGENT
+  ids:
+  - AGENT-46
+  note: |-
+    AGENT-46, in 2026-10-26-round-40: the engineer wants one path for feedback, so AGENT-72 replaces this. Its proposed improvement also contradicted AGENT-74.
+- element: CLI
+  ids:
+  - CLI-V21
+  note: |-
+    CLI-V21, in 2026-10-31-round-41-pr4-review: the check it verified is removed.
+- element: CLI
+  ids:
+  - CLI-32
+  note: |-
+    CLI-32, in 2026-10-31-round-41-pr4-review: the engineer found it too prescriptive; they approve the report's text themselves, so what's in it is up to them.

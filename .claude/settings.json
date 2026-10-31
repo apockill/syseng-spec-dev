@@ -43,6 +43,7 @@
   },
   "permissions": {
     "allow": [
+      "Bash(spec friction *)",
       "Bash(spec status *)",
       "Bash(spec check *)",
       "Bash(spec show *)",
@@ -50,8 +51,7 @@
       "Bash(spec edit *)",
       "Bash(spec change *)",
       "Bash(spec decide *)",
-      "Bash(spec propose *)",
-      "Bash(spec friction *)"
+      "Bash(spec propose *)"
     ]
   }
 }

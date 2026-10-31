@@ -65,19 +65,10 @@
   - AGENT-45
   method: inspection
   technique: unit test
-  description: The skill has a section that invites agents to improve it, and that section names the command for reporting friction.
+  description: The skill has a section that invites agents to improve it, and that section links to the reference explaining how to report a problem with the toolkit.
   tests:
     python:
     - tests/test_skill.py::test_skill_invites_agents_to_improve_it
-- id: AGENT-V7
-  verifies:
-  - AGENT-46
-  method: test
-  technique: unit test
-  description: Reporting friction records the workaround and the proposed improvement in the open change, where the engineer reads them.
-  tests:
-    python:
-    - tests/test_decisions.py::test_friction_is_logged_with_a_proposal
 - id: AGENT-V8
   verifies:
   - AGENT-47
@@ -171,3 +162,14 @@
   tests:
     python:
     - tests/test_skill.py::test_skill_teaches_how_deep_to_write_requirements
+- id: AGENT-V18
+  verifies:
+  - AGENT-72
+  - AGENT-73
+  - AGENT-74
+  method: test
+  technique: unit test
+  description: The skill's guidance contains the instructions to report even what was worked around, to show the full text and ask, to write in general terms for a public repository, and not to propose a solution. Whether agents follow them isn't tested.
+  tests:
+    python:
+    - tests/test_skill.py::test_problem_reports_need_consent_general_terms_and_no_solution

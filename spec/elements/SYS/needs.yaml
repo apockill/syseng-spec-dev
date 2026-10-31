@@ -341,3 +341,30 @@
     said: Wants spec directories allowed in subdirectories throughout a repository, for monorepos where teams spec their own projects; may later allow a spec to point to another spec for a subcomponent, by path or by repository URL, but not now.
     basis: stated
     fingerprint: fa419b18da91
+- id: NEED-30
+  text: The engineer needs the problems agents hit while using the toolkit in any project to reach the engineer freely and easily, including problems an agent works around without saying so.
+  context: The engineer wants to start using the toolkit seriously on other projects, beginning with the sites repository, and worries that an agent could be quietly struggling with the spec without anyone hearing about it. Ideas floated, none chosen yet - a feedback button, agents calling an API, people copying and pasting papercuts to send on, agents opening GitHub issues with their user's consent.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-26 09:36
+    context: Weighing whether to migrate the sites repository now.
+    said: One need for this project is that feedback flows freely and easily to the engineer, so that an agent having problems with the spec while working on another project doesn't go unnoticed; spitballed a feedback button, an API the AI pings, copy-pasted papercuts, and agents filing GitHub issues with their user's consent.
+    basis: stated
+    fingerprint: 2ebb6e593842
+- id: NEED-31
+  text: The engineer needs to see each implementation's health from test results that separate steps of a pipeline produce with different tools.
+  context: |-
+    Discussing how the toolkit should take in test results instead of running tests itself. Scenarios: a CI pipeline with expensive infrastructure steps, then cheap unit tests, then frontend tests, after which the verification items are inspected and an agent works from there; use in a large monorepo at the engineer's work with its own build system; and a system with two implementations during a migration, differing in languages, frameworks and cloud provider.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 11:41
+    context: Discussing how the toolkit should take in test results instead of running tests itself.
+    said: Wants spec results extensible to other formats, for example through a format option, so results from a monorepo's own build system can be added. An implementation may not be tied to a language, since it can span many languages, frameworks and cloud providers, and a second implementation may be a migration target on a different cloud and stack. Ingesting results may take several commands or one pointing at all of them; the command should be runnable again for later steps, so a pipeline can run expensive infrastructure steps, then cheap unit tests, then frontend tests, and at the end inspect the verification items for system health while the LLM works from there.
+    basis: stated
+    fingerprint: f0af8a28db22
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 11:52
+    context: Reviewing the proposal that an implementation becomes a name and a root, with language optional.
+    said: Wants it clear that an implementation is not a language but a holistic process, system or entire working architecture; one implementation might be fine and working while another is in progress. Also prefers standardizing on and obeying existing test standards over making up the toolkit's own format for tests.
+    basis: stated
+    fingerprint: f0af8a28db22

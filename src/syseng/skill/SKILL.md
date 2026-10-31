@@ -20,6 +20,7 @@ Run the toolkit as `spec` from the repository root. `spec <command> --help` expl
 | The fields of each kind of item, with examples | [references/schema.md](references/schema.md) | 145 lines |
 | Handing over a review page, applying feedback, recording locks, raising conflicts | [references/review-and-locks.md](references/review-and-locks.md) | 75 lines |
 | Running the auditors and reasoning checks | [references/auditing.md](references/auditing.md) | 40 lines |
+| Reporting a problem with the toolkit | [references/reporting-problems.md](references/reporting-problems.md) | 30 lines |
 | A checker finding you don't understand | [references/rules.md](references/rules.md) (find the code in its contents) | 250 lines |
 
 ## People
@@ -114,4 +115,4 @@ YAML
 
 ## Improving this skill
 
-If something makes you jump through hoops, log it with `spec friction --workaround "…" --proposal "…"` and propose the change. Nothing here is fixed, except that people control what gets locked.
+If something makes you jump through hoops, or the toolkit lacks something you needed, offer to report it, even if you worked around it (references/reporting-problems.md). Nothing here is fixed, except that people control what gets locked.

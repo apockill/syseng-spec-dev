@@ -1,0 +1,435 @@
+request: Record the engineer's need for toolkit feedback to flow freely to them
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-26'
+entries:
+- op: add
+  id: NEED-30
+  at: 2026-10-26T09:36-07:00
+  reason: a new need the engineer stated.
+  requested: true
+  after:
+    text: The engineer needs the problems agents hit while using the toolkit in any project to reach the engineer freely and easily, including problems an agent works around without saying so.
+    context: The engineer wants to start using the toolkit seriously on other projects, beginning with the sites repository, and worries that an agent could be quietly struggling with the spec without anyone hearing about it. Ideas floated, none chosen yet - a feedback button, agents calling an API, people copying and pasting papercuts to send on, agents opening GitHub issues with their user's consent.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-26 09:36
+      context: Weighing whether to migrate the sites repository now.
+      said: One need for this project is that feedback flows freely and easily to the engineer, so that an agent having problems with the spec while working on another project doesn't go unnoticed; spitballed a feedback button, an API the AI pings, copy-pasted papercuts, and agents filing GitHub issues with their user's consent.
+      basis: stated
+      fingerprint: 2ebb6e593842
+- op: add
+  id: DR-75
+  at: 2026-10-26T14:54-07:00
+  reason: the engineer's decision.
+  requested: true
+  after:
+    title: Parallel agents are coordinated by orchestration, not by toolkit support, for now
+    decided_by: engineer
+    elements:
+    - CHANGE
+    requirements: CHANGE-1, CHANGE-2
+    context: In a repository where several agent sessions work at once, as in the sites repository, the toolkit allows one open change per repository, spec edit rewrites whole files without locking, and the done gate checks the whole spec, so parallel sessions block or overwrite each other.
+    decision: The toolkit keeps one open change per repository for now. Parallel work is coordinated by how agents are orchestrated, for example an orchestrator that owns the spec changes with implementers working under it on code. The engineer will find what works best while developing the sites repository and bring it back here.
+    alternatives: One open change per session with file locking and a done gate scoped to the session's own change, which the engineer judged too much overhead for now.
+    consequences: Agents running in parallel on one repository need an orchestrator that owns the open change; the toolkit's skill may later describe the patterns that work.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-26 14:54
+      context: Discussing what happens when several agent sessions work in one repository at once.
+      said: Parallel-change support may be wanted in future but is too much overhead for now; for now the answer is to be clever about orchestrating changes, with orchestrators changing specs and implementers working under them on code, and the engineer will learn the most effective ways by developing the sites repository and pass that knowledge back.
+      basis: stated
+      fingerprint: 50eab42f80f5
+- op: add
+  id: SYS-56
+  at: 2026-10-31T11:16-07:00
+  reason: the engineer chose this as the first step for NEED-30.
+  requested: true
+  after:
+    kind: system
+    text: With the engineer's consent, the toolkit shall let an agent report a problem it met with the toolkit as an issue on the toolkit's own repository.
+    serves:
+    - NEED-30
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Choosing a first step for getting agents' problems with the toolkit back to the engineer, from ideas floated earlier.
+      said: GitHub issues filed with the user's consent seem a good first step and should be set up now.
+      basis: stated
+      fingerprint: 263feba6dee3
+- op: add
+  id: CLI-29
+  at: 2026-10-31T11:16-07:00
+  reason: part of reporting problems as issues.
+  after:
+    text: The CLI shall print the template of a problem report on request.
+    traces_to: SYS-56
+    basis: derived
+    why: agents need the report's format to write one.
+- op: add
+  id: CLI-30
+  at: 2026-10-31T11:16-07:00
+  reason: the engineer specified the report's content.
+  requested: true
+  after:
+    text: A problem report shall describe the task, how the agent went about it, the problem it met, and how the agent got past the problem.
+    traces_to: SYS-56
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Saying what the issue template should contain.
+      said: Wants a template with a format good for issues, explaining the problem the agent ran into - the task being done, the way the agent went about it and the issue it ran into - with enough context to avoid an XY problem.
+      basis: stated
+      fingerprint: 71a470adf717
+- op: add
+  id: CLI-31
+  at: 2026-10-31T11:16-07:00
+  reason: a mechanical guard for the engineer's rule against prescribing a solution.
+  after:
+    text: The CLI shall refuse a problem report that leaves a section empty or adds a section of its own, such as a proposed solution.
+    traces_to: SYS-56
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Saying what the issue template should contain.
+      said: The report must not prescribe a solution; the goal is enough context to avoid an XY problem.
+      basis: guided
+      fingerprint: 2206d433f911
+- op: add
+  id: CLI-32
+  at: 2026-10-31T11:16-07:00
+  reason: the toolkit's repository is public, so a mechanical check backs the agent's own generifying.
+  after:
+    text: The CLI shall refuse to send a problem report that contains an email address, an absolute path, the name of the recorded author, or the address of the repository at hand.
+    traces_to: SYS-56
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Saying what the issue template should contain.
+      said: The report should be generified, without leaking information.
+      basis: guided
+      fingerprint: 88531a4a0c71
+- op: add
+  id: CLI-33
+  at: 2026-10-31T11:16-07:00
+  reason: consent needs a preview.
+  after:
+    text: The CLI shall send a problem report only when told to, and otherwise show exactly the text it would send.
+    traces_to: SYS-56
+    basis: derived
+    why: the engineer can only consent to text they have seen.
+- op: add
+  id: AGENT-72
+  at: 2026-10-31T11:16-07:00
+  reason: consent is the engineer's condition, and NEED-30 covers quiet workarounds.
+  requested: true
+  after:
+    text: When an agent meets a problem with the toolkit, including one it works around, the agent shall offer to report it, showing the engineer the full text and sending it only once they agree.
+    traces_to: SYS-56
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Choosing a first step for getting agents' problems with the toolkit back to the engineer.
+      said: GitHub issues should be filed with the user's consent.
+      basis: stated
+      fingerprint: 42f94ff80350
+- op: add
+  id: AGENT-73
+  at: 2026-10-31T11:16-07:00
+  reason: the engineer specified it.
+  requested: true
+  after:
+    text: A problem report shall leave out everything specific to the project at hand.
+    traces_to: SYS-56
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Saying what the issue template should contain.
+      said: The problem should be generified without leaking information.
+      basis: stated
+      fingerprint: 06ac6bb879ab
+- op: add
+  id: AGENT-74
+  at: 2026-10-31T11:16-07:00
+  reason: the engineer specified it.
+  requested: true
+  after:
+    text: A problem report shall prescribe no solution.
+    traces_to: SYS-56
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Saying what the issue template should contain.
+      said: The report should not prescribe a solution; the goal is enough context to avoid an XY problem.
+      basis: stated
+      fingerprint: f16f0cb9d4b8
+- op: add
+  id: CLI-V19
+  at: 2026-10-31T11:18-07:00
+  reason: covers the template.
+  after:
+    verifies:
+    - CLI-29
+    - CLI-30
+    method: test
+    technique: unit test
+    description: The printed template has the four sections, and it matches the form on the toolkit's repository.
+    tests:
+      python:
+      - tests/test_issue.py::test_template_prints_the_sections_and_matches_the_github_form
+- op: add
+  id: CLI-V20
+  at: 2026-10-31T11:18-07:00
+  reason: covers the shape check.
+  after:
+    verifies:
+    - CLI-31
+    method: test
+    technique: unit test
+    description: A report with an empty section or a section of its own is refused, and nothing is sent.
+    tests:
+      python:
+      - tests/test_issue.py::test_an_empty_section_is_refused
+      - tests/test_issue.py::test_a_section_of_its_own_is_refused
+- op: add
+  id: CLI-V21
+  at: 2026-10-31T11:18-07:00
+  reason: covers the leak check.
+  after:
+    verifies:
+    - CLI-32
+    method: test
+    technique: unit test
+    description: Email addresses, absolute paths, the author's name and the repository's address are found, and any of them stops a send.
+    tests:
+      python:
+      - tests/test_issue.py::test_leaks_are_found
+      - tests/test_issue.py::test_a_leak_stops_the_send
+- op: add
+  id: CLI-V22
+  at: 2026-10-31T11:18-07:00
+  reason: covers consent's preview.
+  after:
+    verifies:
+    - CLI-33
+    method: test
+    technique: unit test
+    description: Without the send flag nothing is sent and the text is shown; with it, the text sent is the text shown; a failed send prints the text.
+    tests:
+      python:
+      - tests/test_issue.py::test_without_send_it_shows_the_text_and_sends_nothing
+      - tests/test_issue.py::test_send_sends_what_the_preview_showed
+      - tests/test_issue.py::test_a_failed_send_prints_the_text_for_the_engineer
+- op: add
+  id: AGENT-V18
+  at: 2026-10-31T11:18-07:00
+  reason: checks the guidance is there. Whether agents follow it isn't tested.
+  after:
+    verifies:
+    - AGENT-72
+    - AGENT-73
+    - AGENT-74
+    method: test
+    technique: unit test
+    description: The skill's guidance tells agents to ask before sending, to write in general terms for a public repository, and not to propose a solution.
+    tests:
+      python:
+      - tests/test_skill.py::test_problem_reports_need_consent_general_terms_and_no_solution
+- op: add
+  id: SYS-V8
+  at: 2026-10-31T11:18-07:00
+  reason: its children cover it fully, apart from the live send, which is stated here.
+  after:
+    verifies:
+    - SYS-56
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification. The real send to GitHub has not been exercised.
+- op: modify
+  id: CLI-33
+  at: 2026-10-31T11:20-07:00
+  reason: the audit found a report edited after its preview would go out unseen, so consent is tied to the text.
+  before:
+    text: The CLI shall send a problem report only when told to, and otherwise show exactly the text it would send.
+  after:
+    text: The CLI shall send a problem report only when given the code its preview showed for that exact text.
+- op: modify
+  id: CLI-V20
+  at: 2026-10-31T11:20-07:00
+  reason: adds the heading, duplicate and line-ending cases the audit found.
+  before:
+    tests:
+      python:
+      - tests/test_issue.py::test_an_empty_section_is_refused
+      - tests/test_issue.py::test_a_section_of_its_own_is_refused
+  after:
+    tests:
+      python:
+      - tests/test_issue.py::test_an_empty_section_is_refused
+      - tests/test_issue.py::test_a_section_of_its_own_is_refused
+      - tests/test_issue.py::test_only_the_template_s_sections_pass
+- op: modify
+  id: CLI-V21
+  at: 2026-10-31T11:20-07:00
+  reason: adds the bypasses the audit found.
+  before:
+    tests:
+      python:
+      - tests/test_issue.py::test_leaks_are_found
+      - tests/test_issue.py::test_a_leak_stops_the_send
+  after:
+    tests:
+      python:
+      - tests/test_issue.py::test_leaks_are_found
+      - tests/test_issue.py::test_absolute_paths_are_found_under_any_root
+      - tests/test_issue.py::test_the_repository_is_found_from_any_form_of_remote
+      - tests/test_issue.py::test_a_leak_split_by_a_comment_stops_the_send
+      - tests/test_issue.py::test_a_leak_stops_the_send
+- op: modify
+  id: CLI-V22
+  at: 2026-10-31T11:20-07:00
+  reason: follows CLI-33, and stops mocking the step that hid the title difference.
+  before:
+    description: Without the send flag nothing is sent and the text is shown; with it, the text sent is the text shown; a failed send prints the text.
+    tests:
+      python:
+      - tests/test_issue.py::test_without_send_it_shows_the_text_and_sends_nothing
+      - tests/test_issue.py::test_send_sends_what_the_preview_showed
+      - tests/test_issue.py::test_a_failed_send_prints_the_text_for_the_engineer
+  after:
+    description: Without a code nothing is sent and the text and code are shown; with the code, the title and text passed to the GitHub CLI are those shown; a report edited after its preview is not sent; a failed send prints the text; a missing file is reported.
+    tests:
+      python:
+      - tests/test_issue.py::test_without_send_it_shows_the_text_and_sends_nothing
+      - tests/test_issue.py::test_send_sends_exactly_what_the_preview_showed
+      - tests/test_issue.py::test_a_report_edited_after_its_preview_is_not_sent
+      - tests/test_issue.py::test_a_failed_send_prints_the_text_for_the_engineer
+      - tests/test_issue.py::test_a_missing_report_file_is_reported
+- op: modify
+  id: AGENT-V18
+  at: 2026-10-31T11:20-07:00
+  reason: the audit found the description claimed more than the test checks.
+  before:
+    description: The skill's guidance tells agents to ask before sending, to write in general terms for a public repository, and not to propose a solution.
+  after:
+    description: The skill's guidance contains the instructions to report even what was worked around, to show the full text and ask, to write in general terms for a public repository, and not to propose a solution. Whether agents follow them isn't tested.
+- op: remove
+  id: AGENT-V7
+  at: 2026-10-31T11:34-07:00
+  reason: the command it tested is gone; AGENT-V18 covers reporting problems.
+  before:
+    verifies:
+    - AGENT-46
+    method: test
+    technique: unit test
+    description: Reporting friction records the workaround and the proposed improvement in the open change, where the engineer reads them.
+    tests:
+      python:
+      - tests/test_decisions.py::test_friction_is_logged_with_a_proposal
+- op: remove
+  id: AGENT-46
+  at: 2026-10-31T11:34-07:00
+  reason: the engineer wants one path for feedback, so AGENT-72 replaces this. Its proposed improvement also contradicted AGENT-74.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 42713d18db16
+  fingerprint_after: null
+  before:
+    text: When an agent works around friction in the toolkit, the agent shall report the workaround to the engineer with a proposed improvement.
+    traces_to: SYS-31
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Round 9, date approximate. A direction added while slice 1 was being built, about friction agents meet in the toolkit.
+      said: Said agents need to be comfortable bringing those issues up too.
+      basis: guided
+      fingerprint: 42713d18db16
+  acks:
+    AGENT-46: the engineer asked for one feedback path; AGENT-72 takes this over
+- op: modify
+  id: AGENT-72
+  at: 2026-10-31T11:34-07:00
+  reason: the engineer asked for one feedback path, so this now takes over from spec friction.
+  requested: true
+  before:
+    text: When an agent meets a problem with the toolkit, including one it works around, the agent shall offer to report it, showing the engineer the full text and sending it only once they agree.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Choosing a first step for getting agents' problems with the toolkit back to the engineer.
+      said: GitHub issues should be filed with the user's consent.
+      basis: stated
+      fingerprint: 42f94ff80350
+  after:
+    text: When an agent meets a problem with the toolkit, works around one, or needs something the toolkit lacks, the agent shall offer to report it, showing the engineer the full text and sending it only once they agree.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:16
+      context: Choosing a first step for getting agents' problems with the toolkit back to the engineer.
+      said: GitHub issues should be filed with the user's consent.
+      basis: stated
+      fingerprint: 42f94ff80350
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:34
+      context: Questioning why a separate friction command exists alongside issue reports, and whether the template fits feature requests and papercuts.
+      said: Feels features should be consolidated, with one golden path for providing feedback rather than several disparate paths that spread complexity around; wondered about feature requests and papercuts, and left keeping the template to the agent's judgment.
+      basis: stated
+      fingerprint: 5e1c2dd83963
+  acks:
+    AGENT-V18: its test and description still hold; the guidance now also names missing features
+- op: modify
+  id: AGENT-V6
+  at: 2026-10-31T11:34-07:00
+  reason: spec friction is gone.
+  before:
+    description: The skill has a section that invites agents to improve it, and that section names the command for reporting friction.
+  after:
+    description: The skill has a section that invites agents to improve it, and that section points to reporting problems.
+- op: add
+  id: NEED-31
+  at: 2026-10-31T11:41-07:00
+  reason: the engineer stated this need.
+  requested: true
+  after:
+    text: The engineer needs to see each implementation's health from test results that separate steps of a pipeline produce with different tools.
+    context: |-
+      Discussing how the toolkit should take in test results instead of running tests itself. Scenarios: a CI pipeline with expensive infrastructure steps, then cheap unit tests, then frontend tests, after which the verification items are inspected and an agent works from there; use in a large monorepo at the engineer's work with its own build system; and a system with two implementations during a migration, differing in languages, frameworks and cloud provider.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:41
+      context: Discussing how the toolkit should take in test results instead of running tests itself.
+      said: Wants spec results extensible to other formats, for example through a format option, so results from a monorepo's own build system can be added. An implementation may not be tied to a language, since it can span many languages, frameworks and cloud providers, and a second implementation may be a migration target on a different cloud and stack. Ingesting results may take several commands or one pointing at all of them; the command should be runnable again for later steps, so a pipeline can run expensive infrastructure steps, then cheap unit tests, then frontend tests, and at the end inspect the verification items for system health while the LLM works from there.
+      basis: stated
+      fingerprint: f0af8a28db22
+- op: modify
+  id: NEED-31
+  at: 2026-10-31T11:52-07:00
+  reason: the engineer sharpened what an implementation is.
+  requested: true
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:41
+      context: Discussing how the toolkit should take in test results instead of running tests itself.
+      said: Wants spec results extensible to other formats, for example through a format option, so results from a monorepo's own build system can be added. An implementation may not be tied to a language, since it can span many languages, frameworks and cloud providers, and a second implementation may be a migration target on a different cloud and stack. Ingesting results may take several commands or one pointing at all of them; the command should be runnable again for later steps, so a pipeline can run expensive infrastructure steps, then cheap unit tests, then frontend tests, and at the end inspect the verification items for system health while the LLM works from there.
+      basis: stated
+      fingerprint: f0af8a28db22
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:41
+      context: Discussing how the toolkit should take in test results instead of running tests itself.
+      said: Wants spec results extensible to other formats, for example through a format option, so results from a monorepo's own build system can be added. An implementation may not be tied to a language, since it can span many languages, frameworks and cloud providers, and a second implementation may be a migration target on a different cloud and stack. Ingesting results may take several commands or one pointing at all of them; the command should be runnable again for later steps, so a pipeline can run expensive infrastructure steps, then cheap unit tests, then frontend tests, and at the end inspect the verification items for system health while the LLM works from there.
+      basis: stated
+      fingerprint: f0af8a28db22
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 11:52
+      context: Reviewing the proposal that an implementation becomes a name and a root, with language optional.
+      said: Wants it clear that an implementation is not a language but a holistic process, system or entire working architecture; one implementation might be fine and working while another is in progress. Also prefers standardizing on and obeying existing test standards over making up the toolkit's own format for tests.
+      basis: stated
+      fingerprint: f0af8a28db22
+decisions: []
+friction: []
+closed: '2026-10-31'

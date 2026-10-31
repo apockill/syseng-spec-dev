@@ -305,16 +305,6 @@
     said: Wants agents encouraged to modify the skill if the experience can be improved, or if the person is using it in a new way, and the wording to keep that option open.
     basis: stated
     fingerprint: 12c8c954af5c
-- id: AGENT-46
-  text: When an agent works around friction in the toolkit, the agent shall report the workaround to the engineer with a proposed improvement.
-  traces_to: SYS-31
-  intent:
-  - by: Alex Thiele <alex.g.thiele@gmail.com>
-    when: '2026-10-11'
-    context: Round 9, date approximate. A direction added while slice 1 was being built, about friction agents meet in the toolkit.
-    said: Said agents need to be comfortable bringing those issues up too.
-    basis: guided
-    fingerprint: 42713d18db16
 - id: AGENT-12
   text: When the main agent tries to finish, the toolkit shall run the checker and return each finding to the agent.
   traces_to: SYS-7
@@ -613,3 +603,39 @@
     said: Cut the split point of about 30 requirements, splitting along test seams (which presumes tests exist, as only in a migration or code-first work, and risks letting implementation guide requirements), and the cap of about 15 questions; kept one decision record per design topic (asking that it be clear this applies to migrations, since a long project in normal development may rightly have very many decision records), the onboarding order, and grouping thin parts of the same shape.
     basis: stated
     fingerprint: a1639f58928d
+- id: AGENT-72
+  text: When an agent meets a problem with the toolkit, works around one, or needs something the toolkit lacks, the agent shall offer to report it, showing the engineer the full text and sending it only once they agree.
+  traces_to: SYS-56
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 11:16
+    context: Choosing a first step for getting agents' problems with the toolkit back to the engineer.
+    said: GitHub issues should be filed with the user's consent.
+    basis: stated
+    fingerprint: 42f94ff80350
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 11:34
+    context: Questioning why a separate friction command exists alongside issue reports, and whether the template fits feature requests and papercuts.
+    said: Feels features should be consolidated, with one golden path for providing feedback rather than several disparate paths that spread complexity around; wondered about feature requests and papercuts, and left keeping the template to the agent's judgment.
+    basis: stated
+    fingerprint: 5e1c2dd83963
+- id: AGENT-73
+  text: A problem report shall leave out everything specific to the project at hand.
+  traces_to: SYS-56
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 11:16
+    context: Saying what the issue template should contain.
+    said: The problem should be generified without leaking information.
+    basis: stated
+    fingerprint: 06ac6bb879ab
+- id: AGENT-74
+  text: A problem report shall prescribe no solution.
+  traces_to: SYS-56
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 11:16
+    context: Saying what the issue template should contain.
+    said: The report should not prescribe a solution; the goal is enough context to avoid an XY problem.
+    basis: stated
+    fingerprint: f16f0cb9d4b8

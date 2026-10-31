@@ -207,3 +207,33 @@
   traces_to: SYS-35
   basis: derived
   why: what needs judgment, summarizing a person's words, is the agent's; the rest (locks, change records, the format's version) is mechanical, and every repository that used the older format needs it (DR-63).
+- id: CLI-29
+  text: The CLI shall print the template of a problem report on request.
+  traces_to: SYS-56
+  basis: derived
+  why: agents need the report's format to write one.
+- id: CLI-30
+  text: A problem report shall describe the task, how the agent went about it, the problem it met, and how the agent got past the problem.
+  traces_to: SYS-56
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 11:16
+    context: Saying what the issue template should contain.
+    said: Wants a template with a format good for issues, explaining the problem the agent ran into - the task being done, the way the agent went about it and the issue it ran into - with enough context to avoid an XY problem.
+    basis: stated
+    fingerprint: 71a470adf717
+- id: CLI-31
+  text: The CLI shall refuse a problem report that leaves a section empty or adds a section of its own, such as a proposed solution.
+  traces_to: SYS-56
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-10-31 11:16
+    context: Saying what the issue template should contain.
+    said: The report must not prescribe a solution; the goal is enough context to avoid an XY problem.
+    basis: guided
+    fingerprint: 2206d433f911
+- id: CLI-33
+  text: The CLI shall send a problem report only when given the code its preview showed for that exact text.
+  traces_to: SYS-56
+  basis: derived
+  why: the engineer can only consent to text they have seen.
