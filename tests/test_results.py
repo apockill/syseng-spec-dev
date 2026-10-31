@@ -433,3 +433,51 @@ def test_an_unknown_backend_is_reported_without_a_traceback(repo, capsys):
     settings.write_text(settings.read_text() + "version_control: piper\n")
     assert cli.main(["results", "add", "--step", "u", "--id", "t", "--outcome", "pass"]) == 1
     assert "no version-control backend" in capsys.readouterr().out
+
+
+def _lock(repo, *ids):
+    from syseng import review
+    spec = model.load(repo / "spec")
+    (repo / "spec" / "locks.yaml").write_text(yaml.safe_dump([
+        {"id": i, "by": "Ada <ada@example.com>", "when": "2026-01-01", "via": "chat", "count": 1,
+         "fingerprint": review.current_fingerprint(spec, i)} for i in ids]))
+
+
+def test_a_failure_shows_what_it_checks_and_the_locked_items_above_it(repo, capsys):
+    _lock(repo, "NEED-1")
+    _add("--step", "u", "--id", "//api:one_test", "--outcome", "fail")
+    capsys.readouterr()
+    assert cli.main(["results", "status"]) == 1
+    out = capsys.readouterr().out
+    assert "checks: One." in out
+    assert "verifies SYS-1 (derived): The tool shall do one." in out
+    assert "above: NEED-1 (explicit): The engineer needs it." in out
+    assert "that's a conflict to raise" in out
+
+
+def test_items_no_person_stated_stay_out_unless_asked_for(repo, capsys):
+    _add("--step", "u", "--id", "//api:one_test", "--outcome", "fail")
+    capsys.readouterr()
+    cli.main(["results", "status"])
+    out = capsys.readouterr().out
+    assert "above: NEED-1" not in out and "1 more above" in out and "A person's direction" not in out
+    cli.main(["results", "status", "--full-trace"])
+    assert "above: NEED-1 (derived)" in capsys.readouterr().out
+
+
+def test_each_text_is_shown_once_however_many_failures_reach_it(repo, capsys):
+    _lock(repo, "NEED-1")
+    _add("--step", "u", "--id", "//api:one_test", "--outcome", "fail")
+    _add("--step", "v", "--id", "//api:two_test", "--outcome", "fail")
+    capsys.readouterr()
+    cli.main(["results", "status"])
+    out = capsys.readouterr().out
+    assert out.count("The engineer needs it.") == 1 and "NEED-1 (explicit), shown above" in out
+    _, data = _status(capsys)
+    assert set(data["aws"]["context"]) == {"SYS-1", "SYS-2", "NEED-1"}
+    assert data["aws"]["failing"][0]["trace"][0]["above"] == ["NEED-1"]
+
+
+def test_a_need_marked_derived_does_not_count_as_a_persons_word(repo):
+    from syseng import levels
+    assert levels.level_of(model.load(repo / "spec"), "NEED-1").level == levels.DERIVED

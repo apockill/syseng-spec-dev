@@ -38,7 +38,7 @@ An older result still counts: an item says which revision it was last tested in,
 
 ## What to do with a failure
 
-A failure means the code, the test or the requirement is wrong. Find out which before changing anything. The requirement's level says who decides:
+A failure means the code, the test or the requirement is wrong. Find out which before changing anything. Each failure in `spec results status` comes with the requirements it verifies and the explicit and stated items above them, so read those first: a failing test can be the first sign that something the engineer asked for no longer holds, or that your approach has to change. `--full-trace` shows everything above, and `--json` gives the same data with each text once, under `context`. The requirement's level says who decides:
 - explicit or stated: the requirement stands. Fix the code, or raise a conflict.
 - guided: you may change it, and ask about the change once it's built.
 - derived or added: yours to reshape.

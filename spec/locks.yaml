@@ -864,6 +864,14 @@
   review: 9a3fdfb9fb
   text: When the engineer requests a full run, the toolkit shall verify the whole product without the engineer present.
   note: kept under D1
+- id: SYS-13
+  fingerprint: a07e920e0b45
+  locked_at: 2026-10-31T14:47-07:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  review: fb0f2a5e79
+  text: After a full run of the engineer's pipeline, the toolkit shall report the verification status of the whole product without the engineer present.
+  note: kept an alteration
 - id: SYS-14
   fingerprint: 548591ff0ebb
   locked_at: '2026-10-11'

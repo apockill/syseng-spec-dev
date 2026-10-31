@@ -121,3 +121,31 @@
   tests:
     python:
     - tests/test_results.py::test_a_verdict_is_a_result_named_by_the_item
+- id: VERIFY-V11
+  verifies:
+  - VERIFY-30
+  method: test
+  technique: unit test
+  description: A failure shows what it checks, the requirement it verifies and the locked item above it, with a reminder that a broken direction is a conflict; items no person stated stay out by default.
+  tests:
+    python:
+    - tests/test_results.py::test_a_failure_shows_what_it_checks_and_the_locked_items_above_it
+    - tests/test_results.py::test_items_no_person_stated_stay_out_unless_asked_for
+- id: VERIFY-V12
+  verifies:
+  - VERIFY-31
+  method: test
+  technique: unit test
+  description: A text reached by two failures appears once, in the printed report and in the JSON's context.
+  tests:
+    python:
+    - tests/test_results.py::test_each_text_is_shown_once_however_many_failures_reach_it
+- id: VERIFY-V13
+  verifies:
+  - VERIFY-32
+  method: test
+  technique: unit test
+  description: With the full-trace flag, items no person stated are shown too.
+  tests:
+    python:
+    - tests/test_results.py::test_items_no_person_stated_stay_out_unless_asked_for

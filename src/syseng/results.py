@@ -13,7 +13,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import quote
 
-from syseng import levels, readers, vcs
+from syseng import levels, readers, review, vcs
 from syseng.model import Spec
 
 PASSING, FAILING, NOT_RUN, NOT_IMPLEMENTED = "passing", "failing", "not yet run", "not implemented"
@@ -195,16 +195,43 @@ def unlinked(spec: Spec, implementation: str) -> list[str]:
     return sorted(every - linked)
 
 
-def report(spec: Spec) -> dict:
+def _above(spec: Spec, requirement: str, full: bool) -> tuple[list[str], int]:
+    """What sits above a requirement in the trace, nearest first: a person's direction (explicit and stated items), or
+    everything when `full`. Also how many were left out, so a reader knows there's more (VERIFY-30, VERIFY-32)."""
+    seen, frontier, chain = {requirement}, [requirement], []
+    while frontier:
+        frontier = [p for f in frontier for p in review.parents(spec, f) if p not in seen and p in spec.items]
+        seen.update(frontier)
+        chain += frontier
+    shown = [i for i in chain if full or levels.level_of(spec, i).level in (levels.EXPLICIT, levels.STATED)]
+    return shown, len(chain) - len(shown)
+
+
+def _trace(spec: Spec, row: dict, context: dict, full: bool) -> dict:
+    """A failing item with what it checks and what stands above it. Texts go in `context`, once each (VERIFY-31)."""
+    trace = []
+    for r in row["verifies"]:
+        above, left_out = _above(spec, r, full)
+        trace.append({"requirement": r, "above": above, "left_out": left_out})
+        for i in [r, *above]:
+            if i in spec.items:
+                context.setdefault(i, {"level": levels.level_of(spec, i).level, "text": spec.items[i].data.get("text", "")})
+    return {**row, "checks": spec.items[row["id"]].data.get("description", ""), "trace": trace}
+
+
+def report(spec: Spec, full_trace: bool = False) -> dict:
     """Everything `spec results status` and the review page show."""
     out = {}
     for i in implementations(spec):
         name = i["name"]
         items = rows(spec, name)
+        context: dict[str, dict] = {}
+        failing = sorted((asdict(r) for r in items if r.status == FAILING),
+                         key=lambda r: levels.ORDER.index(r["level"]))
         out[name] = {"primary": bool(i.get("primary")),
                      "counts": {s: sum(1 for r in items if r.status == s) for s in STATUSES},
-                     "failing": sorted((asdict(r) for r in items if r.status == FAILING),
-                                       key=lambda r: levels.ORDER.index(r["level"])),
+                     "failing": [_trace(spec, r, context, full_trace) for r in failing],
+                     "context": context,
                      "not_run_locked": [asdict(r) for r in items if r.status == NOT_RUN and r.locked],
                      "items": [asdict(r) for r in items],
                      "unlinked": unlinked(spec, name)}
