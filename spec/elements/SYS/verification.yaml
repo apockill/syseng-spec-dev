@@ -174,7 +174,7 @@
   - SYS-61
   method: test
   technique: unit test
-  description: Cases and checks work without a runner, an adapter turns them into a run with and without the skill, and only the reader in the toolkit names promptfoo.
+  description: Only the toolkit's reader names the eval tool, and this repository's cases and checks are well formed.
   tests:
     python:
     - tests/test_evals.py

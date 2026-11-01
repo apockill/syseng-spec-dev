@@ -1,0 +1,76 @@
+request: Record that the toolkit reads eval results and runs nothing
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-01'
+entries:
+- op: modify
+  id: SYS-61
+  at: 2026-11-01T15:25-08:00
+  reason: the engineer's correction; this is the independence that matters.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 19b802b2e882
+  fingerprint_after: bbcbd522b97e
+  requested: true
+  before:
+    text: The toolkit's evaluations of agent behaviour shall keep their cases and checks independent of the evaluation runner.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 14:59
+      context: Choosing promptfoo to try for evaluating the skill.
+      said: Wants to try promptfoo while not depending on it too heavily in code, keeping things extensible so other runners can be added, or this one deprecated, if they end up not liking it.
+      basis: stated
+      fingerprint: 19b802b2e882
+  after:
+    text: The toolkit shall read evaluation results without depending on a particular evaluation tool.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 14:59
+      context: Choosing promptfoo to try for evaluating the skill.
+      said: Wants to try promptfoo while not depending on it too heavily in code, keeping things extensible so other runners can be added, or this one deprecated, if they end up not liking it.
+      basis: stated
+      fingerprint: 19b802b2e882
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 15:25
+      context: Questioning why a runners folder existed in the evals.
+      said: Asked why there would be runners at all; the toolkit should not be in the business of running but of reading results, such as reading JUnit or writing a promptfoo JSON reader. Agreed to replacing the runner layer with a plain promptfoo config.
+      basis: stated
+      fingerprint: bbcbd522b97e
+  acks:
+    SYS-61: the engineer asked for this
+    DR-77: the engineer agreed to this
+- op: modify
+  id: SYS-V25
+  at: 2026-11-01T15:25-08:00
+  reason: follows SYS-61.
+  before:
+    description: Cases and checks work without a runner, an adapter turns them into a run with and without the skill, and only the reader in the toolkit names promptfoo.
+  after:
+    description: Only the toolkit's reader names the eval tool, and this repository's cases and checks are well formed.
+- op: modify
+  id: DR-77
+  at: 2026-11-01T15:25-08:00
+  reason: the engineer's correction.
+  raised:
+  - a person stated or guided it
+  - a person decided it
+  level: stated
+  fingerprint_before: ae9a961d982c
+  fingerprint_after: 34b1ffb14910
+  before:
+    title: Evals keep neutral cases, with promptfoo as a replaceable runner on the host
+    decision: Cases stay in the Agent Skills evals.json format, checks in plain Python, and the fixture in a script. promptfoo is one adapter under evals/runners and one reader. Runs happen on the host with limited tools, not in a container, with dependencies in a flake shell.
+    alternatives: Harbor, which is strong on isolation and agent coverage but built for benchmarks and needs containers. Writing our own runner, which the engineer ruled out as risky.
+    consequences: An allowed command can still reach outside the workspace, which is acceptable for this repository's own skill. Hermes isn't covered. A case passes at 80% of its runs.
+  after:
+    title: The toolkit reads eval results, and this repository's own evals use promptfoo directly on the host
+    decision: |-
+      The toolkit runs nothing: evaluations reach it through a reader, as other test results do. This repository's evals of its own skill are a plain promptfoo config, with checks in Python and a script that builds the fixture. They run on the host with limited tools, not in a container, with dependencies in a flake shell.
+    alternatives: Harbor, which is strong on isolation and agent coverage but built for benchmarks and needs containers. Neutral cases translated into each runner's config, which was built and removed as abstraction for a second runner that doesn't exist. Writing our own runner, which the engineer ruled out as risky.
+    consequences: An allowed command can still reach outside the workspace, which is acceptable for this repository's own skill. Hermes isn't covered. A case passes at 80% of its runs. Changing eval tool means converting the cases and adding a reader, which is simple YAML work.
+  acks:
+    DR-77: the engineer agreed to this
+decisions: []
+closed: '2026-11-01'

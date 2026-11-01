@@ -844,7 +844,7 @@
     fingerprint: cfc6e41ad0b7
 - id: SYS-61
   kind: system
-  text: The toolkit's evaluations of agent behaviour shall keep their cases and checks independent of the evaluation runner.
+  text: The toolkit shall read evaluation results without depending on a particular evaluation tool.
   serves:
   - NEED-30
   intent:
@@ -854,3 +854,9 @@
     said: Wants to try promptfoo while not depending on it too heavily in code, keeping things extensible so other runners can be added, or this one deprecated, if they end up not liking it.
     basis: stated
     fingerprint: 19b802b2e882
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 15:25
+    context: Questioning why a runners folder existed in the evals.
+    said: Asked why there would be runners at all; the toolkit should not be in the business of running but of reading results, such as reading JUnit or writing a promptfoo JSON reader. Agreed to replacing the runner layer with a plain promptfoo config.
+    basis: stated
+    fingerprint: bbcbd522b97e
