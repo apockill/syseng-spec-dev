@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 
 from syseng import (changes, diff, edit, feedback, fingerprint, init, issue, levels, migrate, model, page, pagedata,
-                    people, readers, render, results, review, vcs, yamlio)
+                    people, readers, render, results, review, rules, vcs, yamlio)
 from syseng import check as checker
 
 
@@ -52,6 +52,8 @@ def cmd_check(args) -> int:
         if args.todo:
             for f in (f for f in findings if f.severity == "todo"):
                 print(f"todo[{f.code}] {f.message}")
+            if any(f.code == "V003" for f in findings):  # CHECK-35: the reminder, where the choice is made
+                print(f"\n{rules.LINK_TESTS}")
             print()
         if args.merge:  # CHECK-15: shows what the engineer may want to answer first; never fails because of it
             pending = review.unanswered(spec)
@@ -218,6 +220,10 @@ def cmd_change(args) -> int:
                 return 1
             open_ds = [d["id"] for d in c.data.get("decisions") or [] if d.get("status") == "open"]
             changes.close(c)
+            unlinked = [f for f in checker.check(model.load(spec.root)) if f.code == "V003"]
+            if unlinked:  # CHECK-36
+                print(f"{len(unlinked)} test file{'s have' if len(unlinked) != 1 else ' has'} tests nothing links "
+                      f"(`spec check --todo` lists them). {rules.LINK_TESTS}")
             print(f"closed {c.id}" + (f"; open decisions left for the engineer: {', '.join(open_ds)}" if open_ds else ""))
         else:
             c = changes.current(spec)
@@ -501,7 +507,10 @@ def _results_status(spec, args) -> int:
                 print(f"not run {r['id']} ({name}), verifies locked {', '.join(r['verifies'])}")
             if d["unlinked"]:
                 print(f"{len(d['unlinked'])} test{'s' if len(d['unlinked']) != 1 else ''} in {name}'s results no "
-                      f"verification item links: {', '.join(d['unlinked'])}")
+                      f"verification item links: {', '.join(d['unlinked'])}\n{rules.LINK_TESTS}")
+            for u in d["unmatched"]:  # VERIFY-35
+                print(f"{u['id']} links {u['link']}, which the current results don't mention: renamed, deleted, or "
+                      f"in a step that hasn't run ({name})")
             if args.all:
                 for r in d["items"]:
                     print(f"  {r['id']:<14} {r['status']:<16} last tested in {short(r['last_tested'])}")

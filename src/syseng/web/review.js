@@ -500,6 +500,8 @@
     // the intent mix: how the needs and requirements split across the levels (one ordinal ramp)
     const mix = o.now.mix, total = Object.values(mix).reduce((a, b) => a + b, 0) || 1;
     const before = (o.was || {}).mix || {};
+    // a sudden rise in requirements against tests linked is what over-specifying looks like (REVIEW-47)
+    if (o.linking) box.append(h("div", { class: "small linking" }, `Since ${o.since}: ${o.linking.requirements} requirements added, ${o.linking.tests} test links added.`));
     // what the pipeline's results say, and what hasn't been run: above all, what verifies a locked requirement (VERIFY-27)
     const verification = Object.entries(o.verification || {});
     box.append(h("div", { class: "verification" }, h("div", { class: "small" }, "Verification status, from test results"),

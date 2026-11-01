@@ -202,3 +202,12 @@
   tests:
     python:
     - tests/test_skill.py::test_handover_records_results_first
+- id: AGENT-V22
+  verifies:
+  - AGENT-78
+  method: test
+  technique: unit test
+  description: The skill's loop tells agents to link each test they add, and the reference puts linking first and adding last.
+  tests:
+    python:
+    - tests/test_skill.py::test_linking_tests_is_guided_link_first_add_last

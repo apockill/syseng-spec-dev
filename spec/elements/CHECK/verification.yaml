@@ -224,3 +224,22 @@
     - tests/test_check_structure.py::test_a_deferred_child_does_not_count_for_a_roll_up
     - tests/test_check_structure.py::test_roll_ups_can_chain_down_to_verified_leaves
     - tests/test_results.py::test_a_chain_of_roll_ups_follows_the_leaves
+- id: CHECK-V22
+  verifies:
+  - CHECK-35
+  method: test
+  technique: unit test
+  description: The reminder says one item can link many tests, warns against implementation detail, and names the reference; the status command prints it with unlinked tests.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_the_unlinked_test_reminder_warns_against_inventing_requirements
+    - tests/test_results.py::test_unlinked_tests_come_with_the_reminder
+- id: CHECK-V23
+  verifies:
+  - CHECK-36
+  method: test
+  technique: unit test
+  description: Closing a change with an unlinked test prints the count and the reminder.
+  tests:
+    python:
+    - tests/test_edit.py::test_closing_a_change_reminds_the_agent_of_unlinked_tests

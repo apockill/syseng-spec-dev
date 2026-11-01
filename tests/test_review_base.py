@@ -81,3 +81,16 @@ def test_the_page_states_its_base_at_the_top(repo):
     assert '"compared":{"label":"main"' in html
     script = (page.WEB / "review.js").read_text()
     assert "Comparing ${cmp.newer} against ${cmp.label} at ${cmp.short}" in script
+
+
+def test_the_overview_shows_requirements_added_against_tests_linked(repo):
+    _git(repo, "switch", "-qc", "work")
+    assert _build(repo)["overview"]["linking"] == {"requirements": 0, "tests": 0}
+    sysdir = repo / "spec" / "elements" / "SYS"
+    (sysdir / "requirements.yaml").write_text(
+        "- id: SYS-1\n  kind: system\n  text: The tool shall do one.\n  serves: []\n  basis: derived\n  why: w\n")
+    (sysdir / "verification.yaml").write_text(
+        "- id: SYS-V1\n  verifies: [SYS-1]\n  method: test\n  technique: unit test\n  description: One.\n"
+        "  tests:\n    python: [a, b]\n")
+    assert _build(repo)["overview"]["linking"] == {"requirements": 1, "tests": 2}
+    assert "test links added" in (page.WEB / "review.js").read_text()

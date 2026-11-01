@@ -166,3 +166,9 @@ def test_every_pull_request_gets_a_review_page_against_its_base():
 def test_handover_records_results_first():
     text = (init.SKILL / "references" / "review-and-locks.md").read_text()
     assert text.index("record their results first") < text.index("Run `spec review`")
+
+
+def test_linking_tests_is_guided_link_first_add_last():
+    text = (init.SKILL / "references" / "writing-requirements.md").read_text()
+    assert "Link first, add last" in text and "Never add a requirement just to give a test a home" in text
+    assert "link every test you add" in (init.SKILL / "SKILL.md").read_text()

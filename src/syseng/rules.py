@@ -41,6 +41,11 @@ class Rule:
         return f"{rules_doc_for(spec_root)}#{self.code.lower()}"
 
 
+LINK_TESTS = ("Link each test to the verification item whose requirement it supports; one item can link many tests, or "
+              "a whole file. Add a requirement or constraint only for behaviour someone relies on, not for an "
+              "implementation detail. If you can't say what contract a test protects, raise it with the engineer. "
+              "See references/writing-requirements.md.")
+
 _RULES = [
     # --- structure of the spec
     Rule("S001", "unreadable or malformed spec file",
@@ -146,8 +151,7 @@ _RULES = [
          "GoogleTest (`Suite.Test`). If the test is gone, remove the link."),
     Rule("V003", "test no verification item links",
          "A test nothing links to checks something the spec doesn't claim, or a requirement that's missing.",
-         "Link it from the verification item whose requirement it checks, or add the requirement it shows is "
-         "missing.", severity="todo"),
+         LINK_TESTS, severity="todo"),
     Rule("V004", "roll-up over an unverified child",
          "A roll-up verifies a requirement by its children's verification, which holds only if every child is verified.",
          "Verify the child, or verify the parent at its own level instead of by roll-up."),

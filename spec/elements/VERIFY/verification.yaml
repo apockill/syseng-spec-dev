@@ -178,3 +178,24 @@
   tests:
     python:
     - tests/test_results.py::test_the_report_says_whether_results_are_recorded
+- id: VERIFY-V17
+  verifies:
+  - VERIFY-34
+  method: test
+  technique: unit test
+  description: A test gone from a step's newest report is gone; a step that didn't run keeps its older report, and outcomes given one at a time survive a later revision.
+  tests:
+    python:
+    - tests/test_results.py::test_a_test_gone_from_a_steps_newest_report_is_gone
+    - tests/test_results.py::test_a_step_that_did_not_run_keeps_its_older_report
+    - tests/test_results.py::test_verdicts_given_one_at_a_time_survive_a_later_revision
+- id: VERIFY-V18
+  verifies:
+  - VERIFY-35
+  method: test
+  technique: unit test
+  description: A link the current results don't mention is listed, and nothing is listed before any results exist.
+  tests:
+    python:
+    - tests/test_results.py::test_a_link_the_current_results_dont_mention_is_flagged
+    - tests/test_results.py::test_nothing_is_flagged_before_any_results_exist

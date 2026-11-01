@@ -1,0 +1,173 @@
+request: Every test links to a verification item, reminding the agent not to invent requirements; stale tests leave the results
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-01'
+entries:
+- op: add
+  id: VERIFY-34
+  at: 2026-11-01T13:10-08:00
+  reason: the engineer asked how to flag these; a test renamed in this repository lingered as unlinked.
+  after:
+    text: A step's newest report shall replace that step's older reports, so a test missing from it no longer counts.
+    traces_to: SYS-57
+    basis: derived
+    why: a renamed or deleted test otherwise lingers in the results.
+- op: add
+  id: VERIFY-35
+  at: 2026-11-01T13:10-08:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: The status command shall list each test link that the current results don't mention.
+    traces_to: SYS-57
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 13:10
+      context: Asking how renamed or deleted tests could be flagged for correction to the LLM automatically.
+      said: Wants these automatically flagged to the LLM for correction.
+      basis: stated
+      fingerprint: 17d5b3ff1c1d
+- op: add
+  id: CHECK-35
+  at: 2026-11-01T13:10-08:00
+  reason: the engineer specified it.
+  requested: true
+  after:
+    text: When the checker lists tests that no verification item links, it shall remind the agent to link them first, to add a requirement only for behaviour someone relies on, and where the advice is.
+    traces_to: SYS-7
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 13:10
+      context: Discussing requiring every test to link to a verification item, and the risk of implementation detail leaking into the spec.
+      said: Wholeheartedly agreed with the risk. However the feature flags tests to link, the tool or skill instructions surfaced should remind the LLM of that risk so it's fresh in context, pointing to a reference for advice.
+      basis: stated
+      fingerprint: 0648e5f15d0f
+- op: add
+  id: CHECK-36
+  at: 2026-11-01T13:10-08:00
+  reason: the moment an agent can still act on it.
+  after:
+    text: When a change closes, the CLI shall remind the agent of tests that no verification item links.
+    traces_to: SYS-7
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 13:10
+      context: Saying tests should always link to a verification item.
+      said: Thinks the spec framework should request that the LLM link tests to verification items, creating them or fleshing out the tree where the relevant requirements and verification items don't exist.
+      basis: guided
+      fingerprint: eda0e3157021
+- op: add
+  id: AGENT-78
+  at: 2026-11-01T13:10-08:00
+  reason: the engineer's rule.
+  requested: true
+  after:
+    text: The agent shall link each test it adds to a verification item, adding a requirement only for behaviour someone relies on.
+    traces_to: SYS-7
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 13:10
+      context: Saying tests should always link to a verification item.
+      said: Tests should always link to some verification item, otherwise why is the test being created if it doesn't validate a part of the system there's a contract for. The framework should ask the LLM to link them and flesh out the tree if the relevant items don't exist.
+      basis: stated
+      fingerprint: 2f612ed2aac6
+- op: add
+  id: REVIEW-47
+  at: 2026-11-01T13:10-08:00
+  reason: the engineer agreed to it.
+  requested: true
+  after:
+    text: The review page's overview shall show how many requirements and how many test links were added since its base.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 13:10
+      context: Reviewing two additions proposed to catch an agent inventing requirements for tests.
+      said: Agreed to a line on the review page showing requirements added against tests linked, where a spike would be visible.
+      basis: stated
+      fingerprint: 6d628387624a
+- op: add
+  id: VERIFY-V17
+  at: 2026-11-01T13:10-08:00
+  reason: covers the step rule.
+  after:
+    verifies:
+    - VERIFY-34
+    method: test
+    technique: unit test
+    description: A test gone from a step's newest report is gone; a step that didn't run keeps its older report, and outcomes given one at a time survive a later revision.
+    tests:
+      python:
+      - tests/test_results.py::test_a_test_gone_from_a_steps_newest_report_is_gone
+      - tests/test_results.py::test_a_step_that_did_not_run_keeps_its_older_report
+      - tests/test_results.py::test_verdicts_given_one_at_a_time_survive_a_later_revision
+- op: add
+  id: VERIFY-V18
+  at: 2026-11-01T13:10-08:00
+  reason: covers the flag.
+  after:
+    verifies:
+    - VERIFY-35
+    method: test
+    technique: unit test
+    description: A link the current results don't mention is listed, and nothing is listed before any results exist.
+    tests:
+      python:
+      - tests/test_results.py::test_a_link_the_current_results_dont_mention_is_flagged
+      - tests/test_results.py::test_nothing_is_flagged_before_any_results_exist
+- op: add
+  id: CHECK-V22
+  at: 2026-11-01T13:10-08:00
+  reason: covers the reminder.
+  after:
+    verifies:
+    - CHECK-35
+    method: test
+    technique: unit test
+    description: The reminder says one item can link many tests, warns against implementation detail, and names the reference; the status command prints it with unlinked tests.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_the_unlinked_test_reminder_warns_against_inventing_requirements
+      - tests/test_results.py::test_unlinked_tests_come_with_the_reminder
+- op: add
+  id: CHECK-V23
+  at: 2026-11-01T13:10-08:00
+  reason: covers the reminder at close.
+  after:
+    verifies:
+    - CHECK-36
+    method: test
+    technique: unit test
+    description: Closing a change with an unlinked test prints the count and the reminder.
+    tests:
+      python:
+      - tests/test_edit.py::test_closing_a_change_reminds_the_agent_of_unlinked_tests
+- op: add
+  id: AGENT-V22
+  at: 2026-11-01T13:10-08:00
+  reason: guards the guidance until the behaviour eval runs.
+  after:
+    verifies:
+    - AGENT-78
+    method: test
+    technique: unit test
+    description: The skill's loop tells agents to link each test they add, and the reference puts linking first and adding last.
+    tests:
+      python:
+      - tests/test_skill.py::test_linking_tests_is_guided_link_first_add_last
+- op: add
+  id: REVIEW-V27
+  at: 2026-11-01T13:10-08:00
+  reason: covers the line.
+  after:
+    verifies:
+    - REVIEW-47
+    method: test
+    technique: unit test
+    description: The overview counts requirements and test links added since the base.
+    tests:
+      python:
+      - tests/test_review_base.py::test_the_overview_shows_requirements_added_against_tests_linked
+decisions: []
+closed: '2026-11-01'
