@@ -14,6 +14,14 @@
   batch: 2
   review: 320cdddbb5
   text: Where a project's tests can run, the agent shall record their results before generating a review page.
+- id: AGENT-78
+  fingerprint: 2f612ed2aac6
+  locked_at: 2026-11-01T13:32-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: 1fcc2f4faa
+  text: The agent shall link each test it adds to a verification item, adding a requirement only for behaviour someone relies on.
 - id: AGENT-V20
   fingerprint: 8f52eaeb8434
   locked_at: 2026-10-31T15:07-07:00
@@ -65,6 +73,22 @@
   - 2026-10-11-round-10-cli-editing D1
   text: The checker shall report each test that no verification item links to.
   said: In the overnight review the engineer strongly agreed with listing unlinked tests and the honest coverage measure, and invited locking both in with their direct approval.
+- id: CHECK-35
+  fingerprint: 0648e5f15d0f
+  locked_at: 2026-11-01T13:32-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: 1fcc2f4faa
+  text: When the checker lists tests that no verification item links, it shall remind the agent to link them first, to add a requirement only for behaviour someone relies on, and where the advice is.
+- id: CHECK-36
+  fingerprint: eda0e3157021
+  locked_at: 2026-11-01T13:32-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: 1fcc2f4faa
+  text: When a change closes, the CLI shall remind the agent of tests that no verification item links.
 - id: CHECK-4
   fingerprint: 303ebb1bb4e4
   locked_at: 2026-10-31T12:10-07:00
