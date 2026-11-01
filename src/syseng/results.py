@@ -52,7 +52,7 @@ def record(spec: Spec, implementation: str, step: str, revision: str, tests: dic
         tests = {**json.loads(path.read_text()).get("tests", {}), **tests}
     when = when or datetime.datetime.now().astimezone().isoformat(timespec="microseconds")
     path.write_text(json.dumps({"implementation": implementation, "step": step, "revision": revision, "when": when,
-                                "tests": tests}, indent=1))
+                                "joined": add, "tests": tests}, indent=1))
     if spec.results_dir is None:
         vcs.backend(spec.repo_root()).ignore(directory(spec))
     return path
@@ -71,10 +71,22 @@ def _records(spec: Spec, implementation: str) -> list[dict]:
     return sorted(out, key=lambda r: _moment(r["when"]))
 
 
+def _current(spec: Spec, implementation: str) -> list[dict]:
+    """VERIFY-34: a step's newest report speaks for that step, so a test it no longer lists has gone, while steps that
+    haven't run again keep their older reports. Outcomes given one at a time stand on their own."""
+    reports, joined = {}, []
+    for r in _records(spec, implementation):
+        if r.get("joined"):
+            joined.append(r)
+        else:
+            reports[r["step"]] = r
+    return sorted([*reports.values(), *joined], key=lambda r: _moment(r["when"]))
+
+
 def latest(spec: Spec, implementation: str) -> dict[str, dict]:
     """VERIFY-20: each test's newest result. A skip isn't a result: the test wasn't run."""
     out = {}
-    for r in _records(spec, implementation):
+    for r in _current(spec, implementation):
         for name, outcome in r["tests"].items():
             if outcome != readers.SKIP:
                 out[name] = {"outcome": outcome, "revision": r["revision"], "when": r["when"]}
@@ -187,7 +199,7 @@ def rows(spec: Spec, implementation: str) -> list[Row]:
 
 def unlinked(spec: Spec, implementation: str) -> list[str]:
     """VERIFY-24: tests in the results, even skipped ones, that no verification item links."""
-    every = {name for r in _records(spec, implementation) for name in r["tests"]}
+    every = {name for r in _current(spec, implementation) for name in r["tests"]}
     index = _Index(every)
     linked = {vi.id for vi in spec.of_kind("vi")}
     for vi in spec.of_kind("vi"):
@@ -221,6 +233,13 @@ def _trace(spec: Spec, row: dict, context: dict, full: bool) -> dict:
     return {**row, "checks": spec.items[row["id"]].data.get("description", ""), "trace": trace}
 
 
+def unmatched(spec: Spec, implementation: str) -> list[dict]:
+    """VERIFY-35: links the current results don't mention: renamed, deleted, or in a step that hasn't run."""
+    index = _Index({name for r in _current(spec, implementation) for name in r["tests"]})
+    return [{"id": vi.id, "link": str(link)} for vi in spec.of_kind("vi")
+            for link in (vi.data.get("tests") or {}).get(implementation) or [] if not index.names(str(link))]
+
+
 def report(spec: Spec, full_trace: bool = False) -> dict:
     """Everything `spec results status` and the review page show."""
     out = {}
@@ -236,5 +255,6 @@ def report(spec: Spec, full_trace: bool = False) -> dict:
                      "context": context,
                      "not_run_locked": [asdict(r) for r in items if r.status == NOT_RUN and r.locked],
                      "items": [asdict(r) for r in items],
-                     "unlinked": unlinked(spec, name)}
+                     "unlinked": unlinked(spec, name),
+                     "unmatched": unmatched(spec, name) if _records(spec, name) else []}
     return out

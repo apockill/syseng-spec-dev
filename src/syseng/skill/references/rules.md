@@ -182,7 +182,7 @@ A verification item links a test that doesn't exist: the file is missing, or the
 
 <a id="v003"></a>
 ### V003: test no verification item links (to-do)
-A Python test in the implementation's tree that no verification item links, listed per file. It checks something the spec doesn't claim, or a requirement that's missing. Link it from the verification item whose requirement it checks, or add the requirement it shows is missing. Folders that are hidden, vendored (`node_modules`, `site-packages`) or hold app data (`state`) are skipped.
+A Python test in the implementation's tree that no verification item links, listed per file. It checks something the spec doesn't claim, or a requirement that's missing. See "Linking tests" in references/writing-requirements.md. Link it from the verification item whose requirement it checks, or add the requirement it shows is missing. Folders that are hidden, vendored (`node_modules`, `site-packages`) or hold app data (`state`) are skipped.
 
 <a id="v004"></a>
 ### V004: roll-up over an unverified child

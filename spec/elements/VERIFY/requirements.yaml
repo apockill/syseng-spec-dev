@@ -228,3 +228,18 @@
     said: Asked why the table on all these reviews showed nothing but not yet run, and why it hadn't been filled in.
     basis: guided
     fingerprint: c4882100a809
+- id: VERIFY-34
+  text: A step's newest report shall replace that step's older reports, so a test missing from it no longer counts.
+  traces_to: SYS-57
+  basis: derived
+  why: a renamed or deleted test otherwise lingers in the results.
+- id: VERIFY-35
+  text: The status command shall list each test link that the current results don't mention.
+  traces_to: SYS-57
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 13:10
+    context: Asking how renamed or deleted tests could be flagged for correction to the LLM automatically.
+    said: Wants these automatically flagged to the LLM for correction.
+    basis: stated
+    fingerprint: 17d5b3ff1c1d

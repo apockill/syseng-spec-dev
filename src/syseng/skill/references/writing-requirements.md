@@ -66,6 +66,16 @@ A verification item says how one or more requirements are checked:
 
 System requirements also get system-level verification, such as an end-to-end run, not only their children's tests.
 
+## Linking tests
+
+Every test links to a verification item: a test exists to protect a contract, so the spec should say which one. `spec check --todo` lists the tests nothing links, and `spec results status` does for every language.
+
+Link first, add last:
+1. **Find the requirement the test supports** and link it from that requirement's verification item. One item can link many tests, or a whole file, so a detailed test of an internal helper goes under the behaviour it serves.
+2. **If nothing fits but people rely on the behaviour,** the spec is missing a contract: add the requirement (`basis: derived`), or a constraint for a rule of the project.
+3. **Never add a requirement just to give a test a home.** Requirements follow the depth rules whether or not a test exists. Implementation details stay out, or the spec starts describing the code.
+4. **If you can't say what contract a test protects,** raise it with the engineer: it may need strengthening, or it may not be needed.
+
 ## Levels and locks
 
 Each item has a level of intent, computed every time and never stored:

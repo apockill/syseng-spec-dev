@@ -669,3 +669,13 @@
     said: Asked why the table on all these reviews hadn't been filled in.
     basis: guided
     fingerprint: 93c1d21b3406
+- id: AGENT-78
+  text: The agent shall link each test it adds to a verification item, adding a requirement only for behaviour someone relies on.
+  traces_to: SYS-7
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 13:10
+    context: Saying tests should always link to a verification item.
+    said: Tests should always link to some verification item, otherwise why is the test being created if it doesn't validate a part of the system there's a contract for. The framework should ask the LLM to link them and flesh out the tree if the relevant items don't exist.
+    basis: stated
+    fingerprint: 2f612ed2aac6

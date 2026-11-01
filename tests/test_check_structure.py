@@ -260,3 +260,9 @@ def test_a_parent_without_verification_is_told_how_to_resolve_it(spec):         
 def test_only_links_that_name_a_file_are_looked_up():
     assert testlinks.names_file("tests/test_x.py::test_y") and testlinks.names_file("tests/test_x.py")
     assert not testlinks.names_file("//backend/api:stop_test") and not testlinks.names_file("infra/apply")
+
+
+def test_the_unlinked_test_reminder_warns_against_inventing_requirements():
+    from syseng import rules
+    assert "not for an implementation detail" in rules.LINK_TESTS and "many tests" in rules.LINK_TESTS
+    assert "references/writing-requirements.md" in rules.LINK_TESTS and rules.RULES["V003"].fix == rules.LINK_TESTS

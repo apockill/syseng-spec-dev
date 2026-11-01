@@ -169,7 +169,8 @@ def overview(spec: Spec, person: str, sets: list[dict]) -> dict:
             source = "what your last review page showed"
     if was is None and first:
         was, source = first.get("measured"), f"the spec at {first['older']['label']}"
-    return {"now": now, "was": was, "against": source, "measures": health.compare(now, was),
+    linking = {"requirements": now["requirements"] - was["requirements"], "tests": now["tests"] - was["tests"]} if was else None
+    return {"now": now, "was": was, "against": source, "measures": health.compare(now, was), "linking": linking,
             "changes": first["counts"] if first else {}, "by_kind": first.get("by_kind", {}) if first else {},
             "since": first["older"]["label"] if first else None, "verification": results.report(spec)}
 

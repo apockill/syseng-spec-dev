@@ -11,7 +11,7 @@ The toolkit runs no tests. The project's own tools or CI run them, and the toolk
 
 ## Taking in results
 
-Run `spec results add` once for each step, in any order. Each adds to what's there; reporting a step again on the same revision replaces that step's earlier results. An outcome given with `--id` joins its step instead, so several verdicts can share one. Add reports as they're produced, or pass `--ran-at` when adding an older one: the time decides which result is newest.
+Run `spec results add` once for each step, in any order. Each adds to what's there. A step's newest report speaks for that step: a test it no longer lists has gone, while other steps keep their older reports, so a partial run needs its own step name. An outcome given with `--id` joins its step instead, so several verdicts can share one. Add reports as they're produced, or pass `--ran-at` when adding an older one: the time decides which result is newest.
 
 ```
 pytest --junitxml=unit.xml

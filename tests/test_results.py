@@ -510,3 +510,50 @@ def test_the_report_says_whether_results_are_recorded(repo, capsys):
     _add("--step", "u", "--id", "t", "--outcome", "pass")
     assert _status(capsys)[1]["aws"]["recorded"] is True
     assert "No test results are recorded for" in (page.WEB / "review.js").read_text()
+
+
+def _report_of(repo, name, *tests, revision="r1", step="unit"):
+    path = repo / f"{name}.jsonl"
+    path.write_text("".join(f'{{"id": "{t}", "outcome": "pass"}}\n' for t in tests))
+    return _add(str(path), "--format", "jsonl", "--step", step, revision=revision)
+
+
+def test_a_test_gone_from_a_steps_newest_report_is_gone(repo, capsys):
+    _report_of(repo, "a", "//api:one_test", "old_name", revision="r1")
+    _report_of(repo, "b", "//api:one_test", revision="r2")
+    data = _status(capsys)[1]["aws"]
+    assert data["unlinked"] == [] and _by_id(_status(capsys)[1])["SYS-V1"]["last_tested"] == "r2"
+
+
+def test_a_step_that_did_not_run_keeps_its_older_report(repo, capsys):
+    _report_of(repo, "a", "//api:one_test", revision="r1", step="nightly")
+    _report_of(repo, "b", "//api:two_test", revision="r2", step="unit")
+    assert _by_id(_status(capsys)[1])["SYS-V1"]["last_tested"] == "r1"
+
+
+def test_verdicts_given_one_at_a_time_survive_a_later_revision(repo, capsys):
+    _add("--step", "review", "--id", "SYS-V3", "--outcome", "pass", revision="r1")
+    _add("--step", "review", "--id", "other", "--outcome", "pass", revision="r2")
+    assert _by_id(_status(capsys)[1])["SYS-V3"]["status"] == results.PASSING
+
+
+def test_a_link_the_current_results_dont_mention_is_flagged(repo, capsys):
+    _report_of(repo, "a", "//api:one_test", "//api:two_test", "infra/apply", revision="r1")
+    assert _status(capsys)[1]["aws"]["unmatched"] == []
+    _report_of(repo, "b", "//api:renamed_test", "//api:two_test", "infra/apply", revision="r2")
+    assert {"id": "SYS-V1", "link": "//api:one_test"} in _status(capsys)[1]["aws"]["unmatched"]
+    capsys.readouterr()
+    cli.main(["results", "status"])
+    assert "renamed, deleted" in capsys.readouterr().out
+
+
+def test_nothing_is_flagged_before_any_results_exist(repo, capsys):
+    assert _status(capsys)[1]["aws"]["unmatched"] == []
+
+
+def test_unlinked_tests_come_with_the_reminder(repo, capsys):
+    _add("--step", "u", "--id", "stray", "--outcome", "pass")
+    capsys.readouterr()
+    cli.main(["results", "status"])
+    out = capsys.readouterr().out
+    assert "stray" in out and "not for an implementation detail" in out

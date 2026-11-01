@@ -271,3 +271,12 @@
     python:
     - tests/test_review_base.py::test_a_stacked_change_compares_against_the_base_it_names
     - tests/test_review_base.py::test_the_page_states_its_base_at_the_top
+- id: REVIEW-V27
+  verifies:
+  - REVIEW-47
+  method: test
+  technique: unit test
+  description: The overview counts requirements and test links added since the base.
+  tests:
+    python:
+    - tests/test_review_base.py::test_the_overview_shows_requirements_added_against_tests_linked

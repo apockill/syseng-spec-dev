@@ -426,3 +426,13 @@
     said: Seeing nothing recommended with no clarity on the work so far can be disconcerting.
     basis: stated
     fingerprint: 967d4368f53e
+- id: REVIEW-47
+  text: The review page's overview shall show how many requirements and how many test links were added since its base.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 13:10
+    context: Reviewing two additions proposed to catch an agent inventing requirements for tests.
+    said: Agreed to a line on the review page showing requirements added against tests linked, where a spike would be visible.
+    basis: stated
+    fingerprint: 6d628387624a

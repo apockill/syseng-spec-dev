@@ -205,3 +205,15 @@ def test_intent_read_from_a_document_keeps_its_source_and_author(open_spec):    
     assert result.applied, [f.message for f in result.errors]
     rec = open_spec.load().items["CORE-1"].data["intent"][-1]
     assert rec["source"] == "document" and rec["source_path"] == "README.md" and rec["by"] == "Ada <ada@example.com>"
+
+
+def test_closing_a_change_reminds_the_agent_of_unlinked_tests(spec, capsys, monkeypatch):
+    from syseng import cli, rules
+    root = spec.write()
+    (root.parent / "tests").mkdir(exist_ok=True)
+    (root.parent / "tests" / "test_stray.py").write_text("def test_stray():\n    pass\n")
+    cli.main(["--spec", str(root), "change", "start", "Do a thing"])
+    capsys.readouterr()
+    cli.main(["--spec", str(root), "change", "close"])
+    out = capsys.readouterr().out
+    assert "tests nothing links" in out and rules.LINK_TESTS in out

@@ -1,9 +1,13 @@
 [
   {
     "name": "onboard-multi-app-repository",
-    "skills": ["syseng"],
+    "skills": [
+      "syseng"
+    ],
     "query": "Migrate this repository to the spec/ system.",
-    "files": ["a copy of a repository with several apps, shared templates and a CLI; some apps tested, some not; a post-commit hook that pushes; top-level directories served as websites"],
+    "files": [
+      "a copy of a repository with several apps, shared templates and a CLI; some apps tested, some not; a post-commit hook that pushes; top-level directories served as websites"
+    ],
     "expected_behavior": [
       "Checks how the repository publishes and pushes before creating spec/, and stops for the engineer when either would expose it",
       "Asks the engineer for the human author instead of setting it from memory",
@@ -17,9 +21,13 @@
   },
   {
     "name": "code-first-change-conflicting-with-a-lock",
-    "skills": ["syseng"],
+    "skills": [
+      "syseng"
+    ],
     "query": "Make the checker also report duplicate titles.",
-    "files": ["a repository with a spec in which the engineer locked the requirement for reporting duplicate IDs"],
+    "files": [
+      "a repository with a spec in which the engineer locked the requirement for reporting duplicate IDs"
+    ],
     "expected_behavior": [
       "Opens a change and records the request as stated intent on the item it directly expresses",
       "Builds the feature, then raises a conflict naming the locked item, with rolling back among the options",
@@ -29,13 +37,32 @@
   },
   {
     "name": "apply-feedback-with-a-comment",
-    "skills": ["syseng"],
+    "skills": [
+      "syseng"
+    ],
     "query": "A pasted syseng-feedback block that locks two items and comments on a third.",
-    "files": ["a repository with a spec and an open change"],
+    "files": [
+      "a repository with a spec and an open change"
+    ],
     "expected_behavior": [
       "Applies the block with spec feedback apply rather than recording locks by hand",
       "Acts on the comment, or explains why not, and answers it with spec feedback respond",
       "Regenerates the review page and hands it back"
+    ]
+  },
+  {
+    "name": "linking-tests-without-inventing-requirements",
+    "skills": [
+      "syseng"
+    ],
+    "query": "spec check says these tests aren't linked to anything. Sort that out.",
+    "files": [
+      "a repository with a spec and six unlinked tests: four of an internal retry helper that serves one existing requirement, one of a user-visible option no requirement mentions, and one whose purpose is unclear"
+    ],
+    "expected_behavior": [
+      "Links the four helper tests to the verification item of the requirement they serve, adding no requirement for the helper",
+      "Adds one requirement for the user-visible option",
+      "Raises the unclear test with the engineer instead of inventing a contract for it"
     ]
   }
 ]

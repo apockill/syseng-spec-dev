@@ -46,7 +46,7 @@ An item changed since its lock or intent record, and not kept, counts one level 
 2. **Record what the engineer said** as intent on the items it directly expresses (below).
 3. **Look for conflicts** with explicit and stated items in the affected elements, the elements that depend on them, and above them in the trace. Spec-first: raise each before building. Code-first: build, then raise each with rolling back among the options. No conflict: just build. See references/review-and-locks.md.
 4. **Work.** Code as you normally would.
-5. **Keep the spec in step, in the same change:** update the requirements and verification items the change affects, record a requirement (with `basis: added`) for each feature a user would notice that you add unasked, and a decision record for each design decision.
+5. **Keep the spec in step, in the same change:** update the requirements and verification items the change affects, link every test you add to a verification item, record a requirement (with `basis: added`) for each feature a user would notice that you add unasked, and a decision record for each design decision.
 6. **Check:** the project's tests, then `spec check`. Fix every error. Where the project records test results, `spec results status` lists what's failing, what you changed included (references/test-results.md).
 7. **Audit:** fresh-context auditors review your spec updates (references/auditing.md). During onboarding, offer them with their cost instead (references/onboarding.md).
 8. **Hand over** the review page and report in a few lines (references/review-and-locks.md).

@@ -287,3 +287,23 @@
       Wants roll-ups to be strict: all child requirements must be verified, it can't be partial. A chain is allowed, so if B and C have no verification items but their children do, B and C roll up and so does their parent A, though that may change if negative consequences appear.
     basis: stated
     fingerprint: bf9acc6bc0de
+- id: CHECK-35
+  text: When the checker lists tests that no verification item links, it shall remind the agent to link them first, to add a requirement only for behaviour someone relies on, and where the advice is.
+  traces_to: SYS-7
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 13:10
+    context: Discussing requiring every test to link to a verification item, and the risk of implementation detail leaking into the spec.
+    said: Wholeheartedly agreed with the risk. However the feature flags tests to link, the tool or skill instructions surfaced should remind the LLM of that risk so it's fresh in context, pointing to a reference for advice.
+    basis: stated
+    fingerprint: 0648e5f15d0f
+- id: CHECK-36
+  text: When a change closes, the CLI shall remind the agent of tests that no verification item links.
+  traces_to: SYS-7
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 13:10
+    context: Saying tests should always link to a verification item.
+    said: Thinks the spec framework should request that the LLM link tests to verification items, creating them or fleshing out the tree where the relevant requirements and verification items don't exist.
+    basis: guided
+    fingerprint: eda0e3157021
