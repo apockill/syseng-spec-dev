@@ -436,3 +436,13 @@
     said: Agreed to a line on the review page showing requirements added against tests linked, where a spike would be visible.
     basis: stated
     fingerprint: 6d628387624a
+- id: REVIEW-48
+  text: The review page's overview shall show the share of tests that a verification item links, with the linked count and the total.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 13:35
+    context: Reviewing the Linked tests tile on the review page.
+    said: The number should have a denominator or be a percentage, so they can tell out of how many in total.
+    basis: stated
+    fingerprint: 8733e4284ae4

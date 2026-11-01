@@ -12,11 +12,12 @@ MEASURES = [
     ("coverage", "Verification coverage", "up", True),
     ("tested", "Requirements with linked tests", "up", True),
     ("unverified", "Requirements without verification", "down", True),
-    ("tests", "Linked tests", "up", True),
+    ("linked_tests", "Tests linked to a verification item", "up", True),
+    ("tests", "Test links", None, False),
     ("failing", "Verification items failing", "down", False),
     ("not_run", "Verification items not run", "down", False),
     ("not_run_locked", "Not run, verifying locked requirements", "down", False),
-    ("stale", "Changed since a person gave it", "down", True),
+    ("stale", "Changed since a person asked for or locked it", "down", True),
     ("awaiting", "Waiting for your answer", "down", True),
     ("errors", "Checker errors", "down", True),
     ("todos", "Checker to-dos", "down", False),
@@ -44,6 +45,7 @@ def metrics(spec: Spec) -> dict:
     ids = list(spec.items) + list(spec.elements)
     lv = {i: levels.level_of(spec, i) for i in ids}
     tested = results.rows(spec, results.primary(spec)) if results.implementations(spec) else []
+    linked, every = results.link_counts(spec) if results.implementations(spec) else (0, 0)
     mix = {name: 0 for name in levels.ORDER}  # the readable layers: needs and requirements
     for item in spec.of_kind("need") + reqs:
         mix[lv[item.id].level] += 1
@@ -57,6 +59,8 @@ def metrics(spec: Spec) -> dict:
         "failing": sum(1 for r in tested if r.status == results.FAILING),
         "not_run": sum(1 for r in tested if r.status == results.NOT_RUN),
         "not_run_locked": sum(1 for r in tested if r.status == results.NOT_RUN and r.locked),
+        "linked_tests": round(100 * linked / every, 1) if every else 100.0,
+        "linked_tests_of": f"{linked} of {every} tests",
         "tests": sum(len(links or []) for v in vis for links in (v.data.get("tests") or {}).values()),
         "stale": sum(1 for x in lv.values() if x.stale),
         "awaiting": len(review.unanswered(spec)) + sum(
@@ -92,5 +96,5 @@ def compare(now: dict, was: dict | None) -> list[dict]:
         worse = bool(delta and better and ((delta < 0) if better == "up" else (delta > 0)))
         improved = bool(delta and better and not worse)
         out.append({"key": key, "label": label, "now": now[key], "was": before, "delta": delta, "better": better,
-                    "worse": worse, "improved": improved, "tile": tile, "percent": key in ("coverage", "tested")})
+                    "worse": worse, "improved": improved, "tile": tile, "detail": now.get(f"{key}_of"), "percent": key in ("coverage", "tested", "linked_tests")})
     return sorted(out, key=lambda m: (not m["worse"], not m["tile"]))

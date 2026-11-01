@@ -492,6 +492,7 @@
     box.append(h("div", { class: "tiles" }, tiles.map((m) => h("div", { class: "tile" + (m.worse ? " worse" : "") },
       h("div", { class: "tile-label" }, m.label),
       h("div", { class: "tile-value" }, fmt(m, m.now)),
+      m.detail ? h("div", { class: "small muted" }, m.detail) : null,
       h("div", { class: "tile-delta" }, m.delta === null ? h("span", { class: "muted" }, "no baseline")
         : m.delta === 0 ? h("span", { class: "muted" }, "no change")
         : m.worse ? h("span", { class: "status critical" }, icon("alert", "sm"), `${signed(m)} · worse`)

@@ -94,3 +94,18 @@ def test_the_overview_shows_requirements_added_against_tests_linked(repo):
         "  tests:\n    python: [a, b]\n")
     assert _build(repo)["overview"]["linking"] == {"requirements": 1, "tests": 2}
     assert "test links added" in (page.WEB / "review.js").read_text()
+
+
+def test_linked_tests_are_shown_against_the_total(repo):
+    (repo / "tests").mkdir()
+    (repo / "tests" / "test_a.py").write_text("def test_one():\n    pass\n\n\ndef test_two():\n    pass\n")
+    (repo / "spec" / "toolkit.yaml").write_text(yaml.safe_dump({
+        "spec_version": 2, "element_order": ["SYS"],
+        "implementations": [{"name": "python", "root": ".", "primary": True}]}))
+    (repo / "spec" / "elements" / "SYS" / "requirements.yaml").write_text(
+        "- id: SYS-1\n  kind: system\n  text: The tool shall do one.\n  serves: []\n  basis: derived\n  why: w\n")
+    (repo / "spec" / "elements" / "SYS" / "verification.yaml").write_text(
+        "- id: SYS-V1\n  verifies: [SYS-1]\n  method: test\n  technique: unit test\n  description: One.\n"
+        "  tests:\n    python: ['tests/test_a.py::test_one']\n")
+    measure = next(m for m in _build(repo)["overview"]["measures"] if m["key"] == "linked_tests")
+    assert (measure["now"], measure["detail"], measure["percent"]) == (50.0, "1 of 2 tests", True)

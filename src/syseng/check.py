@@ -540,7 +540,7 @@ def summarize(findings: list[Finding]) -> str:
     if todos:
         served = f"{_n(unserved, 'need')} nothing serves yet, " if unserved else ""
         answers = f"{_n(unanswered, 'alteration')} awaiting the engineer's answer, " if unanswered else ""
-        changes_ = f", {_n(changed, 'item')} changed since a person gave it" if changed else ""
+        changes_ = f", {_n(changed, 'item')} changed since a person asked for or locked it" if changed else ""
         flows = f", {_n(flow, 'requirement')} skipping a level of the breakdown" if flow else ""
         parts.append(f"{_n(len(todos), 'to-do')} ({answers}{served}{_n(unverified, 'requirement')} without "
                      f"verification items{changes_}{flows}; list them with `spec check --todo`)")
