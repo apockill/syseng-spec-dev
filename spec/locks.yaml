@@ -1301,6 +1301,14 @@
   text: The spec shall trace each requirement to the need or requirement it serves, or mark it as derived.
   migrated_from: ce8a90ff6b69
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: SYS-61
+  fingerprint: bbcbd522b97e
+  locked_at: 2026-11-01T15:35-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 688320b7fe
+  text: The toolkit shall read evaluation results without depending on a particular evaluation tool.
 - id: SYS-7
   fingerprint: 17860781fc49
   locked_at: '2026-10-11'
@@ -1339,3 +1347,11 @@
   batch: 2
   review: 320cdddbb5
   text: When no results are recorded for an implementation, the review page shall say so in place of counting its items as not run.
+- id: VERIFY-36
+  fingerprint: 58095793a899
+  locked_at: 2026-11-01T15:35-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 688320b7fe
+  text: The results command shall include a reader for promptfoo's results.
