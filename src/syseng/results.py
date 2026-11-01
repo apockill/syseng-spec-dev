@@ -230,7 +230,7 @@ def report(spec: Spec, full_trace: bool = False) -> dict:
         context: dict[str, dict] = {}
         failing = sorted((asdict(r) for r in items if r.status == FAILING),
                          key=lambda r: levels.ORDER.index(r["level"]))
-        out[name] = {"primary": bool(i.get("primary")),
+        out[name] = {"primary": bool(i.get("primary")), "recorded": bool(_records(spec, name)),
                      "counts": {s: sum(1 for r in items if r.status == s) for s in STATUSES},
                      "failing": [_trace(spec, r, context, full_trace) for r in failing],
                      "context": context,

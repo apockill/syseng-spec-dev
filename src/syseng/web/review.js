@@ -506,7 +506,9 @@
       h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Implementation"), ["passing", "failing", "not yet run", "not implemented"].map((s) => h("th", {}, s)))),
         h("tbody", {}, verification.map(([name, v]) => h("tr", {}, h("td", {}, name),
           ["passing", "failing", "not yet run", "not implemented"].map((s) => h("td", { class: "num" }, String(v.counts[s]))))))),
-      verification.map(([name, v]) => v.not_run_locked.length ? h("details", {}, h("summary", { class: "small" },
+      verification.filter(([, v]) => !v.recorded).map(([name]) => h("div", { class: "small" },
+        `No test results are recorded for ${name} on this page, so its "not yet run" count says nothing about its health.`)),
+      verification.map(([name, v]) => v.recorded && v.not_run_locked.length ? h("details", {}, h("summary", { class: "small" },
         `${name}: ${v.not_run_locked.length} not run, verifying locked requirements`),
         h("ul", { class: "small" }, v.not_run_locked.map((r) => h("li", {}, idButton(r.id), ", verifying ", r.verifies.map(idButton))))) : null)));
     box.append(h("div", { class: "mix" }, h("div", { class: "small" }, "Intent mix of needs and requirements"),
