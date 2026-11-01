@@ -161,3 +161,8 @@ def test_every_pull_request_gets_a_review_page_against_its_base():
     text = (init.SKILL / "references" / "review-and-locks.md").read_text()
     assert "Every pull request that changes the spec gets its own page" in text
     assert "`spec review --against <its base branch>`" in text and "linked at the top of its description" in text
+
+
+def test_handover_records_results_first():
+    text = (init.SKILL / "references" / "review-and-locks.md").read_text()
+    assert text.index("record their results first") < text.index("Run `spec review`")

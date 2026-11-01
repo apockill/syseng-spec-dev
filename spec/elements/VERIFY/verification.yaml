@@ -169,3 +169,12 @@
     python:
     - tests/test_results.py::test_the_status_prints_for_people
     - tests/test_review_page.py::test_the_page_opens_on_the_overview_and_agents_can_read_it
+- id: VERIFY-V16
+  verifies:
+  - VERIFY-33
+  method: test
+  technique: unit test
+  description: The status data says whether results are recorded, and the page's script has the message for when none are.
+  tests:
+    python:
+    - tests/test_results.py::test_the_report_says_whether_results_are_recorded

@@ -502,3 +502,11 @@ def test_each_text_is_shown_once_however_many_failures_reach_it(repo, capsys):
 def test_a_need_marked_derived_does_not_count_as_a_persons_word(repo):
     from syseng import levels
     assert levels.level_of(model.load(repo / "spec"), "NEED-1").level == levels.DERIVED
+
+
+def test_the_report_says_whether_results_are_recorded(repo, capsys):
+    from syseng import page
+    assert _status(capsys)[1]["aws"]["recorded"] is False
+    _add("--step", "u", "--id", "t", "--outcome", "pass")
+    assert _status(capsys)[1]["aws"]["recorded"] is True
+    assert "No test results are recorded for" in (page.WEB / "review.js").read_text()
