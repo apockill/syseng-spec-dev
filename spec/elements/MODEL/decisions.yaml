@@ -134,7 +134,7 @@
     basis: stated
     fingerprint: 9762ee4a7ccb
 - id: DR-23
-  title: System requirements are verified at the system level
+  title: System requirements are verified at the system level where that means something
   decided_by: engineer
   elements:
   - MODEL
@@ -142,9 +142,10 @@
   requirements: MODEL-32
   recorded: round 5
   context: SE verifies each level at its own level (the V-model). Passing element-level tests doesn't prove the system works end to end.
-  decision: each system requirement gets its own verification, such as an end-to-end run or a demonstration, in addition to its children's verification.
+  decision: |-
+    Each system requirement gets its own verification, such as an end-to-end run or a demonstration, where a test of it wouldn't be arbitrary. Otherwise it rolls up from its children. A roll-up is strict: every child must be verified, and a child may itself be verified by roll-up, so a whole subtree can roll up from its leaves.
   alternatives: treat a system requirement as verified when all its children pass.
-  consequences: the VI round will write system-level checks, for example running a code-first change end to end and confirming that it never stopped to ask.
+  consequences: A system requirement can pass with no end-to-end check, so integration faults can slip through; the important ones should still get their own. The engineer may revisit transitive roll-ups if negative consequences appear.
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
     when: '2026-10-11'

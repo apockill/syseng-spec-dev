@@ -374,7 +374,7 @@ def _verification(spec: Spec) -> list[Finding]:
             if not kids.get(r):
                 out.append(_f("V004", f"{vi.id} verifies {r} by its children, but nothing refines {r}", vi.id, vi))
             for child in kids.get(r, []):
-                if not verified_by.get(child) and not spec.items[child].data.get("verification_deferred"):
+                if not verified_by.get(child):  # CHECK-34: strict; a deferred child isn't a verified one
                     out.append(_f("V004", f"{vi.id} verifies {r} by its children, but {child} has no verification "
                                           f"item", vi.id, vi))
     return out

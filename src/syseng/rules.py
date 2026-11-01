@@ -150,7 +150,7 @@ _RULES = [
          "missing.", severity="todo"),
     Rule("V004", "roll-up over an unverified child",
          "A roll-up verifies a requirement by its children's verification, which holds only if every child is verified.",
-         "Verify the child, or verify the parent at its own level instead of by roll-up.", severity="todo"),
+         "Verify the child, or verify the parent at its own level instead of by roll-up."),
     Rule("R001", "stale Markdown view",
          "The review page replaced the Markdown views; one left behind shows a spec that no longer exists.",
          "Run `spec render`, which removes it, and `spec review` for the page."),

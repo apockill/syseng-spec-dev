@@ -74,7 +74,7 @@ Optional: `verification_deferred: <why>` marks a requirement as knowingly unveri
 - A verification item for a system requirement or constraint is filed on the root element: `element: SYS` (or whatever the root's ID is).
 - A **reasoning check** has no tests; its `description` is the prompt a fresh model answers pass or fail, naming the files or commands it judges.
 - A **manual** item says what a person does and observes. It isn't verification until someone has done it.
-- A **roll-up** (method `analysis`) verifies a requirement through its children's verification. Use it for a parent whose children fully cover it and where a test of its own would be arbitrary; the checker keeps it honest (V004).
+- A **roll-up** (method `analysis`) verifies a requirement through its children's verification. Use it for a parent whose children fully cover it and where a test of its own would be arbitrary. It's strict: every child must have a verification item, and a deferred child doesn't count (V004). A child may itself be a roll-up, down to verified leaves.
 - Describe only what the tests or prompt actually check. "Checks X" when the test checks half of X is the most common audit finding.
 
 ## decision (record)

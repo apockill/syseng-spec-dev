@@ -1,7 +1,7 @@
 request: Link existing tests the coverage audit found, and settle how system requirements are verified
 mode: code-first
 target: python
-status: open
+status: closed
 opened: '2026-10-31'
 entries:
 - op: modify
@@ -264,6 +264,244 @@ entries:
       python:
       - tests/test_results.py::test_the_status_prints_for_people
       - tests/test_review_page.py::test_the_page_opens_on_the_overview_and_agents_can_read_it
+- op: modify
+  id: MODEL-32
+  at: 2026-11-01T09:19-08:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (round 5). Answering Q19, which asked whether system requirements should get their own verification items.
+      said: Agreed that it makes sense for system requirements to get their own verification.
+      basis: guided
+      fingerprint: 485f3eed171b
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (round 5). Answering Q19, which asked whether system requirements should get their own verification items.
+      said: Agreed that it makes sense for system requirements to get their own verification.
+      basis: guided
+      fingerprint: 485f3eed171b
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 09:19
+      context: Reviewing an alteration on the review page (review 6667d7e722).
+      said: Kept the item as it now reads.
+      basis: guided
+      fingerprint: 485f3eed171b
+- op: add
+  id: SYS-V15
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-8
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V16
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-25
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V17
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-31
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V18
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-33
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V19
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-35
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V20
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-36
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V21
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-37
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V22
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-38
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V23
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-39
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V24
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-41
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: modify
+  id: MODEL-32
+  at: 2026-11-01T09:20-08:00
+  reason: D1, the engineer chose this.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 485f3eed171b
+  fingerprint_after: 1fd53a7aadf9
+  conflict: D1
+  before:
+    text: Each system requirement shall be verified at the system level, in addition to the verification of the requirements that refine it.
+  after:
+    text: Each system requirement shall be verified at the system level where a test of its own would not be arbitrary, and otherwise by roll-up from its children.
+  acks:
+    MODEL-32: D1
+    DR-23: D1
+- op: modify
+  id: DR-23
+  at: 2026-11-01T09:20-08:00
+  reason: D1, the engineer chose this.
+  raised:
+  - a person locked it
+  - a person stated or guided it
+  - a person decided it
+  level: explicit
+  fingerprint_before: a905f02e55d8
+  fingerprint_after: 65efacf6276c
+  conflict: D1
+  before:
+    title: System requirements are verified at the system level
+    decision: each system requirement gets its own verification, such as an end-to-end run or a demonstration, in addition to its children's verification.
+    consequences: the VI round will write system-level checks, for example running a code-first change end to end and confirming that it never stopped to ask.
+  after:
+    title: System requirements are verified at the system level where that means something
+    decision: |-
+      Each system requirement gets its own verification, such as an end-to-end run or a demonstration, where a test of it wouldn't be arbitrary. Otherwise it rolls up from its children. A roll-up is strict: every child must be verified, and a child may itself be verified by roll-up, so a whole subtree can roll up from its leaves.
+    consequences: A system requirement can pass with no end-to-end check, so integration faults can slip through; the important ones should still get their own. The engineer may revisit transitive roll-ups if negative consequences appear.
+  acks:
+    DR-23: D1
+- op: add
+  id: CHECK-34
+  at: 2026-11-01T09:20-08:00
+  reason: the engineer asked for strict roll-ups.
+  requested: true
+  after:
+    text: The checker shall report as an error each roll-up over a requirement with a child that has no verification item.
+    traces_to: SYS-10
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 09:20
+      context: Choosing that system requirements may roll up from their children.
+      said: |-
+        Wants roll-ups to be strict: all child requirements must be verified, it can't be partial. A chain is allowed, so if B and C have no verification items but their children do, B and C roll up and so does their parent A, though that may change if negative consequences appear.
+      basis: stated
+      fingerprint: bf9acc6bc0de
+- op: add
+  id: CHECK-V21
+  at: 2026-11-01T09:20-08:00
+  reason: covers strict roll-ups.
+  after:
+    verifies:
+    - CHECK-34
+    method: test
+    technique: unit test
+    description: A roll-up over an unverified child, or a child only deferred, is an error, and a chain of roll-ups down to verified leaves passes.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
+      - tests/test_check_structure.py::test_a_deferred_child_does_not_count_for_a_roll_up
+      - tests/test_check_structure.py::test_roll_ups_can_chain_down_to_verified_leaves
+- op: modify
+  id: CHECK-V19
+  at: 2026-11-01T09:21-08:00
+  reason: the test was renamed.
+  before:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_parent_without_verification_is_told_how_to_resolve_it
+      - tests/test_check_structure.py::test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified
+  after:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_parent_without_verification_is_told_how_to_resolve_it
+      - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
+- op: modify
+  id: CHECK-V21
+  at: 2026-11-01T09:21-08:00
+  reason: adds the chain of statuses.
+  before:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
+      - tests/test_check_structure.py::test_a_deferred_child_does_not_count_for_a_roll_up
+      - tests/test_check_structure.py::test_roll_ups_can_chain_down_to_verified_leaves
+  after:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
+      - tests/test_check_structure.py::test_a_deferred_child_does_not_count_for_a_roll_up
+      - tests/test_check_structure.py::test_roll_ups_can_chain_down_to_verified_leaves
+      - tests/test_results.py::test_a_chain_of_roll_ups_follows_the_leaves
 decisions:
 - id: D1
   kind: conflict
@@ -285,4 +523,20 @@ decisions:
     rolls_back:
     - DR-23
     - MODEL-32
-  status: open
+  status: resolved
+  chosen: Own verification where it means something, roll-up otherwise
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose Own verification where it means something, roll-up otherwise on the review page (summary)
+  resolved: '2026-11-01'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-01T09:19-08:00
+  review: 6667d7e722
+  decision: 2026-10-31-round-48-coverage-links D1
+  kind: comment
+  comment: "I'm ok with this decision, but I want to be clear- roll ups are strict: all child requirements must be verified (it can't be partial). I suppose if \n\nA -> (B, C)\n\nB -> (D, E)\nC -> (F, G)\n\nand B and C don't have VERs but D, E, F, G do, then C and B get 'roll up' verified, and so does A. That would be allowed, but we may change our minds on this in the future if we find negative consequences."
+  response: |-
+    Done as you described. A roll-up over any unverified child is now an error, not a to-do, and a child that's only deferred doesn't count, so it can't be partial. Your A, B, C example works: B and C can roll up from their leaves, and A from them, and a failing leaf fails all the way up. DR-23 notes you may revisit this.
+  responded: 2026-11-01T09:20-08:00
+closed: '2026-11-01'

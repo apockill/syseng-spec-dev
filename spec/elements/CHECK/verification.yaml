@@ -201,7 +201,7 @@
   tests:
     python:
     - tests/test_check_structure.py::test_a_parent_without_verification_is_told_how_to_resolve_it
-    - tests/test_check_structure.py::test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified
+    - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
 - id: CHECK-V20
   verifies:
   - CHECK-33
@@ -212,3 +212,15 @@
     python:
     - tests/test_check_structure.py::test_only_links_that_name_a_file_are_looked_up
     - tests/test_results.py::test_a_link_that_names_no_file_is_left_to_results
+- id: CHECK-V21
+  verifies:
+  - CHECK-34
+  method: test
+  technique: unit test
+  description: A roll-up over an unverified child, or a child only deferred, is an error, and a chain of roll-ups down to verified leaves passes.
+  tests:
+    python:
+    - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
+    - tests/test_check_structure.py::test_a_deferred_child_does_not_count_for_a_roll_up
+    - tests/test_check_structure.py::test_roll_ups_can_chain_down_to_verified_leaves
+    - tests/test_results.py::test_a_chain_of_roll_ups_follows_the_leaves

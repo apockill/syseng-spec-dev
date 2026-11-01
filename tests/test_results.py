@@ -366,6 +366,26 @@ def test_a_roll_up_follows_its_children(repo, capsys):
     assert row["status"] == results.FAILING and row["failed"] == ["SYS-V1"]
 
 
+def test_a_chain_of_roll_ups_follows_the_leaves(repo, capsys):
+    _rollup_spec(repo)
+    path = repo / "spec" / "elements" / "SYS" / "requirements.yaml"
+    path.write_text(path.read_text() + "- id: SYS-4\n  kind: system\n  text: The tool shall do four.\n"
+                    "  serves: [NEED-1]\n  traces_to: SYS-3\n  basis: derived\n  why: w\n")
+    path = repo / "spec" / "elements" / "SYS" / "verification.yaml"
+    path.write_text(path.read_text().replace("verifies: [SYS-3]", "verifies: [SYS-4]") + textwrap.dedent("""\
+        - id: SYS-V5
+          verifies: [SYS-3]
+          method: analysis
+          technique: roll-up
+          description: By its children.
+        """))
+    _add("--step", "u", "--id", "//api:one_test", "--outcome", "pass")
+    items = _by_id(_status(capsys)[1])
+    assert items["SYS-V5"]["status"] == items["SYS-V4"]["status"] == results.PASSING
+    _add("--step", "u", "--id", "//api:one_test", "--outcome", "fail", revision="r2")
+    assert _by_id(_status(capsys)[1])["SYS-V4"]["status"] == results.FAILING
+
+
 def test_a_roll_up_with_an_unverified_child_is_not_passing(repo, capsys):
     _rollup_spec(repo)
     path = repo / "spec" / "elements" / "SYS" / "verification.yaml"
