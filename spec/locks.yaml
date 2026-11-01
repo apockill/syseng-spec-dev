@@ -6,6 +6,14 @@
   batch: 3
   review: 6fab0daf3a
   text: For each pull request that changes the spec, the agent shall publish a review page compared against the pull request's base and link it at the top of the pull request.
+- id: AGENT-77
+  fingerprint: 93c1d21b3406
+  locked_at: 2026-11-01T10:10-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 320cdddbb5
+  text: Where a project's tests can run, the agent shall record their results before generating a review page.
 - id: AGENT-V20
   fingerprint: 8f52eaeb8434
   locked_at: 2026-10-31T15:07-07:00
@@ -1299,3 +1307,11 @@
   batch: 1
   review: db4b473b64
   text: The status command shall show each requirement's text once in a report, even when more than one failing item reaches it.
+- id: VERIFY-33
+  fingerprint: c4882100a809
+  locked_at: 2026-11-01T10:10-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 320cdddbb5
+  text: When no results are recorded for an implementation, the review page shall say so in place of counting its items as not run.
