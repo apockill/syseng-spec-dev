@@ -1,0 +1,8 @@
+{
+  "name": "syseng-evals",
+  "private": true,
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "*",
+    "promptfoo": "0.125.1"
+  }
+}

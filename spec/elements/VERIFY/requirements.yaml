@@ -243,3 +243,13 @@
     said: Wants these automatically flagged to the LLM for correction.
     basis: stated
     fingerprint: 17d5b3ff1c1d
+- id: VERIFY-36
+  text: The results command shall include a reader for promptfoo's results.
+  traces_to: SYS-58
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 14:59
+    context: Asking what tools exist for testing skills, then choosing promptfoo to try.
+    said: Suggested supporting ingesting an eval toolkit's results, so verification items can test behaviour on a target model, and chose to try promptfoo.
+    basis: stated
+    fingerprint: 58095793a899

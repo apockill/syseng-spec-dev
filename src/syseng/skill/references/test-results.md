@@ -51,7 +51,7 @@ A link in a verification item's `tests` is the identifier its results report: `t
 
 ## Adding a format
 
-Formats: `junit`, `pytest-junit`, and `jsonl`, one `{"id": "...", "outcome": "pass"}` per line (pass, fail or skip).
+Formats: `junit`, `pytest-junit`, `promptfoo` (its JSON output, for evals of agent behaviour), and `jsonl`, one `{"id": "...", "outcome": "pass"}` per line (pass, fail or skip).
 
 If the project's test tool has no reader, offer to ask for one with a problem report (references/reporting-problems.md) before writing a conversion of your own, so the next project gets it too. Use `jsonl` to keep working meanwhile.
 

@@ -169,3 +169,12 @@
   method: analysis
   technique: roll-up
   description: Verified through its children's verification.
+- id: SYS-V25
+  verifies:
+  - SYS-61
+  method: test
+  technique: unit test
+  description: Only the toolkit's reader names the eval tool, and this repository's cases and checks are well formed.
+  tests:
+    python:
+    - tests/test_evals.py

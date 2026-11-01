@@ -220,3 +220,28 @@
     said: Chose to migrate fully to the new system, since version control keeps the history.
     basis: guided
     fingerprint: c3f3153a5a50
+- id: DR-77
+  title: The toolkit reads eval results, and this repository's own evals use promptfoo directly on the host
+  decided_by: engineer
+  elements:
+  - SYS
+  - VERIFY
+  requirements: SYS-61, VERIFY-36
+  context: The skill's behaviour needs testing on a real agent. Claude's own eval tool breaks SYS-27. A trial of promptfoo worked. Harbor needs containers.
+  decision: |-
+    The toolkit runs nothing: evaluations reach it through a reader, as other test results do. This repository's evals of its own skill are a plain promptfoo config, with checks in Python and a script that builds the fixture. They run on the host with limited tools, not in a container, with dependencies in a flake shell.
+  alternatives: Harbor, which is strong on isolation and agent coverage but built for benchmarks and needs containers. Neutral cases translated into each runner's config, which was built and removed as abstraction for a second runner that doesn't exist. Writing our own runner, which the engineer ruled out as risky.
+  consequences: An allowed command can still reach outside the workspace, which is acceptable for this repository's own skill. Hermes isn't covered. A case passes at 80% of its runs. Changing eval tool means converting the cases and adding a reader, which is simple YAML work.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 14:59
+    context: Weighing whether containers were needed, then choosing a tool.
+    said: Doubted a container was needed for low-stakes tests, and chose to try promptfoo without depending on it heavily.
+    basis: stated
+    fingerprint: ae9a961d982c
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 15:35
+    context: Reviewing an alteration on the review page (review 688320b7fe).
+    said: Kept the item as it now reads.
+    basis: guided
+    fingerprint: 34b1ffb14910

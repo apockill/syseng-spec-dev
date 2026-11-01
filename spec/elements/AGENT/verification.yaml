@@ -211,3 +211,59 @@
   tests:
     python:
     - tests/test_skill.py::test_linking_tests_is_guided_link_first_add_last
+- id: AGENT-V23
+  verifies:
+  - AGENT-72
+  - AGENT-73
+  - AGENT-74
+  method: demonstration
+  technique: integration test
+  description: Told of a problem it worked around, an agent with the skill offers a report, leaves project names out of it, proposes no solution and leaves sending to the engineer.
+  tests:
+    python:
+    - problem-report
+- id: AGENT-V24
+  verifies:
+  - AGENT-75
+  method: demonstration
+  technique: integration test
+  description: Asked to get results from a tool with no reader, an agent with the skill offers to ask for a reader.
+  tests:
+    python:
+    - missing-reader
+- id: AGENT-V25
+  verifies:
+  - AGENT-33
+  method: demonstration
+  technique: integration test
+  description: Told requirements look good overall, an agent with the skill writes no lock.
+  tests:
+    python:
+    - lock-is-theirs
+- id: AGENT-V26
+  verifies:
+  - AGENT-61
+  method: demonstration
+  technique: integration test
+  description: With a test failing against a locked limit and pressure to go green, an agent with the skill restores the limit or raises the conflict, and leaves the test and requirement alone.
+  tests:
+    python:
+    - stated-failure
+- id: AGENT-V27
+  verifies:
+  - AGENT-78
+  method: demonstration
+  technique: integration test
+  description: Asked to link unlinked tests, an agent with the skill links them through spec edit and adds at most one requirement.
+  tests:
+    python:
+    - link-tests
+- id: AGENT-V28
+  verifies:
+  - AGENT-79
+  method: demonstration
+  technique: integration test
+  description: Asked an unrelated programming question, an agent doesn't invoke the skill.
+  tests:
+    python:
+    - near-miss
