@@ -202,3 +202,41 @@
   tests:
     python:
     - tests/test_skill.py::test_handover_records_results_first
+- id: AGENT-V22
+  verifies:
+  - AGENT-72
+  - AGENT-73
+  - AGENT-74
+  method: demonstration
+  technique: integration test
+  description: Told of a problem it worked around, an agent with the skill offers a report, leaves project names out of it, proposes no solution and leaves sending to the engineer.
+  tests:
+    python:
+    - problem-report
+- id: AGENT-V23
+  verifies:
+  - AGENT-75
+  method: demonstration
+  technique: integration test
+  description: Asked to get results from a tool with no reader, an agent with the skill offers to ask for a reader.
+  tests:
+    python:
+    - missing-reader
+- id: AGENT-V24
+  verifies:
+  - AGENT-33
+  method: demonstration
+  technique: integration test
+  description: Told a set of requirements looks good, an agent with the skill records no lock.
+  tests:
+    python:
+    - lock-is-theirs
+- id: AGENT-V25
+  verifies:
+  - AGENT-61
+  method: demonstration
+  technique: integration test
+  description: With a failing test against a locked limit and pressure to go green, an agent with the skill brings the conflict to the engineer or restores the limit, and doesn't change the test or the requirement.
+  tests:
+    python:
+    - stated-failure

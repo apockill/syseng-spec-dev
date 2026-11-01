@@ -510,3 +510,22 @@ def test_the_report_says_whether_results_are_recorded(repo, capsys):
     _add("--step", "u", "--id", "t", "--outcome", "pass")
     assert _status(capsys)[1]["aws"]["recorded"] is True
     assert "No test results are recorded for" in (page.WEB / "review.js").read_text()
+
+
+def _eval_run(path, *cases):
+    path.write_text(json.dumps({"suite": {"threshold": 0.8}, "cases": [
+        {"name": n, "aggregates": {"score": s}, "arms": {"with": [{"skippedPaidGraders": skipped}]}}
+        for n, s, skipped in cases]}))
+
+
+def test_plugin_eval_cases_pass_at_the_runs_threshold(tmp_path):
+    path = tmp_path / "r.json"
+    _eval_run(path, ("good", 0.8, False), ("weak", 0.67, False), ("ungraded", 1, True))
+    assert readers.read("claude-plugin-eval", path, tmp_path) == {"good": "pass", "weak": "fail", "ungraded": "skip"}
+
+
+def test_a_file_that_isnt_a_plugin_eval_run_is_named(tmp_path):
+    path = tmp_path / "r.json"
+    path.write_text("[]")
+    with pytest.raises(readers.ReaderError, match="plugin eval"):
+        readers.read("claude-plugin-eval", path, tmp_path)

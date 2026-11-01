@@ -178,3 +178,13 @@
   tests:
     python:
     - tests/test_results.py::test_the_report_says_whether_results_are_recorded
+- id: VERIFY-V17
+  verifies:
+  - VERIFY-34
+  method: test
+  technique: unit test
+  description: A case passes at the run's threshold, fails below it, and is skipped when its graders didn't run; a file of another shape is named.
+  tests:
+    python:
+    - tests/test_results.py::test_plugin_eval_cases_pass_at_the_runs_threshold
+    - tests/test_results.py::test_a_file_that_isnt_a_plugin_eval_run_is_named

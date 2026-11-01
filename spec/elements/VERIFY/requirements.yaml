@@ -228,3 +228,13 @@
     said: Asked why the table on all these reviews showed nothing but not yet run, and why it hadn't been filled in.
     basis: guided
     fingerprint: c4882100a809
+- id: VERIFY-34
+  text: The results command shall include a reader for the results of a skill evaluation tool.
+  traces_to: SYS-58
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 10:15
+    context: Asking what tools exist for testing skills.
+    said: Suggested using an eval toolkit for skills and supporting ingesting its test results, so verification items can test behaviour on a target model instead of stating that text exists in a file.
+    basis: stated
+    fingerprint: 07c660c28abf

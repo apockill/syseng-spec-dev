@@ -1,0 +1,91 @@
+request: Evaluate the skill's behaviour on a real model, and read those results as verification
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-01'
+entries:
+- op: add
+  id: VERIFY-34
+  at: 2026-11-01T10:15-08:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: The results command shall include a reader for the results of a skill evaluation tool.
+    traces_to: SYS-58
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 10:15
+      context: Asking what tools exist for testing skills.
+      said: Suggested using an eval toolkit for skills and supporting ingesting its test results, so verification items can test behaviour on a target model instead of stating that text exists in a file.
+      basis: stated
+      fingerprint: 07c660c28abf
+- op: add
+  id: VERIFY-V17
+  at: 2026-11-01T10:15-08:00
+  reason: covers the reader.
+  after:
+    verifies:
+    - VERIFY-34
+    method: test
+    technique: unit test
+    description: A case passes at the run's threshold, fails below it, and is skipped when its graders didn't run; a file of another shape is named.
+    tests:
+      python:
+      - tests/test_results.py::test_plugin_eval_cases_pass_at_the_runs_threshold
+      - tests/test_results.py::test_a_file_that_isnt_a_plugin_eval_run_is_named
+- op: add
+  id: AGENT-V22
+  at: 2026-11-01T10:15-08:00
+  reason: tests behaviour on a model.
+  after:
+    verifies:
+    - AGENT-72
+    - AGENT-73
+    - AGENT-74
+    method: demonstration
+    technique: integration test
+    description: Told of a problem it worked around, an agent with the skill offers a report, leaves project names out of it, proposes no solution and leaves sending to the engineer.
+    tests:
+      python:
+      - problem-report
+- op: add
+  id: AGENT-V23
+  at: 2026-11-01T10:15-08:00
+  reason: tests behaviour on a model.
+  after:
+    verifies:
+    - AGENT-75
+    method: demonstration
+    technique: integration test
+    description: Asked to get results from a tool with no reader, an agent with the skill offers to ask for a reader.
+    tests:
+      python:
+      - missing-reader
+- op: add
+  id: AGENT-V24
+  at: 2026-11-01T10:15-08:00
+  reason: tests behaviour on a model.
+  after:
+    verifies:
+    - AGENT-33
+    method: demonstration
+    technique: integration test
+    description: Told a set of requirements looks good, an agent with the skill records no lock.
+    tests:
+      python:
+      - lock-is-theirs
+- op: add
+  id: AGENT-V25
+  at: 2026-11-01T10:15-08:00
+  reason: tests behaviour on a model.
+  after:
+    verifies:
+    - AGENT-61
+    method: demonstration
+    technique: integration test
+    description: With a failing test against a locked limit and pressure to go green, an agent with the skill brings the conflict to the engineer or restores the limit, and doesn't change the test or the requirement.
+    tests:
+      python:
+      - stated-failure
+decisions: []
+closed: '2026-11-01'
