@@ -220,3 +220,21 @@
     said: Chose to migrate fully to the new system, since version control keeps the history.
     basis: guided
     fingerprint: c3f3153a5a50
+- id: DR-77
+  title: Evals keep neutral cases, with promptfoo as a replaceable runner on the host
+  decided_by: engineer
+  elements:
+  - SYS
+  - VERIFY
+  requirements: SYS-61, VERIFY-36
+  context: The skill's behaviour needs testing on a real agent. Claude's own eval tool breaks SYS-27. A trial of promptfoo worked. Harbor needs containers.
+  decision: Cases stay in the Agent Skills evals.json format, checks in plain Python, and the fixture in a script. promptfoo is one adapter under evals/runners and one reader. Runs happen on the host with limited tools, not in a container, with dependencies in a flake shell.
+  alternatives: Harbor, which is strong on isolation and agent coverage but built for benchmarks and needs containers. Writing our own runner, which the engineer ruled out as risky.
+  consequences: An allowed command can still reach outside the workspace, which is acceptable for this repository's own skill. Hermes isn't covered. A case passes at 80% of its runs.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 14:59
+    context: Weighing whether containers were needed, then choosing a tool.
+    said: Doubted a container was needed for low-stakes tests, and chose to try promptfoo without depending on it heavily.
+    basis: stated
+    fingerprint: ae9a961d982c

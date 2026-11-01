@@ -57,6 +57,15 @@
               export PATH="$PWD/bin:$PATH"
             '';
           };
+          # The skill evals: Node for the runner, in its own shell to keep the default one small.
+          evals = pkgs.mkShell {
+            name = "syseng-evals";
+            packages = [ python pkgs.nodejs_22 ];
+            shellHook = ''
+              export PYTHONPATH="$PWD/src''${PYTHONPATH:+:$PYTHONPATH}"
+              export PATH="$PWD/bin:$PATH"
+            '';
+          };
         }
       );
     };

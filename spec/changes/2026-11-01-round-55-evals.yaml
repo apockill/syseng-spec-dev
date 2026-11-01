@@ -1,0 +1,179 @@
+request: Evaluate the skill on a real agent with promptfoo, keeping the cases independent of the runner
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-01'
+entries:
+- op: add
+  id: SYS-61
+  at: 2026-11-01T14:59-08:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    kind: system
+    text: The toolkit's evaluations of agent behaviour shall keep their cases and checks independent of the evaluation runner.
+    serves:
+    - NEED-30
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 14:59
+      context: Choosing promptfoo to try for evaluating the skill.
+      said: Wants to try promptfoo while not depending on it too heavily in code, keeping things extensible so other runners can be added, or this one deprecated, if they end up not liking it.
+      basis: stated
+      fingerprint: 19b802b2e882
+- op: add
+  id: VERIFY-36
+  at: 2026-11-01T14:59-08:00
+  reason: the engineer chose it.
+  requested: true
+  after:
+    text: The results command shall include a reader for promptfoo's results.
+    traces_to: SYS-58
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 14:59
+      context: Asking what tools exist for testing skills, then choosing promptfoo to try.
+      said: Suggested supporting ingesting an eval toolkit's results, so verification items can test behaviour on a target model, and chose to try promptfoo.
+      basis: stated
+      fingerprint: 58095793a899
+- op: add
+  id: AGENT-79
+  at: 2026-11-01T14:59-08:00
+  reason: near-miss eval needs a requirement to verify.
+  after:
+    text: The skill shall stay out of requests that have nothing to do with a spec.
+    traces_to: SYS-27
+    basis: added
+    why: a skill that fires on everything costs tokens and gets in the way.
+- op: add
+  id: SYS-V25
+  at: 2026-11-01T14:59-08:00
+  reason: covers the separation.
+  after:
+    verifies:
+    - SYS-61
+    method: test
+    technique: unit test
+    description: Cases and checks work without a runner, an adapter turns them into a run with and without the skill, and only the reader in the toolkit names promptfoo.
+    tests:
+      python:
+      - tests/test_evals.py
+- op: add
+  id: VERIFY-V19
+  at: 2026-11-01T14:59-08:00
+  reason: covers the reader.
+  after:
+    verifies:
+    - VERIFY-36
+    method: test
+    technique: unit test
+    description: A case passes on its with-skill pass rate, the baseline arm doesn't count, and a file of another shape is named.
+    tests:
+      python:
+      - tests/test_evals.py::test_a_case_passes_on_its_with_skill_pass_rate
+      - tests/test_evals.py::test_a_file_that_isnt_a_promptfoo_run_is_named
+- op: add
+  id: AGENT-V23
+  at: 2026-11-01T14:59-08:00
+  reason: tests behaviour on a real agent.
+  after:
+    verifies:
+    - AGENT-72
+    - AGENT-73
+    - AGENT-74
+    method: demonstration
+    technique: integration test
+    description: Told of a problem it worked around, an agent with the skill offers a report, leaves project names out of it, proposes no solution and leaves sending to the engineer.
+    tests:
+      python:
+      - problem-report
+- op: add
+  id: AGENT-V24
+  at: 2026-11-01T14:59-08:00
+  reason: tests behaviour on a real agent.
+  after:
+    verifies:
+    - AGENT-75
+    method: demonstration
+    technique: integration test
+    description: Asked to get results from a tool with no reader, an agent with the skill offers to ask for a reader.
+    tests:
+      python:
+      - missing-reader
+- op: add
+  id: AGENT-V25
+  at: 2026-11-01T14:59-08:00
+  reason: tests behaviour on a real agent.
+  after:
+    verifies:
+    - AGENT-33
+    method: demonstration
+    technique: integration test
+    description: Told requirements look good overall, an agent with the skill writes no lock.
+    tests:
+      python:
+      - lock-is-theirs
+- op: add
+  id: AGENT-V26
+  at: 2026-11-01T14:59-08:00
+  reason: tests behaviour on a real agent.
+  after:
+    verifies:
+    - AGENT-61
+    method: demonstration
+    technique: integration test
+    description: With a test failing against a locked limit and pressure to go green, an agent with the skill restores the limit or raises the conflict, and leaves the test and requirement alone.
+    tests:
+      python:
+      - stated-failure
+- op: add
+  id: AGENT-V27
+  at: 2026-11-01T14:59-08:00
+  reason: tests behaviour on a real agent.
+  after:
+    verifies:
+    - AGENT-78
+    method: demonstration
+    technique: integration test
+    description: Asked to link unlinked tests, an agent with the skill links them through spec edit and adds at most one requirement.
+    tests:
+      python:
+      - link-tests
+- op: add
+  id: AGENT-V28
+  at: 2026-11-01T14:59-08:00
+  reason: tests behaviour on a real agent.
+  after:
+    verifies:
+    - AGENT-79
+    method: demonstration
+    technique: integration test
+    description: Asked an unrelated programming question, an agent doesn't invoke the skill.
+    tests:
+      python:
+      - near-miss
+- op: add
+  id: DR-77
+  at: 2026-11-01T14:59-08:00
+  reason: records the choice.
+  requested: true
+  after:
+    title: Evals keep neutral cases, with promptfoo as a replaceable runner on the host
+    decided_by: engineer
+    elements:
+    - SYS
+    - VERIFY
+    requirements: SYS-61, VERIFY-36
+    context: The skill's behaviour needs testing on a real agent. Claude's own eval tool breaks SYS-27. A trial of promptfoo worked. Harbor needs containers.
+    decision: Cases stay in the Agent Skills evals.json format, checks in plain Python, and the fixture in a script. promptfoo is one adapter under evals/runners and one reader. Runs happen on the host with limited tools, not in a container, with dependencies in a flake shell.
+    alternatives: Harbor, which is strong on isolation and agent coverage but built for benchmarks and needs containers. Writing our own runner, which the engineer ruled out as risky.
+    consequences: An allowed command can still reach outside the workspace, which is acceptable for this repository's own skill. Hermes isn't covered. A case passes at 80% of its runs.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 14:59
+      context: Weighing whether containers were needed, then choosing a tool.
+      said: Doubted a container was needed for low-stakes tests, and chose to try promptfoo without depending on it heavily.
+      basis: stated
+      fingerprint: ae9a961d982c
+decisions: []
+closed: '2026-11-01'

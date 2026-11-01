@@ -842,3 +842,15 @@
     said: Needs a way to see the timeline of review rounds and gauge roughly the changes made between them.
     basis: stated
     fingerprint: cfc6e41ad0b7
+- id: SYS-61
+  kind: system
+  text: The toolkit's evaluations of agent behaviour shall keep their cases and checks independent of the evaluation runner.
+  serves:
+  - NEED-30
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 14:59
+    context: Choosing promptfoo to try for evaluating the skill.
+    said: Wants to try promptfoo while not depending on it too heavily in code, keeping things extensible so other runners can be added, or this one deprecated, if they end up not liking it.
+    basis: stated
+    fingerprint: 19b802b2e882

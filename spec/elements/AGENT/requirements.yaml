@@ -679,3 +679,8 @@
     said: Tests should always link to some verification item, otherwise why is the test being created if it doesn't validate a part of the system there's a contract for. The framework should ask the LLM to link them and flesh out the tree if the relevant items don't exist.
     basis: stated
     fingerprint: 2f612ed2aac6
+- id: AGENT-79
+  text: The skill shall stay out of requests that have nothing to do with a spec.
+  traces_to: SYS-27
+  basis: added
+  why: a skill that fires on everything costs tokens and gets in the way.

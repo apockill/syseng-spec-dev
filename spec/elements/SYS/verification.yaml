@@ -169,3 +169,12 @@
   method: analysis
   technique: roll-up
   description: Verified through its children's verification.
+- id: SYS-V25
+  verifies:
+  - SYS-61
+  method: test
+  technique: unit test
+  description: Cases and checks work without a runner, an adapter turns them into a run with and without the skill, and only the reader in the toolkit names promptfoo.
+  tests:
+    python:
+    - tests/test_evals.py
