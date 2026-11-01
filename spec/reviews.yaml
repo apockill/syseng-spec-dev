@@ -2964,3 +2964,24 @@
   did:
     locked:
     - NEED-32
+- review: 6667d7e722
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-01T09:19-08:00
+  generated: 2026-10-31T15:55-07:00
+  revision: cb859a10725a5bd689eefc99ac500e8e2c270058
+  dirty: false
+  did:
+    kept:
+    - DR-23
+    - MODEL-32
+    decided:
+    - D1 → Own verification where it means something, roll-up otherwise
+- review: 4455debd05
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-01T09:52-08:00
+  generated: 2026-11-01T09:22-08:00
+  revision: 442bb39a2a531e9fe5a139274596ec3703044aca
+  dirty: false
+  did:
+    kept:
+    - MODEL-32

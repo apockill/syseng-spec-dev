@@ -226,6 +226,15 @@
     System requirements are verified at the system level: each system requirement gets its own verification, such as an end-to-end run or a demonstration, in addition to its children's verification.
   migrated_from: e782a5d176aa
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: DR-23
+  fingerprint: a905f02e55d8
+  locked_at: 2026-11-01T09:19-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  review: 6667d7e722
+  text: |-
+    System requirements are verified at the system level: each system requirement gets its own verification, such as an end-to-end run or a demonstration, in addition to its children's verification.
+  note: kept under D1
 - id: DR-24
   fingerprint: ab705e6d05ee
   locked_at: '2026-10-11'

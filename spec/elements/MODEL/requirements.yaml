@@ -194,7 +194,7 @@
     basis: stated
     fingerprint: 79f245711f3d
 - id: MODEL-32
-  text: Each system requirement shall be verified at the system level, in addition to the verification of the requirements that refine it.
+  text: Each system requirement shall be verified at the system level where a test of its own would not be arbitrary, and otherwise by roll-up from its children.
   traces_to: SYS-10
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -203,6 +203,18 @@
     said: Agreed that it makes sense for system requirements to get their own verification.
     basis: guided
     fingerprint: 485f3eed171b
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 09:19
+    context: Reviewing an alteration on the review page (review 6667d7e722).
+    said: Kept the item as it now reads.
+    basis: guided
+    fingerprint: 485f3eed171b
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 09:52
+    context: Reviewing an alteration on the review page (review 4455debd05).
+    said: Kept the item as it now reads.
+    basis: guided
+    fingerprint: 1fd53a7aadf9
 - id: MODEL-33
   text: No requirement shall restate the requirement it refines.
   traces_to: SYS-6

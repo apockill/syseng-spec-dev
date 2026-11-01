@@ -1,0 +1,542 @@
+request: Link existing tests the coverage audit found, and settle how system requirements are verified
+mode: code-first
+target: python
+status: closed
+opened: '2026-10-31'
+entries:
+- op: modify
+  id: MODEL-V10
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
+      - tests/test_approvals.py::test_approve_command_records_fingerprint_and_words
+  after:
+    tests:
+      python:
+      - tests/test_approvals.py::test_rewording_unapproves_but_relinking_does_not
+      - tests/test_approvals.py::test_approve_command_records_fingerprint_and_words
+      - tests/test_approvals.py::test_approve_refuses_unknown_ids
+      - tests/test_edit.py::test_test_link_changes_are_logged_and_shown
+- op: modify
+  id: CHECK-V1
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_one_run_reports_every_problem
+      - tests/test_check_structure.py::test_malformed_file_is_reported_without_crashing
+  after:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_one_run_reports_every_problem
+      - tests/test_check_structure.py::test_malformed_file_is_reported_without_crashing
+      - tests/test_check_structure.py::test_valid_spec_has_no_errors
+- op: modify
+  id: AGENT-V4
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_hooks.py::test_approvals_that_name_items_by_id_are_read
+      - tests/test_hooks.py::test_approvals_that_need_interpreting_are_not_read
+      - tests/test_hooks.py::test_lines_that_approve_no_items_are_ignored
+      - tests/test_hooks.py::test_chat_approval_is_recorded_without_the_engineers_words
+      - tests/test_hooks.py::test_approval_on_any_line_of_a_longer_message
+      - tests/test_hooks.py::test_quoted_lines_are_not_approvals
+      - tests/test_hooks.py::test_described_exceptions_record_nothing
+      - tests/test_hooks.py::test_lgtm_is_not_an_approval
+      - tests/test_hooks.py::test_pasted_text_is_not_the_engineers_approval
+  after:
+    tests:
+      python:
+      - tests/test_hooks.py::test_approvals_that_name_items_by_id_are_read
+      - tests/test_hooks.py::test_approvals_that_need_interpreting_are_not_read
+      - tests/test_hooks.py::test_lines_that_approve_no_items_are_ignored
+      - tests/test_hooks.py::test_chat_approval_is_recorded_without_the_engineers_words
+      - tests/test_hooks.py::test_approval_on_any_line_of_a_longer_message
+      - tests/test_hooks.py::test_quoted_lines_are_not_approvals
+      - tests/test_hooks.py::test_described_exceptions_record_nothing
+      - tests/test_hooks.py::test_lgtm_is_not_an_approval
+      - tests/test_hooks.py::test_pasted_text_is_not_the_engineers_approval
+      - tests/test_hooks.py::test_unknown_ids_record_nothing
+      - tests/test_skill.py::test_skill_teaches_locks_without_a_ritual
+- op: modify
+  id: CLI-V5
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_init.py::test_init_sets_up_an_empty_repository
+      - tests/test_init.py::test_init_says_when_spec_is_not_on_the_path
+      - tests/test_init.py::test_init_removes_the_launcher_earlier_setups_wrote
+      - tests/test_init.py::test_antigravity_gets_the_skill_without_claude_code_glue
+      - tests/test_init.py::test_existing_spec_is_left_alone
+  after:
+    tests:
+      python:
+      - tests/test_init.py::test_init_sets_up_an_empty_repository
+      - tests/test_init.py::test_init_says_when_spec_is_not_on_the_path
+      - tests/test_init.py::test_init_removes_the_launcher_earlier_setups_wrote
+      - tests/test_init.py::test_antigravity_gets_the_skill_without_claude_code_glue
+      - tests/test_init.py::test_existing_spec_is_left_alone
+      - tests/test_init.py::test_language_is_guessed_from_tests_when_the_root_has_no_build_file
+- op: modify
+  id: CHECK-V2
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_messages.py::test_error_explains_rule
+  after:
+    tests:
+      python:
+      - tests/test_messages.py::test_error_explains_rule
+      - tests/test_messages.py::test_every_rule_is_explained_in_the_rules_page
+      - tests/test_messages.py::test_rule_links_prefer_the_installed_rules_page
+      - tests/test_wording.py::test_issue_spans_point_at_the_offending_words
+- op: modify
+  id: CHECK-V5
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_levels.py::test_each_item_gets_the_level_its_records_give_it
+      - tests/test_levels.py::test_the_highest_level_applies
+      - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
+      - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
+  after:
+    tests:
+      python:
+      - tests/test_levels.py::test_each_item_gets_the_level_its_records_give_it
+      - tests/test_levels.py::test_the_highest_level_applies
+      - tests/test_levels.py::test_a_change_after_a_lock_is_a_to_do_until_answered
+      - tests/test_review.py::test_a_changed_item_is_neither_approved_nor_delegated
+      - tests/test_results.py::test_a_need_marked_derived_does_not_count_as_a_persons_word
+- op: modify
+  id: VCS-V1
+  at: 2026-10-31T15:54-07:00
+  reason: links tests the coverage audit found unlinked.
+  before:
+    tests:
+      python:
+      - tests/test_vcs.py::test_the_git_backend_answers_each_operation
+      - tests/test_vcs.py::test_nothing_outside_the_backend_calls_git
+      - tests/test_vcs.py::test_no_trunk_is_an_empty_answer
+  after:
+    tests:
+      python:
+      - tests/test_vcs.py::test_the_git_backend_answers_each_operation
+      - tests/test_vcs.py::test_nothing_outside_the_backend_calls_git
+      - tests/test_vcs.py::test_no_trunk_is_an_empty_answer
+      - tests/test_results.py::test_results_stay_out_of_version_control_and_can_live_elsewhere
+- op: add
+  id: CHANGE-V13
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - CHANGE-1
+    method: test
+    technique: unit test
+    description: A change records its spec-first mode, and in that mode a change to what a person stated waits for the person.
+    tests:
+      python:
+      - tests/test_edit.py::test_spec_first_mode_is_recorded
+      - tests/test_levels.py::test_spec_first_refuses_to_change_what_a_person_stated
+- op: add
+  id: CHANGE-V14
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - CHANGE-2
+    method: test
+    technique: unit test
+    description: A change defaults to code-first, goes ahead, and the done check asks for the conflict.
+    tests:
+      python:
+      - tests/test_edit.py::test_change_defaults_to_code_first_and_the_primary_target
+      - tests/test_levels.py::test_code_first_goes_ahead_and_the_done_check_asks_for_the_conflict
+- op: add
+  id: MODEL-V19
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - MODEL-7
+    method: test
+    technique: unit test
+    description: Named implementations need no language, and a name the settings do not list is refused.
+    tests:
+      python:
+      - tests/test_results.py::test_status_counts_each_implementation_separately
+      - tests/test_results.py::test_results_are_kept_per_implementation
+      - tests/test_testlinks.py::test_the_checker_reports_broken_links_and_unknown_implementations
+- op: add
+  id: MODEL-V20
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - MODEL-8
+    method: test
+    technique: unit test
+    description: An item links tests per implementation, and each implementation is counted apart.
+    tests:
+      python:
+      - tests/test_results.py::test_status_counts_each_implementation_separately
+      - tests/test_testlinks.py::test_the_checker_reports_broken_links_and_unknown_implementations
+- op: add
+  id: REVIEW-V26
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - REVIEW-2
+    method: test
+    technique: unit test
+    description: The page renders the differences from a named revision to the working tree, and states that revision.
+    tests:
+      python:
+      - tests/test_review_base.py::test_a_stacked_change_compares_against_the_base_it_names
+      - tests/test_review_base.py::test_the_page_states_its_base_at_the_top
+- op: add
+  id: SYS-V13
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - SYS-13
+    method: test
+    technique: unit test
+    description: The status command reports the whole product from recorded results, with nobody present.
+    tests:
+      python:
+      - tests/test_results.py::test_status_counts_each_implementation_separately
+      - tests/test_results.py::test_the_status_prints_for_people
+- op: add
+  id: SYS-V14
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - SYS-18
+    method: test
+    technique: unit test
+    description: A conflict stops nothing while it awaits an answer, and the merge check never fails over locks.
+    tests:
+      python:
+      - tests/test_levels.py::test_code_first_goes_ahead_and_the_done_check_asks_for_the_conflict
+      - tests/test_approvals.py::test_merge_check_never_fails_because_of_approvals
+- op: add
+  id: VERIFY-V14
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - VERIFY-2
+    method: test
+    technique: unit test
+    description: Results for tests and verdicts for reasoning items all set an item's status.
+    tests:
+      python:
+      - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+      - tests/test_results.py::test_a_verdict_is_a_result_named_by_the_item
+- op: add
+  id: VERIFY-V15
+  at: 2026-10-31T15:54-07:00
+  reason: an existing test already checks this; the coverage audit found the link missing.
+  after:
+    verifies:
+    - VERIFY-12
+    method: test
+    technique: unit test
+    description: The status command and the review page's overview show the product's health.
+    tests:
+      python:
+      - tests/test_results.py::test_the_status_prints_for_people
+      - tests/test_review_page.py::test_the_page_opens_on_the_overview_and_agents_can_read_it
+- op: modify
+  id: MODEL-32
+  at: 2026-11-01T09:19-08:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (round 5). Answering Q19, which asked whether system requirements should get their own verification items.
+      said: Agreed that it makes sense for system requirements to get their own verification.
+      basis: guided
+      fingerprint: 485f3eed171b
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: '2026-10-11'
+      context: Date approximate (round 5). Answering Q19, which asked whether system requirements should get their own verification items.
+      said: Agreed that it makes sense for system requirements to get their own verification.
+      basis: guided
+      fingerprint: 485f3eed171b
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 09:19
+      context: Reviewing an alteration on the review page (review 6667d7e722).
+      said: Kept the item as it now reads.
+      basis: guided
+      fingerprint: 485f3eed171b
+- op: add
+  id: SYS-V15
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-8
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V16
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-25
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V17
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-31
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V18
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-33
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V19
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-35
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V20
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-36
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V21
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-37
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V22
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-38
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V23
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-39
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: add
+  id: SYS-V24
+  at: 2026-11-01T09:20-08:00
+  reason: |-
+    D1: a test of its own would repeat its children.
+  after:
+    verifies:
+    - SYS-41
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+- op: modify
+  id: MODEL-32
+  at: 2026-11-01T09:20-08:00
+  reason: D1, the engineer chose this.
+  raised:
+  - a person stated or guided it
+  level: guided
+  fingerprint_before: 485f3eed171b
+  fingerprint_after: 1fd53a7aadf9
+  conflict: D1
+  before:
+    text: Each system requirement shall be verified at the system level, in addition to the verification of the requirements that refine it.
+  after:
+    text: Each system requirement shall be verified at the system level where a test of its own would not be arbitrary, and otherwise by roll-up from its children.
+  acks:
+    MODEL-32: D1
+    DR-23: D1
+- op: modify
+  id: DR-23
+  at: 2026-11-01T09:20-08:00
+  reason: D1, the engineer chose this.
+  raised:
+  - a person locked it
+  - a person stated or guided it
+  - a person decided it
+  level: explicit
+  fingerprint_before: a905f02e55d8
+  fingerprint_after: 65efacf6276c
+  conflict: D1
+  before:
+    title: System requirements are verified at the system level
+    decision: each system requirement gets its own verification, such as an end-to-end run or a demonstration, in addition to its children's verification.
+    consequences: the VI round will write system-level checks, for example running a code-first change end to end and confirming that it never stopped to ask.
+  after:
+    title: System requirements are verified at the system level where that means something
+    decision: |-
+      Each system requirement gets its own verification, such as an end-to-end run or a demonstration, where a test of it wouldn't be arbitrary. Otherwise it rolls up from its children. A roll-up is strict: every child must be verified, and a child may itself be verified by roll-up, so a whole subtree can roll up from its leaves.
+    consequences: A system requirement can pass with no end-to-end check, so integration faults can slip through; the important ones should still get their own. The engineer may revisit transitive roll-ups if negative consequences appear.
+  acks:
+    DR-23: D1
+- op: add
+  id: CHECK-34
+  at: 2026-11-01T09:20-08:00
+  reason: the engineer asked for strict roll-ups.
+  requested: true
+  after:
+    text: The checker shall report as an error each roll-up over a requirement with a child that has no verification item.
+    traces_to: SYS-10
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 09:20
+      context: Choosing that system requirements may roll up from their children.
+      said: |-
+        Wants roll-ups to be strict: all child requirements must be verified, it can't be partial. A chain is allowed, so if B and C have no verification items but their children do, B and C roll up and so does their parent A, though that may change if negative consequences appear.
+      basis: stated
+      fingerprint: bf9acc6bc0de
+- op: add
+  id: CHECK-V21
+  at: 2026-11-01T09:20-08:00
+  reason: covers strict roll-ups.
+  after:
+    verifies:
+    - CHECK-34
+    method: test
+    technique: unit test
+    description: A roll-up over an unverified child, or a child only deferred, is an error, and a chain of roll-ups down to verified leaves passes.
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
+      - tests/test_check_structure.py::test_a_deferred_child_does_not_count_for_a_roll_up
+      - tests/test_check_structure.py::test_roll_ups_can_chain_down_to_verified_leaves
+- op: modify
+  id: CHECK-V19
+  at: 2026-11-01T09:21-08:00
+  reason: the test was renamed.
+  before:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_parent_without_verification_is_told_how_to_resolve_it
+      - tests/test_check_structure.py::test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified
+  after:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_parent_without_verification_is_told_how_to_resolve_it
+      - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
+- op: modify
+  id: CHECK-V21
+  at: 2026-11-01T09:21-08:00
+  reason: adds the chain of statuses.
+  before:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
+      - tests/test_check_structure.py::test_a_deferred_child_does_not_count_for_a_roll_up
+      - tests/test_check_structure.py::test_roll_ups_can_chain_down_to_verified_leaves
+  after:
+    tests:
+      python:
+      - tests/test_check_structure.py::test_a_roll_up_is_an_error_until_every_child_is_verified
+      - tests/test_check_structure.py::test_a_deferred_child_does_not_count_for_a_roll_up
+      - tests/test_check_structure.py::test_roll_ups_can_chain_down_to_verified_leaves
+      - tests/test_results.py::test_a_chain_of_roll_ups_follows_the_leaves
+decisions:
+- id: D1
+  kind: conflict
+  question: Can a system requirement be verified by its children alone, when a test of its own would be arbitrary? DR-23, which you locked, says no.
+  importance: This decides what to do with 28 of the 120 unverified requirements, and whether coverage moves from about 67% to about 76% cheaply or takes many new system tests. DR-23 and MODEL-32 say each system requirement gets its own verification in addition to its children's. In round 38 you asked for a way to say a requirement is verified by its children, preferring its own verification where a test wouldn't be arbitrary, and CHECK-32 records that. The two now disagree, and I added five system roll-ups (SYS-V8 to SYS-V12) without noticing they break DR-23, so those are affected too.
+  involves:
+  - DR-23
+  - MODEL-32
+  options:
+  - label: Own verification where it means something, roll-up otherwise
+    recommended: true
+    detail: |-
+      MODEL-32 and DR-23 change to say a system requirement gets its own verification where a test of it wouldn't be arbitrary, and otherwise rolls up from its children, which the checker holds honest (V004: every child must be verified). Example: SYS-33 (what a lock records) rolls up from MODEL-34 and CLI-12, since a separate test would repeat theirs, while SYS-13 (a full run's report) keeps its own. 10 roll-ups are ready now, and 18 more wait for their children. What follows: a system requirement can pass with no end-to-end check. Standard systems-engineering practice accepts verification by analysis of lower-level results, but integration faults between children can slip through, so the important ones should still get their own.
+    keeps:
+    - DR-23
+    - MODEL-32
+  - label: Keep the rule - every system requirement gets its own verification
+    detail: DR-23 stands. Each of the system requirements needs an end-to-end test or demonstration, and the five roll-ups I added become to-dos again. Stronger against integration faults, but about 36 unverified system requirements each need a test, many repeating their children's. Coverage stays near 67% until those are written.
+    rolls_back:
+    - DR-23
+    - MODEL-32
+  status: resolved
+  chosen: Own verification where it means something, roll-up otherwise
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose Own verification where it means something, roll-up otherwise on the review page (summary)
+  resolved: '2026-11-01'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-01T09:19-08:00
+  review: 6667d7e722
+  decision: 2026-10-31-round-48-coverage-links D1
+  kind: comment
+  comment: "I'm ok with this decision, but I want to be clear- roll ups are strict: all child requirements must be verified (it can't be partial). I suppose if \n\nA -> (B, C)\n\nB -> (D, E)\nC -> (F, G)\n\nand B and C don't have VERs but D, E, F, G do, then C and B get 'roll up' verified, and so does A. That would be allowed, but we may change our minds on this in the future if we find negative consequences."
+  response: |-
+    Done as you described. A roll-up over any unverified child is now an error, not a to-do, and a child that's only deferred doesn't count, so it can't be partial. Your A, B, C example works: B and C can roll up from their leaves, and A from them, and a failing leaf fails all the way up. DR-23 notes you may revisit this.
+  responded: 2026-11-01T09:20-08:00
+closed: '2026-11-01'

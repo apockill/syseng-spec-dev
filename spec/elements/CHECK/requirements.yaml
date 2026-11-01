@@ -276,3 +276,14 @@
   traces_to: SYS-57
   basis: derived
   why: a build target or a step's name has no source file to find.
+- id: CHECK-34
+  text: The checker shall report as an error each roll-up over a requirement with a child that has no verification item.
+  traces_to: SYS-10
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-01 09:20
+    context: Choosing that system requirements may roll up from their children.
+    said: |-
+      Wants roll-ups to be strict: all child requirements must be verified, it can't be partial. A chain is allowed, so if B and C have no verification items but their children do, B and C roll up and so does their parent A, though that may change if negative consequences appear.
+    basis: stated
+    fingerprint: bf9acc6bc0de

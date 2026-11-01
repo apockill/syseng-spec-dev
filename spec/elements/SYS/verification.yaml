@@ -89,3 +89,83 @@
   method: analysis
   technique: roll-up
   description: Verified through its children's verification.
+- id: SYS-V13
+  verifies:
+  - SYS-13
+  method: test
+  technique: unit test
+  description: The status command reports the whole product from recorded results, with nobody present.
+  tests:
+    python:
+    - tests/test_results.py::test_status_counts_each_implementation_separately
+    - tests/test_results.py::test_the_status_prints_for_people
+- id: SYS-V14
+  verifies:
+  - SYS-18
+  method: test
+  technique: unit test
+  description: A conflict stops nothing while it awaits an answer, and the merge check never fails over locks.
+  tests:
+    python:
+    - tests/test_levels.py::test_code_first_goes_ahead_and_the_done_check_asks_for_the_conflict
+    - tests/test_approvals.py::test_merge_check_never_fails_because_of_approvals
+- id: SYS-V15
+  verifies:
+  - SYS-8
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V16
+  verifies:
+  - SYS-25
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V17
+  verifies:
+  - SYS-31
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V18
+  verifies:
+  - SYS-33
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V19
+  verifies:
+  - SYS-35
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V20
+  verifies:
+  - SYS-36
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V21
+  verifies:
+  - SYS-37
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V22
+  verifies:
+  - SYS-38
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V23
+  verifies:
+  - SYS-39
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.
+- id: SYS-V24
+  verifies:
+  - SYS-41
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.

@@ -149,3 +149,23 @@
   tests:
     python:
     - tests/test_results.py::test_items_no_person_stated_stay_out_unless_asked_for
+- id: VERIFY-V14
+  verifies:
+  - VERIFY-2
+  method: test
+  technique: unit test
+  description: Results for tests and verdicts for reasoning items all set an item's status.
+  tests:
+    python:
+    - tests/test_results.py::test_steps_add_up_in_any_order_into_one_status
+    - tests/test_results.py::test_a_verdict_is_a_result_named_by_the_item
+- id: VERIFY-V15
+  verifies:
+  - VERIFY-12
+  method: test
+  technique: unit test
+  description: The status command and the review page's overview show the product's health.
+  tests:
+    python:
+    - tests/test_results.py::test_the_status_prints_for_people
+    - tests/test_review_page.py::test_the_page_opens_on_the_overview_and_agents_can_read_it

@@ -119,3 +119,23 @@
   tests:
     python:
     - tests/test_decisions.py::test_a_decision_can_be_checked_without_recording_it
+- id: CHANGE-V13
+  verifies:
+  - CHANGE-1
+  method: test
+  technique: unit test
+  description: A change records its spec-first mode, and in that mode a change to what a person stated waits for the person.
+  tests:
+    python:
+    - tests/test_edit.py::test_spec_first_mode_is_recorded
+    - tests/test_levels.py::test_spec_first_refuses_to_change_what_a_person_stated
+- id: CHANGE-V14
+  verifies:
+  - CHANGE-2
+  method: test
+  technique: unit test
+  description: A change defaults to code-first, goes ahead, and the done check asks for the conflict.
+  tests:
+    python:
+    - tests/test_edit.py::test_change_defaults_to_code_first_and_the_primary_target
+    - tests/test_levels.py::test_code_first_goes_ahead_and_the_done_check_asks_for_the_conflict

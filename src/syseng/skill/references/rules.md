@@ -185,7 +185,7 @@ A verification item links a test that doesn't exist: the file is missing, or the
 A Python test in the implementation's tree that no verification item links, listed per file. It checks something the spec doesn't claim, or a requirement that's missing. Link it from the verification item whose requirement it checks, or add the requirement it shows is missing. Folders that are hidden, vendored (`node_modules`, `site-packages`) or hold app data (`state`) are skipped.
 
 <a id="v004"></a>
-### V004: roll-up over an unverified child (to-do)
+### V004: roll-up over an unverified child
 A verification item with technique `roll-up` verifies a requirement through the verification of the requirements that refine it, the way systems engineering verifies a higher-level requirement by analysis of its subordinate results. It holds only while every child is verified: verify the child, or verify the parent at its own level. Prefer a test at the parent's own level where one wouldn't be arbitrary.
 
 <a id="r001"></a>

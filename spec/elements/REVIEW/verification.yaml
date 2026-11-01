@@ -261,3 +261,13 @@
   tests:
     python:
     - tests/test_review_history.py::test_the_page_has_the_tab_and_nothing_recommended_says_what_happened
+- id: REVIEW-V26
+  verifies:
+  - REVIEW-2
+  method: test
+  technique: unit test
+  description: The page renders the differences from a named revision to the working tree, and states that revision.
+  tests:
+    python:
+    - tests/test_review_base.py::test_a_stacked_change_compares_against_the_base_it_names
+    - tests/test_review_base.py::test_the_page_states_its_base_at_the_top

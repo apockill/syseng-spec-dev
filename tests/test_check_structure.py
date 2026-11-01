@@ -213,15 +213,42 @@ def test_an_item_can_allow_a_wording_rule_with_a_reason(spec):                  
     assert "W011" in spec.codes() and "S007" in spec.codes()
 
 
-def test_a_roll_up_verifies_a_parent_only_while_every_child_is_verified(spec):         # CHECK-32
+def test_a_roll_up_is_an_error_until_every_child_is_verified(spec):                    # CHECK-34
     spec.files["elements/SYS/verification.yaml"] = [{
         "id": "SYS-V1", "verifies": ["SYS-1"], "method": "analysis", "technique": "roll-up", "origin": "agent",
         "description": "SYS-1 holds when every requirement refining it is verified."}]
     spec.write()
-    assert "V004" not in spec.codes(severity="todo") and "V001" not in spec.codes()
+    assert "V004" not in spec.codes() and "V001" not in spec.codes()
     spec.files["elements/CORE/verification.yaml"] = []
     spec.write()
-    assert "V004" in spec.codes(severity="todo")
+    assert "V004" in spec.codes()
+
+
+def test_a_deferred_child_does_not_count_for_a_roll_up(spec):                          # CHECK-34
+    spec.files["elements/SYS/verification.yaml"] = [{
+        "id": "SYS-V1", "verifies": ["SYS-1"], "method": "analysis", "technique": "roll-up", "origin": "agent",
+        "description": "By its children."}]
+    spec.files["elements/CORE/verification.yaml"] = []
+    for r in spec.files["elements/CORE/requirements.yaml"]:
+        r["verification_deferred"] = "needs hardware"
+    spec.write()
+    assert "V004" in spec.codes()
+
+
+def test_roll_ups_can_chain_down_to_verified_leaves(spec):                             # CHECK-34
+    rollup = {"method": "analysis", "technique": "roll-up", "origin": "agent", "description": "By its children."}
+    first = spec.files["elements/CORE/requirements.yaml"][0]
+    leaf = {**first, "id": "CORE-90", "traces_to": first["id"], "text": "The core shall stamp each widget twice."}
+    spec.files["elements/CORE/requirements.yaml"].append(leaf)
+    spec.files["elements/SYS/verification.yaml"] = [{"id": "SYS-V1", "verifies": ["SYS-1"], **rollup}]
+    leaf_check = dict(spec.files["elements/CORE/verification.yaml"][0], id="CORE-V90", verifies=["CORE-90"])
+    spec.files["elements/CORE/verification.yaml"] = [
+        {"id": "CORE-V89", "verifies": [first["id"]], **rollup}, leaf_check]
+    spec.write()
+    assert "V004" not in spec.codes()
+    spec.files["elements/CORE/verification.yaml"] = [{"id": "CORE-V89", "verifies": [first["id"]], **rollup}]
+    spec.write()
+    assert "V004" in spec.codes()
 
 
 def test_a_parent_without_verification_is_told_how_to_resolve_it(spec):                # CHECK-32
