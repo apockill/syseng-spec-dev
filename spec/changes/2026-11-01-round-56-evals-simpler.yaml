@@ -1,0 +1,8 @@
+request: The toolkit reads results and runs nothing, so drop the runner layer from this repository's evals
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-01'
+entries: []
+decisions: []
+closed: '2026-11-01'
