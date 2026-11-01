@@ -272,8 +272,8 @@ def test_the_overview_measures_the_spec_and_marks_what_got_worse(repo):
     now = health.metrics(model.load(repo))
     assert (now["requirements"], now["vis"], now["unverified"], now["tests"]) == (2, 1, 1, 1)
     assert now["coverage"] == 50.0 and sum(now["mix"].values()) == 3
-    measures = {m["key"]: m for m in health.compare(now, {**now, "unverified": 0, "coverage": 100.0, "tests": 0})}
-    assert measures["unverified"]["worse"] and measures["coverage"]["worse"] and measures["tests"]["improved"]
+    measures = {m["key"]: m for m in health.compare(now, {**now, "unverified": 0, "coverage": 100.0, "linked_tests": 0})}
+    assert measures["unverified"]["worse"] and measures["coverage"]["worse"] and measures["linked_tests"]["improved"]
     assert health.compare(now, {**now, "unverified": 0})[0]["key"] == "unverified"        # what got worse comes first
 
 

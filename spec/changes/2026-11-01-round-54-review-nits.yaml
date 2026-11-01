@@ -1,0 +1,36 @@
+request: Show linked tests against the total, and reword the measure for changed items
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-01'
+entries:
+- op: add
+  id: REVIEW-48
+  at: 2026-11-01T13:35-08:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: The review page's overview shall show the share of tests that a verification item links, with the linked count and the total.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-01 13:35
+      context: Reviewing the Linked tests tile on the review page.
+      said: The number should have a denominator or be a percentage, so they can tell out of how many in total.
+      basis: stated
+      fingerprint: 8733e4284ae4
+- op: add
+  id: REVIEW-V28
+  at: 2026-11-01T13:35-08:00
+  reason: covers the measure.
+  after:
+    verifies:
+    - REVIEW-48
+    method: test
+    technique: unit test
+    description: With one of two tests linked, the measure reads 50% with the detail 1 of 2 tests.
+    tests:
+      python:
+      - tests/test_review_base.py::test_linked_tests_are_shown_against_the_total
+decisions: []
+closed: '2026-11-01'

@@ -280,3 +280,12 @@
   tests:
     python:
     - tests/test_review_base.py::test_the_overview_shows_requirements_added_against_tests_linked
+- id: REVIEW-V28
+  verifies:
+  - REVIEW-48
+  method: test
+  technique: unit test
+  description: With one of two tests linked, the measure reads 50% with the detail 1 of 2 tests.
+  tests:
+    python:
+    - tests/test_review_base.py::test_linked_tests_are_shown_against_the_total

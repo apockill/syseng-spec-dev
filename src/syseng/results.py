@@ -13,7 +13,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import quote
 
-from syseng import levels, readers, review, vcs
+from syseng import levels, readers, review, testlinks, vcs
 from syseng.model import Spec
 
 PASSING, FAILING, NOT_RUN, NOT_IMPLEMENTED = "passing", "failing", "not yet run", "not implemented"
@@ -238,6 +238,20 @@ def unmatched(spec: Spec, implementation: str) -> list[dict]:
     index = _Index({name for r in _current(spec, implementation) for name in r["tests"]})
     return [{"id": vi.id, "link": str(link)} for vi in spec.of_kind("vi")
             for link in (vi.data.get("tests") or {}).get(implementation) or [] if not index.names(str(link))]
+
+
+def link_counts(spec: Spec) -> tuple[int, int]:
+    """How many tests a verification item links, of how many there are (REVIEW-48): from the primary implementation's
+    recorded results, which cover any language, otherwise from reading its Python tests."""
+    name = primary(spec)
+    if _current(spec, name):
+        every = {t for r in _current(spec, name) for t in r["tests"]} - {vi.id for vi in spec.of_kind("vi")}
+        return len(every) - len(unlinked(spec, name)), len(every)
+    root = next((i for i in implementations(spec) if i["name"] == name), {}).get("root") or "."
+    links = [str(x) for vi in spec.of_kind("vi") for x in ((vi.data.get("tests") or {}).get(name) or [])]
+    base = spec.repo_root() / str(root)
+    total = sum(len(names) for names in testlinks.python_tests(base).values())
+    return total - sum(len(names) for names in testlinks.unlinked(base, links).values()), total
 
 
 def report(spec: Spec, full_trace: bool = False) -> dict:
