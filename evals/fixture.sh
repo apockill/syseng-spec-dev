@@ -80,7 +80,7 @@ PY
 
 git init -q -b main
 git config user.name "Ada Tester"; git config user.email ada@example.com; git config syseng.author "Ada Tester <ada@example.com>"
-spec init --harness none --no-instructions >/dev/null
+spec init --harness claude-code >/dev/null
 git add -A; git commit -qm "Start the arm project"
 spec change start "Set up the arm spec" >/dev/null
 spec edit >/dev/null <<'YAML'

@@ -270,3 +270,14 @@
   alternatives: Keeping the numeric rules, which drove some convergence but presumed tests exist and fixed counts the engineer would rather not encode.
   consequences: Element splitting and question counts are left to agents' judgment; the next migration shows whether counts stay close without them.
   basis: derived
+- id: DR-78
+  title: The offer to report a problem belongs in the hand-over step
+  decided_by: agent
+  elements:
+  - AGENT
+  requirements: AGENT-72
+  context: The rule sat in the last section of the skill, outside the loop agents follow. An eval found agents with the skill offered a report only about half the time.
+  decision: Step 8 of the loop says to mention anything in the toolkit that got in the way and offer to report it. The last section points to it.
+  alternatives: Leaving it where it was. A reminder printed when a change closes, which isn't tried yet.
+  consequences: In 120 side-by-side runs, when the skill loaded the offer rose from 23 of 30 to 33 of 34. With the instructions a real repository gets in its fixture, the skill loaded 26 of 30 times, against 3 of 30 without. With a real toolkit limit in the case, agents offered a report 13 of 15 times with the skill and 1 of 15 without.
+  basis: derived

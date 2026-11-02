@@ -172,3 +172,8 @@ def test_linking_tests_is_guided_link_first_add_last():
     text = (init.SKILL / "references" / "writing-requirements.md").read_text()
     assert "Link first, add last" in text and "Never add a requirement just to give a test a home" in text
     assert "link every test you add" in (init.SKILL / "SKILL.md").read_text()
+
+
+def test_the_hand_over_step_says_to_offer_a_problem_report():
+    step = next(l for l in (init.SKILL / "SKILL.md").read_text().splitlines() if l.startswith("8. **Hand over**"))
+    assert "offer to report it" in step and "references/reporting-problems.md" in step

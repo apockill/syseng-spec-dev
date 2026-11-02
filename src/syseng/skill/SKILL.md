@@ -49,7 +49,7 @@ An item changed since its lock or intent record, and not kept, counts one level 
 5. **Keep the spec in step, in the same change:** update the requirements and verification items the change affects, link every test you add to a verification item, record a requirement (with `basis: added`) for each feature a user would notice that you add unasked, and a decision record for each design decision.
 6. **Check:** the project's tests, then `spec check`. Fix every error. Where the project records test results, `spec results status` lists what's failing, what you changed included (references/test-results.md).
 7. **Audit:** fresh-context auditors review your spec updates (references/auditing.md). During onboarding, offer them with their cost instead (references/onboarding.md).
-8. **Hand over** the review page and report in a few lines (references/review-and-locks.md).
+8. **Hand over** the review page and report in a few lines (references/review-and-locks.md). If the toolkit got in your way during this change, whether it refused something you couldn't understand, made you work around it, or lacked something you needed, say so and offer to report it (references/reporting-problems.md). Its maintainers can only fix what reaches them.
 
 When the engineer asks for something quickly, say so as soon as it's usable, then finish the tests and spec. Where and how you sequence the work is up to you.
 
@@ -116,4 +116,4 @@ YAML
 
 ## Improving this skill
 
-If something makes you jump through hoops, or the toolkit lacks something you needed, offer to report it, even if you worked around it (references/reporting-problems.md). Nothing here is fixed, except that people control what gets locked.
+What gets in your way goes in your report at hand-over (step 8, references/reporting-problems.md). Nothing here is fixed, except that people control what gets locked.

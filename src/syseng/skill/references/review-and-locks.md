@@ -54,7 +54,7 @@ Beside the page, report in a few lines:
 - each conflict, with its options, the recommended one first;
 - each alteration to an item a person locked, stated or guided, which they keep on the page (or with `lock <ID>`) or ask you to roll back;
 - the items you propose for locking;
-- any friction you hit.
+- anything in the toolkit that got in your way, with an offer to report it (references/reporting-problems.md).
 
 ## Feedback from the review page
 
