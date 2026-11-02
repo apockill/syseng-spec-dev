@@ -1,0 +1,36 @@
+request: Move the rule on reporting problems into the hand-over step, and measure it
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-01'
+entries:
+- op: modify
+  id: AGENT-V18
+  at: 2026-11-01T16:11-08:00
+  reason: the rule now sits in the hand-over step.
+  before:
+    tests:
+      python:
+      - tests/test_skill.py::test_problem_reports_need_consent_general_terms_and_no_solution
+  after:
+    tests:
+      python:
+      - tests/test_skill.py::test_problem_reports_need_consent_general_terms_and_no_solution
+      - tests/test_skill.py::test_the_hand_over_step_says_to_offer_a_problem_report
+- op: add
+  id: DR-78
+  at: 2026-11-01T16:11-08:00
+  reason: records why the rule moved, with the measurement.
+  after:
+    title: The offer to report a problem belongs in the hand-over step
+    decided_by: agent
+    elements:
+    - AGENT
+    requirements: AGENT-72
+    context: The rule sat in the last section of the skill, outside the loop agents follow. An eval found agents with the skill offered a report only about half the time.
+    decision: Step 8 of the loop says to mention anything in the toolkit that got in the way and offer to report it. The last section points to it.
+    alternatives: Leaving it where it was. A reminder printed when a change closes, which isn't tried yet.
+    consequences: In 120 side-by-side runs, when the skill loaded the offer rose from 23 of 30 to 33 of 34. The skill still loaded only about half the time on this case, so the overall rise wasn't conclusive.
+    basis: derived
+decisions: []
+closed: '2026-11-01'
