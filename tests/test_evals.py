@@ -94,6 +94,15 @@ def test_a_case_passes_on_its_with_skill_pass_rate(tmp_path):
     assert readers.read("promptfoo", path, tmp_path) == {"a": "pass", "b": "fail"}
 
 
+def test_runs_that_errored_dont_count(tmp_path):
+    rows = _rows(("a", "with-skill", True), ("a", "with-skill", False), ("b", "with-skill", False))
+    rows["results"]["results"][1]["failureReason"] = 2
+    rows["results"]["results"][2]["failureReason"] = 2
+    path = tmp_path / "r.json"
+    path.write_text(json.dumps(rows))
+    assert readers.read("promptfoo", path, tmp_path) == {"a": "pass", "b": "skip"}
+
+
 def test_a_file_that_isnt_a_promptfoo_run_is_named(tmp_path):
     path = tmp_path / "r.json"
     path.write_text("[]")

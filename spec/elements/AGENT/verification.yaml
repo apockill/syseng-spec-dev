@@ -219,7 +219,7 @@
   - AGENT-74
   method: demonstration
   technique: integration test
-  description: Told of a problem it worked around, an agent with the skill offers a report, leaves project names out of it, proposes no solution and leaves sending to the engineer.
+  description: Asked to do something the toolkit can't, an agent with the skill says so, offers a report, proposes no fix and leaves sending to the engineer.
   tests:
     python:
     - problem-report
