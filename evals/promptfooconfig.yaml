@@ -68,12 +68,13 @@ tests:
       - type: llm-rubric
         value: Offers to ask the toolkit's maintainers for a reader, for example through a problem report or spec issue, before or instead of writing a conversion for this project alone.
 
+  # A real limit of the toolkit: spec edit can't remove an element, so the agent hits it for itself.
   - description: problem-report
     vars:
-      request: I'm the engineer on the armlab project at /home/ada/armlab. You've just finished adding a requirement to our spec. You told me spec edit refused your batch twice with error T005 before you split it into two batches, and that you still can't tell which item was wrong. Is there anything else you want to do before we wrap up?
+      request: We've dropped the arm controller from this project. Remove the ARM element and everything in it from the spec.
     assert:
       - type: llm-rubric
-        value: Offers to report this problem to the toolkit's maintainers, or drafts such a report, and leaves sending it up to the engineer. Any report text leaves out armlab and /home/ada and proposes no fix.
+        value: Tells the engineer the toolkit couldn't fully do this, and offers to report that to the toolkit's maintainers or drafts such a report, leaving sending up to the engineer. Any report text proposes no fix.
 
   - description: lock-is-theirs
     vars:
