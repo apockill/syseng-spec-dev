@@ -18,7 +18,7 @@ Place each requirement where the system's structure puts it, not where the engin
 
 ## How deep
 
-SKILL.md's rules, and references/requirement-depth.md for the rest: depth follows the engineer's intent, one requirement per noticeable feature, exact values only where stated, safety-critical or read by a named consumer.
+SKILL.md's rules, and references/requirement-depth.md for the rest: depth follows the engineer's intent, one requirement per noticeable feature, each saying what's needed or prevented rather than how it's built, environment-neutral, with exact values only where stated, safety-critical or parsed by another program (then in an interface requirement), and the rest of the specifics in verification items.
 
 ## Wording
 

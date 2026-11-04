@@ -1,0 +1,192 @@
+request: Show every waiting agent recommendation on the review page, make proposing part of every hand-over, keep requirements free of implementation and environment specifics, and investigate a lock refused by a fingerprint mismatch
+mode: code-first
+target: python
+status: open
+opened: '2026-11-04'
+started_from: ba5615eea2ac5a04a267c16b9c997726c3ed7958
+entries:
+- op: modify
+  id: REVIEW-37
+  at: 2026-11-04T08:14-08:00
+  reason: every waiting proposal now shows, newest round first, each naming its round; the engineer found none shown in a review that had many waiting.
+  before:
+    text: The review page shall present as the agent's current recommendations only those made in the newest change, listing older ones as earlier recommendations.
+    why: a change with decisions but no proposals showed proposals from months-old changes as the agent's current advice, above the decisions it was handing over.
+  after:
+    text: The review page shall list as the agent's recommendations each agent proposal that is neither withdrawn nor locked, the newest change's first, each naming the change that made it.
+    why: REVIEW-37 first showed only the newest change's proposals, so a newer change with decisions but no proposals wouldn't present months-old advice as current; but a round that proposes nothing, such as one applying review feedback, then showed nothing recommended with ten proposals waiting, folded away. Naming each proposal's change keeps old advice from reading as current without hiding it.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-04 08:14
+      context: Reviewing a large migration spec on the review page, which showed nothing under the agent's recommendations although earlier rounds had proposed items.
+      said: Asked why nothing was marked as recommended by the agent in so large a review they had barely begun, noting that an earlier review had recommended many items and that knowing what to focus on makes their work much easier.
+      basis: guided
+      source: human_conversation
+      fingerprint: 9c3810dc456b
+- op: modify
+  id: REVIEW-V17
+  at: 2026-11-04T08:14-08:00
+  reason: verifies REVIEW-37 as reworded.
+  before:
+    description: With an older change holding a proposal and a newer change holding none, the page marks the newer change as current, so the older proposal is listed as earlier.
+    tests:
+      python:
+      - tests/test_review_page.py::test_only_the_newest_changes_proposals_are_current
+  after:
+    description: With a proposal in each of two older changes and none in the newest change, the page lists both as the agent's recommendations, the newer change's first, each naming the change that made it, and the items it counts mechanically apart from them.
+    tests:
+      python:
+      - tests/test_review_page.py::test_every_waiting_proposal_is_recommended_newest_round_first_naming_its_round
+- op: add
+  id: AGENT-81
+  at: 2026-11-04T08:14-08:00
+  reason: the engineer asked for agents to be reminded to recommend items at every round, not only at onboarding.
+  requested: true
+  after:
+    text: Before handing over each change that adds or alters needs or requirements, the agent shall propose for locking up to eight of the items it judges most worth the engineer's attention, contentious ones first, with one reason for each group of items.
+    traces_to: SYS-38
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-04 08:14
+      context: Reviewing a large migration spec whose review page showed nothing recommended by the agent.
+      said: Noticed the agent had not recommended items in about the past twenty reviews, and suggested, perhaps as a to-do, improving the skill and its evals so the agent is reminded to surface useful, possibly contentious items in the requirement graph for them to review and possibly lock.
+      basis: stated
+      source: human_conversation
+      fingerprint: 946d17ca0c62
+- op: add
+  id: CLI-38
+  at: 2026-11-04T08:14-08:00
+  reason: the toolkit's half of the reminder the engineer asked for.
+  after:
+    text: When the open change has added or altered needs or requirements and proposes no item for locking, the CLI shall say so when it writes the review page, naming the command that proposes items.
+    traces_to: SYS-38
+    basis: derived
+    why: the engineer asked that agents be reminded to recommend items; writing the review page is the moment an agent hands over, so one line there reminds it without adding to the check's to-dos.
+- op: add
+  id: AGENT-82
+  at: 2026-11-04T08:14-08:00
+  reason: the engineer's rule from the migration review, which the depth rules contradicted by pushing flag and file names into requirements.
+  requested: true
+  after:
+    text: The skill shall direct agents to write each need and requirement as the capability needed or the risk prevented, naming no host, domain, operating system or deployment, and naming an exact value only where the engineer stated it, it is a safety limit, or another program parses it, leaving every other specific to verification items.
+    traces_to: SYS-20
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 18:00
+      context: Reviewing a spec migrated from a repository of web apps, whose requirements named the host's operating system, command flags and file names.
+      said: Wants nothing in the spec to mention that it runs on a machine running NixOS; thinks verification items may be very prescriptive since they test the implementation, while constraints should talk more about the risks involved and what is to be prevented; asked whether a command-line requirement should instead say the command can accept standard input, with the verification checking it does so through the flag; and suggested a manifest requirement might say each app shall have a file that is enforced to follow one schema, with a verification item or child requirements saying how.
+      basis: stated
+      source: human_conversation
+      fingerprint: 6dba055f0efa
+- op: add
+  id: AGENT-83
+  at: 2026-11-04T08:14-08:00
+  reason: the exception that keeps the engineer's rule from losing real interface contracts.
+  after:
+    text: Where another program parses an exact value, the skill shall direct agents to state the value in an interface requirement on the element that defines the interface, naming the program that reads it.
+    traces_to: SYS-20
+    basis: derived
+    why: the textbook exception to keeping specifics out of requirements is a contract another program depends on; placing it on the defining element keeps it out of the consumer's requirements.
+- op: add
+  id: REVIEW-54
+  at: 2026-11-04T08:14-08:00
+  reason: answers kept in the browser across page versions were sent against text the person never answered.
+  after:
+    text: When the review page holds an answer a person gave on an earlier version of the page to an item that has changed since, the review page shall set the answer aside and name the item, instead of sending the answer with the feedback.
+    traces_to: SYS-46
+    basis: derived
+    why: in a sites review the page sent a lock on BOX-13 with the fingerprint of its wording before a wording pass; the answer had been kept from an earlier version of the page, the page showed it as given to the new text, and the agent refused it only after the engineer had sent the review.
+- op: add
+  id: AGENT-V30
+  at: 2026-11-04T08:14-08:00
+  reason: verifies AGENT-81 in the skill's text.
+  after:
+    verifies:
+    - AGENT-81
+    method: inspection
+    technique: unit test
+    description: The skill's hand-over step says to propose the items most worth the engineer's look, contentious ones first, and its proposing section says to do so in every change that alters the spec, lists inferred items, items stating an exact name or value, items others build on and items the engineer's words were reworded into, and asks for typically three to eight items grouped by an honest reason.
+    tests:
+      python:
+      - tests/test_skill.py::test_every_change_that_alters_the_spec_ends_with_proposals
+- op: add
+  id: AGENT-V31
+  at: 2026-11-04T08:14-08:00
+  reason: verifies AGENT-81 on a real agent.
+  after:
+    verifies:
+    - AGENT-81
+    method: demonstration
+    technique: integration test
+    description: Asked to add two requirements and rework a third, then hand over, an agent with the skill runs spec propose with a reason.
+    tests:
+      python:
+      - propose-at-hand-over
+- op: add
+  id: CLI-V25
+  at: 2026-11-04T08:14-08:00
+  reason: verifies CLI-38.
+  after:
+    verifies:
+    - CLI-38
+    method: test
+    technique: unit test
+    description: Writing the review page prints no reminder while the open change has altered nothing, prints that it added or altered 1 needs or requirements and proposes none once it modifies a requirement, and prints none again after spec propose.
+    tests:
+      python:
+      - tests/test_review_page.py::test_the_review_command_reminds_a_change_that_altered_requirements_to_propose
+- op: add
+  id: AGENT-V32
+  at: 2026-11-04T08:14-08:00
+  reason: verifies AGENT-82 and AGENT-83.
+  after:
+    verifies:
+    - AGENT-82
+    - AGENT-83
+    method: inspection
+    technique: unit test
+    description: SKILL.md says a requirement states what's needed or the risk it prevents, is environment-neutral, names an exact value another program parses only in an interface requirement on the defining element saying which program reads it, and leaves the rest to verification items as prescriptive as their tests; the depth reference's value rule 3 no longer lists command and flag names, says to state the capability, and its worked examples keep the operating system, proxy and domain out of requirements; neither says named consumer.
+    tests:
+      python:
+      - tests/test_skill.py::test_requirements_say_what_is_needed_environment_neutral_and_leave_specifics_to_verification
+- op: add
+  id: REVIEW-V31
+  at: 2026-11-04T08:14-08:00
+  reason: verifies REVIEW-54.
+  after:
+    verifies:
+    - REVIEW-54
+    method: test
+    technique: unit test
+    description: On load, the page takes the lock, alteration and intent answers off each stored item whose fingerprint differs from the item's on the page, keeps its comment and wording with the new fingerprint, does so before any feedback block is built, and the For you tab names each such item with what was set aside.
+    tests:
+      python:
+      - tests/test_review_page.py::test_an_answer_given_on_an_earlier_version_of_an_item_that_changed_is_set_aside
+- op: modify
+  id: AGENT-V17
+  at: 2026-11-04T08:14-08:00
+  reason: the value rule now names values another program parses, not a named consumer (AGENT-83).
+  before:
+    description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or named-consumer cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
+  after:
+    description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or parsed-by-another-program cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
+decisions: []
+proposals:
+- ids:
+  - AGENT-82
+  - AGENT-83
+  why: |-
+    I turned your 2026-11-03 remarks on the migrated spec into the skill's rule: needs and requirements say what's needed or prevented, name no host, OS or deployment, and name an exact value only in an interface requirement when another program parses it. Every future spec is written by this rule.
+  proposed: 2026-11-04T08:15-08:00
+- ids:
+  - AGENT-81
+  - CLI-38
+  why: |-
+    Your ask to remind agents to recommend items: AGENT-81 sets the cap at eight per round (my number), and CLI-38 is my choice of where the toolkit reminds, one line from spec review rather than a to-do in spec check.
+  proposed: 2026-11-04T08:15-08:00
+- ids:
+  - REVIEW-37
+  - REVIEW-54
+  why: |-
+    Two changes to what the review page shows you: every waiting recommendation, newest round first and named by round, instead of only this round's; and answers kept from an earlier page version on items changed since are set aside and named, not sent.
+  proposed: 2026-11-04T08:16-08:00

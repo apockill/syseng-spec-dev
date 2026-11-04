@@ -689,3 +689,30 @@
   traces_to: SYS-62
   basis: derived
   why: agents working on apps outside the spec would otherwise follow the spec loop for them.
+- id: AGENT-81
+  text: Before handing over each change that adds or alters needs or requirements, the agent shall propose for locking up to eight of the items it judges most worth the engineer's attention, contentious ones first, with one reason for each group of items.
+  traces_to: SYS-38
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-04 08:14
+    context: Reviewing a large migration spec whose review page showed nothing recommended by the agent.
+    said: Noticed the agent had not recommended items in about the past twenty reviews, and suggested, perhaps as a to-do, improving the skill and its evals so the agent is reminded to surface useful, possibly contentious items in the requirement graph for them to review and possibly lock.
+    basis: stated
+    source: human_conversation
+    fingerprint: 946d17ca0c62
+- id: AGENT-82
+  text: The skill shall direct agents to write each need and requirement as the capability needed or the risk prevented, naming no host, domain, operating system or deployment, and naming an exact value only where the engineer stated it, it is a safety limit, or another program parses it, leaving every other specific to verification items.
+  traces_to: SYS-20
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 18:00
+    context: Reviewing a spec migrated from a repository of web apps, whose requirements named the host's operating system, command flags and file names.
+    said: Wants nothing in the spec to mention that it runs on a machine running NixOS; thinks verification items may be very prescriptive since they test the implementation, while constraints should talk more about the risks involved and what is to be prevented; asked whether a command-line requirement should instead say the command can accept standard input, with the verification checking it does so through the flag; and suggested a manifest requirement might say each app shall have a file that is enforced to follow one schema, with a verification item or child requirements saying how.
+    basis: stated
+    source: human_conversation
+    fingerprint: 6dba055f0efa
+- id: AGENT-83
+  text: Where another program parses an exact value, the skill shall direct agents to state the value in an interface requirement on the element that defines the interface, naming the program that reads it.
+  traces_to: SYS-20
+  basis: derived
+  why: the textbook exception to keeping specifics out of requirements is a contract another program depends on; placing it on the defining element keeps it out of the consumer's requirements.

@@ -269,3 +269,8 @@
   traces_to: SYS-25
   basis: derived
   why: In the onboarding of a web-apps folder on 2026-11-03, two of five agents met an unquoted colon inside a value as a bare YAML parse error giving only a line and column, and had to work out what was wrong.
+- id: CLI-38
+  text: When the open change has added or altered needs or requirements and proposes no item for locking, the CLI shall say so when it writes the review page, naming the command that proposes items.
+  traces_to: SYS-38
+  basis: derived
+  why: the engineer asked that agents be reminded to recommend items; writing the review page is the moment an agent hands over, so one line there reminds it without adding to the check's to-dos.

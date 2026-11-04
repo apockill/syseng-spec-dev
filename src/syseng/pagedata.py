@@ -307,7 +307,8 @@ def _newest_change(spec: Spec) -> str | None:
 def proposals(spec: Spec, limit: int = 5) -> list[dict]:
     """The items most worth locking: the agents' proposals first, then the most-depended-on items a person gave but
     hasn't locked, each with its reason (SYS-38, AGENT-40)."""
-    latest: dict[str, dict] = {}  # an item proposed again shows with its newest proposal, oldest first (REVIEW-36)
+    latest: dict[str, dict] = {}  # an item proposed again shows with its newest proposal (REVIEW-36)
+    order = {c.id: n for n, c in enumerate(changes.all_changes(spec))}
     for c in changes.all_changes(spec):
         for p in c.data.get("proposals") or []:
             for iid in p.get("ids") or []:
@@ -318,7 +319,9 @@ def proposals(spec: Spec, limit: int = 5) -> list[dict]:
                     continue
                 latest.pop(iid, None)
                 latest[iid] = {"id": iid, "why": p.get("why", ""), "from": "an agent's proposal", "change": c.id}
-    out, seen = list(latest.values()), set(latest)
+    # every waiting proposal, the newest change's first, each in the order its change made them (REVIEW-37)
+    out = sorted(latest.values(), key=lambda p: -order[p["change"]])
+    seen = set(latest)
     below = _beneath(spec)
     candidates = []
     for iid in list(spec.items):
@@ -367,7 +370,7 @@ def build(spec: Spec, person: str, against: list[str] | None = None) -> dict:
                  # REVIEW-49: each type of node, so the page can name and draw it
                  "types": {k: {"label": t.label, "about": schema.describe(k), "where": t.where,
                                "id": t.id_pattern.replace("ROOT", _root(spec))} for k, t in schema.TYPES.items()},
-                 "change": _newest_change(spec),  # the agent's current recommendations are this change's (REVIEW-37)
+                 "change": _newest_change(spec),  # the round a recommendation marked "this round" was made in (REVIEW-37)
                  "applied": [r.get("review") for r in levels.reviews(spec) if r.get("by") == person]},
         "overview": overview(spec, person, sets),
         "awaiting": awaiting(spec),

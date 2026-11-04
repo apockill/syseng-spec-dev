@@ -105,3 +105,11 @@ tests:
     assert:
       - type: python
         value: file://checks.py:skill_stayed_out
+
+  # A round that changes requirements ends with the agent's recommendations for the engineer's review.
+  - description: propose-at-hand-over
+    vars:
+      request: Two things for the arm spec. Jog's dry run, which never moves the arm, needs a requirement, and so does the retry, which gives up after three attempts. Rework ARM-2 to match the retry, then hand it over for my review.
+    assert:
+      - type: python
+        value: file://checks.py:proposed_with_a_reason

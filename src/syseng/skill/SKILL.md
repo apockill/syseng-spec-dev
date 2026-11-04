@@ -18,7 +18,7 @@ Run the toolkit as `spec` from the repository root. `spec <command> --help` expl
 | Writing or editing needs, requirements, verification items | [references/writing-requirements.md](references/writing-requirements.md) | 80 lines |
 | How deep to write a requirement: features, values, inferred requirements, documents, gaps (beyond the rules below) | [references/requirement-depth.md](references/requirement-depth.md) | 90 lines |
 | The types of node and the fields of each, with examples | [references/schema.md](references/schema.md) | 280 lines |
-| Handing over a review page, applying feedback, recording locks, raising conflicts, correcting earlier rounds' decisions and proposals | [references/review-and-locks.md](references/review-and-locks.md) | 90 lines |
+| Handing over a review page, applying feedback, recording locks, raising conflicts, correcting earlier rounds' decisions and proposals, what to propose | [references/review-and-locks.md](references/review-and-locks.md) | 100 lines |
 | Running the auditors and reasoning checks | [references/auditing.md](references/auditing.md) | 40 lines |
 | Taking in test results, reading verification status, adding a result format | [references/test-results.md](references/test-results.md) | 45 lines |
 | Reporting a problem with the toolkit | [references/reporting-problems.md](references/reporting-problems.md) | 30 lines |
@@ -49,7 +49,7 @@ An item changed since its lock or intent record, and not kept, counts one level 
 5. **Keep the spec in step, in the same change:** update the requirements and verification items the change affects, link every test you add to a verification item, record a requirement (with `basis: added`) for each feature a user would notice that you add unasked, and a decision record for each design decision.
 6. **Check:** the project's tests, then `spec check`. Fix every error. Where the project records test results, `spec results status` lists what's failing, what you changed included (references/test-results.md).
 7. **Audit:** fresh-context auditors review your spec updates (references/auditing.md). During onboarding, offer them with their cost instead (references/onboarding.md).
-8. **Hand over** the review page and report in a few lines (references/review-and-locks.md). If the toolkit got in your way during this change, whether it refused something you couldn't understand, made you work around it, or lacked something you needed, say so and offer to report it (references/reporting-problems.md). Its maintainers can only fix what reaches them.
+8. **Hand over** the review page and report in a few lines (references/review-and-locks.md). When the change altered the spec, first propose the few items most worth the engineer's look, contentious ones first (references/review-and-locks.md, Proposing items to lock). If the toolkit got in your way during this change, whether it refused something you couldn't understand, made you work around it, or lacked something you needed, say so and offer to report it (references/reporting-problems.md). Its maintainers can only fix what reaches them.
 
 When the engineer asks for something quickly, say so as soon as it's usable, then finish the tests and spec. Where and how you sequence the work is up to you.
 
@@ -68,12 +68,13 @@ What the engineer says becomes intent on the spec without an approval step; they
 
 1. **Depth follows intent.** Write what the engineer specified as deep as they went, in their terms, and never weaken it to match the code: a mismatch is an open decision. Write everything else at the level of behaviour someone relies on.
 2. **One requirement per feature** a user or another program would notice, even unasked (`basis: added`, or `derived` when a stated need implies it). Count features, not effects: polish serving a requirement you already have needs none of its own.
-3. **Exact values in a requirement** only if the engineer stated it, it's a safety limit, or a named consumer outside the element reads it.
-4. **Other values stay in the code.** A verification item names a value only when a test that exists, or that you're adding, checks it. Values you find in existing code get at most one decision record per design topic, and only when someone would ask why; decisions you make while building each get their own.
-5. **Subjective qualities** ("beautiful") are needs the engineer verifies by review, not requirements.
-6. **A requirement you infer is derived:** cite the statement and propose it. When two designs would both satisfy the statement, ask instead of picking.
-7. **A requirement belongs to the element whose code does it;** a system constraint is never restated in an element.
-8. For anything these don't settle, read references/requirement-depth.md.
+3. **What's needed, not how it's built.** A requirement states the capability, or the risk it prevents. It names an exact value only if the engineer stated it, it's a safety limit, or another program parses that exact value; then it's an interface requirement on the element that defines the interface, saying which program reads it. Commands, flags, file names and formats otherwise go in the verification item, which may be as prescriptive as its test.
+4. **Environment-neutral.** Needs and requirements name no host, domain, operating system or deployment; a need's context may give example deployments.
+5. **Other values stay in the code.** A verification item names a value only when a test that exists, or that you're adding, checks it. Values you find in existing code get at most one decision record per design topic, and only when someone would ask why; decisions you make while building each get their own.
+6. **Subjective qualities** ("beautiful") are needs the engineer verifies by review, not requirements.
+7. **A requirement you infer is derived:** cite the statement and propose it. When two designs would both satisfy the statement, ask instead of picking.
+8. **A requirement belongs to the element whose code does it;** a system constraint is never restated in an element.
+9. For anything these don't settle, read references/requirement-depth.md.
 
 ## Editing the spec
 

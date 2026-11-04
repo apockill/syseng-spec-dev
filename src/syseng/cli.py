@@ -642,7 +642,21 @@ def cmd_review(args) -> int:
         print("  compared against nothing: no base was found. Name one with --against")
     print(f"  {awaiting} awaiting a decision, {len(data['changes'][0]['items']) if data['changes'] else 0} items changed, "
           f"{len(data['captured'])} intent records captured, {len(data['proposals'])} proposed for locking")
+    unproposed = _altered_without_proposals(spec)
+    if unproposed:  # the hand-over reminder (CLI-38): one line, and only when it applies
+        print(f"  this change added or altered {unproposed} needs or requirements and proposes none for locking: propose the "
+              "few most worth the engineer's look with `spec propose <IDs> --why \"…\"`, or say in your report why none")
     return 0
+
+
+def _altered_without_proposals(spec) -> int:
+    """How many needs and requirements the open change added or modified, when it proposes nothing to lock."""
+    c = changes.current(spec)
+    if c is None or c.data.get("proposals"):
+        return 0
+    kinds = ("need", "system", "constraint", "requirement")
+    return len({e["id"] for e in c.data.get("entries") or [] if e.get("op") in ("add", "modify")
+                and e.get("id") in spec.items and spec.items[e["id"]].kind in kinds})
 
 
 def cmd_feedback(args) -> int:
