@@ -3044,3 +3044,14 @@
     - REVIEW-41
     decided:
     - D1 → Keep the narrowed REVIEW-41
+- review: f61700c8ef
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-03T20:58-08:00
+  generated: 2026-11-03T20:23-08:00
+  revision: d376e460e13a05346b5f5092662372c807d8ec00
+  dirty: false
+  did:
+    locked:
+    - CHANGE-30
+    - CHANGE-31
+    - REVIEW-41
