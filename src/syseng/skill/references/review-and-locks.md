@@ -1,7 +1,7 @@
 # Conflicts, review pages, feedback and locks
 
 ## Contents
-- Conflicts
+- Conflicts (and open decisions after the round that filed them)
 - Handing over the review page
 - Reporting
 - Feedback from the review page
@@ -36,11 +36,21 @@ YAML
 
 An ordinary open decision is the same without `kind`, `keeps` and `rolls_back`. Every decision needs a question, an importance, at least two options and exactly one recommended.
 
+### Open decisions after the round that filed them
+
+Each change numbers its decisions from D1, so name one of another change as `<change>/D<n>`, with the change record's ID or a part naming only it (`round-63/D1`). A bare `D<n>` means the open change's, and is refused when another change has an open decision of that number. `spec status` lists the open decisions of earlier changes by those names.
+
+When one goes stale after its change closed (the facts settled it, a later round asks it again, or it names items since removed), correct it from the open change, which logs what you did:
+- `spec decide --withdraw <change>/D<n> --reason "…"` withdraws it;
+- `spec decide --replace <change>/D<n>` (the new decision on standard input) files the new one in the open change and withdraws the old one, naming its replacement.
+
+The earlier record keeps what it asked; it only gains the withdrawal and why. Withdrawing is yours and answers nothing: only the engineer resolves a decision (`spec resolve`, or a choice on the page), and a withdrawn one takes no choice.
+
 ## Handing over the review page
 
 Where the project's tests can run, record their results first (references/test-results.md), or the page has no health to show.
 
-Run `spec review`. It compares against the trunk unless you name a base, and states its base at the top of the page. For a pull request, name the pull request's own base, so a stacked pull request compares against the one beneath it: `spec review --against <its base branch>`.
+Run `spec review`. It compares against the trunk unless you name a base, and states its base at the top of the page. In a repository that commits straight to the trunk, comparing with the trunk would show nothing, so there it compares against the person's last review, or, before their first, the commit before the newest change started, and says which and why; `--against` still names any other base. For a pull request, name the pull request's own base, so a stacked pull request compares against the one beneath it: `spec review --against <its base branch>`.
 
 Where your harness can publish a private web page, as Claude's artifacts do, publish it there and give the person the link. Otherwise give the file's location. **Every pull request that changes the spec gets its own page, linked at the top of its description:** the person reviews it there, so a pull request without one can't be reviewed. Publish a new page when the branch changes, and say what it compares against beside the link. Don't publish when your instructions confine you to the machine or a sandbox.
 
@@ -74,4 +84,4 @@ A lock is a person's own act, naming the items: a lock line in chat (`lock CHECK
 
 ## Proposing items to lock
 
-Propose the items whose consequences reach the engineer (what they see, lock or do), judged from what you know they care about: `spec propose <IDs> --why "…"`, most consequential first. One reason per group of items; don't repeat it for each. Your decision records about mechanics stay yours to revise. The review page also lists the items the most of the tree hangs from, but that list is mechanical and no substitute for your judgment.
+Propose the items whose consequences reach the engineer (what they see, lock or do), judged from what you know they care about: `spec propose <IDs> --why "…"`, most consequential first. To take a proposal back, because its reason was wrong or you proposed too much, `spec propose <IDs> --withdraw --reason "…"` withdraws it from whichever change made it; propose again with the right reason if the items still deserve it. One reason per group of items; don't repeat it for each. Your decision records about mechanics stay yours to revise. The review page also lists the items the most of the tree hangs from, but that list is mechanical and no substitute for your judgment.

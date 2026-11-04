@@ -18,7 +18,7 @@ Run the toolkit as `spec` from the repository root. `spec <command> --help` expl
 | Writing or editing needs, requirements, verification items | [references/writing-requirements.md](references/writing-requirements.md) | 80 lines |
 | How deep to write a requirement: features, values, inferred requirements, documents, gaps (beyond the rules below) | [references/requirement-depth.md](references/requirement-depth.md) | 90 lines |
 | The types of node and the fields of each, with examples | [references/schema.md](references/schema.md) | 280 lines |
-| Handing over a review page, applying feedback, recording locks, raising conflicts | [references/review-and-locks.md](references/review-and-locks.md) | 75 lines |
+| Handing over a review page, applying feedback, recording locks, raising conflicts, correcting earlier rounds' decisions and proposals | [references/review-and-locks.md](references/review-and-locks.md) | 90 lines |
 | Running the auditors and reasoning checks | [references/auditing.md](references/auditing.md) | 40 lines |
 | Taking in test results, reading verification status, adding a result format | [references/test-results.md](references/test-results.md) | 45 lines |
 | Reporting a problem with the toolkit | [references/reporting-problems.md](references/reporting-problems.md) | 30 lines |
@@ -110,7 +110,7 @@ YAML
 
 - Give every ID a short title: "SYS-7 (done gate)".
 - Order questions by how much each answer would change, each with options and one recommended, plus a one-line way to accept everything. Use your harness's question menu if it has one. Record open decisions with `spec decide`, so they survive the conversation.
-- **Anything you want the engineer to answer goes on a rendered page,** not in chat: record it with `spec decide`, hand over the review page, and give the link. Write each decision for a reader with none of your context: what is being decided, why it matters now, what each option does and what follows from it, with examples. If you'd only be informing them, a chat line is enough. Until they answer, `spec decide --replace D<n>` rewrites an open decision, and `spec decide --withdraw D<n> --reason "…"` withdraws one the conversation has overtaken.
+- **Anything you want the engineer to answer goes on a rendered page,** not in chat: record it with `spec decide`, hand over the review page, and give the link. Write each decision for a reader with none of your context: what is being decided, why it matters now, what each option does and what follows from it, with examples. If you'd only be informing them, a chat line is enough. Until they answer, `spec decide --replace D<n>` rewrites an open decision, and `spec decide --withdraw D<n> --reason "…"` withdraws one the conversation has overtaken; name one of an earlier change as `<change>/D<n>`.
 - **Locks belong to the engineer.** Record one only when they named the items; never lock your own work. Details in references/review-and-locks.md.
 - When asked "why is X like this?", answer from `spec show X`.
 

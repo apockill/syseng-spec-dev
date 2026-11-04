@@ -109,3 +109,110 @@ def test_a_decision_can_be_checked_without_recording_it(spec, capsys):
     assert cli.main(["--spec", str(spec.root), "decide", "--dry-run", "--file", str(path)]) == 0
     assert "nothing was written" in capsys.readouterr().out
     assert not changes.current(spec.load()).data.get("decisions")
+
+
+# ---------------------------------------------------------------- earlier rounds (CHANGE-24 to CHANGE-29)
+# In the onboarding of a web-apps folder on 2026-11-03, a round's 7 open decisions went stale once the agent had
+# closed it to start the next, and none could be withdrawn; round 2 had its own D1; 2 of 6 agents wanted to take
+# back a lock proposal.
+def _two_rounds(spec):
+    spec.write()
+    first = changes.start(spec.load(), "Round one", None, None, "one")
+    changes.add_decision(first, _decision())
+    changes.add_decision(first, _decision(question="Paint or not?"))
+    changes.add_proposal(first, ["CORE-1"], "it is what the engineer sees")
+    changes.close(first)
+    second = changes.start(spec.load(), "Round two", None, None, "two")
+    changes.add_decision(second, _decision(question="Ship it?"))
+    return first, second
+
+
+def _run(spec, *argv):
+    from syseng import cli
+    return cli.main(["--spec", str(spec.root), *argv])
+
+
+def test_a_decision_is_named_across_rounds_by_its_change(spec, capsys):           # CHANGE-26
+    first, second = _two_rounds(spec)
+    loaded = spec.load()
+    assert changes.find_decision(loaded, f"{first.id}/D2", second)[1]["question"] == "Paint or not?"
+    assert changes.find_decision(loaded, "round-1-one/D1", second)[1]["question"] == "Stamp twice or once?"
+    assert changes.find_decision(loaded, f"{first.id} D1", second)[0].id == first.id
+    with pytest.raises(changes.ChangeError, match="could mean"):  # D1 is open in both rounds
+        changes.find_decision(loaded, "D1", second)
+    with pytest.raises(changes.ChangeError, match="could mean"):
+        changes.find_decision(loaded, "D2", second)  # round two has no D2, round one's is open
+    assert _run(spec, "status") == 0
+    out = capsys.readouterr().out
+    assert f"{first.id}/D1: Stamp twice or once?" in out and f"{first.id}/D2" in out
+
+
+def test_an_earlier_rounds_decision_is_withdrawn_from_the_open_change(spec, capsys):  # CHANGE-24
+    first, second = _two_rounds(spec)
+    assert _run(spec, "decide", "--withdraw", f"{first.id}/D1", "--reason", "settled by the facts") == 0
+    assert f"withdrew open decision {first.id}/D1; logged in {second.id}" in capsys.readouterr().out
+    loaded = spec.load()
+    old = next(c for c in changes.all_changes(loaded) if c.id == first.id)
+    d = old.data["decisions"][0]
+    # what was asked stays as it was; the record gains only the status, why and where
+    assert d["question"] == "Stamp twice or once?" and len(d["options"]) == 2
+    assert d["status"] == "withdrawn" and d["withdrawn_because"] == "settled by the facts"
+    assert d["withdrawn_in"] == second.id and "chosen" not in d and "words" not in d
+    log = changes.current(loaded).data["withdrawals"]
+    assert log[0]["decision"] == f"{first.id}/D1" and log[0]["because"] == "settled by the facts"
+    from syseng import pagedata
+    awaiting = [(x["change"], x["id"]) for x in pagedata.awaiting(loaded)["decisions"]]
+    assert (first.id, "D1") not in awaiting and (first.id, "D2") in awaiting
+    assert "Withdrawn here" in changes.view(loaded, changes.current(loaded))
+    _run(spec, "status")
+    assert f"{first.id}/D1" not in capsys.readouterr().out
+
+
+def test_an_earlier_rounds_decision_is_replaced_by_one_in_the_open_change(spec, capsys, tmp_path):  # CHANGE-25
+    first, second = _two_rounds(spec)
+    path = tmp_path / "d.yaml"
+    import yaml
+    path.write_text(yaml.safe_dump(_decision(question="Paint it blue or not?")))
+    assert _run(spec, "decide", "--replace", f"{first.id}/D2", "--file", str(path)) == 0
+    assert f"added open decision D2 to {second.id}, replacing {first.id}/D2" in capsys.readouterr().out
+    loaded = spec.load()
+    new = changes.current(loaded).data["decisions"][1]
+    assert new["question"] == "Paint it blue or not?" and new["replaces"] == f"{first.id}/D2"
+    old = next(c for c in changes.all_changes(loaded) if c.id == first.id).data["decisions"][1]
+    assert old["question"] == "Paint or not?" and old["status"] == "withdrawn"
+    assert old["withdrawn_because"] == f"replaced by {second.id}/D2"
+    assert _run(spec, "decide", "--replace", f"{first.id}/D2", "--file", str(path)) == 1
+    assert "already withdrawn" in capsys.readouterr().out
+
+
+def test_withdrawing_never_resolves_and_a_withdrawn_decision_takes_no_choice(spec, capsys):
+    first, second = _two_rounds(spec)
+    _run(spec, "decide", "--withdraw", f"{first.id}/D1", "--reason", "duplicated in round two")
+    capsys.readouterr()
+    assert _run(spec, "resolve", f"{first.id}/D1", "--words", "fine") == 1
+    assert "withdrawn, so there's nothing to choose" in capsys.readouterr().out
+    assert _run(spec, "resolve", f"{first.id}/D2", "--words", "paint it") == 0
+    d = next(c for c in changes.all_changes(spec.load()) if c.id == first.id).data["decisions"][1]
+    assert d["status"] == "resolved" and d["words"] == "paint it"
+
+
+def test_a_lock_proposal_is_withdrawn_with_a_reason(spec, capsys):                # CHANGE-28
+    first, second = _two_rounds(spec)
+    from syseng import pagedata
+    assert [p["id"] for p in pagedata.proposals(spec.load()) if p["from"] != "computed"] == ["CORE-1"]
+    assert _run(spec, "propose", "CORE-1", "--withdraw") == 1
+    assert "say why" in capsys.readouterr().out
+    assert _run(spec, "propose", "CORE-1", "--withdraw", "--reason", "the reason was wrong") == 0
+    loaded = spec.load()
+    p = next(c for c in changes.all_changes(loaded) if c.id == first.id).data["proposals"][0]
+    assert p["ids"] == ["CORE-1"] and p["why"] == "it is what the engineer sees"
+    assert p["withdrawn"][0]["because"] == "the reason was wrong"
+    assert changes.current(loaded).data["withdrawals"][0]["proposal"] == ["CORE-1"]
+    assert not [x for x in pagedata.proposals(loaded) if x["from"] != "computed"]
+    assert "Proposed for you to lock" not in changes.view(loaded, next(c for c in changes.all_changes(loaded) if c.id == first.id))
+    _run(spec, "status")
+    assert "Proposed for locking" not in capsys.readouterr().out
+    assert _run(spec, "propose", "CORE-1", "--withdraw", "--reason", "again") == 1
+    assert "no proposal to lock CORE-1 is waiting" in capsys.readouterr().out
+    assert _run(spec, "propose", "CORE-1", "--why", "the right reason this time") == 0  # proposed afresh
+    assert [x["why"] for x in pagedata.proposals(spec.load()) if x["from"] != "computed"] == ["the right reason this time"]

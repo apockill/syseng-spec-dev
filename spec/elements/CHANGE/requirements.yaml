@@ -166,3 +166,53 @@
   traces_to: SYS-16
   basis: added
   why: agents in the trial validated decisions by hand before filing them, since a filed decision is permanent until answered.
+- id: CHANGE-23
+  text: Each change record shall record the revision the change started from.
+  traces_to: SYS-48
+  basis: derived
+  why: the review page on the trunk compares against where the newest change started (REVIEW-52), which version control alone can't say once the change is committed.
+- id: CHANGE-24
+  text: When an agent withdraws or replaces an open decision of an earlier change, the toolkit shall log the act in the open change and leave unchanged what the earlier change asked.
+  traces_to: SYS-16
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 20:04
+    context: Hearing what five agents met while onboarding the same web-apps folder in parallel on 2026-11-03. Once an agent closed a round to start the next, 7 of that round's open decisions went stale (one settled by facts, two asked again in round 2, others naming removed items or contradicting the spec) and none could be withdrawn or replaced.
+    said: |-
+      Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+    basis: guided
+    source: human_conversation
+    fingerprint: 82baf12a425f
+- id: CHANGE-25
+  text: Until the engineer answers an open decision of an earlier change, the toolkit shall let an agent replace it with a new decision in the open change.
+  traces_to: SYS-16
+  basis: derived
+  why: two of a closed round's stale decisions in the onboarding of 2026-11-03 needed asking differently, not dropping, and the round that filed them was closed.
+- id: CHANGE-26
+  text: The toolkit shall name each open decision unambiguously across changes, and refuse a reference that could name open decisions in more than one change.
+  traces_to: SYS-16
+  basis: derived
+  why: decision numbers restart in each change; in the onboarding of 2026-11-03 round 2 had its own D1 while round 1's was still open, so resolving D1 could mean either.
+- id: CHANGE-27
+  text: The toolkit shall record no choice for a decision an agent withdraws, and refuse a later choice on it.
+  traces_to: SYS-16
+  basis: derived
+  why: resolving a decision is the engineer's act; an agent withdrawing one must never answer it on the engineer's behalf.
+- id: CHANGE-28
+  text: The toolkit shall let an agent withdraw its proposal that the engineer lock items, with a reason, whichever change holds the proposal.
+  traces_to: SYS-38
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 20:04
+    context: |-
+      Hearing what six agents met while onboarding the same web-apps folder on 2026-11-03: two wanted to take back a lock proposal, one for a wrong reason and one for proposing too much, and couldn't.
+    said: |-
+      Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+    basis: guided
+    source: human_conversation
+    fingerprint: c23a22e34dc7
+- id: CHANGE-29
+  text: The toolkit shall show no withdrawn decision or withdrawn proposal as awaiting the engineer.
+  traces_to: SYS-16
+  basis: derived
+  why: the point of withdrawing is that the engineer no longer spends attention on it, on the review page or in the status summary.

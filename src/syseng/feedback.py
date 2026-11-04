@@ -45,7 +45,9 @@ def parse(text: str) -> records.FeedbackBlock:
     m = FENCE.search(text)
     body = m.group(1) if m else text
     try:
-        data = yamlio.loads(body)
+        data = yamlio.loads_batch(body)
+    except yamlio.BatchError as e:
+        raise FeedbackError(str(e).replace("the YAML you sent", "the feedback block")) from e
     except Exception as e:  # noqa: BLE001 - any YAML problem is reported the same way
         raise FeedbackError(f"can't read the feedback block: {e}") from e
     wrong = records.problems(records.FeedbackBlock, data)
@@ -123,7 +125,9 @@ def apply(spec: Spec, block: records.FeedbackBlock) -> Report:
             report.refused.append(f"{d.change} {d.id}: no such decision")
             continue
         if d.choose:
-            if found.get("status") != "open":
+            if found.get("status") == "withdrawn":
+                report.refused.append(f"{d.id}: withdrawn since the page showed it ({found.get('withdrawn_because')})")
+            elif found.get("status") != "open":
                 report.refused.append(f"{d.id}: already resolved ({found.get('chosen')})")
             elif pagedata.decision_fingerprint(found) != d.fingerprint:
                 report.refused.append(f"{d.id}: its options changed since the page showed them")

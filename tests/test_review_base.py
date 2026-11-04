@@ -1,11 +1,11 @@
-"""What a review page compares against, and that it says so (REVIEW-40 to REVIEW-43)."""
+"""What a review page compares against, and that it says so (REVIEW-40 to REVIEW-43, REVIEW-52, REVIEW-53)."""
 
 import subprocess
 
 import pytest
 import yaml
 
-from syseng import model, page, pagedata
+from syseng import changes, cli, model, page, pagedata
 
 ADA = "Ada <ada@example.com>"
 
@@ -59,7 +59,13 @@ def test_a_stacked_change_compares_against_the_base_it_names(repo):
     assert "two" in data["changes"][0]["items"][0]["after"]["text"]
 
 
+def _head(repo):
+    return subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True).stdout.strip()
+
+
 def test_the_persons_last_review_stays_a_choice(repo):
+    _git(repo, "switch", "-qc", "work")
+    _edit(repo, "The engineer needs one.")
     (repo / "spec" / "reviews.yaml").write_text(yaml.safe_dump([
         {"by": ADA, "at": "2026-01-01T00:00", "review": "r1", "dirty": False, "revision":
          subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True).stdout.strip()}]))
@@ -80,7 +86,62 @@ def test_the_page_states_its_base_at_the_top(repo):
     assert 'id="compared"' in html.split("</header>")[0]
     assert '"compared":{"label":"main"' in html
     script = (page.WEB / "review.js").read_text()
-    assert "Comparing ${cmp.newer} against ${cmp.label} at ${cmp.short}" in script
+    assert "against ${cmp.text}" in script and "cmp.why" in script
+
+
+def test_a_base_named_by_its_commit_reads_as_that_commit(repo, capsys, monkeypatch):
+    base = _head(repo)
+    _edit(repo, "The engineer needs one.")
+    compared = _build(repo, [base[:7]])["meta"]["compared"]
+    assert compared["text"] == f"commit {compared['short']}" and not compared["why"]
+    monkeypatch.chdir(repo)
+    assert cli.main(["review", "--against", base[:7], "--out", str(repo / "page.html")]) == 0
+    out = capsys.readouterr().out
+    # the newer side names the commit it stands on, so the base can't be mistaken for it
+    assert f"compared working tree (HEAD {_head(repo)[:7]}) against commit {base[:7]}" in out
+
+
+def test_on_the_trunk_the_page_compares_against_the_last_review(repo):
+    """A repository that commits straight to its trunk: comparing with the trunk would show nothing."""
+    (repo / "spec" / "reviews.yaml").write_text(yaml.safe_dump([
+        {"by": ADA, "at": "2026-01-01T00:00", "review": "r1", "dirty": False, "revision": _head(repo)}]))
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-qm", "review")
+    _edit(repo, "The engineer needs one.")
+    data = _build(repo)
+    compared = data["meta"]["compared"]
+    assert compared["label"] == "your last review" and compared["text"].startswith("your last review at ")
+    assert "main, the trunk" in compared["why"] and "last review" in compared["why"]
+    assert [i["id"] for i in data["changes"][0]["items"]] == ["NEED-1"]
+    assert "last review" in pagedata.section_text(data, "changes")
+
+
+def test_on_the_trunk_without_a_review_it_compares_against_where_the_change_started(repo):
+    before = _head(repo)
+    spec = model.load(repo / "spec")
+    c = changes.start(spec, "Add a need", None, None, "need")
+    assert c.data["started_from"] == before
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-qm", "open the change")
+    _edit(repo, "The engineer needs one.")
+    data = _build(repo)
+    compared = data["meta"]["compared"]
+    assert compared["label"] == f"the commit before {c.id} started" and compared["revision"] == before
+    assert compared["text"].endswith(compared["short"]) and "haven't sent a review" in compared["why"]
+    assert [i["id"] for i in data["changes"][0]["items"]] == ["NEED-1"]
+
+
+def test_on_the_trunk_with_nothing_to_go_on_the_page_keeps_the_trunk(repo):
+    _edit(repo, "The engineer needs one.")
+    compared = _build(repo)["meta"]["compared"]
+    assert compared["label"] == "main" and not compared["why"]
+
+
+def test_a_named_base_on_the_trunk_is_kept(repo):
+    (repo / "spec" / "reviews.yaml").write_text(yaml.safe_dump([
+        {"by": ADA, "at": "2026-01-01T00:00", "review": "r1", "dirty": False, "revision": _head(repo)}]))
+    data = _build(repo, ["main"])
+    assert [c["older"]["label"] for c in data["changes"]] == ["main", "your last review"]
 
 
 def test_the_overview_shows_requirements_added_against_tests_linked(repo):

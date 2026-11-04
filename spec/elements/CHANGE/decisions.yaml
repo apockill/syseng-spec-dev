@@ -130,3 +130,20 @@
     said: Parallel-change support may be wanted in future but is too much overhead for now; for now the answer is to be clever about orchestrating changes, with orchestrators changing specs and implementers working under them on code, and the engineer will learn the most effective ways by developing the sites repository and pass that knowledge back.
     basis: stated
     fingerprint: 50eab42f80f5
+- id: DR-82
+  title: How agents correct open decisions and lock proposals of closed rounds
+  decided_by: agent
+  elements:
+  - CHANGE
+  requirements:
+  - CHANGE-24
+  - CHANGE-25
+  - CHANGE-26
+  - CHANGE-27
+  - CHANGE-28
+  - CHANGE-29
+  context: Only one change is open at a time, so agents close a round to start the next, and every correcting command reached only the open change. Decision numbers restart in each change, and change records already in repositories use those numbers.
+  decision: A decision is named across changes as change/D-number, the change given by its record's ID or a part of it naming only that record, such as round-63/D1. A bare D-number still means the open change's (the newest change's when none is open), and is refused, listing the candidates, when another change has an open decision of that number. Withdrawing one of an earlier change marks it withdrawn in its own record, with why and the change that withdrew it, and appends the act to the open change's withdrawals; its question and options are never rewritten. Replacing one of an earlier change files the new decision in the open change with replaces, and withdraws the old one naming its replacement. A lock proposal is withdrawn per item with spec propose --withdraw, which marks the item withdrawn in every waiting proposal of it and logs the act; proposing it again starts afresh.
+  alternatives: Numbering decisions uniquely across changes from now on, which leaves the numbers already filed ambiguous and makes new numbers long; keeping withdrawals only in the open change and computing each decision's status from them, which every reader of a decision's status would have to learn.
+  consequences: Existing change records load unchanged. A bare D1 that used to resolve silently against the newest change is now refused when another change also has an open D1, so the engineer or agent names the one they mean.
+  basis: derived

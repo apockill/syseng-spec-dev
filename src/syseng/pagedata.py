@@ -138,12 +138,43 @@ def _since_review(spec: Spec, person: str) -> dict | None:
 
 def change_sets(spec: Spec, person: str, against: list[str]) -> list[dict]:
     """The comparisons the page offers. The first is the page's base, the one everything on it is measured against:
-    the base the person named, otherwise the trunk (REVIEW-41, REVIEW-42); then the person's last review."""
+    the base the person named (REVIEW-42), otherwise the trunk (REVIEW-41); then the person's last review. Where the
+    trunk's base is the current revision, as in a repository that commits straight to the trunk, comparing with it
+    would show nothing, so the base is the person's last review, else the revision the newest change started from
+    (REVIEW-52), with why it was chosen (REVIEW-53)."""
     repo = spec.repo_root()
-    named = against or [t for t in [vcs.backend(repo).trunk(repo)] if t]
-    out = [{**d.to_data(), "measured": d.inspected} for d in (_safe_between(spec, a) for a in named) if d is not None]
     review = _since_review(spec, person)
+    if against:
+        out = [{**d.to_data(), "measured": d.inspected} for d in (_safe_between(spec, a) for a in against)
+               if d is not None]
+        return out + [review] if review else out
+    version_control = vcs.backend(repo)
+    trunk = version_control.trunk(repo)
+    first = _safe_between(spec, trunk) if trunk else None
+    if first is not None and first.older.revision == version_control.revision(repo):
+        why = f"The current revision is on {trunk}, the trunk, so comparing with the trunk would show nothing; "
+        if review:
+            return [{**review, "why": why + "this compares against your last review instead."}]
+        started = _since_change_started(spec)
+        if started:
+            return [{**started, "why": why + "you haven't sent a review back yet, so this compares against the "
+                                             "commit before the newest change started."}]
+    out = [{**first.to_data(), "measured": first.inspected}] if first is not None else []
     return out + [review] if review else out
+
+
+def _since_change_started(spec: Spec) -> dict | None:
+    """From the revision the open change, or else the newest, started from (CHANGE-23) to the working tree."""
+    c = changes.current(spec) or (changes.all_changes(spec) or [None])[-1]
+    revision = str(c.data.get("started_from") or "") if c else ""
+    if not revision:
+        return None
+    try:
+        d = diff.between(spec, revision, inspect=health.metrics)
+    except diff.DiffError:
+        return None
+    d.older = diff.Version(f"the commit before {c.id} started", d.older.revision, "")
+    return {**d.to_data(), "measured": d.inspected}
 
 
 def _root(spec: Spec) -> str:
@@ -151,12 +182,23 @@ def _root(spec: Spec) -> str:
 
 
 def _compared(repo, sets: list[dict]) -> dict | None:
-    """What the page says at its top it compares against (REVIEW-40), or None when it found nothing (REVIEW-43)."""
+    """What the page says at its top it compares against, in plain words (REVIEW-40), and why when the page chose it
+    itself (REVIEW-53); None when it found nothing (REVIEW-43)."""
     if not sets:
         return None
     older, newer = sets[0]["older"], sets[0]["newer"]
-    return {"label": older["label"], "revision": older["revision"], "note": older["note"], "newer": newer["label"],
-            "short": vcs.backend(repo).short(repo, older["revision"])}
+    short = vcs.backend(repo).short(repo, older["revision"])
+    label = older["label"]
+    if label == "your last review":
+        text = f"your last review at {short}"
+    elif label.startswith("the commit before "):
+        text = f"{label}, {short}"
+    elif older["note"] == short or str(older["revision"] or "").startswith(label):  # named by its commit
+        text = f"commit {short}"
+    else:
+        text = f"{label} at {short}"
+    return {"label": label, "revision": older["revision"], "note": older["note"], "newer": newer["label"],
+            "short": short, "text": text, "why": sets[0].get("why", "")}
 
 
 def overview(spec: Spec, person: str, sets: list[dict]) -> dict:
@@ -269,6 +311,9 @@ def proposals(spec: Spec, limit: int = 5) -> list[dict]:
     for c in changes.all_changes(spec):
         for p in c.data.get("proposals") or []:
             for iid in p.get("ids") or []:
+                if iid in changes.withdrawn_from(p):  # taken back by an agent (CHANGE-28)
+                    latest.pop(iid, None)
+                    continue
                 if review.kind_and_data(spec, iid) is None or levels.level_of(spec, iid).level == levels.EXPLICIT:
                     continue
                 latest.pop(iid, None)
@@ -373,7 +418,7 @@ def section_text(data: dict, name: str) -> str:
         lines.append("  intent mix: " + ", ".join(f"{n} {k}" for k, n in o["now"]["mix"].items()))
     elif name == "awaiting":
         for d in data["awaiting"]["decisions"]:
-            lines.append(f"{'CONFLICT ' if d.get('kind') == 'conflict' else ''}{d['change']} {d['id']}: {d['question']}")
+            lines.append(f"{'CONFLICT ' if d.get('kind') == 'conflict' else ''}{d['change']}/{d['id']}: {d['question']}")
             if d.get("involves"):
                 lines.append("  involves: " + "; ".join(_label(data, i) for i in d["involves"]))
             for n, o in enumerate(d.get("options") or [], 1):
@@ -391,6 +436,8 @@ def section_text(data: dict, name: str) -> str:
             lines.append(f"{d['older']['label']} → {d['newer']['label']}: "
                          + (", ".join(f"{n} {diff.CLASS_WORDS.get(c, c)}" for c, n in d["counts"].items())
                             or "no differences"))
+            if d.get("why"):
+                lines.append(f"  ({d['why']})")
             for it in d["items"][:200]:
                 lines.append(f"  {it['id']} [{', '.join(it['classes'])}] {it.get('title', '')[:120]}")
     elif name == "captured":

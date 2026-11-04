@@ -205,11 +205,12 @@
   - REVIEW-43
   method: test
   technique: unit test
-  description: The generated page has the comparison in its header and carries the version, revision and how it was resolved; with nothing to compare against, the data says so and the page's script has the message.
+  description: The generated page has the comparison in its header and carries the version, revision, how it was resolved and, where the page chose it, why; a base named by its commit reads as that commit, and the command names the commit the working tree stands on beside it. With nothing to compare against, the data says so and the page's script has the message.
   tests:
     python:
     - tests/test_review_base.py::test_the_page_states_its_base_at_the_top
     - tests/test_review_base.py::test_the_page_says_when_it_found_nothing_to_compare_against
+    - tests/test_review_base.py::test_a_base_named_by_its_commit_reads_as_that_commit
 - id: REVIEW-V21
   verifies:
   - REVIEW-41
@@ -300,3 +301,18 @@
   tests:
     python:
     - tests/test_schema.py::test_the_review_page_carries_each_type_and_draws_it
+- id: REVIEW-V30
+  verifies:
+  - REVIEW-41
+  - REVIEW-52
+  - REVIEW-53
+  method: test
+  technique: unit test
+  description: On the trunk, the page compares against the person's last review, or without one against the commit before the change started, showing what changed since, and says why; with neither it keeps the trunk; a base named on the trunk is kept; on a branch with commits of its own the trunk's merge base stays first.
+  tests:
+    python:
+    - tests/test_review_base.py::test_on_the_trunk_the_page_compares_against_the_last_review
+    - tests/test_review_base.py::test_on_the_trunk_without_a_review_it_compares_against_where_the_change_started
+    - tests/test_review_base.py::test_on_the_trunk_with_nothing_to_go_on_the_page_keeps_the_trunk
+    - tests/test_review_base.py::test_a_named_base_on_the_trunk_is_kept
+    - tests/test_review_base.py::test_the_persons_last_review_stays_a_choice

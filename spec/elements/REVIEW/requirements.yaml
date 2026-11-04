@@ -377,7 +377,7 @@
     basis: stated
     fingerprint: d45886b2be03
 - id: REVIEW-41
-  text: When a person names no base, the review page shall compare against the repository's trunk.
+  text: When a person names no base and the trunk's base is not the current revision, the review page shall compare against the repository's trunk.
   traces_to: SYS-48
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -471,3 +471,20 @@
   traces_to: SYS-30
   basis: added
   why: once types are visible, filtering by them is the natural next question.
+- id: REVIEW-52
+  text: When a person names no base and the trunk's base is the current revision, the review page shall compare against the person's last review, or, without one, against the revision the open or newest change started from.
+  traces_to: SYS-48
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 20:04
+    context: Hearing what five agents met while onboarding the same web-apps folder, which commits straight to main and has no branches, in parallel on 2026-11-03. All five got a review page showing 0 items changed, because it compared main with itself, and each had to find the option naming the setup commit as the base.
+    said: |-
+      Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+    basis: guided
+    source: human_conversation
+    fingerprint: cd1cab72eb85
+- id: REVIEW-53
+  text: When the review page chooses its base in place of the trunk, it shall say at its top what it compares against and why.
+  traces_to: SYS-48
+  basis: derived
+  why: a base the page chose itself would otherwise look like a mistake; one onboarding agent's page said it compared against a commit at that same commit, which read as wrong while the current commit was another.
