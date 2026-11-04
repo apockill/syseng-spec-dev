@@ -89,3 +89,16 @@
     said: Asked for the overview to be clean, without too much noise.
     basis: guided
     fingerprint: d0e6ae33bf34
+- id: DR-79
+  title: On the review page, colour shows the level of intent and shape shows the type of node
+  decided_by: agent
+  elements:
+  - REVIEW
+  requirements:
+  - REVIEW-49
+  - REVIEW-50
+  context: The engineer asked for design language that tells node types apart, suggesting colours or border shapes. The page already used colour for the level of intent.
+  decision: Each type has a shape, used for its dots in the graph and as a glyph beside its name on every badge. Cards repeat it with a differently styled left edge. Colour keeps meaning the level of intent, so the two never compete, and the name is always written out, so nothing relies on shape alone.
+  alternatives: A colour per type, which would clash with the level colours and fail for people who can't tell colours apart.
+  consequences: Readers learn one rule, shape for type and colour for level. The graph's legend says both.
+  basis: derived

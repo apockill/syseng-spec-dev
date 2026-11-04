@@ -208,3 +208,25 @@
     python:
     - tests/test_results.py::test_status_counts_each_implementation_separately
     - tests/test_testlinks.py::test_the_checker_reports_broken_links_and_unknown_implementations
+- id: MODEL-V21
+  verifies:
+  - MODEL-44
+  method: test
+  technique: unit test
+  description: Every type has a name, a description and fields; the edit command's fields are the schema's; problems name the field and what is wrong; the checker reports them with the node's type; and the reference in the skill matches what the schema generates.
+  tests:
+    python:
+    - tests/test_schema.py::test_every_type_has_a_label_a_description_and_fields
+    - tests/test_schema.py::test_the_edit_command_takes_its_fields_from_the_schema
+    - tests/test_schema.py::test_problems_name_the_field_and_what_is_wrong
+    - tests/test_schema.py::test_the_checker_reports_problems_with_the_type
+    - tests/test_skill.py::test_the_schema_reference_is_generated_from_the_schema
+- id: MODEL-V22
+  verifies:
+  - MODEL-45
+  method: test
+  technique: unit test
+  description: Adding an element named DR is refused with the reason, and an existing one is reported.
+  tests:
+    python:
+    - tests/test_schema.py::test_reserved_names_cannot_name_an_element

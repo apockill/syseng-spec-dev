@@ -368,3 +368,18 @@
   traces_to: SYS-60
   basis: derived
   why: the page can't show afterwards what no record kept.
+- id: MODEL-44
+  text: Each type of node shall have one definition of its fields, from which the edit command, the checker and the reference are derived.
+  traces_to: SYS-6
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 17:42
+    context: Reviewing the item types and their fields, assembled from several places in the code.
+    said: Sees needs, decision records, elements and system requirements as different node types with different schemas, and wants that clearer wherever possible; asked for the cleanup, including a single typed definition.
+    basis: stated
+    fingerprint: b84d0a079059
+- id: MODEL-45
+  text: No element shall take a name that another type of node uses as its prefix.
+  traces_to: SYS-6
+  basis: derived
+  why: an element named DR or NEED would number its requirements like decision records or needs.

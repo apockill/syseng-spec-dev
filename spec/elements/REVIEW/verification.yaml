@@ -289,3 +289,14 @@
   tests:
     python:
     - tests/test_review_base.py::test_linked_tests_are_shown_against_the_total
+- id: REVIEW-V29
+  verifies:
+  - REVIEW-49
+  - REVIEW-50
+  - REVIEW-51
+  method: test
+  technique: unit test
+  description: The page carries each type's name, description and ID pattern; its styles have a shape for every type; and its script draws the badge on cards, the type line in the pane, the graph legend and the type filter.
+  tests:
+    python:
+    - tests/test_schema.py::test_the_review_page_carries_each_type_and_draws_it

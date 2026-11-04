@@ -1,0 +1,172 @@
+request: |-
+  Make the types of node clear: one schema per type, reserved names, and the type shown wherever a node appears
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-03'
+entries:
+- op: add
+  id: MODEL-44
+  at: 2026-11-03T17:42-08:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: Each type of node shall have one definition of its fields, from which the edit command, the checker and the reference are derived.
+    traces_to: SYS-6
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 17:42
+      context: Reviewing the item types and their fields, assembled from several places in the code.
+      said: Sees needs, decision records, elements and system requirements as different node types with different schemas, and wants that clearer wherever possible; asked for the cleanup, including a single typed definition.
+      basis: stated
+      fingerprint: b84d0a079059
+- op: add
+  id: MODEL-45
+  at: 2026-11-03T17:42-08:00
+  reason: a collision found while explaining the types.
+  after:
+    text: No element shall take a name that another type of node uses as its prefix.
+    traces_to: SYS-6
+    basis: derived
+    why: an element named DR or NEED would number its requirements like decision records or needs.
+- op: add
+  id: CLI-34
+  at: 2026-11-03T17:42-08:00
+  reason: part of making the types clear.
+  after:
+    text: The CLI shall print each type of node with its fields, as text or as JSON Schema.
+    traces_to: SYS-30
+    basis: derived
+    why: the one definition has to be readable by people and editors.
+- op: add
+  id: CLI-35
+  at: 2026-11-03T17:42-08:00
+  reason: an ID alone doesn't say what a node is.
+  after:
+    text: Wherever the CLI lists or shows a node, it shall name the node's type.
+    traces_to: SYS-30
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 17:42
+      context: Reviewing the item types and their fields.
+      said: Wants the node types and their schemas clearer wherever possible.
+      basis: guided
+      fingerprint: d99d4e8ca7ab
+- op: add
+  id: REVIEW-49
+  at: 2026-11-03T17:42-08:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: The review page shall draw each type of node with its own shape and name, the same in the graph, on cards and in the item pane.
+    traces_to: SYS-30
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 17:42
+      context: Asking for the dashboard to make node types visible.
+      said: A user should know what type a node is when they look at the dashboard, from the graph view to widgets and items, through design language such as colours, border shapes or other things that make the different node types and schemas clear.
+      basis: stated
+      fingerprint: 854c9256e13f
+- op: add
+  id: REVIEW-50
+  at: 2026-11-03T17:42-08:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    text: When a node is open in the item pane, the review page shall state the node's type and what that type is.
+    traces_to: SYS-30
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 17:42
+      context: Asking for the dashboard to make node types visible.
+      said: When they click into a node there should be text showing its type.
+      basis: stated
+      fingerprint: 99cb1ec4f1da
+- op: add
+  id: REVIEW-51
+  at: 2026-11-03T17:42-08:00
+  reason: added with the type badges.
+  after:
+    text: The full spec on the review page shall let the person show or hide each type of node.
+    traces_to: SYS-30
+    basis: added
+    why: once types are visible, filtering by them is the natural next question.
+- op: add
+  id: DR-79
+  at: 2026-11-03T17:42-08:00
+  reason: records the design choice.
+  after:
+    title: On the review page, colour shows the level of intent and shape shows the type of node
+    decided_by: agent
+    elements:
+    - REVIEW
+    requirements:
+    - REVIEW-49
+    - REVIEW-50
+    context: The engineer asked for design language that tells node types apart, suggesting colours or border shapes. The page already used colour for the level of intent.
+    decision: Each type has a shape, used for its dots in the graph and as a glyph beside its name on every badge. Cards repeat it with a differently styled left edge. Colour keeps meaning the level of intent, so the two never compete, and the name is always written out, so nothing relies on shape alone.
+    alternatives: A colour per type, which would clash with the level colours and fail for people who can't tell colours apart.
+    consequences: Readers learn one rule, shape for type and colour for level. The graph's legend says both.
+    basis: derived
+- op: add
+  id: MODEL-V21
+  at: 2026-11-03T17:42-08:00
+  reason: covers the one definition.
+  after:
+    verifies:
+    - MODEL-44
+    method: test
+    technique: unit test
+    description: Every type has a name, a description and fields; the edit command's fields are the schema's; problems name the field and what is wrong; the checker reports them with the node's type; and the reference in the skill matches what the schema generates.
+    tests:
+      python:
+      - tests/test_schema.py::test_every_type_has_a_label_a_description_and_fields
+      - tests/test_schema.py::test_the_edit_command_takes_its_fields_from_the_schema
+      - tests/test_schema.py::test_problems_name_the_field_and_what_is_wrong
+      - tests/test_schema.py::test_the_checker_reports_problems_with_the_type
+      - tests/test_skill.py::test_the_schema_reference_is_generated_from_the_schema
+- op: add
+  id: MODEL-V22
+  at: 2026-11-03T17:42-08:00
+  reason: covers reserved names.
+  after:
+    verifies:
+    - MODEL-45
+    method: test
+    technique: unit test
+    description: Adding an element named DR is refused with the reason, and an existing one is reported.
+    tests:
+      python:
+      - tests/test_schema.py::test_reserved_names_cannot_name_an_element
+- op: add
+  id: CLI-V23
+  at: 2026-11-03T17:42-08:00
+  reason: covers the CLI.
+  after:
+    verifies:
+    - CLI-34
+    - CLI-35
+    method: test
+    technique: unit test
+    description: The schema command prints the reference and the JSON Schema of every type, and the show command names each node's type.
+    tests:
+      python:
+      - tests/test_schema.py::test_spec_schema_prints_the_reference_and_json_schema
+      - tests/test_schema.py::test_show_names_the_type
+- op: add
+  id: REVIEW-V29
+  at: 2026-11-03T17:42-08:00
+  reason: covers the page's data and code; the screenshots were checked by eye.
+  after:
+    verifies:
+    - REVIEW-49
+    - REVIEW-50
+    - REVIEW-51
+    method: test
+    technique: unit test
+    description: The page carries each type's name, description and ID pattern; its styles have a shape for every type; and its script draws the badge on cards, the type line in the pane, the graph legend and the type filter.
+    tests:
+      python:
+      - tests/test_schema.py::test_the_review_page_carries_each_type_and_draws_it
+decisions: []
+closed: '2026-11-03'

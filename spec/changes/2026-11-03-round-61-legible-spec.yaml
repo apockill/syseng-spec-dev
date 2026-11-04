@@ -1,7 +1,7 @@
 request: Make the spec's text legible on its own, to a reader with no context
 mode: spec-first
 target: python
-status: open
+status: closed
 opened: '2026-11-03'
 entries:
 - op: add
@@ -20,3 +20,4 @@ entries:
       basis: stated
       fingerprint: c2be1e77f7df
 decisions: []
+closed: '2026-11-03'

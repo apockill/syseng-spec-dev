@@ -269,9 +269,32 @@ textarea.wording { font-family: var(--sans); border-color: color-mix(in srgb, va
 .tree-guide { position: absolute; left: 0; top: 0; bottom: 0; border-left: 1px solid var(--border); }
 .dots { display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start; }
 .dot { width: 14px; height: 14px; border-radius: 4px; cursor: pointer; border: 0; padding: 0; position: relative; }
-.dot.kind-need, .dot.kind-system, .dot.kind-constraint { width: 18px; height: 18px; border-radius: 5px; }
-.dot.kind-decision { border-radius: 50%; }
-.dot.kind-vi { width: 9px; height: 9px; border-radius: 2px; opacity: 0.8; }
+/* REVIEW-49: shape is a node's type, everywhere it's drawn; colour stays its level of intent */
+.glyph { display: inline-block; flex: none; width: 10px; height: 10px; background: var(--text-secondary); vertical-align: -1px; }
+.shape-need { border-radius: 50%; }
+.shape-system { border-radius: 2px; box-shadow: inset 0 0 0 2px var(--text-primary); }
+.shape-constraint { border-radius: 2px; background-image: repeating-linear-gradient(45deg, transparent 0 2px, color-mix(in srgb, var(--surface-1) 75%, transparent) 2px 4px); }
+.shape-requirement { border-radius: 3px; }
+.shape-vi { transform: rotate(45deg) scale(0.8); border-radius: 1px; }
+.shape-decision { width: 14px; height: 8px; border-radius: 4px; vertical-align: 0; }
+.shape-element { width: 12px; height: 9px; border-radius: 1px 4px 1px 1px; background: transparent; box-shadow: inset 0 0 0 1.5px var(--text-secondary); }
+.dot.shape-need, .dot.shape-system, .dot.shape-constraint { width: 18px; height: 18px; }
+.dot.shape-need { border-radius: 50%; }
+.dot.shape-vi { width: 11px; height: 11px; opacity: 0.85; margin: 2px; }
+.dot.shape-decision { width: 20px; height: 11px; border-radius: 6px; }
+.type { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text-secondary); padding: 1px 7px 1px 5px;
+  border: 1px solid var(--border); border-radius: 999px; white-space: nowrap; }
+.typeline { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; margin: 0 0 8px; padding: 8px 10px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+.typeline .type { font-size: 12.5px; font-weight: 600; color: var(--text-primary); }
+/* the card's left edge repeats the type: a different line for each */
+.card.type-need { border-left: 4px solid var(--border-strong); }
+.card.type-system { border-left: 4px double var(--border-strong); }
+.card.type-constraint { border-left: 4px dashed var(--border-strong); }
+.card.type-requirement { border-left: 2px solid var(--border-strong); }
+.card.type-vi { border-left: 3px dotted var(--border-strong); }
+.card.type-decision { border-left: 4px solid var(--border-strong); border-left-style: ridge; }
+.card.type-element { border-left: 4px solid var(--text-muted); }
 .dot.changed::after { content: ""; position: absolute; inset: -3px; border: 2px solid var(--st-warning); border-radius: 6px; }
 .dot:hover, .dot.sel { box-shadow: 0 0 0 2px var(--surface-1), 0 0 0 4px var(--accent), 0 0 14px color-mix(in srgb, var(--accent) 70%, transparent); }
 .dot.lit { box-shadow: 0 0 0 2px var(--surface-1), 0 0 0 3px var(--text-secondary); }
