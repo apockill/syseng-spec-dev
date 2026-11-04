@@ -4,7 +4,7 @@ The rules in SKILL.md settle most cases. This file covers the rest, with the tes
 
 ## Contents
 - A. What counts as a noticeable feature
-- B. Where a value goes
+- B. Where a value goes, and staying environment-neutral
 - C. Requirements you infer
 - D. Code that falls short, and conventions some parts break
 - E. Intent read from documents
@@ -21,16 +21,20 @@ The rules in SKILL.md settle most cases. This file covers the rest, with the tes
 - Data sent to a third party counts even if invisible: write the requirement and ask the engineer about it.
 - Unsure: write it as `added` and ask. Never drop a feature silently.
 
-## B. Where a value goes
+## B. Where a value goes, and staying environment-neutral
+
+A requirement says what is needed, or what must be prevented, never how it's built. "The CLI shall accept a batch on standard input" is the requirement; the flag that does it, and the test that pipes a batch through it, are the verification item's. "Each app shall have a manifest that follows one schema, enforced at startup" is the requirement; the file's name and fields go in the verification item that checks conformity, or in child interface requirements when another program parses them. A constraint says what risk it guards against ("no app shall reach another app's files"), not the mechanism that does it.
 
 Decide per value; the first match wins.
 
 1. The engineer stated it → the requirement, exactly.
 2. A safety limit, or it guards an irreversible action → the requirement, exactly.
-3. A named consumer outside this element reads or parses it: another program, a script, a stored file format, another team. JSON field names, exit codes, file formats, command and flag names → the requirement, exactly, in double quotes ("node_id", "meta.json") so the wording check reads them as quoted values, not code names. Options a UI happens to offer, animation timings and log text nobody parses don't count.
-4. A test that exists, or that you are adding, checks the exact value → that verification item's description.
+3. Another program parses this exact value: JSON field names a client reads, exit codes a script checks, a file format another tool reads → an interface requirement on the element that defines the interface, saying which program reads it, with the value exactly, in double quotes ("node_id", "meta.json") so the wording check reads it as a quoted value, not a code name. Command and flag names a person types, files only the element itself reads, options a UI happens to offer, animation timings and log text nobody parses don't count: state the capability.
+4. A test that exists, or that you are adding, checks the exact value → that verification item's description. Verification items test the implementation, so they may be as prescriptive as the tests: flags, paths, field names, values.
 5. Someone would ask "why this number?" and the answer isn't obvious → a decision record. For values found in existing code during a migration, one record per design topic (a "motion timings" record), never one per value. Decisions you make while building each get their own record, however many there are.
 6. Otherwise → the code only. Most values end here.
+
+**Environment-neutral.** Needs and requirements name no host, domain, operating system, package manager, proxy or other deployment specific, so the spec stays true when the product moves. Say what the deployment must provide ("each app shall be reachable at its own address"), and leave the machinery to the code and the verification items. A need's context may give example deployments ("for example, on a home server").
 
 ## C. Requirements you infer
 
@@ -42,7 +46,7 @@ Decide per value; the first match wins.
 - Where the code doesn't do what the engineer intended, keep the requirement as intended and raise one open decision naming the gap. Never reword a requirement, and never narrow a safety rule, to fit the code.
 - Where a repository-wide convention (a constraint) is broken by a few parts, keep the constraint as written and raise one decision per constraint listing every part that breaks it, with options: fix the parts, record them as named exceptions, or change the constraint.
 - Never restate a system constraint in an element's requirements, word for word or more weakly: it already applies to every element. An element's requirements add only what is specific to it.
-- A requirement belongs to the element whose code does it. A script or program outside the element that reads its output is a named consumer (B.3), not a requirement there.
+- A requirement belongs to the element whose code does it. A script or program outside the element that reads its output is the reader an interface requirement names (B.3), not a requirement there.
 
 ## E. Intent read from documents
 
@@ -74,4 +78,6 @@ Decide per value; the first match wins.
 - four or five `stated` requirements in the engineer's words ("about one second", "blinks twice", "remains scrollable"); the code's 1.1 s and 40 ms per letter stay in the code.
 - two open decisions: the code blinks three times, and it locks scrolling.
 
-**A status endpoint the portal reads, and a CLI whose exit codes a cron script checks.** The JSON field names and the exit codes go in requirements exactly (named consumers). The UI's turn options (90°, 180°), a 250 ms animation and a log format nobody parses stay in the code. The cron script is the consumer, not a requirement of this element.
+**A status endpoint the portal reads, and a CLI whose exit codes a cron script checks.** An interface requirement on the status endpoint names the fields the portal parses, in quotes, and says the portal reads them; one on the CLI names the exit codes the cron script checks. The cron script is the reader, not a requirement of this element. The UI's turn options (90°, 180°), a 250 ms animation and a log format nobody parses stay in the code.
+
+**A CLI that reads a batch from standard input with a flag, and apps served from a NixOS host behind a reverse proxy, each with a manifest file.** "The CLI shall accept a batch on standard input"; its verification item names the flag and pipes a batch through it. "Each app shall be served at its own address" and "Each app shall have a manifest that follows one schema, enforced"; NixOS, the proxy, the domain and the manifest's file name appear in no need or requirement. They go in the verification items that check them, or in an interface requirement only where another program parses the manifest. A need's context may say the apps run on a home server, as an example.

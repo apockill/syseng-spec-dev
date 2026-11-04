@@ -114,3 +114,13 @@ def test_only_the_reader_in_the_toolkit_names_the_eval_tool():
     source = REPO / "src" / "syseng"
     named = {p.relative_to(source).as_posix() for p in source.rglob("*.py") if "promptfoo" in p.read_text()}
     assert named == {"readers/promptfoo.py"}
+
+
+def test_a_proposal_counts_only_with_a_reason():
+    def run(*commands):
+        return _passed(checks.proposed_with_a_reason("", _context(tool_calls=[
+            {"name": "Bash", "input": {"command": c}} for c in commands])))
+    assert run('spec propose ARM-3 ARM-4 --why "I inferred both from your words; ARM-2 builds on them"')
+    assert not run("spec check", "spec review")
+    assert not run('spec propose ARM-3 --why ""')
+    assert not run("spec propose ARM-3 --withdraw")

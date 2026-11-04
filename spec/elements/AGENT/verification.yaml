@@ -160,7 +160,7 @@
   - AGENT-71
   method: inspection
   technique: unit test
-  description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or named-consumer cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
+  description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or parsed-by-another-program cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
   tests:
     python:
     - tests/test_skill.py::test_skill_teaches_how_deep_to_write_requirements
@@ -277,3 +277,31 @@
   tests:
     python:
     - tests/test_scope.py::test_the_instructions_say_ignored_paths_need_no_spec
+- id: AGENT-V30
+  verifies:
+  - AGENT-81
+  method: inspection
+  technique: unit test
+  description: The skill's hand-over step says to propose the items most worth the engineer's look, contentious ones first, and its proposing section says to do so in every change that alters the spec, lists inferred items, items stating an exact name or value, items others build on and items the engineer's words were reworded into, and asks for typically three to eight items grouped by an honest reason.
+  tests:
+    python:
+    - tests/test_skill.py::test_every_change_that_alters_the_spec_ends_with_proposals
+- id: AGENT-V31
+  verifies:
+  - AGENT-81
+  method: demonstration
+  technique: integration test
+  description: Asked to add two requirements and rework a third, then hand over, an agent with the skill runs spec propose with a reason.
+  tests:
+    python:
+    - propose-at-hand-over
+- id: AGENT-V32
+  verifies:
+  - AGENT-82
+  - AGENT-83
+  method: inspection
+  technique: unit test
+  description: SKILL.md says a requirement states what's needed or the risk it prevents, is environment-neutral, names an exact value another program parses only in an interface requirement on the defining element saying which program reads it, and leaves the rest to verification items as prescriptive as their tests; the depth reference's value rule 3 no longer lists command and flag names, says to state the capability, and its worked examples keep the operating system, proxy and domain out of requirements; neither says named consumer.
+  tests:
+    python:
+    - tests/test_skill.py::test_requirements_say_what_is_needed_environment_neutral_and_leave_specifics_to_verification

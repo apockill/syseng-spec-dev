@@ -81,6 +81,19 @@
   // feedback already applied isn't sent again (REVIEW-23): a review this page copied that the agent has since applied
   if ((state.copied || []).some((r) => (META.applied || []).includes(r)))
     state = { items: {}, decisions: {}, general: "", person: state.person };
+  // an answer kept from an earlier version of this page, on an item that has changed since, is set aside rather than
+  // sent as an answer to the new text, which the person hasn't seen (REVIEW-54); comments and wordings stay
+  const setAside = [];
+  for (const [id, s] of Object.entries(state.items)) {
+    if (!ITEMS[id] || !s.fingerprint || s.fingerprint === ITEMS[id].fingerprint) continue;
+    const what = [s.lock === true ? "locked" : s.lock === false ? "unlocked" : null,
+      s.alteration ? (s.alteration === "keep" ? "kept" : "rolled back") : null,
+      s.intent && Object.keys(s.intent).length ? "corrected its intent" : null].filter(Boolean);
+    if (what.length) setAside.push({ id, what: what.join(", ") });
+    delete s.lock; delete s.alteration; delete s.intent;
+    s.fingerprint = ITEMS[id].fingerprint;
+    if (s.comment === undefined && s.wording === undefined) delete state.items[id];
+  }
   const person = () => state.person || META.person;
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* see load */ }
@@ -385,19 +398,25 @@
     const el = block("awaiting", "For you", "sparkles",
       "What the agent recommends you look at, then the decisions waiting for you, then its answers to your feedback. Each one shows as answered once you act on it; what you leave stays.");
     renderOverview(el);
-    // the agent's judgment leads (AGENT-51)
-    const all = DATA.proposals.filter((p) => p.from !== "computed");
-    const latest = META.change;  // proposals from older changes are earlier recommendations (REVIEW-37)
-    const judged = all.filter((p) => p.change === latest && ITEMS[p.id]);
-    el.append(h("h3", { class: "subhead" }, icon("lock", "sm"), "Recommended by the agent"));
+    if (setAside.length) el.append(h("div", { class: "card conflict" },
+      h("div", { class: "item-head" }, h("span", { class: "status warning" }, icon("alert", "sm"), "answers set aside")),
+      h("div", { class: "item-text" }, `On an earlier version of this page you answered ${setAside.length} item${setAside.length === 1 ? "" : "s"} that changed since, `
+        + `so ${setAside.length === 1 ? "that answer was" : "those answers were"} set aside. Look at each again: `,
+      setAside.map((a, n) => [n ? "; " : "", idButton(a.id), ` (${a.what})`]))));
+    // the agent's judgment leads (AGENT-51): every proposal still waiting, the newest round's first, each naming
+    // the round that made it, so a round that proposes nothing hides none of the earlier ones (REVIEW-37)
+    const judged = DATA.proposals.filter((p) => p.from !== "computed" && ITEMS[p.id]);
+    const latest = META.change;
+    el.append(h("h3", { class: "subhead" }, icon("lock", "sm"), "Recommended by the agent",
+      judged.length ? h("span", { class: "small muted" }, ` (${judged.length} waiting)`) : null));
     const rounds = DATA.history.rounds;  // nothing to do isn't the same as nothing done (REVIEW-46)
     if (!judged.length) el.append(h("div", { class: "empty" }, "Nothing recommended right now.", rounds.length ? [
       ` This has been through ${rounds.length} round${rounds.length === 1 ? "" : "s"} of review, the last on ${when(rounds[rounds.length - 1].at)}. `,
       h("button", { type: "button", class: "linkish", onclick: () => showTab("history") }, "See the review history")] : null));
     const groups = [];
     for (const p of judged) {  // one recommendation can name several items: its reason shows once
-      const g = groups.find((x) => x.why === p.why);
-      if (g) g.ids.push(p.id); else groups.push({ why: p.why, ids: [p.id] });
+      const g = groups.find((x) => x.why === p.why && x.change === p.change);
+      if (g) g.ids.push(p.id); else groups.push({ why: p.why, change: p.change, ids: [p.id] });
     }
     for (const g of groups) {
       const card = h("div", { class: "card" });
@@ -417,18 +436,14 @@
         save(); rebuild();
       });
       rebuild();
-      card.append(h("div", { class: "reason why-agent", style: "margin-top:0" }, icon("sparkles", "sm"),
-        h("b", {}, " Why the agent recommends " + (g.ids.length > 1 ? "these: " : "it: ")), linkify(g.why)),
-      h("div", { class: "actions" }, lockAll), list);
+      card.append(h("div", { class: "item-head" }, h("span", { class: "chip" }, g.change === latest ? "this round" : "earlier round"),
+          h("span", { class: "mono small" }, `recommended in ${g.change}`)),
+        h("div", { class: "reason why-agent", style: "margin-top:0" }, icon("sparkles", "sm"),
+          h("b", {}, " Why the agent recommends " + (g.ids.length > 1 ? "these: " : "it: ")), linkify(g.why)),
+        h("div", { class: "actions" }, lockAll), list);
       el.append(card);
     }
-    const earlier = all.filter((p) => p.change !== latest && ITEMS[p.id]);
     const computed = DATA.proposals.filter((p) => p.from === "computed" && ITEMS[p.id]);
-    if (earlier.length) {
-      const box = h("details", { class: "counted" }, h("summary", { class: "small" }, `Earlier recommendations, still unlocked (${earlier.length})`));
-      for (const p of earlier) box.append(itemCard(p.id, { extra: h("div", { class: "reason why-agent" }, h("b", {}, `Why (${p.change}): `), linkify(p.why)) }));
-      el.append(box);
-    }
     if (computed.length) {
       const box = h("details", { class: "counted" }, h("summary", { class: "small" },
         `Also: ${computed.length} items the most of the tree hangs from (counted, not judged by an agent)`));
@@ -891,8 +906,7 @@
     });
     t.addEventListener("click", () => { const n = currentTheme() === "dark" ? "light" : "dark"; applyTheme(n); try { localStorage.setItem("syseng-theme", n); } catch (e) { /* fine */ } });
     applyTheme();
-    const recs = DATA.proposals.filter((p) => p.from !== "computed");
-    const judged = recs.filter((p) => p.change === META.change).length;
+    const judged = DATA.proposals.filter((p) => p.from !== "computed" && ITEMS[p.id]).length;  // every waiting one (REVIEW-37)
     const counts = { awaiting: judged + DATA.awaiting.decisions.length,
       altered: DATA.awaiting.alterations.length, captured: DATA.captured.length,
       changes: DATA.changes.length ? DATA.changes[0].items.length : 0, history: DATA.history.rounds.length, items: Object.keys(ITEMS).length };

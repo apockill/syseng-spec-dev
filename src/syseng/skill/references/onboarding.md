@@ -50,7 +50,7 @@ The system layer is what the engineer reads. Keep it to what they'd recognize; o
 
 ## 3. How deep to write
 
-Follow the rules in SKILL.md and references/requirement-depth.md: one requirement per feature, not per function or test; exact values only where the engineer stated them, a safety limit, or a named consumer needs them; repository-wide conventions as system constraints, never restated per element. Where nothing can verify a part (no tests, hardware only), raise the missing verification once, as a decision.
+Follow the rules in SKILL.md and references/requirement-depth.md: one requirement per feature, not per function or test; each saying what's needed or prevented, not how it's built, and naming no host, domain or operating system; exact values only where the engineer stated them, a safety limit, or another program parses them, with other specifics in verification items; repository-wide conventions as system constraints, never restated per element. Where nothing can verify a part (no tests, hardware only), raise the missing verification once, as a decision.
 
 ## 4. Drafting, alone or with helpers
 

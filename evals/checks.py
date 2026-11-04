@@ -57,3 +57,11 @@ def used_spec_edit(output, context):
 def skill_stayed_out(output, context):
     skills = [s.get("name") for s in _meta(context).get("skillCalls") or []]
     return _result(SKILL not in skills, f"skills invoked: {skills}")
+
+
+def proposed_with_a_reason(output, context):
+    calls = _meta(context).get("toolCalls") or []
+    commands = [str((t.get("input") or {}).get("command", "")) for t in calls if t.get("name") == "Bash"]
+    proposals = [c for c in commands if re.search(r"\bspec propose\b", c) and "--withdraw" not in c]
+    reasoned = [c for c in proposals if re.search(r"--why[ =]+(\"[^\"\s]|'[^'\s]|[^\s\"'-])", c)]
+    return _result(bool(reasoned), f"spec propose runs: {len(proposals)}, with a reason: {len(reasoned)}")

@@ -180,10 +180,10 @@
   - REVIEW-37
   method: test
   technique: unit test
-  description: With an older change holding a proposal and a newer change holding none, the page marks the newer change as current, so the older proposal is listed as earlier.
+  description: With a proposal in each of two older changes and none in the newest change, the page lists both as the agent's recommendations, the newer change's first, each naming the change that made it, and the items it counts mechanically apart from them.
   tests:
     python:
-    - tests/test_review_page.py::test_only_the_newest_changes_proposals_are_current
+    - tests/test_review_page.py::test_every_waiting_proposal_is_recommended_newest_round_first_naming_its_round
 - id: REVIEW-V18
   verifies:
   - REVIEW-38
@@ -316,3 +316,12 @@
     - tests/test_review_base.py::test_on_the_trunk_with_nothing_to_go_on_the_page_keeps_the_trunk
     - tests/test_review_base.py::test_a_named_base_on_the_trunk_is_kept
     - tests/test_review_base.py::test_the_persons_last_review_stays_a_choice
+- id: REVIEW-V31
+  verifies:
+  - REVIEW-54
+  method: test
+  technique: unit test
+  description: On load, the page takes the lock, alteration and intent answers off each stored item whose fingerprint differs from the item's on the page, keeps its comment and wording with the new fingerprint, does so before any feedback block is built, and the For you tab names each such item with what was set aside.
+  tests:
+    python:
+    - tests/test_review_page.py::test_an_answer_given_on_an_earlier_version_of_an_item_that_changed_is_set_aside
