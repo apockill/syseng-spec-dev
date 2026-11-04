@@ -1,0 +1,571 @@
+request: |-
+  Fix three toolkit problems the sites/ migration surfaced: text cut at ' #' in YAML batches, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds
+mode: code-first
+target: python
+status: open
+opened: '2026-11-03'
+entries:
+- op: add
+  id: CLI-36
+  at: 2026-11-03T20:04-08:00
+  reason: Three of five onboarding agents lost text silently to YAML comments in their batches.
+  after:
+    text: The CLI shall refuse a batch in which YAML would end a prose value at a comment on the same line, naming the line and the key and saying to quote the value.
+    traces_to: SYS-25
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:04
+      context: Hearing what five agents met while onboarding the same web-apps folder, which commits straight to main, in parallel on 2026-11-03. Three of the five lost text from spec edit batches with no warning, because YAML ends an unquoted value where a space and a hash begin; one noticed only because a title looked short.
+      said: |-
+        Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+      basis: guided
+      source: human_conversation
+      fingerprint: 71fee26288fc
+- op: add
+  id: CLI-37
+  at: 2026-11-03T20:04-08:00
+  reason: Two of five onboarding agents met a bare YAML error for a colon inside a value.
+  after:
+    text: When a batch can't be read because a value holds a colon followed by a space, the CLI shall name the line and the key and say the value needs quotes.
+    traces_to: SYS-25
+    basis: derived
+    why: In the onboarding of a web-apps folder on 2026-11-03, two of five agents met an unquoted colon inside a value as a bare YAML parse error giving only a line and column, and had to work out what was wrong.
+- op: add
+  id: CLI-V24
+  at: 2026-11-03T20:04-08:00
+  reason: Links the tests of the batch reading checks.
+  after:
+    verifies:
+    - CLI-36
+    - CLI-37
+    method: test
+    technique: unit test
+    description: A comment after a prose field is refused naming the line, the key and the text that would be lost, as is a hash glued to a word after any value; edit, decide and a hand-written feedback block refuse such a batch and write nothing. Comments on their own lines, after short values such as add, and every YAML example in the skill and the edit command's help still pass. A colon inside a value is reported with its line and key and the advice to quote it.
+    tests:
+      python:
+      - tests/test_batches.py
+- op: add
+  id: DR-80
+  at: 2026-11-03T20:04-08:00
+  reason: Records the inline-comment rule and why it allows the skill's examples.
+  after:
+    title: Which comments after a value a batch may carry
+    decided_by: agent
+    elements:
+    - CLI
+    requirements:
+    - CLI-36
+    context: YAML ends an unquoted value where a space and a hash begin, so prose such as a colour code lost the rest of its line. Refusing every comment after a value would refuse the skill's own examples, which annotate short values such as the type to add, a basis, an ID list or a person.
+    decision: A comment on the same line as a value is refused when the key is a prose field (text, title, why, said, context, reason, description, question, importance, detail, label and the like, or an acknowledgment note under an item's ID), or, after any value, when the hash is glued to the word after it, as in a colour code or an issue number. A comment after a short value with a space after the hash, and comments on lines of their own, are allowed. Quoted values and blocks are never affected.
+    alternatives: Refusing every comment after a value, which breaks the skill's annotated examples; refusing only multi-word values, which still allows a person field and breaks examples such as a name with an email; warning instead of refusing, which agents miss.
+    consequences: A new prose field has to be added to the list in yamlio. A single-word prose value followed by a spaced comment is still refused, because the field is prose.
+    basis: derived
+- op: modify
+  id: REVIEW-41
+  at: 2026-11-03T20:04-08:00
+  reason: On the trunk itself the trunk's base is the current revision, so the page showed nothing changed; all five onboarding agents hit this on 2026-11-03. Raised as the conflict D1.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: 22a3374f59ff
+  fingerprint_after: 81ab33c2f00b
+  before:
+    text: When a person names no base, the review page shall compare against the repository's trunk.
+  after:
+    text: When a person names no base and the trunk's base is not the current revision, the review page shall compare against the repository's trunk.
+  acks:
+    REVIEW-41: narrowed to branches whose trunk base is not the current commit; raised as conflict D1 for the engineer
+    REVIEW-V21: |-
+      still holds: a branch with a commit of its own compares against the trunk merge base; REVIEW-V30 covers the trunk case
+- op: add
+  id: REVIEW-52
+  at: 2026-11-03T20:04-08:00
+  reason: The page on the trunk compared the trunk with itself.
+  after:
+    text: When a person names no base and the trunk's base is the current revision, the review page shall compare against the person's last review, or, without one, against the revision the open or newest change started from.
+    traces_to: SYS-48
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:04
+      context: Hearing what five agents met while onboarding the same web-apps folder, which commits straight to main and has no branches, in parallel on 2026-11-03. All five got a review page showing 0 items changed, because it compared main with itself, and each had to find the option naming the setup commit as the base.
+      said: |-
+        Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+      basis: guided
+      source: human_conversation
+      fingerprint: cd1cab72eb85
+- op: add
+  id: REVIEW-53
+  at: 2026-11-03T20:04-08:00
+  reason: A chosen base has to say why it was chosen.
+  after:
+    text: When the review page chooses its base in place of the trunk, it shall say at its top what it compares against and why.
+    traces_to: SYS-48
+    basis: derived
+    why: a base the page chose itself would otherwise look like a mistake; one onboarding agent's page said it compared against a commit at that same commit, which read as wrong while the current commit was another.
+- op: add
+  id: REVIEW-V30
+  at: 2026-11-03T20:04-08:00
+  reason: Links the tests of the base chosen on the trunk.
+  after:
+    verifies:
+    - REVIEW-41
+    - REVIEW-52
+    - REVIEW-53
+    method: test
+    technique: unit test
+    description: On the trunk, the page compares against the person's last review, or without one against the commit before the change started, showing what changed since, and says why; with neither it keeps the trunk; a base named on the trunk is kept; on a branch with commits of its own the trunk's merge base stays first.
+    tests:
+      python:
+      - tests/test_review_base.py::test_on_the_trunk_the_page_compares_against_the_last_review
+      - tests/test_review_base.py::test_on_the_trunk_without_a_review_it_compares_against_where_the_change_started
+      - tests/test_review_base.py::test_on_the_trunk_with_nothing_to_go_on_the_page_keeps_the_trunk
+      - tests/test_review_base.py::test_a_named_base_on_the_trunk_is_kept
+      - tests/test_review_base.py::test_the_persons_last_review_stays_a_choice
+- op: modify
+  id: REVIEW-V20
+  at: 2026-11-03T20:04-08:00
+  reason: A base named by its commit read as "compared against 635035f at 635035f"; it now reads as that commit, beside the current one.
+  before:
+    description: The generated page has the comparison in its header and carries the version, revision and how it was resolved; with nothing to compare against, the data says so and the page's script has the message.
+    tests:
+      python:
+      - tests/test_review_base.py::test_the_page_states_its_base_at_the_top
+      - tests/test_review_base.py::test_the_page_says_when_it_found_nothing_to_compare_against
+  after:
+    description: The generated page has the comparison in its header and carries the version, revision, how it was resolved and, where the page chose it, why; a base named by its commit reads as that commit, and the command names the commit the working tree stands on beside it. With nothing to compare against, the data says so and the page's script has the message.
+    tests:
+      python:
+      - tests/test_review_base.py::test_the_page_states_its_base_at_the_top
+      - tests/test_review_base.py::test_the_page_says_when_it_found_nothing_to_compare_against
+      - tests/test_review_base.py::test_a_base_named_by_its_commit_reads_as_that_commit
+- op: add
+  id: CHANGE-23
+  at: 2026-11-03T20:04-08:00
+  reason: The review page on the trunk needs where a change started.
+  after:
+    text: Each change record shall record the revision the change started from.
+    traces_to: SYS-48
+    basis: derived
+    why: the review page on the trunk compares against where the newest change started (REVIEW-52), which version control alone can't say once the change is committed.
+- op: add
+  id: DR-81
+  at: 2026-11-03T20:04-08:00
+  reason: Records how the base on the trunk is chosen and why the change record carries it.
+  after:
+    title: Where the review page on the trunk takes its base from
+    decided_by: agent
+    elements:
+    - REVIEW
+    - CHANGE
+    requirements:
+    - REVIEW-52
+    - REVIEW-53
+    - CHANGE-23
+    - REVIEW-41
+    context: In a repository that commits straight to the trunk, the trunk's merge base with the current commit is the current commit, so the page compared the spec with itself. The fallback needs a revision to compare against.
+    decision: The page treats the trunk as empty when its base equals the current revision, on the trunk or on a branch with no commits of its own. It then compares against the person's last review, from spec/reviews.yaml, else against the revision recorded when the open, or else the newest, change started, which spec change start now records in the change record as started_from. The empty trunk comparison is dropped rather than offered. The top of the page and the command's output say what it compares against in plain words (your last review at abc1234, the commit before a change started, commit abc1234, or main at abc1234), with why when the page chose it, and the command names the commit the working tree stands on.
+    alternatives: A version-control operation finding the commit that added the change record, which would change the locked version-control interface (VCS-1); preferring the change's start over the last review, which hides what changed between the review and the change.
+    consequences: Change records written before this have no started_from, so with no review either the page falls back to the trunk and its empty comparison, as before.
+    basis: derived
+- op: add
+  id: CHANGE-24
+  at: 2026-11-03T20:04-08:00
+  reason: Stale decisions of a closed round couldn't be corrected.
+  after:
+    text: When an agent withdraws or replaces an open decision of an earlier change, the toolkit shall log the act in the open change and leave unchanged what the earlier change asked.
+    traces_to: SYS-16
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:04
+      context: Hearing what five agents met while onboarding the same web-apps folder in parallel on 2026-11-03. Once an agent closed a round to start the next, 7 of that round's open decisions went stale (one settled by facts, two asked again in round 2, others naming removed items or contradicting the spec) and none could be withdrawn or replaced.
+      said: |-
+        Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+      basis: guided
+      source: human_conversation
+      fingerprint: 82baf12a425f
+- op: add
+  id: CHANGE-25
+  at: 2026-11-03T20:04-08:00
+  reason: A stale decision of a closed round may need asking again in a new form.
+  after:
+    text: Until the engineer answers an open decision of an earlier change, the toolkit shall let an agent replace it with a new decision in the open change.
+    traces_to: SYS-16
+    basis: derived
+    why: two of a closed round's stale decisions in the onboarding of 2026-11-03 needed asking differently, not dropping, and the round that filed them was closed.
+- op: add
+  id: CHANGE-26
+  at: 2026-11-03T20:04-08:00
+  reason: Decision numbers restart per change, so a bare number can be ambiguous.
+  after:
+    text: The toolkit shall name each open decision unambiguously across changes, and refuse a reference that could name open decisions in more than one change.
+    traces_to: SYS-16
+    basis: derived
+    why: decision numbers restart in each change; in the onboarding of 2026-11-03 round 2 had its own D1 while round 1's was still open, so resolving D1 could mean either.
+- op: add
+  id: CHANGE-27
+  at: 2026-11-03T20:04-08:00
+  reason: Keeps withdrawing apart from answering.
+  after:
+    text: The toolkit shall record no choice for a decision an agent withdraws, and refuse a later choice on it.
+    traces_to: SYS-16
+    basis: derived
+    why: resolving a decision is the engineer's act; an agent withdrawing one must never answer it on the engineer's behalf.
+- op: add
+  id: CHANGE-28
+  at: 2026-11-03T20:04-08:00
+  reason: Lock proposals couldn't be withdrawn at all.
+  after:
+    text: The toolkit shall let an agent withdraw its proposal that the engineer lock items, with a reason, whichever change holds the proposal.
+    traces_to: SYS-38
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:04
+      context: |-
+        Hearing what six agents met while onboarding the same web-apps folder on 2026-11-03: two wanted to take back a lock proposal, one for a wrong reason and one for proposing too much, and couldn't.
+      said: |-
+        Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+      basis: guided
+      source: human_conversation
+      fingerprint: c23a22e34dc7
+- op: add
+  id: CHANGE-29
+  at: 2026-11-03T20:04-08:00
+  reason: Withdrawn items must leave what awaits the engineer.
+  after:
+    text: The toolkit shall show no withdrawn decision or withdrawn proposal as awaiting the engineer.
+    traces_to: SYS-16
+    basis: derived
+    why: the point of withdrawing is that the engineer no longer spends attention on it, on the review page or in the status summary.
+- op: add
+  id: CHANGE-V15
+  at: 2026-11-03T20:04-08:00
+  reason: Links the tests of correcting decisions and proposals of earlier rounds.
+  after:
+    verifies:
+    - CHANGE-24
+    - CHANGE-25
+    - CHANGE-26
+    - CHANGE-27
+    - CHANGE-28
+    - CHANGE-29
+    - CHANGE-21
+    method: test
+    technique: unit test
+    description: |-
+      With a closed round and an open one: a decision is found as change/D-number or by part of the change's ID, and a bare number open in both rounds is refused; the status lists the earlier round's open decisions by those names. Withdrawing one from the open change keeps its question and options, records why and where, logs it in the open change, and drops it from what the page and status show awaiting. Replacing one files the new decision in the open change, naming what it replaces, and withdraws the old one. A withdrawn decision takes no choice. A lock proposal is withdrawn only with a reason, keeps its items and reason, leaves the proposals and the status, can't be withdrawn twice, and can be proposed afresh.
+    tests:
+      python:
+      - tests/test_decisions.py::test_a_decision_is_named_across_rounds_by_its_change
+      - tests/test_decisions.py::test_an_earlier_rounds_decision_is_withdrawn_from_the_open_change
+      - tests/test_decisions.py::test_an_earlier_rounds_decision_is_replaced_by_one_in_the_open_change
+      - tests/test_decisions.py::test_withdrawing_never_resolves_and_a_withdrawn_decision_takes_no_choice
+      - tests/test_decisions.py::test_a_lock_proposal_is_withdrawn_with_a_reason
+- op: add
+  id: CHANGE-V16
+  at: 2026-11-03T20:04-08:00
+  reason: Links the test of the recorded starting revision.
+  after:
+    verifies:
+    - CHANGE-23
+    method: test
+    technique: unit test
+    description: Opening a change records the revision it started from, and a page on the trunk compares against it.
+    tests:
+      python:
+      - tests/test_review_base.py::test_on_the_trunk_without_a_review_it_compares_against_where_the_change_started
+- op: add
+  id: DR-82
+  at: 2026-11-03T20:04-08:00
+  reason: Records the scheme for naming and correcting decisions of earlier rounds.
+  after:
+    title: How agents correct open decisions and lock proposals of closed rounds
+    decided_by: agent
+    elements:
+    - CHANGE
+    requirements:
+    - CHANGE-24
+    - CHANGE-25
+    - CHANGE-26
+    - CHANGE-27
+    - CHANGE-28
+    - CHANGE-29
+    context: Only one change is open at a time, so agents close a round to start the next, and every correcting command reached only the open change. Decision numbers restart in each change, and change records already in repositories use those numbers.
+    decision: A decision is named across changes as change/D-number, the change given by its record's ID or a part of it naming only that record, such as round-63/D1. A bare D-number still means the open change's (the newest change's when none is open), and is refused, listing the candidates, when another change has an open decision of that number. Withdrawing one of an earlier change marks it withdrawn in its own record, with why and the change that withdrew it, and appends the act to the open change's withdrawals; its question and options are never rewritten. Replacing one of an earlier change files the new decision in the open change with replaces, and withdraws the old one naming its replacement. A lock proposal is withdrawn per item with spec propose --withdraw, which marks the item withdrawn in every waiting proposal of it and logs the act; proposing it again starts afresh.
+    alternatives: Numbering decisions uniquely across changes from now on, which leaves the numbers already filed ambiguous and makes new numbers long; keeping withdrawals only in the open change and computing each decision's status from them, which every reader of a decision's status would have to learn.
+    consequences: Existing change records load unchanged. A bare D1 that used to resolve silently against the newest change is now refused when another change also has an open D1, so the engineer or agent names the one they mean.
+    basis: derived
+- op: modify
+  id: REVIEW-41
+  at: 2026-11-03T21:05-08:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Would typically expect it to diff against trunk and state as such, or, for a stacked pull request, to say it is diffing against that pull request.
+      basis: stated
+      fingerprint: 22a3374f59ff
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Would typically expect it to diff against trunk and state as such, or, for a stacked pull request, to say it is diffing against that pull request.
+      basis: stated
+      fingerprint: 22a3374f59ff
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 21:05
+      context: Reviewing an alteration on the review page (review 607eac5aa3).
+      said: Kept the item as it now reads.
+      basis: guided
+      fingerprint: 81ab33c2f00b
+- op: add
+  id: CHANGE-30
+  at: 2026-11-03T20:20-08:00
+  reason: The engineer wants corrections to work that never reached the trunk to be light and unrecorded (F1).
+  requested: true
+  after:
+    text: When an agent withdraws or replaces an open decision or lock proposal of a change record that is not on the trunk, the toolkit shall remove or rewrite it in place, keeping no record of the act.
+    traces_to: SYS-16
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:20
+      context: Reviewing the branch that let agents withdraw open decisions and lock proposals of closed rounds with a logged reason, in particular CHANGE-24 (log each withdrawal in the open change) and CHANGE-28 (withdraw a lock proposal with a reason).
+      said: Would not worry about those two. As long as the work is not committed, cleaning the slate and redoing a change entirely should not be process-heavy, or even recorded; sees no need to carefully record things that never made it to the trunk, past the pull request, or even past a commit.
+      basis: stated
+      source: human_conversation
+      fingerprint: c75499fcb408
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:20
+      context: Hearing what five agents met while onboarding the same web-apps folder in parallel on 2026-11-03. Once an agent closed a round to start the next, 7 of that round's open decisions went stale (one settled by facts, two asked again in round 2, others naming removed items or contradicting the spec) and none could be withdrawn or replaced.
+      said: |-
+        Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+      basis: guided
+      source: human_conversation
+      fingerprint: c75499fcb408
+- op: add
+  id: CHANGE-31
+  at: 2026-11-03T20:20-08:00
+  reason: The engineer wants redoing an uncommitted change to be light (F1).
+  requested: true
+  after:
+    text: The toolkit shall let an agent discard an open change that is not on the trunk.
+    traces_to: SYS-16
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:20
+      context: Reviewing the branch that let agents withdraw open decisions and lock proposals of closed rounds with a logged reason.
+      said: As long as the work is not committed, cleaning the slate and redoing a change entirely should not be process-heavy, or even recorded.
+      basis: stated
+      source: human_conversation
+      fingerprint: 99967aa27130
+- op: add
+  id: CHANGE-32
+  at: 2026-11-03T20:20-08:00
+  reason: Replaces CHANGE-24 and the reason part of CHANGE-28, now only for records on the trunk.
+  after:
+    text: When an agent withdraws or replaces an open decision or lock proposal of a change record on the trunk, the toolkit shall keep it in that record marked withdrawn with the agent's reason, and log the act in the open change.
+    traces_to: SYS-16
+    basis: derived
+    why: a record on the trunk is history people may have seen on a review page; the engineer limited the light, unrecorded corrections to what never reached the trunk.
+- op: add
+  id: CHANGE-33
+  at: 2026-11-03T20:20-08:00
+  reason: Replaces CHANGE-28 without the reason it required everywhere.
+  after:
+    text: The toolkit shall let an agent withdraw its proposal that the engineer lock items, whichever change holds the proposal.
+    traces_to: SYS-38
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:20
+      context: |-
+        Hearing what six agents met while onboarding the same web-apps folder on 2026-11-03: two wanted to take back a lock proposal, one for a wrong reason and one for proposing too much, and couldn't.
+      said: |-
+        Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+      basis: guided
+      source: human_conversation
+      fingerprint: 9439c09488f6
+- op: add
+  id: CHANGE-34
+  at: 2026-11-03T20:20-08:00
+  reason: Addresses why agents closed rounds they hadn't finished.
+  after:
+    text: When an agent starts a change while one that is not on the trunk is open, the toolkit shall tell the agent it can keep working in the open change or discard it.
+    traces_to: SYS-16
+    basis: derived
+    why: in the onboarding of 2026-11-03 the agent closed round 1 only because starting round 2 was refused while it was open, which put round 1's open decisions out of reach; continuing in a change that never reached the trunk keeps them correctable without any record.
+- op: modify
+  id: CHANGE-21
+  at: 2026-11-03T20:20-08:00
+  reason: A reason is now needed only for a decision on the trunk (CHANGE-32); one in a draft is just removed.
+  before:
+    text: Until the engineer answers an open decision, the toolkit shall let an agent withdraw it with a reason.
+  after:
+    text: Until the engineer answers an open decision, the toolkit shall let an agent withdraw it.
+- op: modify
+  id: CHANGE-25
+  at: 2026-11-03T20:20-08:00
+  reason: A draft's decision is rewritten in place; only one on the trunk is replaced from the open change.
+  before:
+    text: Until the engineer answers an open decision of an earlier change, the toolkit shall let an agent replace it with a new decision in the open change.
+    why: two of a closed round's stale decisions in the onboarding of 2026-11-03 needed asking differently, not dropping, and the round that filed them was closed.
+  after:
+    text: Until the engineer answers an open decision of an earlier change, the toolkit shall let an agent replace it.
+    why: two of a closed round's stale decisions in the onboarding of 2026-11-03 needed asking differently, not dropping, and the round that filed them was closed. How the replacement is kept depends on whether the record is on the trunk (CHANGE-30, CHANGE-32).
+- op: modify
+  id: CHANGE-V11
+  at: 2026-11-03T20:20-08:00
+  reason: The reason is now needed only where the withdrawal is kept on record.
+  before:
+    description: Withdrawing an open decision needs a reason, marks it withdrawn with that reason, and is refused for a decision already withdrawn.
+  after:
+    description: Withdrawing an open decision kept on record needs a reason, marks it withdrawn with that reason, and is refused for a decision already withdrawn.
+- op: modify
+  id: CHANGE-V15
+  at: 2026-11-03T20:20-08:00
+  reason: Links the reworked tests, drafts and records on the trunk alike.
+  before:
+    verifies:
+    - CHANGE-24
+    - CHANGE-25
+    - CHANGE-26
+    - CHANGE-27
+    - CHANGE-28
+    - CHANGE-29
+    - CHANGE-21
+    description: |-
+      With a closed round and an open one: a decision is found as change/D-number or by part of the change's ID, and a bare number open in both rounds is refused; the status lists the earlier round's open decisions by those names. Withdrawing one from the open change keeps its question and options, records why and where, logs it in the open change, and drops it from what the page and status show awaiting. Replacing one files the new decision in the open change, naming what it replaces, and withdraws the old one. A withdrawn decision takes no choice. A lock proposal is withdrawn only with a reason, keeps its items and reason, leaves the proposals and the status, can't be withdrawn twice, and can be proposed afresh.
+    tests:
+      python:
+      - tests/test_decisions.py::test_a_decision_is_named_across_rounds_by_its_change
+      - tests/test_decisions.py::test_an_earlier_rounds_decision_is_withdrawn_from_the_open_change
+      - tests/test_decisions.py::test_an_earlier_rounds_decision_is_replaced_by_one_in_the_open_change
+      - tests/test_decisions.py::test_withdrawing_never_resolves_and_a_withdrawn_decision_takes_no_choice
+      - tests/test_decisions.py::test_a_lock_proposal_is_withdrawn_with_a_reason
+  after:
+    verifies:
+    - CHANGE-21
+    - CHANGE-25
+    - CHANGE-26
+    - CHANGE-27
+    - CHANGE-29
+    - CHANGE-30
+    - CHANGE-31
+    - CHANGE-32
+    - CHANGE-33
+    - CHANGE-34
+    description: |-
+      With a closed round and an open one: a decision is found as change/D-number or by part of the change's ID, and a bare number open in both rounds is refused; the status lists the earlier round's decisions by those names. Where the closed round isn't on the trunk, withdrawing its decision or lock proposal removes it with no reason and no log, replacing a decision rewrites it in place, and numbering survives a removal. Where it is on the trunk, withdrawing needs a reason, keeps the question and options, records why and where, logs the act in the open change and drops it from what the page and status show awaiting; replacing files the new decision in the open change and withdraws the old; a withdrawn decision takes no choice; a withdrawn proposal keeps its items and reason and can be proposed afresh. An open change not on the trunk can be discarded, one on it can't, and starting a change while a draft is open says to keep working in it or discard it.
+    tests:
+      python:
+      - tests/test_decisions.py::test_a_decision_is_named_across_rounds_by_its_change
+      - tests/test_decisions.py::test_a_drafts_decision_is_removed_without_a_trace
+      - tests/test_decisions.py::test_a_drafts_decision_is_rewritten_in_place
+      - tests/test_decisions.py::test_a_drafts_lock_proposal_is_removed_without_a_reason
+      - tests/test_decisions.py::test_a_trunk_decision_is_withdrawn_with_a_reason_and_logged
+      - tests/test_decisions.py::test_a_trunk_decision_is_replaced_by_one_in_the_open_change
+      - tests/test_decisions.py::test_withdrawing_never_resolves_and_a_withdrawn_decision_takes_no_choice
+      - tests/test_decisions.py::test_a_trunk_lock_proposal_is_withdrawn_with_a_reason
+      - tests/test_decisions.py::test_a_draft_change_is_discarded_and_one_on_the_trunk_is_not
+      - tests/test_decisions.py::test_starting_a_change_while_a_draft_is_open_says_to_keep_working_in_it
+- op: modify
+  id: DR-82
+  at: 2026-11-03T20:20-08:00
+  reason: Reworked after the engineer's review (F1).
+  before:
+    title: How agents correct open decisions and lock proposals of closed rounds
+    requirements:
+    - CHANGE-24
+    - CHANGE-25
+    - CHANGE-26
+    - CHANGE-27
+    - CHANGE-28
+    - CHANGE-29
+    context: Only one change is open at a time, so agents close a round to start the next, and every correcting command reached only the open change. Decision numbers restart in each change, and change records already in repositories use those numbers.
+    decision: A decision is named across changes as change/D-number, the change given by its record's ID or a part of it naming only that record, such as round-63/D1. A bare D-number still means the open change's (the newest change's when none is open), and is refused, listing the candidates, when another change has an open decision of that number. Withdrawing one of an earlier change marks it withdrawn in its own record, with why and the change that withdrew it, and appends the act to the open change's withdrawals; its question and options are never rewritten. Replacing one of an earlier change files the new decision in the open change with replaces, and withdraws the old one naming its replacement. A lock proposal is withdrawn per item with spec propose --withdraw, which marks the item withdrawn in every waiting proposal of it and logs the act; proposing it again starts afresh.
+    alternatives: Numbering decisions uniquely across changes from now on, which leaves the numbers already filed ambiguous and makes new numbers long; keeping withdrawals only in the open change and computing each decision's status from them, which every reader of a decision's status would have to learn.
+    consequences: Existing change records load unchanged. A bare D1 that used to resolve silently against the newest change is now refused when another change also has an open D1, so the engineer or agent names the one they mean.
+  after:
+    title: How agents correct open decisions and lock proposals, drafts and history alike
+    requirements:
+    - CHANGE-21
+    - CHANGE-25
+    - CHANGE-26
+    - CHANGE-27
+    - CHANGE-29
+    - CHANGE-30
+    - CHANGE-31
+    - CHANGE-32
+    - CHANGE-33
+    - CHANGE-34
+    context: Only one change is open at a time, so agents closed a round to start the next, and every correcting command reached only the open change. Decision numbers restart in each change. The engineer wants corrections to work that never reached the trunk to be light and unrecorded, and only what reached it kept as history.
+    decision: The line is the trunk. A change record is a draft until the trunk has it, read through the version-control interface by extracting the record at the trunk's tip (with no trunk, at the current revision); a decision or proposal counts as on the trunk only when the trunk's copy of its record holds it. A draft's open decision is removed on withdrawal and rewritten in place on replacement, a draft's lock proposal loses the item, no reason is asked and nothing is logged, and spec change discard deletes an open draft change. On the trunk, withdrawing needs a reason and marks the decision or proposal withdrawn in its own record, logged in the open change's withdrawals; replacing one of an earlier change files the new decision in the open change, naming what it replaces. Starting a change while a draft is open says to keep working in it or discard it, the usual way to avoid closing a round early. Decisions are named across changes as change/D-number, the change given by its record's ID or a part naming only it; a bare D-number means the open change's, and is refused when another change has an open decision of that number. New numbers follow the highest, so a removal leaves no duplicate.
+    alternatives: Logging every withdrawal, which the engineer found too heavy for work nobody saw; a new version-control operation asking whether a file is on the trunk, which would change the locked VCS-1; reopening closed changes, which keeping drafts correctable from any change made unnecessary; numbering decisions uniquely across changes, which leaves the numbers already filed ambiguous.
+    consequences: In a repository that commits straight to the trunk, every committed record is history, so its corrections are logged. Spec edits of a discarded change stay in the working tree for version control to undo.
+- op: remove
+  id: CHANGE-24
+  at: 2026-11-03T20:20-08:00
+  reason: The engineer doesn't want withdrawals of work that never reached the trunk recorded (F1); CHANGE-30 and CHANGE-32 replace it.
+  before:
+    text: When an agent withdraws or replaces an open decision of an earlier change, the toolkit shall log the act in the open change and leave unchanged what the earlier change asked.
+    traces_to: SYS-16
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:04
+      context: Hearing what five agents met while onboarding the same web-apps folder in parallel on 2026-11-03. Once an agent closed a round to start the next, 7 of that round's open decisions went stale (one settled by facts, two asked again in round 2, others naming removed items or contradicting the spec) and none could be withdrawn or replaced.
+      said: |-
+        Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+      basis: guided
+      source: human_conversation
+      fingerprint: 82baf12a425f
+- op: remove
+  id: CHANGE-28
+  at: 2026-11-03T20:20-08:00
+  reason: Replaced by CHANGE-33, with a reason needed only on the trunk (CHANGE-32), per the engineer's review (F1).
+  before:
+    text: The toolkit shall let an agent withdraw its proposal that the engineer lock items, with a reason, whichever change holds the proposal.
+    traces_to: SYS-38
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:04
+      context: |-
+        Hearing what six agents met while onboarding the same web-apps folder on 2026-11-03: two wanted to take back a lock proposal, one for a wrong reason and one for proposing too much, and couldn't.
+      said: |-
+        Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+      basis: guided
+      source: human_conversation
+      fingerprint: c23a22e34dc7
+decisions:
+- id: D1
+  kind: conflict
+  question: REVIEW-41 (with no base named, the review page compares against the trunk) now has an exception. In a repository that commits straight to the trunk, the trunk's base is the current commit, so the page showed 0 items changed (all 5 agents onboarding the web-apps folder on 2026-11-03 hit this). There the page now compares against your last review, or before your first one, the commit before the newest change started, and says why at its top. REVIEW-41 is narrowed to say the trunk applies when its base isn't the current commit. Keep the change?
+  importance: REVIEW-41 is your own stated wording about what every review page compares against, so it decides what every page you read counts as changed. You approved fixing this problem, but the new wording is the agent's.
+  involves:
+  - REVIEW-41
+  options:
+  - label: Keep the narrowed REVIEW-41
+    recommended: true
+    detail: |-
+      On a branch, nothing changes: the page compares against the trunk's merge base. On the trunk itself, or on a branch with no commits of its own, the page compares against your last review, else the commit before the newest change started. Naming a base with --against works as before.
+    keeps:
+    - REVIEW-41
+  - label: Roll back to the trunk always
+    detail: REVIEW-41 keeps its old wording and the page on the trunk shows nothing changed again; agents in such repositories have to find --against themselves.
+    rolls_back:
+    - REVIEW-41
+  status: resolved
+  chosen: Keep the narrowed REVIEW-41
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose Keep the narrowed REVIEW-41 on the review page (summary)
+  resolved: '2026-11-03'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-03T21:05-08:00
+  review: 607eac5aa3
+  kind: general
+  comment: I feel like 24 and 28 are not things I'd worry about. Look. As long as we're not committing things, cleaning the slate and redoing a change entirely shouldn't be a process heavy thing, or even recorded. I don't think we need to carefully record a bunch of stuff that never made it to trunk / past the PR state / past even a commit. Does that make sense?
+  response: |-
+    Agreed: what isn't on the trunk is now a draft, so withdrawing or replacing its decisions and proposals just removes or rewrites them, with no reason and no log, and spec change discard throws away an uncommitted change; logging is kept only for records already on the trunk (CHANGE-24 and CHANGE-28 removed, CHANGE-30 to CHANGE-34 added). Starting a change while a draft is open now says to keep working in it, which removes the reason agents closed round 1 early.
+  responded: 2026-11-03T20:21-08:00

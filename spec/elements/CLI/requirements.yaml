@@ -252,3 +252,20 @@
     said: Wants the node types and their schemas clearer wherever possible.
     basis: guided
     fingerprint: d99d4e8ca7ab
+- id: CLI-36
+  text: The CLI shall refuse a batch in which YAML would end a prose value at a comment on the same line, naming the line and the key and saying to quote the value.
+  traces_to: SYS-25
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 20:04
+    context: Hearing what five agents met while onboarding the same web-apps folder, which commits straight to main, in parallel on 2026-11-03. Three of the five lost text from spec edit batches with no warning, because YAML ends an unquoted value where a space and a hash begin; one noticed only because a title looked short.
+    said: |-
+      Approved fixing the toolkit problems the migration surfaced before migrating sites/: the text cut short at a space and hash, the review base on the trunk, and correcting open decisions and lock proposals in closed rounds.
+    basis: guided
+    source: human_conversation
+    fingerprint: 71fee26288fc
+- id: CLI-37
+  text: When a batch can't be read because a value holds a colon followed by a space, the CLI shall name the line and the key and say the value needs quotes.
+  traces_to: SYS-25
+  basis: derived
+  why: In the onboarding of a web-apps folder on 2026-11-03, two of five agents met an unquoted colon inside a value as a bare YAML parse error giving only a line and column, and had to work out what was wrong.

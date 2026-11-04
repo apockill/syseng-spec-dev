@@ -4,11 +4,12 @@
   spec render                               write the review page (and remove old Markdown views)
   spec show ID                              one item: trace, children, verification, history
   spec lock ID... [--words TEXT] [--via]    record a person's lock, with who and how (SYS-33); alias: approve
-  spec propose ID... --why TEXT             propose items for the engineer's explicit approval (SYS-38)
-  spec change start|close|show              open and close the change record edits are logged in
+  spec propose ID... --why TEXT             propose items for the engineer's explicit approval (SYS-38);
+                                            --withdraw takes a proposal back
+  spec change start|close|show|discard      open and close the change record edits are logged in
   spec edit [--dry-run] < edits.yaml        change the spec (CLI-5 to CLI-8)
   spec decide < decision.yaml               add an open decision with options (CHANGE-10)
-  spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12)
+  spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12); <change>/D1 for another change
   spec schema [--json]                       each type of node and its fields (CLI-34)
   spec results add|status                    take in test results, report verification status (SYS-57)
   spec issue [FILE] --title … [--send CODE] report a problem as an issue, with consent (SYS-56)
@@ -200,7 +201,9 @@ def cmd_approve(args) -> int:
 def _read_doc(args):
     text = Path(args.file).read_text() if getattr(args, "file", None) else sys.stdin.read()
     try:
-        return yamlio.loads(text)
+        return yamlio.loads_batch(text)  # refuses values YAML would cut short (CLI-36, CLI-37)
+    except yamlio.BatchError as e:
+        raise edit.EditError(str(e)) from e
     except Exception as e:  # report YAML problems the same way as any other edit problem
         raise edit.EditError(f"can't read the YAML you sent: {e}") from e
 
@@ -214,6 +217,14 @@ def cmd_change(args) -> int:
                 return 1
             c = changes.start(spec, args.request, args.mode, args.target, args.slug)
             print(f"opened {c.id} ({c.data['mode']}, target {c.data['target']}). Every `spec edit` is logged here.")
+        elif args.action == "discard":  # CHANGE-31: a draft is thrown away to be redone
+            c = changes.current(spec)
+            if c is None:
+                print("no change is open")
+                return 1
+            touched = changes.discard(spec, c)
+            print(f"discarded {c.id}" + (f"; its edits to {', '.join(touched)} stay in the working tree: undo them "
+                                         "with version control if they should go too" if touched else ""))
         elif args.action == "close":
             c = changes.current(spec)
             if c is None:
@@ -300,13 +311,20 @@ def cmd_status(args) -> int:
         for x in d.get("decisions") or []:
             if x.get("status") == "open":
                 print(f"  open decision {x['id']}: {x.get('question', '')}")
+    earlier = [(ch, x) for ch in changes.all_changes(spec) if c is None or ch.path != c.path
+               for x in ch.data.get("decisions") or [] if x.get("status") == "open"]
+    if earlier:  # CHANGE-26: named so they can be answered, replaced or withdrawn from here
+        print("Open decisions of earlier changes:")
+        for ch, x in earlier:
+            print(f"  {changes.qualified(ch, x['id'])}: {x.get('question', '')}")
     pending = review.unanswered(spec)
     if pending:
         print("Awaiting the engineer's answer:")
         for cid, alt in pending:
             print(f"  {changes._label(spec, alt['id'])}, altered in {cid}. Keep it: `lock {alt['id']}`")
     waiting = [i for ch in changes.all_changes(spec) for p in ch.data.get("proposals") or [] for i in p.get("ids") or []
-               if review.kind_and_data(spec, i) and levels.level_of(spec, i).level != levels.EXPLICIT]
+               if i not in changes.withdrawn_from(p) and review.kind_and_data(spec, i)
+               and levels.level_of(spec, i).level != levels.EXPLICIT]
     if waiting:
         print(f"Proposed for locking: `lock {', '.join(dict.fromkeys(waiting))}`")
     print(checker.summarize(checker.check(spec)))
@@ -319,45 +337,78 @@ def cmd_decide(args) -> int:
     if c is None:
         print("spec decide: no change is open")
         return 1
-    if args.withdraw:
+    if args.withdraw:  # CHANGE-21: from a draft it's removed (CHANGE-30); from the trunk it's logged (CHANGE-32)
         try:
-            changes.withdraw(c, args.withdraw, args.reason or "")
+            target, d = changes.find_decision(spec, args.withdraw, c)
+            if changes.decision_seen(spec, target, d["id"]):
+                changes.withdraw(target, d["id"], args.reason or "", into=c)
+                done = "withdrew open decision {}" + ("" if target.path == c.path else f"; logged in {c.id}")
+            else:
+                changes.drop_decision(target, d["id"])
+                done = "removed open decision {}: it isn't on the trunk, so nothing is kept"
         except changes.ChangeError as e:
             print(f"spec decide: {e}")
             return 1
         render.write_views(model.load(spec.root))
-        print(f"withdrew open decision {args.withdraw} in {c.id}")
+        print(done.format(changes.qualified(target, d["id"])))
         return 0
+    try:
+        target, old = changes.find_decision(spec, args.replace, c) if args.replace else (c, None)
+    except changes.ChangeError as e:
+        print(f"spec decide: {e}")
+        return 1
+    # CHANGE-25: one of an earlier change on the trunk is replaced from the open change (CHANGE-32); in a draft, or in
+    # the open change, it's rewritten in place (CHANGE-20, CHANGE-30)
+    earlier = old is not None and target.path != c.path and changes.decision_seen(spec, target, old["id"])
     if args.dry_run:  # validate against a copy of the change, write nothing
         import copy
         probe = copy.copy(c)
         probe.data = copy.deepcopy(c.data)
         probe.save = lambda: None
         try:
-            did = changes.add_decision(probe, _read_doc(args) or {}, replace=args.replace)
+            if earlier and old.get("status") != "open":
+                raise changes.ChangeError(f"{args.replace} is already {old.get('status')}; file a new decision instead")
+            did = changes.add_decision(probe, _read_doc(args) or {}, replace=None if earlier else
+                                       (old["id"] if old else None))
         except (changes.ChangeError, edit.EditError) as e:
             print(f"spec decide: {e}")
             return 1
         print(f"dry run: decision {did} is valid; nothing was written")
         return 0
     try:
-        did = changes.add_decision(c, _read_doc(args) or {}, replace=args.replace)
+        doc = _read_doc(args) or {}
+        if earlier:
+            did = changes.replace_earlier(c, target, old["id"], doc)
+        else:
+            did = changes.add_decision(target, doc, replace=old["id"] if old else None)
     except (changes.ChangeError, edit.EditError) as e:
         print(f"spec decide: {e}")
         return 1
     render.write_views(model.load(spec.root))
-    print(f"{'rewrote' if args.replace else 'added'} open decision {did} {'in' if args.replace else 'to'} {c.id}")
+    if earlier:
+        print(f"added open decision {did} to {c.id}, replacing {changes.qualified(target, old['id'])}, now withdrawn")
+    else:
+        print(f"{'rewrote' if args.replace else 'added'} open decision {did} {'in' if args.replace else 'to'} {target.id}")
     return 0
 
 
 def cmd_resolve(args) -> int:
+    """The engineer's choice (CHANGE-12). A bare D<n> is in the open change, else the newest; <change>/D<n> names
+    another (CHANGE-26)."""
     spec = _load(args)
     c = changes.current(spec) or (changes.all_changes(spec) or [None])[-1]
     if c is None:
         print("spec resolve: no change record found")
         return 1
     try:
-        done = changes.resolve(c, args.ids, args.words, args.option)
+        found = [changes.find_decision(spec, ref, c) for ref in args.ids]
+        by_change: dict = {}
+        for target, d in found:
+            by_change.setdefault(target.path, (target, []))[1].append(d["id"])
+        done = []
+        for target, ids in by_change.values():
+            done += [i if target.path == c.path else changes.qualified(target, i)
+                     for i in changes.resolve(target, ids, args.words, args.option)]
     except changes.ChangeError as e:
         print(f"spec resolve: {e}")
         return 1
@@ -373,6 +424,22 @@ def cmd_propose(args) -> int:
         print("spec propose: no change is open")
         return 1
     ids = list(dict.fromkeys(_expand(args.ids)))
+    if args.withdraw:  # CHANGE-33: take back a proposal, from whichever change made it
+        try:
+            kept = changes.withdraw_proposals(spec, c, ids, args.reason or "")
+        except changes.ChangeError as e:
+            print(f"spec propose: {e}")
+            return 1
+        render.write_views(model.load(spec.root))
+        gone = [i for i in ids if i not in kept]
+        if gone:
+            print(f"removed the proposal to lock {', '.join(gone)}: it isn't on the trunk, so nothing is kept")
+        if kept:
+            print(f"withdrew the proposal to lock {', '.join(kept)}; logged in {c.id}")
+        return 0
+    if not args.why:
+        print("spec propose: say why these items deserve the engineer's attention, with --why")
+        return 1
     missing = [i for i in ids if i not in spec.items and i not in spec.elements]
     if missing:
         print(f"spec propose: unknown IDs: {', '.join(missing)}; nothing recorded")
@@ -564,8 +631,15 @@ def cmd_review(args) -> int:
     print(f"wrote {out}")
     print(f"  open it: file://{out.resolve()}")
     compared = data["meta"]["compared"]
-    print(f"  compared against {compared['label']} at {compared['short']}" if compared
-          else "  compared against nothing: no base was found. Name one with --against")
+    if compared:  # the newer side with the commit it stands on, so the base can't be mistaken for it
+        head = data["meta"]["revision"]
+        newer = compared["newer"] + (f" (HEAD {vcs.backend(spec.repo_root()).short(spec.repo_root(), head)})"
+                                     if head and compared["newer"] == "working tree" else "")
+        print(f"  compared {newer} against {compared['text']}")
+        if compared.get("why"):
+            print(f"  {compared['why']}")
+    else:
+        print("  compared against nothing: no base was found. Name one with --against")
     print(f"  {awaiting} awaiting a decision, {len(data['changes'][0]['items']) if data['changes'] else 0} items changed, "
           f"{len(data['captured'])} intent records captured, {len(data['proposals'])} proposed for locking")
     return 0
@@ -697,12 +771,17 @@ def build_parser() -> argparse.ArgumentParser:
                                 f"${people.ENV}, then version control's user)")
     p.add_argument("--note", help="anything else about how it was given, such as a pasted reply they confirmed")
     p.set_defaults(fn=cmd_approve)
-    p = sub.add_parser("propose", help="recommend items for the engineer to lock, saying why")
+    p = sub.add_parser("propose", help="recommend items for the engineer to lock, saying why; or withdraw that")
     p.add_argument("ids", nargs="+", help="IDs, or ranges like CHECK-3..CHECK-5")
-    p.add_argument("--why", required=True, help="why these deserve the engineer's attention")
+    p.add_argument("--why", help="why these deserve the engineer's attention")
+    p.add_argument("--withdraw", action="store_true",
+                   help="withdraw the waiting proposals to lock these items, from whichever change made them; "
+                        "one on the trunk needs --reason")
+    p.add_argument("--reason", help="why the proposal is withdrawn, for one on the trunk")
     p.set_defaults(fn=cmd_propose)
     p = sub.add_parser("change", help="open, close or show the change record edits are logged in")
-    p.add_argument("action", choices=["start", "close", "show"])
+    p.add_argument("action", choices=["start", "close", "show", "discard"],
+                   help="discard throws away the open change when it isn't on the trunk yet")
     p.add_argument("request", nargs="?", help="start: what the engineer asked for, summarized")
     p.add_argument("--mode", choices=list(changes.MODES), help="default: code-first")
     p.add_argument("--target", help="implementation the change targets (default: the primary one)")
@@ -721,13 +800,18 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(fn=cmd_status)
     p = sub.add_parser("decide", help="add an open decision (YAML on stdin: question, importance, involves, options)")
     p.add_argument("--file", help="read the decision from a file instead of stdin")
-    p.add_argument("--replace", metavar="D<n>", help="rewrite this open decision of the open change in place")
-    p.add_argument("--withdraw", metavar="D<n>", help="withdraw this open decision, overtaken by events (needs --reason)")
-    p.add_argument("--reason", help="why the decision is withdrawn")
+    p.add_argument("--replace", metavar="D<n>",
+                   help="rewrite this open decision in place (<change>/D<n> names one of another change); one of an "
+                        "earlier change already on the trunk is withdrawn and replaced by a new decision in the open "
+                        "change")
+    p.add_argument("--withdraw", metavar="D<n>",
+                   help="withdraw this open decision; one not on the trunk yet is removed, one on the trunk is kept "
+                        "as withdrawn and needs --reason")
+    p.add_argument("--reason", help="why the decision is withdrawn, for one on the trunk")
     p.add_argument("--dry-run", action="store_true", help="check the decision without recording it")
     p.set_defaults(fn=cmd_decide)
     p = sub.add_parser("resolve", help="record the engineer's choice on open decisions")
-    p.add_argument("ids", nargs="+")
+    p.add_argument("ids", nargs="+", help="D<n> in the open change, or <change>/D<n>, such as round-63/D1")
     p.add_argument("--words", required=True, help="the engineer's words, as evidence")
     p.add_argument("--option", type=int, help="the option number chosen (default: the recommended one)")
     p.set_defaults(fn=cmd_resolve)

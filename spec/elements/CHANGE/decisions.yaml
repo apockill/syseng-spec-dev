@@ -130,3 +130,24 @@
     said: Parallel-change support may be wanted in future but is too much overhead for now; for now the answer is to be clever about orchestrating changes, with orchestrators changing specs and implementers working under them on code, and the engineer will learn the most effective ways by developing the sites repository and pass that knowledge back.
     basis: stated
     fingerprint: 50eab42f80f5
+- id: DR-82
+  title: How agents correct open decisions and lock proposals, drafts and history alike
+  decided_by: agent
+  elements:
+  - CHANGE
+  requirements:
+  - CHANGE-21
+  - CHANGE-25
+  - CHANGE-26
+  - CHANGE-27
+  - CHANGE-29
+  - CHANGE-30
+  - CHANGE-31
+  - CHANGE-32
+  - CHANGE-33
+  - CHANGE-34
+  context: Only one change is open at a time, so agents closed a round to start the next, and every correcting command reached only the open change. Decision numbers restart in each change. The engineer wants corrections to work that never reached the trunk to be light and unrecorded, and only what reached it kept as history.
+  decision: The line is the trunk. A change record is a draft until the trunk has it, read through the version-control interface by extracting the record at the trunk's tip (with no trunk, at the current revision); a decision or proposal counts as on the trunk only when the trunk's copy of its record holds it. A draft's open decision is removed on withdrawal and rewritten in place on replacement, a draft's lock proposal loses the item, no reason is asked and nothing is logged, and spec change discard deletes an open draft change. On the trunk, withdrawing needs a reason and marks the decision or proposal withdrawn in its own record, logged in the open change's withdrawals; replacing one of an earlier change files the new decision in the open change, naming what it replaces. Starting a change while a draft is open says to keep working in it or discard it, the usual way to avoid closing a round early. Decisions are named across changes as change/D-number, the change given by its record's ID or a part naming only it; a bare D-number means the open change's, and is refused when another change has an open decision of that number. New numbers follow the highest, so a removal leaves no duplicate.
+  alternatives: Logging every withdrawal, which the engineer found too heavy for work nobody saw; a new version-control operation asking whether a file is on the trunk, which would change the locked VCS-1; reopening closed changes, which keeping drafts correctable from any change made unnecessary; numbering decisions uniquely across changes, which leaves the numbers already filed ambiguous.
+  consequences: In a repository that commits straight to the trunk, every committed record is history, so its corrections are logged. Spec edits of a discarded change stay in the working tree for version control to undo.
+  basis: derived

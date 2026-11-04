@@ -102,3 +102,19 @@
   alternatives: A colour per type, which would clash with the level colours and fail for people who can't tell colours apart.
   consequences: Readers learn one rule, shape for type and colour for level. The graph's legend says both.
   basis: derived
+- id: DR-81
+  title: Where the review page on the trunk takes its base from
+  decided_by: agent
+  elements:
+  - REVIEW
+  - CHANGE
+  requirements:
+  - REVIEW-52
+  - REVIEW-53
+  - CHANGE-23
+  - REVIEW-41
+  context: In a repository that commits straight to the trunk, the trunk's merge base with the current commit is the current commit, so the page compared the spec with itself. The fallback needs a revision to compare against.
+  decision: The page treats the trunk as empty when its base equals the current revision, on the trunk or on a branch with no commits of its own. It then compares against the person's last review, from spec/reviews.yaml, else against the revision recorded when the open, or else the newest, change started, which spec change start now records in the change record as started_from. The empty trunk comparison is dropped rather than offered. The top of the page and the command's output say what it compares against in plain words (your last review at abc1234, the commit before a change started, commit abc1234, or main at abc1234), with why when the page chose it, and the command names the commit the working tree stands on.
+  alternatives: A version-control operation finding the commit that added the change record, which would change the locked version-control interface (VCS-1); preferring the change's start over the last review, which hides what changed between the review and the change.
+  consequences: Change records written before this have no started_from, so with no review either the page falls back to the trunk and its empty comparison, as before.
+  basis: derived

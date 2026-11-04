@@ -5,8 +5,9 @@ An edit is a batch of operations, sent as one YAML document:
     edits:
       - add: requirement            # need | requirement | system | constraint | vi | decision | element
         element: CLI                # where it goes (not needed for needs, system requirements, constraints)
-        text: The CLI shall …       # plus the kind's other fields; `id` is allocated when omitted
-        reason: why this is added   # every operation needs a reason
+        # the kind's other fields follow; `id` is allocated when omitted; every operation needs a reason
+        text: The CLI shall …
+        reason: why this is added
       - modify: CLI-3
         set: {text: …}              # fields to set; `unset: [field]` removes fields
         reason: …
@@ -32,6 +33,10 @@ The batch runs against a scratch copy first. The CLI shows each operation's cont
 asks for acknowledgments only where a locked or depended-on item is affected, and
 rejects the batch if it would introduce checker errors. Only then does it write the spec and
 log every operation, with its reason, in the open change record.
+
+YAML ends an unquoted value at ` #` and reads `: ` inside one as a new key. The CLI refuses a batch
+where either would cut text short, naming the line and the key: quote such a value, or write it as
+a block (`text: |`), and keep comments after prose fields on lines of their own.
 """
 
 import copy

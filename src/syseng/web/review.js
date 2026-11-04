@@ -875,7 +875,9 @@
     // what everything on this page is measured against (REVIEW-40, REVIEW-43)
     const cmp = META.compared, bar = document.getElementById("compared");
     bar.classList.toggle("none", !cmp);
-    bar.textContent = cmp ? `Comparing ${cmp.newer} against ${cmp.label} at ${cmp.short}` + (cmp.note && !cmp.note.endsWith(cmp.short) ? ` (${cmp.note})` : "")
+    // in plain words, with the current commit, and why when the page chose the base itself (REVIEW-53)
+    bar.textContent = cmp ? `Comparing ${cmp.newer}${cmp.newer === "working tree" ? ` at ${META.revision.slice(0, 7)}` : ""} against ${cmp.text}`
+        + (cmp.note && !cmp.note.endsWith(cmp.short) ? ` (${cmp.note})` : "") + "." + (cmp.why ? ` ${cmp.why}` : "")
       : "Compared against nothing: no base was found, so nothing here is marked as changed.";
     const t = document.getElementById("theme");
     const changed = Object.values(CHANGE).filter((c) => c.cls !== "added").length;
@@ -952,7 +954,7 @@
     const L = [];
     const group = (title, list) => { if (list.length) { L.push(`${title}:`); list.forEach((x) => L.push(`- ${x}`)); L.push(""); } };
     L.push(`## Spec review by ${who}`, "");
-    L.push(`Review ${META.review} of ${META.repository} at ${META.revision.slice(0, 7)}${META.dirty ? " with uncommitted changes" : ""}, made ${META.generated}, compared against ${META.compared ? `${META.compared.label} at ${META.compared.short}` : "nothing"}.`, "");
+    L.push(`Review ${META.review} of ${META.repository} at ${META.revision.slice(0, 7)}${META.dirty ? " with uncommitted changes" : ""}, made ${META.generated}, compared against ${META.compared ? META.compared.text : "nothing"}.`, "");
     group("Locked", items.filter(([, s]) => s.lock === true).map(([id]) => label(id)));
     group("Unlocked", items.filter(([, s]) => s.lock === false).map(([id]) => label(id)));
     group("Kept", items.filter(([, s]) => s.alteration === "keep").map(([id]) => label(id)));

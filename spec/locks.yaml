@@ -62,6 +62,22 @@
   batch: 4
   review: 8b5e84e04f
   text: An item shall count as locked, written or decided by the engineer when its level of intent is explicit, stated or guided.
+- id: CHANGE-30
+  fingerprint: c75499fcb408
+  locked_at: 2026-11-03T21:05-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: f61700c8ef
+  text: When an agent withdraws or replaces an open decision or lock proposal of a change record that is not on the trunk, the toolkit shall remove or rewrite it in place, keeping no record of the act.
+- id: CHANGE-31
+  fingerprint: 99967aa27130
+  locked_at: 2026-11-03T21:05-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: f61700c8ef
+  text: The toolkit shall let an agent discard an open change that is not on the trunk.
 - id: CHECK-14
   fingerprint: d6397a381791
   locked_at: 2026-10-17T23:00-07:00
@@ -920,6 +936,14 @@
   batch: 2
   text: The review page overview shall show the share of requirements whose verification links tests, beside the verification coverage.
   said: In the overnight review the engineer strongly agreed with listing unlinked tests and the honest coverage measure, and invited locking both in with their direct approval.
+- id: REVIEW-41
+  fingerprint: 81ab33c2f00b
+  locked_at: 2026-11-03T21:05-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: f61700c8ef
+  text: When a person names no base and the trunk's base is not the current revision, the review page shall compare against the repository's trunk.
 - id: REVIEW-50
   fingerprint: 99cb1ec4f1da
   locked_at: 2026-11-03T21:02-08:00
@@ -928,6 +952,14 @@
   batch: 3
   review: '5027511589'
   text: When a node is open in the item pane, the review page shall state the node's type and what that type is.
+- id: REVIEW-52
+  fingerprint: cd1cab72eb85
+  locked_at: 2026-11-03T21:05-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 1
+  review: 607eac5aa3
+  text: When a person names no base and the trunk's base is the current revision, the review page shall compare against the person's last review, or, without one, against the revision the open or newest change started from.
 - id: SYS
   fingerprint: 395a73f004d8
   locked_at: 2026-10-26T09:16-07:00

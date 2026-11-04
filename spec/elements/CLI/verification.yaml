@@ -253,3 +253,13 @@
     python:
     - tests/test_schema.py::test_spec_schema_prints_the_reference_and_json_schema
     - tests/test_schema.py::test_show_names_the_type
+- id: CLI-V24
+  verifies:
+  - CLI-36
+  - CLI-37
+  method: test
+  technique: unit test
+  description: A comment after a prose field is refused naming the line, the key and the text that would be lost, as is a hash glued to a word after any value; edit, decide and a hand-written feedback block refuse such a batch and write nothing. Comments on their own lines, after short values such as add, and every YAML example in the skill and the edit command's help still pass. A colon inside a value is reported with its line and key and the advice to quote it.
+  tests:
+    python:
+    - tests/test_batches.py

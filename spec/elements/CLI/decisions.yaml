@@ -202,3 +202,15 @@
   alternatives: Leaving them for later, which would have the next migration hit the same friction.
   consequences: The next onboarding run measures the skill with these out of the way.
   basis: derived
+- id: DR-80
+  title: Which comments after a value a batch may carry
+  decided_by: agent
+  elements:
+  - CLI
+  requirements:
+  - CLI-36
+  context: YAML ends an unquoted value where a space and a hash begin, so prose such as a colour code lost the rest of its line. Refusing every comment after a value would refuse the skill's own examples, which annotate short values such as the type to add, a basis, an ID list or a person.
+  decision: A comment on the same line as a value is refused when the key is a prose field (text, title, why, said, context, reason, description, question, importance, detail, label and the like, or an acknowledgment note under an item's ID), or, after any value, when the hash is glued to the word after it, as in a colour code or an issue number. A comment after a short value with a space after the hash, and comments on lines of their own, are allowed. Quoted values and blocks are never affected.
+  alternatives: Refusing every comment after a value, which breaks the skill's annotated examples; refusing only multi-word values, which still allows a person field and breaks examples such as a name with an email; warning instead of refusing, which agents miss.
+  consequences: A new prose field has to be added to the list in yamlio. A single-word prose value followed by a spaced comment is still refused, because the field is prose.
+  basis: derived

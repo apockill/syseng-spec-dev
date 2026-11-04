@@ -106,7 +106,7 @@
   - CHANGE-21
   method: test
   technique: unit test
-  description: Withdrawing an open decision needs a reason, marks it withdrawn with that reason, and is refused for a decision already withdrawn.
+  description: Withdrawing an open decision kept on record needs a reason, marks it withdrawn with that reason, and is refused for a decision already withdrawn.
   tests:
     python:
     - tests/test_decisions.py::test_an_overtaken_decision_is_withdrawn_with_a_reason
@@ -139,3 +139,40 @@
     python:
     - tests/test_edit.py::test_change_defaults_to_code_first_and_the_primary_target
     - tests/test_levels.py::test_code_first_goes_ahead_and_the_done_check_asks_for_the_conflict
+- id: CHANGE-V15
+  verifies:
+  - CHANGE-21
+  - CHANGE-25
+  - CHANGE-26
+  - CHANGE-27
+  - CHANGE-29
+  - CHANGE-30
+  - CHANGE-31
+  - CHANGE-32
+  - CHANGE-33
+  - CHANGE-34
+  method: test
+  technique: unit test
+  description: |-
+    With a closed round and an open one: a decision is found as change/D-number or by part of the change's ID, and a bare number open in both rounds is refused; the status lists the earlier round's decisions by those names. Where the closed round isn't on the trunk, withdrawing its decision or lock proposal removes it with no reason and no log, replacing a decision rewrites it in place, and numbering survives a removal. Where it is on the trunk, withdrawing needs a reason, keeps the question and options, records why and where, logs the act in the open change and drops it from what the page and status show awaiting; replacing files the new decision in the open change and withdraws the old; a withdrawn decision takes no choice; a withdrawn proposal keeps its items and reason and can be proposed afresh. An open change not on the trunk can be discarded, one on it can't, and starting a change while a draft is open says to keep working in it or discard it.
+  tests:
+    python:
+    - tests/test_decisions.py::test_a_decision_is_named_across_rounds_by_its_change
+    - tests/test_decisions.py::test_a_drafts_decision_is_removed_without_a_trace
+    - tests/test_decisions.py::test_a_drafts_decision_is_rewritten_in_place
+    - tests/test_decisions.py::test_a_drafts_lock_proposal_is_removed_without_a_reason
+    - tests/test_decisions.py::test_a_trunk_decision_is_withdrawn_with_a_reason_and_logged
+    - tests/test_decisions.py::test_a_trunk_decision_is_replaced_by_one_in_the_open_change
+    - tests/test_decisions.py::test_withdrawing_never_resolves_and_a_withdrawn_decision_takes_no_choice
+    - tests/test_decisions.py::test_a_trunk_lock_proposal_is_withdrawn_with_a_reason
+    - tests/test_decisions.py::test_a_draft_change_is_discarded_and_one_on_the_trunk_is_not
+    - tests/test_decisions.py::test_starting_a_change_while_a_draft_is_open_says_to_keep_working_in_it
+- id: CHANGE-V16
+  verifies:
+  - CHANGE-23
+  method: test
+  technique: unit test
+  description: Opening a change records the revision it started from, and a page on the trunk compares against it.
+  tests:
+    python:
+    - tests/test_review_base.py::test_on_the_trunk_without_a_review_it_compares_against_where_the_change_started
