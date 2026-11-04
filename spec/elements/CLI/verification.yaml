@@ -242,3 +242,14 @@
     - tests/test_issue.py::test_a_report_edited_after_its_preview_is_not_sent
     - tests/test_issue.py::test_a_failed_send_prints_the_text_for_the_engineer
     - tests/test_issue.py::test_a_missing_report_file_is_reported
+- id: CLI-V23
+  verifies:
+  - CLI-34
+  - CLI-35
+  method: test
+  technique: unit test
+  description: The schema command prints the reference and the JSON Schema of every type, and the show command names each node's type.
+  tests:
+    python:
+    - tests/test_schema.py::test_spec_schema_prints_the_reference_and_json_schema
+    - tests/test_schema.py::test_show_names_the_type

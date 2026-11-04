@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import re
 from pathlib import Path
 
-from syseng import levels, records, render, review, testlinks
+from syseng import levels, records, render, review, schema, testlinks
 from syseng.model import Spec
 from syseng.rules import METHODS, RULES, TECHNIQUES, check_wording
 
@@ -240,8 +240,6 @@ def _attributes(spec: Spec) -> list[Finding]:
         elif origin is None and item.kind != "vi" and not item.data.get("intent") and not (
                 item.data.get("basis") or (item.kind != "need" and review.history(spec, item.id))):
             out.append(_f("A002", f"{item.id} says neither who asked for it nor where it came from", item.id, item))
-        if not item.data.get("text") and item.kind != "vi":
-            out.append(_f("S007", f"{item.id} has no `text`", item.id, item))
     for item in spec.requirements():
         if not (item.data.get("why") or item.data.get("source") or item.data.get("quotes") or item.data.get("intent")):
             out.append(_f("A001", f"{item.id} has neither `why` nor `source`", item.id, item))
@@ -267,12 +265,22 @@ def _attributes(spec: Spec) -> list[Finding]:
             if wrong:
                 out.append(Finding("A010", f"the lock on {a.get('id')}: {'; '.join(wrong)}", a.get("id"),
                                    spec.locks_path()))
-    for item in spec.of_kind("decision"):
-        if item.data.get("decided_by") not in ("engineer", "agent"):
-            out.append(_f("S007", f"{item.id} needs `decided_by: engineer` or `agent`", item.id, item))
-        for f in ("title", "context", "decision"):
-            if not item.data.get(f):
-                out.append(_f("S007", f"{item.id} has no `{f}`", item.id, item))
+    return out + _schemas(spec)
+
+
+def _schemas(spec: Spec) -> list[Finding]:
+    """MODEL-44: each node has the fields its type allows, with values of the right kind (S007, V001 for
+    verification items). MODEL-45: no element takes a name reserved for another type of node (S009)."""
+    out = []
+    for item in spec.items.values():
+        for problem in schema.problems(item.kind, {k: v for k, v in item.data.items() if k != "id"}):
+            out.append(_f("V001" if item.kind == "vi" else "S007", f"{item.id} ({schema.label(item.kind)}) {problem}",
+                          item.id, item))
+    for e in spec.elements.values():
+        for problem in schema.problems("element", {k: v for k, v in e.data.items() if k != "id"}):
+            out.append(_f("S007", f"{e.id} (element) {problem}", e.id, e))
+        if e.id in schema.RESERVED_ELEMENT_IDS:
+            out.append(_f("S009", f"{e.id} is reserved for another type of node, so it can't name an element", e.id, e))
     return out
 
 
@@ -344,18 +352,7 @@ def _wording(spec: Spec) -> list[Finding]:
 def _verification(spec: Spec) -> list[Finding]:
     out = []
     for vi in spec.of_kind("vi"):
-        method, technique = vi.data.get("method"), vi.data.get("technique")
-        if method not in METHODS:
-            out.append(_f("V001", f"{vi.id} has method {method!r}; use one of {', '.join(METHODS)}", vi.id, vi))
-        if technique not in TECHNIQUES:
-            out.append(_f("V001", f"{vi.id} has technique {technique!r}; use one of {', '.join(TECHNIQUES)}",
-                          vi.id, vi))
-        if not vi.data.get("description"):
-            out.append(_f("V001", f"{vi.id} has no `description`", vi.id, vi))
-        verifies = vi.data.get("verifies") or []
-        if not verifies:
-            out.append(_f("V001", f"{vi.id} verifies nothing", vi.id, vi))
-        for r in verifies:
+        for r in vi.data.get("verifies") or []:  # fields and values: _schemas
             if r not in spec.items or spec.items[r].kind not in ("system", "constraint", "requirement"):
                 out.append(_f("T003", f"{vi.id} verifies {r}, which isn't a requirement", vi.id, vi))
     # CHECK-32: a roll-up verifies a requirement through its children, so every child must be verified itself

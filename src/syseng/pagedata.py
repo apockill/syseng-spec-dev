@@ -18,7 +18,7 @@ import hashlib
 import tempfile
 from pathlib import Path
 
-from syseng import changes, diff, health, levels, results, review, vcs
+from syseng import changes, diff, health, levels, results, review, schema, vcs
 from syseng.model import Spec
 
 SECTIONS = ("overview", "awaiting", "responses", "changes", "captured", "proposals", "graph", "items", "history")
@@ -144,6 +144,10 @@ def change_sets(spec: Spec, person: str, against: list[str]) -> list[dict]:
     out = [{**d.to_data(), "measured": d.inspected} for d in (_safe_between(spec, a) for a in named) if d is not None]
     review = _since_review(spec, person)
     return out + [review] if review else out
+
+
+def _root(spec: Spec) -> str:
+    return next((e.id for e in spec.elements.values() if not e.parent), "ROOT")
 
 
 def _compared(repo, sets: list[dict]) -> dict | None:
@@ -315,6 +319,9 @@ def build(spec: Spec, person: str, against: list[str] | None = None) -> dict:
         "meta": {"review": hashlib.sha256(f"{revision}{now}{person}".encode()).hexdigest()[:10], "person": person,
                  "generated": now, "revision": revision, "dirty": dirty, "repository": repo.name,
                  "levels": list(levels.ORDER), "compared": _compared(repo, sets),
+                 # REVIEW-49: each type of node, so the page can name and draw it
+                 "types": {k: {"label": t.label, "about": schema.describe(k), "where": t.where,
+                               "id": t.id_pattern.replace("ROOT", _root(spec))} for k, t in schema.TYPES.items()},
                  "change": _newest_change(spec),  # the agent's current recommendations are this change's (REVIEW-37)
                  "applied": [r.get("review") for r in levels.reviews(spec) if r.get("by") == person]},
         "overview": overview(spec, person, sets),

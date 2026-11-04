@@ -237,3 +237,18 @@
   traces_to: SYS-56
   basis: derived
   why: the engineer can only consent to text they have seen.
+- id: CLI-34
+  text: The CLI shall print each type of node with its fields, as text or as JSON Schema.
+  traces_to: SYS-30
+  basis: derived
+  why: the one definition has to be readable by people and editors.
+- id: CLI-35
+  text: Wherever the CLI lists or shows a node, it shall name the node's type.
+  traces_to: SYS-30
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 17:42
+    context: Reviewing the item types and their fields.
+    said: Wants the node types and their schemas clearer wherever possible.
+    basis: guided
+    fingerprint: d99d4e8ca7ab

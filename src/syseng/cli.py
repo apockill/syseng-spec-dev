@@ -9,6 +9,7 @@
   spec edit [--dry-run] < edits.yaml        change the spec (CLI-5 to CLI-8)
   spec decide < decision.yaml               add an open decision with options (CHANGE-10)
   spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12)
+  spec schema [--json]                       each type of node and its fields (CLI-34)
   spec results add|status                    take in test results, report verification status (SYS-57)
   spec issue [FILE] --title … [--send CODE] report a problem as an issue, with consent (SYS-56)
   spec init [--harness NAME]                set up a repository in one step (SYS-5)
@@ -28,7 +29,7 @@ import sys
 from pathlib import Path
 
 from syseng import (changes, diff, edit, feedback, fingerprint, init, issue, levels, migrate, model, page, pagedata,
-                    people, readers, render, results, review, rules, vcs, yamlio)
+                    people, readers, render, results, review, rules, schema, vcs, yamlio)
 from syseng import check as checker
 
 
@@ -84,7 +85,7 @@ def cmd_show(args) -> int:
         print(f"{iid}: {e.title}  (system element; parent {e.parent or '—'}; depends on {', '.join(e.depends_on) or '—'})")
         print(f"  {e.data.get('purpose', '')}")
         for item in sorted((i for i in spec.items.values() if i.element == iid), key=lambda i: i.id):
-            print(f"  {item.id} [{item.kind}] {item.data.get('text') or item.data.get('title') or item.data.get('description', '')}")
+            print(f"  {item.id} [{schema.label(item.kind)}] {item.data.get('text') or item.data.get('title') or item.data.get('description', '')}")
         return 0
     item = spec.items.get(iid)
     if item is None:
@@ -92,7 +93,7 @@ def cmd_show(args) -> int:
         print(f"{iid} was retired: {retired[0].get('note')}" if retired else f"{iid}: no such item")
         return 1
     d = item.data
-    print(f"{iid} [{item.kind}, in {item.element}, level of intent: {levels.describe(spec, iid)}]")
+    print(f"{iid} [{schema.label(item.kind)}, in {item.element}, level of intent: {levels.describe(spec, iid)}]")
     print(f"  {d.get('text') or d.get('title') or d.get('description', '')}")
     print(f"  attention: {review.describe(spec, iid)}")
     for a in review.history(spec, iid):
@@ -517,6 +518,15 @@ def _results_status(spec, args) -> int:
     return 1 if any(d["failing"] for d in data.values()) else 0
 
 
+def cmd_schema(args) -> int:
+    """CLI-34: each type of node and its fields, from the one definition the checker and `spec edit` use."""
+    if args.json:
+        print(json.dumps(schema.json_schema(), indent=1))
+    else:
+        print(schema.reference(), end="")
+    return 0
+
+
 def cmd_diff(args) -> int:
     """CLI-26: the spec differences between two versions, for agents (the review page renders the same data)."""
     spec = _load(args)
@@ -721,6 +731,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--words", required=True, help="the engineer's words, as evidence")
     p.add_argument("--option", type=int, help="the option number chosen (default: the recommended one)")
     p.set_defaults(fn=cmd_resolve)
+    p = sub.add_parser("schema", help="each type of node, and the fields it can have")
+    p.add_argument("--json", action="store_true", help="as JSON Schema")
+    p.set_defaults(fn=cmd_schema)
     p = sub.add_parser("results", help="take in test results from pipeline steps, and report verification status",
                        description=results.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     steps = p.add_subparsers(dest="action", required=True)

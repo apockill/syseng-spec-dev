@@ -44,23 +44,12 @@ import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from syseng import changes, check, fingerprint, levels, model, people, records, render, review, yamlio
+from syseng import changes, check, fingerprint, levels, model, people, records, render, review, schema, yamlio
 from syseng.model import Spec
 
 KIND_FILES = {"need": "needs.yaml", "requirement": "requirements.yaml", "system": "requirements.yaml",
               "constraint": "requirements.yaml", "vi": "verification.yaml", "decision": "decisions.yaml"}
-FIELDS = {
-    "need": {"text", "origin", "source", "quotes", "context", "intent", "basis", "why", "allow"},
-    "requirement": {"text", "origin", "traces_to", "derived", "why", "source", "quotes", "refines", "reworded",
-                    "allocation_note", "verification_deferred", "intent", "basis", "allow"},
-    "system": {"kind", "text", "origin", "serves", "why", "source", "quotes", "refines", "reworded",
-               "allocation_note", "verification_deferred", "intent", "basis", "allow"},
-    "vi": {"verifies", "method", "technique", "description", "origin", "tests", "intent"},
-    "decision": {"title", "decided_by", "elements", "requirements", "recorded", "status", "context",
-                 "decision", "alternatives", "consequences", "intent", "basis"},
-    "element": {"title", "parent", "depends_on", "purpose", "related_code", "note", "intent"},
-}
-FIELDS["constraint"] = FIELDS["system"]
+FIELDS = {kind: schema.fields(kind) for kind in schema.TYPES}  # MODEL-44: one definition, in schema.py
 
 
 class EditError(Exception):
@@ -226,6 +215,9 @@ def _add(spec: Spec, root: Path, op: Op) -> str:
             raise EditError("adding a system element needs an `id`, such as STORAGE")
         if op.id in spec.elements:
             raise EditError(f"system element {op.id} already exists")
+        if op.id in schema.RESERVED_ELEMENT_IDS:  # MODEL-45
+            raise EditError(f"{op.id} can't name an element: it's the prefix of another type of node "
+                            f"({', '.join(schema.RESERVED_ELEMENT_IDS)} are reserved)")
         yamlio.write(root / "elements" / op.id / "element.yaml", {"id": op.id, **op.fields})
         settings = root / "toolkit.yaml"  # a new element joins the order elements are listed in
         config = yamlio.read(settings) if settings.exists() else None

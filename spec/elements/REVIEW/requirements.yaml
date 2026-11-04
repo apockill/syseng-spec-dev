@@ -446,3 +446,28 @@
     said: The number should have a denominator or be a percentage, so they can tell out of how many in total.
     basis: stated
     fingerprint: 8733e4284ae4
+- id: REVIEW-49
+  text: The review page shall draw each type of node with its own shape and name, the same in the graph, on cards and in the item pane.
+  traces_to: SYS-30
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 17:42
+    context: Asking for the dashboard to make node types visible.
+    said: A user should know what type a node is when they look at the dashboard, from the graph view to widgets and items, through design language such as colours, border shapes or other things that make the different node types and schemas clear.
+    basis: stated
+    fingerprint: 854c9256e13f
+- id: REVIEW-50
+  text: When a node is open in the item pane, the review page shall state the node's type and what that type is.
+  traces_to: SYS-30
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 17:42
+    context: Asking for the dashboard to make node types visible.
+    said: When they click into a node there should be text showing its type.
+    basis: stated
+    fingerprint: 99cb1ec4f1da
+- id: REVIEW-51
+  text: The full spec on the review page shall let the person show or hide each type of node.
+  traces_to: SYS-30
+  basis: added
+  why: once types are visible, filtering by them is the natural next question.

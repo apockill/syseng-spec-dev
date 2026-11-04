@@ -10,7 +10,7 @@ The wording rules (W…) flag patterns that are usually wrong. When one doesn't 
 
 ## Contents
 
-- Structure: S001, S002, S003, S004, S005, S006, S007, S008
+- Structure: S001, S002, S003, S004, S005, S006, S007, S008, S009
 - Traceability: T001, T002, T003, T004, T005
 - Attributes: A001, A002, A003, A004, A005, A006, A007, A008, A009, A010, F001
 - Conflicts: C001
@@ -46,11 +46,15 @@ Requirements flow down `parent` links, so the links must form one tree: exactly 
 
 <a id="s007"></a>
 ### S007: missing or invalid field
-A required field is missing or has a value the toolkit doesn't know. The message names the field.
+A node is missing a field its type requires, has a field its type doesn't have, or has a value of the wrong kind. The message names the node's type and the field. Each type's fields are in references/schema.md, and `spec schema` prints them.
 
 <a id="s008"></a>
 ### S008: item in the wrong system element
 An item lives in the directory its ID names: `CORE-3` in `elements/CORE/`, needs and system requirements in the system's directory, and a decision record with the first element it lists.
+
+<a id="s009"></a>
+### S009: reserved element name
+`NEED` and `DR` are the prefixes of needs and decision records. An element with one of those names would number its requirements the way decision records are numbered, so the two would collide. Neither can name an element.
 
 ## Traceability
 

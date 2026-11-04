@@ -611,6 +611,14 @@
     Wording rules from INCOSE plus EARS patterns: use the mechanically checkable subset of INCOSE's Guide to Writing Requirements: one "shall"; no vague terms, escape clauses or open-ended endings; no test or implementation vocabulary. Add the EARS sentence patterns.
   migrated_from: de09a707460a
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: MODEL-44
+  fingerprint: b84d0a079059
+  locked_at: 2026-11-03T21:02-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: '5027511589'
+  text: Each type of node shall have one definition of its fields, from which the edit command, the checker and the reference are derived.
 - id: NEED-1
   fingerprint: f4d032821275
   locked_at: '2026-10-11'
@@ -808,6 +816,14 @@
   batch: 1
   review: 8806fc60af
   text: The engineer needs to see, on a new review page, the rounds of review a pull request has been through and roughly what changed between them.
+- id: NEED-33
+  fingerprint: c2be1e77f7df
+  locked_at: 2026-11-03T21:02-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: '5027511589'
+  text: The engineer needs every item the toolkit writes to read clearly on its own, to someone arriving with no context.
 - id: NEED-4
   fingerprint: 4f923c2ad874
   locked_at: '2026-10-11'
@@ -880,6 +896,14 @@
   batch: 2
   text: The review page overview shall show the share of requirements whose verification links tests, beside the verification coverage.
   said: In the overnight review the engineer strongly agreed with listing unlinked tests and the honest coverage measure, and invited locking both in with their direct approval.
+- id: REVIEW-50
+  fingerprint: 99cb1ec4f1da
+  locked_at: 2026-11-03T21:02-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 3
+  review: '5027511589'
+  text: When a node is open in the item pane, the review page shall state the node's type and what that type is.
 - id: SYS
   fingerprint: 395a73f004d8
   locked_at: 2026-10-26T09:16-07:00

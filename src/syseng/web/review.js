@@ -136,7 +136,7 @@
   document.body.append(tip);
   function showTip(id, e) {
     const it = ITEMS[id];
-    tip.replaceChildren(h("div", { class: "item-head" }, h("span", { class: "mono" }, id), levelChip(id), statusChips(id)),
+    tip.replaceChildren(h("div", { class: "item-head" }, h("span", { class: "mono" }, id), typeBadge(it.kind), levelChip(id), statusChips(id)),
       h("div", { class: "item-text" }, brief(it.title || it.text, 30)));
     tip.hidden = false;
     const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
@@ -147,6 +147,19 @@
   function hideTip() { tip.hidden = true; }
 
   // ---------------------------------------------------------------- shared pieces
+  // REVIEW-49: a node's type has its own shape, the same in the graph, on cards and in the pane; colour stays the
+  // level of intent. The shape is a glyph beside the type's name, so it never relies on shape alone.
+  const TYPES = META.types || {};
+  const typeName = (kind) => (TYPES[kind] || {}).label || kind;
+  function typeBadge(kind) {
+    return h("span", { class: `type type-${kind}`, title: (TYPES[kind] || {}).about || "" },
+      h("span", { class: `glyph shape-${kind}`, "aria-hidden": "true" }), typeName(kind));
+  }
+  function typeLine(kind) {
+    const t = TYPES[kind] || {};
+    return h("div", { class: `typeline type-${kind}` }, typeBadge(kind), h("span", { class: "small" }, t.about || ""),
+      t.id ? h("span", { class: "small muted" }, `ID ${t.id}, in ${t.where}.`) : null);
+  }
   function levelChip(id, level) {
     const it = level ? null : ITEMS[id];
     const lv = level || (it && it.level);
@@ -280,7 +293,7 @@
       const has = (k) => on && (k in c.before || k in c.after);
       const textKey = on ? TEXT_KEYS.find(has) : null;
       const rest = on ? [...new Set([...Object.keys(c.before), ...Object.keys(c.after)])].filter((k) => k !== "title" && k !== textKey) : [];
-      fill(box, h("div", { class: "item-head" }, idButton(id), levelChip(id), changeChip(id, draw), ...statusChips(id), h("span", { class: "small" }, it.kind)),
+      fill(box, h("div", { class: "item-head" }, idButton(id), typeBadge(it.kind), levelChip(id), changeChip(id, draw), ...statusChips(id)),
         has("title") ? h("div", { class: "item-text" }, h("b", {}, wordDiff(c.before.title, c.after.title)))
           : it.title ? h("div", { class: "item-text" }, h("b", {}, it.title)) : null,
         textKey ? h("div", { class: "item-text" }, wordDiff(c.before[textKey], c.after[textKey]))
@@ -303,7 +316,7 @@
   function itemCard(id, opts) {
     const it = ITEMS[id];
     if (!it) return h("div", { class: "card" }, id, " (no longer in the spec)");
-    const card = h("div", { class: "card", "data-item": id }, itemBody(id));
+    const card = h("div", { class: `card type-${it.kind}`, "data-item": id }, itemBody(id));
     if (opts && opts.extra) card.append(opts.extra);
     if (opts && opts.details) card.append(details(id));
     const mark = triage(card, () => answered(id));
@@ -646,7 +659,9 @@
     const changedEls = new Set();
     for (const d of (DATA.changes[0] || { items: [] }).items)
       if (d.classes.some((c) => ["added", "removed", "meaning", "moved"].includes(c)) && d.kind !== "vi" && d.element) changedEls.add(d.element);
-    const legend = h("div", { class: "legend" }, LEVELS.map((l) => h("span", { class: "lv" }, h("span", { class: `sw lv-${l} ${l}` }), LEVEL_WORDS[l])),
+    const legend = h("div", { class: "legend" },
+      h("span", { class: "small muted" }, "Shape: type"), ["need", "system", "constraint", "requirement", "vi", "decision"].map((k) => typeBadge(k)),
+      h("span", { class: "small muted" }, "Colour: level of intent"), LEVELS.map((l) => h("span", { class: "lv" }, h("span", { class: `sw lv-${l} ${l}` }), LEVEL_WORDS[l])),
       h("span", { class: "status warning" }, icon("alert", "sm"), "ring: changed since"),
       h("span", { class: "status warning" }, icon("compare", "sm"), "requirements changed"),
       h("label", { class: "small" }, h("input", { type: "checkbox", onchange: (e) => { showVI = e.target.checked; draw(); } }), " verification items"));
@@ -657,15 +672,15 @@
         const row = h("div", { class: "erow" + (changedEls.has(e.id) ? " changed" : ""), "data-el": e.id, style: `margin-left:${e.depth * 14}px` });
         rows[e.id] = row;
         if (e.depth) row.append(h("span", { class: "tree-guide", style: "left:-8px" }));
-        const name = h("div", { class: "ename", "data-id": e.id, onclick: () => openItem(e.id) }, h("span", { class: "eid" }, e.id),
+        const name = h("div", { class: "ename", "data-id": e.id, onclick: () => openItem(e.id) }, h("span", { class: "glyph shape-element", "aria-hidden": "true" }), h("span", { class: "eid" }, e.id),
           changedEls.has(e.id) ? h("span", { class: "status warning", title: "its requirements changed" }, " ", icon("compare", "sm")) : null,
           h("span", { class: "et" }, e.title));
         const dotbox = h("div", { class: "dots" });
         for (const id of e.items) {
           const it = ITEMS[id];
           if (!it || (it.kind === "vi" && !showVI)) continue;
-          const b = h("button", { class: `dot lv-${it.level} kind-${it.kind}${it.level === "added" ? " added" : ""}${it.changed ? " changed" : ""}`,
-            "aria-label": `${id}, ${it.level}`, "data-id": id, onclick: () => openItem(id),
+          const b = h("button", { class: `dot lv-${it.level} shape-${it.kind}${it.level === "added" ? " added" : ""}${it.changed ? " changed" : ""}`,
+            "aria-label": `${id}, ${typeName(it.kind)}, ${it.level}`, "data-id": id, onclick: () => openItem(id),
             onmousemove: (ev) => showTip(id, ev), onmouseleave: hideTip });
           dots[id] = b;
           dotbox.append(b);
@@ -741,7 +756,7 @@
     if (!ITEMS[id]) return;
     fill(focus, h("div", { class: "focus-head" }, h("span", { class: "small" }, "In focus"), h("span", { class: "grow" }),
       h("button", { class: "iconbtn", "aria-label": "Close", onclick: closeItem }, icon("x", "sm"))),
-    itemCard(id, { details: true, alteration: DATA.awaiting.alterations.some((a) => a.id === id) }));
+    typeLine(ITEMS[id].kind), itemCard(id, { details: true, alteration: DATA.awaiting.alterations.some((a) => a.id === id) }));
     focus.scrollTop = 0;
     Graph.select(id);
     side.classList.add("open");
@@ -810,13 +825,17 @@
     const el = block("items", "The full spec", "list", "Every item, grouped by system element. Verification items are hidden until you ask for them.");
     const q = h("input", { type: "search", placeholder: "Search IDs and text", "aria-label": "Search" });
     const lvOn = new Set(LEVELS);
+    const KINDS = ["element", "need", "system", "constraint", "requirement", "decision"];
+    const kindOn = new Set(KINDS);
     let showVI = false, changedOnly = false;
     const chips = LEVELS.map((l) => h("button", { class: "act on", onclick: (e) => { lvOn.has(l) ? lvOn.delete(l) : lvOn.add(l); e.currentTarget.classList.toggle("on"); draw(); } },
       h("span", { class: `sw lv-${l} ${l}` }), l));
     const extras = [h("button", { class: "act", onclick: (e) => { changedOnly = !changedOnly; e.currentTarget.classList.toggle("on"); draw(); } }, icon("alert", "sm"), "changed since"),
       h("button", { class: "act", onclick: (e) => { showVI = !showVI; e.currentTarget.classList.toggle("on"); draw(); } }, "verification items")];
     const list = h("div", {});
-    el.append(h("div", { class: "filters" }, icon("search"), q), h("div", { class: "filters" }, chips, extras), list);
+    const kindChips = KINDS.map((k) => h("button", { class: "act on", onclick: (e) => { kindOn.has(k) ? kindOn.delete(k) : kindOn.add(k); e.currentTarget.classList.toggle("on"); draw(); } },
+      h("span", { class: `glyph shape-${k}`, "aria-hidden": "true" }), typeName(k)));
+    el.append(h("div", { class: "filters" }, icon("search"), q), h("div", { class: "filters" }, kindChips), h("div", { class: "filters" }, chips, extras), list);
     q.addEventListener("input", () => draw());
     function draw() {
       const needle = q.value.trim().toLowerCase();
@@ -825,7 +844,7 @@
       for (const e of DATA.graph.elements) {
         const ids = [e.id, ...e.items].filter((id) => {
           const it = ITEMS[id];
-          if (!it || (it.kind === "vi" && !showVI) || !lvOn.has(it.level) || (changedOnly && !it.changed)) return false;
+          if (!it || (it.kind === "vi" ? !showVI : !kindOn.has(it.kind)) || !lvOn.has(it.level) || (changedOnly && !it.changed)) return false;
           return !needle || id.toLowerCase().includes(needle) || (it.text + " " + it.title).toLowerCase().includes(needle);
         });
         if (!ids.length) continue;
@@ -834,8 +853,8 @@
           if (n++ > 600) break;
           const it = ITEMS[id];
           const body = h("div", {});
-          const card = h("div", { class: "card", "data-item": id },
-            h("div", { class: "item-head" }, idButton(id), levelChip(id), ...statusChips(id), h("span", { class: "small" }, it.kind),
+          const card = h("div", { class: `card type-${it.kind}`, "data-item": id },
+            h("div", { class: "item-head" }, idButton(id), typeBadge(it.kind), levelChip(id), ...statusChips(id),
               h("span", { class: "grow" }), h("button", { class: "iconbtn", "aria-label": "Details", onclick: () => { body.childNodes.length ? body.replaceChildren() : body.append(details(id), itemActions(id)); } }, icon("list", "sm"))),
             it.title ? h("div", { class: "item-text" }, h("b", {}, it.title)) : null,
             it.text ? h("div", { class: "item-text" }, linkify(it.text)) : null, body);

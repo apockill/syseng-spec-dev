@@ -67,11 +67,15 @@ _RULES = [
          "Change impact flows along `depends_on`, so it must name real elements and contain no cycles.",
          "Point `depends_on` at existing elements; break cycles by extracting the shared part into its own element."),
     Rule("S007", "missing or invalid field",
-         "Each kind of item has fields the toolkit relies on.",
-         "Add the field the message names, with one of the allowed values."),
+         "Each type of node has its own fields, which the toolkit relies on.",
+         "Fix the field the message names; `spec schema` lists each type's fields and allowed values."),
     Rule("S008", "item in the wrong system element",
          "An item's ID prefix names its system element, so an item filed elsewhere is hard to find and easy to mis-trace.",
          "Move the item into the directory of the element its ID names, or rename it with a fresh ID there."),
+    Rule("S009", "reserved element name",
+         "NEED and DR are the prefixes of needs and decision records, so an element with one of those names would "
+         "number its requirements like them.",
+         "Give the element another name. Its items then need new IDs too, so retire them and add them again."),
     # --- traceability
     Rule("T001", "broken trace",
          "Every requirement traces up to what it serves; the trace is how anyone answers 'why does this exist?'.",
@@ -206,8 +210,7 @@ _RULES = [
 ]
 RULES = {r.code: r for r in _RULES}
 
-METHODS = ("test", "analysis", "demonstration", "inspection")
-TECHNIQUES = ("unit test", "integration test", "reasoning check", "manual", "roll-up")
+from syseng.schema import METHODS, TECHNIQUES  # noqa: F401  (the checker imports them from here)
 
 # --- wording patterns -------------------------------------------------------------
 _QUOTED = re.compile(r'"[^"]*"')

@@ -17,7 +17,7 @@ Run the toolkit as `spec` from the repository root. `spec <command> --help` expl
 | Bringing an existing project in | [references/onboarding.md](references/onboarding.md) | 100 lines |
 | Writing or editing needs, requirements, verification items | [references/writing-requirements.md](references/writing-requirements.md) | 80 lines |
 | How deep to write a requirement: features, values, inferred requirements, documents, gaps (beyond the rules below) | [references/requirement-depth.md](references/requirement-depth.md) | 90 lines |
-| The fields of each kind of item, with examples | [references/schema.md](references/schema.md) | 145 lines |
+| The types of node and the fields of each, with examples | [references/schema.md](references/schema.md) | 280 lines |
 | Handing over a review page, applying feedback, recording locks, raising conflicts | [references/review-and-locks.md](references/review-and-locks.md) | 75 lines |
 | Running the auditors and reasoning checks | [references/auditing.md](references/auditing.md) | 40 lines |
 | Taking in test results, reading verification status, adding a result format | [references/test-results.md](references/test-results.md) | 45 lines |
@@ -101,7 +101,7 @@ YAML
 
 - If it replies with an `acks:` block, read each item and send the batch again with a one-line note per item. If it rejects the batch, nothing was written; fix what the errors say.
 - To change an explicit or stated item, name the resolved conflict (`conflict: D<n>`), add the person's own request as stated intent, or mark a pure rewording `rewording: true`.
-- Every field of every kind is in references/schema.md.
+- Every type of node and its fields are in references/schema.md (`spec schema` prints them).
 - **Before you change an item,** weigh what `spec edit` and `spec show <ID>` say about it: its level, who gave it and how, how often it changed, and how much discussion is behind it.
 - **Needs come only from the engineer's words,** never from your own ideas.
 - Use a distinctive heredoc delimiter, such as `YAML`, so a batch can't collide with your own script's.
