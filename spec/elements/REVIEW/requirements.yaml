@@ -386,6 +386,12 @@
     said: Would typically expect it to diff against trunk and state as such, or, for a stacked pull request, to say it is diffing against that pull request.
     basis: stated
     fingerprint: 22a3374f59ff
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 20:14
+    context: Reviewing an alteration on the review page (review 607eac5aa3).
+    said: Kept the item as it now reads.
+    basis: guided
+    fingerprint: 81ab33c2f00b
 - id: REVIEW-42
   text: When a person names a base, the review page shall compare against that base first.
   traces_to: SYS-48

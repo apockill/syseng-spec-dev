@@ -294,6 +294,32 @@ entries:
     alternatives: Numbering decisions uniquely across changes from now on, which leaves the numbers already filed ambiguous and makes new numbers long; keeping withdrawals only in the open change and computing each decision's status from them, which every reader of a decision's status would have to learn.
     consequences: Existing change records load unchanged. A bare D1 that used to resolve silently against the newest change is now refused when another change also has an open D1, so the engineer or agent names the one they mean.
     basis: derived
+- op: modify
+  id: REVIEW-41
+  at: 2026-11-03T20:14-08:00
+  reason: Alex Thiele <alex.g.thiele@gmail.com> kept this alteration on the review page
+  before:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Would typically expect it to diff against trunk and state as such, or, for a stacked pull request, to say it is diffing against that pull request.
+      basis: stated
+      fingerprint: 22a3374f59ff
+  after:
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Would typically expect it to diff against trunk and state as such, or, for a stacked pull request, to say it is diffing against that pull request.
+      basis: stated
+      fingerprint: 22a3374f59ff
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 20:14
+      context: Reviewing an alteration on the review page (review 607eac5aa3).
+      said: Kept the item as it now reads.
+      basis: guided
+      fingerprint: 81ab33c2f00b
 decisions:
 - id: D1
   kind: conflict
@@ -312,4 +338,16 @@ decisions:
     detail: REVIEW-41 keeps its old wording and the page on the trunk shows nothing changed again; agents in such repositories have to find --against themselves.
     rolls_back:
     - REVIEW-41
-  status: open
+  status: resolved
+  chosen: Keep the narrowed REVIEW-41
+  words: Alex Thiele <alex.g.thiele@gmail.com> chose Keep the narrowed REVIEW-41 on the review page (summary)
+  resolved: '2026-11-03'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-03T20:14-08:00
+  review: 607eac5aa3
+  kind: general
+  comment: I feel like 24 and 28 are not things I'd worry about. Look. As long as we're not committing things, cleaning the slate and redoing a change entirely shouldn't be a process heavy thing, or even recorded. I don't think we need to carefully record a bunch of stuff that never made it to trunk / past the PR state / past even a commit. Does that make sense?
+  response: null
