@@ -8,7 +8,8 @@ with the syseng toolkit. For every change, follow the `syseng` skill:
 - change the spec only with `spec edit`, never by editing files under `spec/`;
 - run `spec check` before reporting a change as done.
 
-`spec status` shows what's open and what awaits the engineer.
+`spec status` shows what's open and what awaits the engineer. Paths listed in `.specignore` are outside the spec:
+a change that touches only those needs none of this.
 
 In Claude Code, the toolkit's hooks (`.syseng/hook`) run in this repository. They're guardrails, and the method works without them:
 

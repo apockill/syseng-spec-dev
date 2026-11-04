@@ -1,0 +1,99 @@
+request: Let a repository leave paths out of its spec with .specignore
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-03'
+entries:
+- op: add
+  id: SYS-62
+  at: 2026-11-03T18:08-08:00
+  reason: the engineer asked for it.
+  requested: true
+  after:
+    kind: system
+    text: The toolkit shall let a repository name paths that its spec leaves out.
+    serves:
+    - NEED-3
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 18:08
+      context: Preparing the sites repository for migration, where only the portal, the templates and the repository's conventions are to be specified and the other apps are throwaway.
+      said: Asked to add .specignore, so the apps that aren't specified stay out of the spec.
+      basis: stated
+      fingerprint: ebd15577ee66
+- op: add
+  id: CHECK-37
+  at: 2026-11-03T18:08-08:00
+  reason: part of SYS-62.
+  after:
+    text: When a repository has a .specignore file, the checker shall leave the paths it lists out of its checks of code and tests.
+    traces_to: SYS-62
+    basis: derived
+    why: tests in apps outside the spec shouldn't be asked to be linked.
+- op: add
+  id: CHECK-38
+  at: 2026-11-03T18:08-08:00
+  reason: part of SYS-62, from the design agreed earlier for scoping.
+  after:
+    text: When a repository has a .specignore file, the checker shall report as a to-do each top-level path that no element's related code covers and the file doesn't list.
+    traces_to: SYS-62
+    basis: derived
+    why: nothing should be in or out of the spec by accident.
+- op: add
+  id: AGENT-80
+  at: 2026-11-03T18:08-08:00
+  reason: part of SYS-62.
+  after:
+    text: The instructions the toolkit writes into a repository shall tell agents that a change touching only paths in .specignore needs no spec work.
+    traces_to: SYS-62
+    basis: derived
+    why: agents working on apps outside the spec would otherwise follow the spec loop for them.
+- op: modify
+  id: VCS-1
+  at: 2026-11-03T18:08-08:00
+  reason: the scope check lists tracked files.
+  before:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, names the trunk, reads a setting, and keeps generated files out of version control.
+  after:
+    text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, names the trunk, lists the tracked files, reads a setting, and keeps generated files out of version control.
+  acks:
+    VCS-V1: its test now also lists tracked files
+- op: add
+  id: CHECK-V24
+  at: 2026-11-03T18:08-08:00
+  reason: covers the scope checks.
+  after:
+    verifies:
+    - CHECK-37
+    - CHECK-38
+    method: test
+    technique: unit test
+    description: Patterns match folders, files and globs; without a .specignore nothing is listed; with one, paths neither related nor listed are reported, the spec's own files never are, and tests in listed paths aren't asked to be linked.
+    tests:
+      python:
+      - tests/test_scope.py
+- op: add
+  id: AGENT-V29
+  at: 2026-11-03T18:08-08:00
+  reason: covers the instruction.
+  after:
+    verifies:
+    - AGENT-80
+    method: test
+    technique: unit test
+    description: The instruction section the toolkit writes says paths in .specignore are outside the spec.
+    tests:
+      python:
+      - tests/test_scope.py::test_the_instructions_say_ignored_paths_need_no_spec
+- op: add
+  id: SYS-V26
+  at: 2026-11-03T18:08-08:00
+  reason: its children cover it.
+  after:
+    verifies:
+    - SYS-62
+    method: analysis
+    technique: roll-up
+    description: Verified through its children's verification.
+decisions: []
+closed: '2026-11-03'

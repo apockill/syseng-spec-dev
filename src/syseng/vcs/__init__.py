@@ -50,6 +50,10 @@ class Backend(ABC):
         """A setting from version control's configuration, or ""."""
 
     @abstractmethod
+    def files(self, repo: Path) -> list[str]:
+        """The repository's tracked files, relative to its top."""
+
+    @abstractmethod
     def ignore(self, path: Path) -> None:
         """Keeps a generated file or folder out of version control."""
 

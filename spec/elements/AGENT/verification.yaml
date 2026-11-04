@@ -268,3 +268,12 @@
   tests:
     python:
     - near-miss
+- id: AGENT-V29
+  verifies:
+  - AGENT-80
+  method: test
+  technique: unit test
+  description: The instruction section the toolkit writes says paths in .specignore are outside the spec.
+  tests:
+    python:
+    - tests/test_scope.py::test_the_instructions_say_ignored_paths_need_no_spec

@@ -53,6 +53,7 @@ def test_the_git_backend_answers_each_operation(tmp_path):
     git.extract(tmp_path, revision, "a.txt", tmp_path / "out")
     assert (tmp_path / "out" / "a.txt").read_text() == "one"
     assert git.setting(tmp_path, "syseng.author") == "Ada"
+    assert git.files(tmp_path) == ["a.txt"]
     assert revision.startswith(git.short(tmp_path, revision))
     run("checkout", "-q", "-b", "side")
     (tmp_path / "b.txt").write_text("x")

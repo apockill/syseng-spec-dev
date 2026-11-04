@@ -22,6 +22,14 @@
   batch: 3
   review: 1fcc2f4faa
   text: The agent shall link each test it adds to a verification item, adding a requirement only for behaviour someone relies on.
+- id: AGENT-80
+  fingerprint: 35ee965f5e06
+  locked_at: 2026-11-03T21:04-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: fb9e41a5f8
+  text: The instructions the toolkit writes into a repository shall tell agents that a change touching only paths in .specignore needs no spec work.
 - id: AGENT-V20
   fingerprint: 8f52eaeb8434
   locked_at: 2026-10-31T15:07-07:00
@@ -30,6 +38,14 @@
   batch: 1
   said: Said they are OK with locking this once the sentence about what isn't tested is removed.
   text: The skill's guidance gives every pull request that changes the spec its own page against its base, linked at the top.
+- id: AGENT-V29
+  fingerprint: 52033b47db8b
+  locked_at: 2026-11-03T21:04-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: fb9e41a5f8
+  text: The instruction section the toolkit writes says paths in .specignore are outside the spec.
 - id: CHANGE-13
   fingerprint: d0754061b7ad
   locked_at: 2026-10-17T22:49-07:00
@@ -89,6 +105,14 @@
   batch: 3
   review: 1fcc2f4faa
   text: When a change closes, the CLI shall remind the agent of tests that no verification item links.
+- id: CHECK-37
+  fingerprint: c88c2ec45047
+  locked_at: 2026-11-03T21:04-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: fb9e41a5f8
+  text: When a repository has a .specignore file, the checker shall leave the paths it lists out of its checks of code and tests.
 - id: CHECK-4
   fingerprint: 303ebb1bb4e4
   locked_at: 2026-10-31T12:10-07:00
@@ -1333,6 +1357,14 @@
   batch: 2
   review: 688320b7fe
   text: The toolkit shall read evaluation results without depending on a particular evaluation tool.
+- id: SYS-62
+  fingerprint: ebd15577ee66
+  locked_at: 2026-11-03T21:04-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: fb9e41a5f8
+  text: The toolkit shall let a repository name paths that its spec leaves out.
 - id: SYS-7
   fingerprint: 17860781fc49
   locked_at: '2026-10-11'
@@ -1355,6 +1387,14 @@
   text: The toolkit shall track, for each implementation, which requirements it satisfies.
   migrated_from: 5083c59f3792
   note: given via chat (round 8); approver not recorded; the migration filled in the person running it
+- id: VCS-1
+  fingerprint: e404755cbe1c
+  locked_at: 2026-11-03T21:04-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 5
+  review: fb9e41a5f8
+  text: The toolkit shall reach version control only through one interface, which names the current revision, says whether the working tree differs from it, reads a path at a revision, finds the base of two revisions, names the trunk, lists the tracked files, reads a setting, and keeps generated files out of version control.
 - id: VERIFY-31
   fingerprint: '520945854509'
   locked_at: 2026-10-31T15:18-07:00

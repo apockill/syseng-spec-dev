@@ -37,6 +37,8 @@ Then run `spec init` (or ask the engineer to) and open the change: `spec change 
 
 ## 2. The tree and the system layer
 
+**Scope first.** When the engineer wants only part of the repository specified, list everything else in `.specignore` at the repository's top, one path per line in .gitignore style (`desklab/`). Work there then needs no spec. Each remaining top-level path belongs in some element's `related_code`; `spec check --todo` lists the ones that aren't (T006).
+
 Map the system elements from the code's structure first: one tree with the project as the root, `depends_on` for reuse. Good first cuts are what can be deployed, owned or deleted separately (an app, a service, a library). Group thin parts with the same shape into one element. Give an element children where it's too big to read as one.
 
 Then write the system layer yourself, before any element requirement:
