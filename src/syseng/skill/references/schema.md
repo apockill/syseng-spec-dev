@@ -271,7 +271,7 @@ options:
   - label: …
 ```
 
-Add `kind: conflict`, and `keeps:` / `rolls_back:` per option, for a conflict with a locked or stated item. Check one with `spec decide --dry-run` before filing it. Until the engineer answers, `--replace D<n>` rewrites it and `--withdraw D<n> --reason "…"` withdraws it. Decision numbers restart in each change, so one of an earlier change is `<change>/D<n>`, such as `round-63/D1`; replacing it files the new decision in the open change (references/review-and-locks.md).
+Add `kind: conflict`, and `keeps:` / `rolls_back:` per option, for a conflict with a locked or stated item. Check one with `spec decide --dry-run` before filing it. Until the engineer answers, `--replace D<n>` rewrites it and `--withdraw D<n>` removes it, while its change isn't on the trunk; once it is, withdrawing needs `--reason "…"` and both keep the history. Decision numbers restart in each change, so one of another change is `<change>/D<n>`, such as `round-63/D1` (references/review-and-locks.md).
 
 ## Settings (`spec/toolkit.yaml`)
 

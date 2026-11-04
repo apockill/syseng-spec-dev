@@ -42,7 +42,7 @@ An item changed since its lock or intent record, and not kept, counts one level 
 
 ## The loop, for every change
 
-1. **Open a change:** `spec change start "<the request, summarized>"`. Add `--mode spec-first` when the engineer wants to see the spec before code exists. One change is open at a time.
+1. **Open a change:** `spec change start "<the request, summarized>"`. Add `--mode spec-first` when the engineer wants to see the spec before code exists. One change is open at a time: keep working in it until its work is done, rather than closing it to start the next request.
 2. **Record what the engineer said** as intent on the items it directly expresses (below).
 3. **Look for conflicts** with explicit and stated items in the affected elements, the elements that depend on them, and above them in the trace. Spec-first: raise each before building. Code-first: build, then raise each with rolling back among the options. No conflict: just build. See references/review-and-locks.md.
 4. **Work.** Code as you normally would.
@@ -110,7 +110,7 @@ YAML
 
 - Give every ID a short title: "SYS-7 (done gate)".
 - Order questions by how much each answer would change, each with options and one recommended, plus a one-line way to accept everything. Use your harness's question menu if it has one. Record open decisions with `spec decide`, so they survive the conversation.
-- **Anything you want the engineer to answer goes on a rendered page,** not in chat: record it with `spec decide`, hand over the review page, and give the link. Write each decision for a reader with none of your context: what is being decided, why it matters now, what each option does and what follows from it, with examples. If you'd only be informing them, a chat line is enough. Until they answer, `spec decide --replace D<n>` rewrites an open decision, and `spec decide --withdraw D<n> --reason "…"` withdraws one the conversation has overtaken; name one of an earlier change as `<change>/D<n>`.
+- **Anything you want the engineer to answer goes on a rendered page,** not in chat: record it with `spec decide`, hand over the review page, and give the link. Write each decision for a reader with none of your context: what is being decided, why it matters now, what each option does and what follows from it, with examples. If you'd only be informing them, a chat line is enough. Until they answer, `spec decide --replace D<n>` rewrites an open decision, and `spec decide --withdraw D<n>` withdraws one the conversation has overtaken (with `--reason "…"` once it's on the trunk); name one of an earlier change as `<change>/D<n>`.
 - **Locks belong to the engineer.** Record one only when they named the items; never lock your own work. Details in references/review-and-locks.md.
 - When asked "why is X like this?", answer from `spec show X`.
 

@@ -311,7 +311,7 @@ def proposals(spec: Spec, limit: int = 5) -> list[dict]:
     for c in changes.all_changes(spec):
         for p in c.data.get("proposals") or []:
             for iid in p.get("ids") or []:
-                if iid in changes.withdrawn_from(p):  # taken back by an agent (CHANGE-28)
+                if iid in changes.withdrawn_from(p):  # taken back by an agent (CHANGE-29)
                     latest.pop(iid, None)
                     continue
                 if review.kind_and_data(spec, iid) is None or levels.level_of(spec, iid).level == levels.EXPLICIT:

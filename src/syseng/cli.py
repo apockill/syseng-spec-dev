@@ -5,8 +5,8 @@
   spec show ID                              one item: trace, children, verification, history
   spec lock ID... [--words TEXT] [--via]    record a person's lock, with who and how (SYS-33); alias: approve
   spec propose ID... --why TEXT             propose items for the engineer's explicit approval (SYS-38);
-                                            --withdraw --reason TEXT takes a proposal back
-  spec change start|close|show              open and close the change record edits are logged in
+                                            --withdraw takes a proposal back
+  spec change start|close|show|discard      open and close the change record edits are logged in
   spec edit [--dry-run] < edits.yaml        change the spec (CLI-5 to CLI-8)
   spec decide < decision.yaml               add an open decision with options (CHANGE-10)
   spec resolve D1 ... --words TEXT          record the engineer's choice (CHANGE-12); <change>/D1 for another change
@@ -217,6 +217,14 @@ def cmd_change(args) -> int:
                 return 1
             c = changes.start(spec, args.request, args.mode, args.target, args.slug)
             print(f"opened {c.id} ({c.data['mode']}, target {c.data['target']}). Every `spec edit` is logged here.")
+        elif args.action == "discard":  # CHANGE-31: a draft is thrown away to be redone
+            c = changes.current(spec)
+            if c is None:
+                print("no change is open")
+                return 1
+            touched = changes.discard(spec, c)
+            print(f"discarded {c.id}" + (f"; its edits to {', '.join(touched)} stay in the working tree: undo them "
+                                         "with version control if they should go too" if touched else ""))
         elif args.action == "close":
             c = changes.current(spec)
             if c is None:
@@ -329,23 +337,29 @@ def cmd_decide(args) -> int:
     if c is None:
         print("spec decide: no change is open")
         return 1
-    if args.withdraw:  # CHANGE-21, CHANGE-24: in the open change or an earlier one, logged in the open change
+    if args.withdraw:  # CHANGE-21: from a draft it's removed (CHANGE-30); from the trunk it's logged (CHANGE-32)
         try:
             target, d = changes.find_decision(spec, args.withdraw, c)
-            changes.withdraw(target, d["id"], args.reason or "", into=c)
+            if changes.decision_seen(spec, target, d["id"]):
+                changes.withdraw(target, d["id"], args.reason or "", into=c)
+                done = "withdrew open decision {}" + ("" if target.path == c.path else f"; logged in {c.id}")
+            else:
+                changes.drop_decision(target, d["id"])
+                done = "removed open decision {}: it isn't on the trunk, so nothing is kept"
         except changes.ChangeError as e:
             print(f"spec decide: {e}")
             return 1
         render.write_views(model.load(spec.root))
-        print(f"withdrew open decision {changes.qualified(target, d['id'])}"
-              + ("" if target.path == c.path else f"; logged in {c.id}"))
+        print(done.format(changes.qualified(target, d["id"])))
         return 0
     try:
         target, old = changes.find_decision(spec, args.replace, c) if args.replace else (c, None)
     except changes.ChangeError as e:
         print(f"spec decide: {e}")
         return 1
-    earlier = old is not None and target.path != c.path  # CHANGE-25: replaced from the open change
+    # CHANGE-25: one of an earlier change on the trunk is replaced from the open change (CHANGE-32); in a draft, or in
+    # the open change, it's rewritten in place (CHANGE-20, CHANGE-30)
+    earlier = old is not None and target.path != c.path and changes.decision_seen(spec, target, old["id"])
     if args.dry_run:  # validate against a copy of the change, write nothing
         import copy
         probe = copy.copy(c)
@@ -366,7 +380,7 @@ def cmd_decide(args) -> int:
         if earlier:
             did = changes.replace_earlier(c, target, old["id"], doc)
         else:
-            did = changes.add_decision(c, doc, replace=old["id"] if old else None)
+            did = changes.add_decision(target, doc, replace=old["id"] if old else None)
     except (changes.ChangeError, edit.EditError) as e:
         print(f"spec decide: {e}")
         return 1
@@ -374,7 +388,7 @@ def cmd_decide(args) -> int:
     if earlier:
         print(f"added open decision {did} to {c.id}, replacing {changes.qualified(target, old['id'])}, now withdrawn")
     else:
-        print(f"{'rewrote' if args.replace else 'added'} open decision {did} {'in' if args.replace else 'to'} {c.id}")
+        print(f"{'rewrote' if args.replace else 'added'} open decision {did} {'in' if args.replace else 'to'} {target.id}")
     return 0
 
 
@@ -410,14 +424,18 @@ def cmd_propose(args) -> int:
         print("spec propose: no change is open")
         return 1
     ids = list(dict.fromkeys(_expand(args.ids)))
-    if args.withdraw:  # CHANGE-28: take back a proposal, from whichever change made it
+    if args.withdraw:  # CHANGE-33: take back a proposal, from whichever change made it
         try:
-            changes.withdraw_proposals(spec, c, ids, args.reason or "")
+            kept = changes.withdraw_proposals(spec, c, ids, args.reason or "")
         except changes.ChangeError as e:
             print(f"spec propose: {e}")
             return 1
         render.write_views(model.load(spec.root))
-        print(f"withdrew the proposal to lock {', '.join(ids)}; logged in {c.id}")
+        gone = [i for i in ids if i not in kept]
+        if gone:
+            print(f"removed the proposal to lock {', '.join(gone)}: it isn't on the trunk, so nothing is kept")
+        if kept:
+            print(f"withdrew the proposal to lock {', '.join(kept)}; logged in {c.id}")
         return 0
     if not args.why:
         print("spec propose: say why these items deserve the engineer's attention, with --why")
@@ -757,12 +775,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("ids", nargs="+", help="IDs, or ranges like CHECK-3..CHECK-5")
     p.add_argument("--why", help="why these deserve the engineer's attention")
     p.add_argument("--withdraw", action="store_true",
-                   help="withdraw the waiting proposals to lock these items, from whichever change made them "
-                        "(needs --reason)")
-    p.add_argument("--reason", help="why the proposal is withdrawn")
+                   help="withdraw the waiting proposals to lock these items, from whichever change made them; "
+                        "one on the trunk needs --reason")
+    p.add_argument("--reason", help="why the proposal is withdrawn, for one on the trunk")
     p.set_defaults(fn=cmd_propose)
     p = sub.add_parser("change", help="open, close or show the change record edits are logged in")
-    p.add_argument("action", choices=["start", "close", "show"])
+    p.add_argument("action", choices=["start", "close", "show", "discard"],
+                   help="discard throws away the open change when it isn't on the trunk yet")
     p.add_argument("request", nargs="?", help="start: what the engineer asked for, summarized")
     p.add_argument("--mode", choices=list(changes.MODES), help="default: code-first")
     p.add_argument("--target", help="implementation the change targets (default: the primary one)")
@@ -782,12 +801,13 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("decide", help="add an open decision (YAML on stdin: question, importance, involves, options)")
     p.add_argument("--file", help="read the decision from a file instead of stdin")
     p.add_argument("--replace", metavar="D<n>",
-                   help="rewrite this open decision of the open change in place; one of an earlier change, named as "
-                        "<change>/D<n>, is withdrawn and replaced by a new decision in the open change")
+                   help="rewrite this open decision in place (<change>/D<n> names one of another change); one of an "
+                        "earlier change already on the trunk is withdrawn and replaced by a new decision in the open "
+                        "change")
     p.add_argument("--withdraw", metavar="D<n>",
-                   help="withdraw this open decision, overtaken by events (needs --reason); <change>/D<n> names one "
-                        "of an earlier change")
-    p.add_argument("--reason", help="why the decision is withdrawn")
+                   help="withdraw this open decision; one not on the trunk yet is removed, one on the trunk is kept "
+                        "as withdrawn and needs --reason")
+    p.add_argument("--reason", help="why the decision is withdrawn, for one on the trunk")
     p.add_argument("--dry-run", action="store_true", help="check the decision without recording it")
     p.set_defaults(fn=cmd_decide)
     p = sub.add_parser("resolve", help="record the engineer's choice on open decisions")

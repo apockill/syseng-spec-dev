@@ -8,6 +8,7 @@ reason (CHANGE-5).
 
 import datetime
 import re
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -64,8 +65,14 @@ class ChangeError(Exception):
 
 
 def start(spec: Spec, request: str, mode: str | None, target: str | None, slug: str | None) -> Change:
-    if current(spec):
-        raise ChangeError(f"change {current(spec).id} is still open. Close it first with `spec change close`.")
+    open_change = current(spec)
+    if open_change and on_trunk(spec, open_change) is None:  # CHANGE-34: no need to close a draft to move on
+        raise ChangeError(
+            f"change {open_change.id} is still open, and isn't on the trunk yet. Keep working in it: its open "
+            "decisions and proposals can be rewritten or withdrawn there, without a trace. Close it with "
+            "`spec change close` only when its work is done, or throw it away to redo it with `spec change discard`.")
+    if open_change:
+        raise ChangeError(f"change {open_change.id} is still open. Close it first with `spec change close`.")
     mode = mode or "code-first"  # CHANGE-9: a request that names no mode is code-first
     if mode not in MODES:
         raise ChangeError(f"mode must be one of {', '.join(MODES)}")
@@ -132,7 +139,8 @@ def add_decision(change: Change, decision: dict, replace: str | None = None) -> 
             raise ChangeError(f"{replace} is already {old.get('status')}; file a new decision instead")
         did = replace
     else:
-        did = f"D{len(decisions) + 1}"
+        # the next number after the highest: a draft decision removed leaves a gap (CHANGE-30)
+        did = f"D{max([int(str(x.get('id', 'D0'))[1:] or 0) for x in decisions] + [0]) + 1}"
     entry = {"id": did, **({"kind": kind} if kind else {}), "question": decision["question"],
              "importance": decision["importance"], "involves": decision.get("involves") or [], "options": options,
              **({"replaces": decision["replaces"]} if decision.get("replaces") else {}), "status": "open"}
@@ -187,12 +195,69 @@ def find_decision(spec: Spec, ref: str, default: Change | None) -> tuple[Change,
     return change, d
 
 
+# ---------------------------------------------------------------- drafts and history (CHANGE-30, CHANGE-32)
+def on_trunk(spec: Spec, change: Change) -> dict | None:
+    """The change record as the trunk has it, or None when it isn't there yet: a draft, which nobody reviewing the
+    trunk has seen, so its decisions and proposals are rewritten or removed without a trace (CHANGE-30). Read through
+    the version-control interface: the record at the trunk's tip, or, with no trunk, at the current revision."""
+    try:
+        version_control = vcs.backend(spec.root)
+        top = version_control.root(spec.root)
+        rel = change.path.resolve().relative_to(top.resolve()).as_posix()
+        trunk = version_control.trunk(top)
+        revision = version_control.resolve(top, trunk, trunk)[0] if trunk else version_control.revision(top)
+        if not revision:
+            return None
+        with tempfile.TemporaryDirectory() as tmp:
+            version_control.extract(top, revision, rel, Path(tmp))
+            return yamlio.loads((Path(tmp) / rel).read_text()) or {}
+    except (vcs.VersionControlError, ValueError, OSError):
+        return None
+
+
+def decision_seen(spec: Spec, change: Change, did: str) -> bool:
+    """Whether the trunk has this decision, so people may have seen it."""
+    there = on_trunk(spec, change)
+    return bool(there) and any(d.get("id") == did for d in there.get("decisions") or [])
+
+
+def _proposal_seen(there: dict | None, proposal: dict, iid: str) -> bool:
+    return bool(there) and any(iid in (p.get("ids") or []) and p.get("proposed") == proposal.get("proposed")
+                               for p in there.get("proposals") or [])
+
+
+def drop_decision(change: Change, did: str) -> None:
+    """CHANGE-30: a draft's open decision is removed outright; nobody saw it, so nothing is kept."""
+    decisions = change.data.get("decisions") or []
+    d = next((x for x in decisions if x.get("id") == did), None)
+    if d is None:
+        raise ChangeError(f"{change.id} has no decision {did}")
+    if d.get("status") != "open":
+        raise ChangeError(f"{did} is already {d.get('status')}")
+    decisions.remove(d)
+    change.save()
+
+
+def discard(spec: Spec, change: Change) -> list[str]:
+    """CHANGE-31: an open change that isn't on the trunk is thrown away, record and all, to be redone. Returns the
+    items its edits touched, which stay as they are in the working tree."""
+    if not change.is_open:
+        raise ChangeError(f"{change.id} isn't open")
+    if on_trunk(spec, change) is not None:
+        raise ChangeError(f"{change.id} is on the trunk, so people may have seen it; close it instead, and correct "
+                          "what it holds from the next change")
+    touched = list(dict.fromkeys(str(e.get("id")) for e in change.data.get("entries") or []))
+    change.path.unlink()
+    return touched
+
+
 def withdraw(change: Change, did: str, reason: str, into: Change | None = None) -> None:
-    """CHANGE-21: an open decision the conversation has overtaken is withdrawn with a reason, not left to linger.
-    One of an earlier change is withdrawn from the open change, `into`, which logs the act (CHANGE-24); the earlier
-    record keeps what was asked, and gains only its new status and why."""
+    """CHANGE-21, CHANGE-32: an open decision on the trunk is withdrawn with a reason, not left to linger. One of an
+    earlier change is withdrawn from the open change, `into`, which logs the act; the earlier record keeps what was
+    asked, and gains only its new status and why. A draft's decision is removed instead (`drop_decision`)."""
     if not (reason or "").strip():
-        raise ChangeError("say why the decision is withdrawn")
+        raise ChangeError(f"{qualified(change, did)} is on the trunk, so people may have seen it: say why it's "
+                          "withdrawn, with --reason")
     d = next((x for x in change.data.get("decisions") or [] if x.get("id") == did), None)
     if d is None:
         raise ChangeError(f"{change.id} has no decision {did}")
@@ -210,8 +275,8 @@ def withdraw(change: Change, did: str, reason: str, into: Change | None = None) 
 
 
 def replace_earlier(current: Change, earlier: Change, did: str, decision: dict) -> str:
-    """CHANGE-25: an open decision of an earlier change is replaced by a new one in the open change, and withdrawn
-    there, so the earlier record keeps what it asked."""
+    """CHANGE-25, CHANGE-32: an open decision of an earlier change on the trunk is replaced by a new one in the open
+    change, and withdrawn there, so the earlier record keeps what it asked."""
     old = next((x for x in earlier.data.get("decisions") or [] if x.get("id") == did), None)
     if old is None or old.get("status") != "open":
         raise ChangeError(f"{qualified(earlier, did)} is {'already ' + str(old.get('status')) if old else 'not there'}; "
@@ -252,7 +317,7 @@ def add_proposal(change: Change, ids: list[str], why: str) -> None:
 
 
 def withdrawn_from(proposal: dict) -> set[str]:
-    """The items an agent took back out of a proposal (CHANGE-28)."""
+    """The items an agent took back out of a proposal on the trunk (CHANGE-32)."""
     return {str(w.get("id")) for w in proposal.get("withdrawn") or []}
 
 
@@ -262,24 +327,35 @@ def pending_proposals(spec: Spec, iid: str) -> list[tuple[Change, dict]]:
 
 
 def withdraw_proposals(spec: Spec, current: Change, ids: list[str], reason: str) -> list[str]:
-    """CHANGE-28: an agent takes back its proposal that the engineer lock items, with a reason, in whichever change
-    proposed them. The proposal keeps its items and reason; it gains the withdrawal, logged in the open change."""
-    if not (reason or "").strip():
-        raise ChangeError("say why the proposal is withdrawn")
+    """CHANGE-33: an agent takes back its proposal that the engineer lock items, in whichever change proposed them.
+    From a draft the item is simply removed (CHANGE-30). From a proposal on the trunk it's marked withdrawn with the
+    agent's reason, the proposal keeping its items and reason, and the act is logged in the open change (CHANGE-32).
+    Returns the items whose withdrawal was kept on record."""
     missing = [i for i in ids if not pending_proposals(spec, i)]
     if missing:
         raise ChangeError(f"no proposal to lock {', '.join(missing)} is waiting; nothing withdrawn")
+    trunk = {c.path: on_trunk(spec, c) for c in {c.path: c for i in ids for c, _ in pending_proposals(spec, i)}.values()}
+    seen = [i for i in ids if any(_proposal_seen(trunk[c.path], p, i) for c, p in pending_proposals(spec, i))]
+    if seen and not (reason or "").strip():
+        raise ChangeError(f"the proposal to lock {', '.join(seen)} is on the trunk, so people may have seen it: say "
+                          "why it's withdrawn, with --reason")
     now = _stamp()
     for iid in ids:
         for c, p in pending_proposals(spec, iid):
             target = current if c.path == current.path else c
             prop = next(x for x in target.data["proposals"] if x == p)
-            prop.setdefault("withdrawn", []).append(
-                {"id": iid, "because": reason, "at": now, **({} if target is current else {"withdrawn_in": current.id})})
+            if _proposal_seen(trunk[c.path], p, iid):
+                prop.setdefault("withdrawn", []).append(
+                    {"id": iid, "because": reason, "at": now, **({} if target is current else {"withdrawn_in": current.id})})
+            else:
+                prop["ids"] = [i for i in prop.get("ids") or [] if i != iid]
+                if not prop["ids"]:
+                    target.data["proposals"].remove(prop)
             target.save()
-    current.data.setdefault("withdrawals", []).append({"proposal": ids, "because": reason, "at": now})
-    current.save()
-    return ids
+    if seen:
+        current.data.setdefault("withdrawals", []).append({"proposal": seen, "because": reason, "at": now})
+        current.save()
+    return seen
 
 
 # ---------------------------------------------------------------- view
@@ -353,7 +429,7 @@ def view(spec: Spec, change: Change) -> str:
                 for x in withdrawn]
         out.append("")
     acts = d.get("withdrawals") or []
-    if acts:  # CHANGE-24: what this change withdrew from earlier ones
+    if acts:  # CHANGE-32: what this change withdrew from earlier ones on the trunk
         out += ["## Withdrawn here", ""]
         out += [f"- {'decision ' + a['decision'] if a.get('decision') else 'proposal to lock ' + ', '.join(a.get('proposal') or [])}: "
                 f"{a.get('because', '')}" for a in acts]
@@ -495,7 +571,7 @@ def _proposals_section(spec: Spec, change: Change) -> list[str]:
             pending.append(iid)
             head, body = _full(spec, iid)
             out += [f"### {head}", "", f"**Why I'm asking:** {p.get('why', '')}", "", *body, ""]
-    if not pending and not done:  # every proposal withdrawn (CHANGE-28)
+    if not pending and not done:  # every proposal withdrawn (CHANGE-29)
         return []
     if pending:
         out += [f"To lock every item above: `lock {', '.join(pending)}`", ""]

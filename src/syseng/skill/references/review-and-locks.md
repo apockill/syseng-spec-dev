@@ -1,7 +1,7 @@
 # Conflicts, review pages, feedback and locks
 
 ## Contents
-- Conflicts (and open decisions after the round that filed them)
+- Conflicts (and correcting open decisions and proposals)
 - Handing over the review page
 - Reporting
 - Feedback from the review page
@@ -36,15 +36,18 @@ YAML
 
 An ordinary open decision is the same without `kind`, `keeps` and `rolls_back`. Every decision needs a question, an importance, at least two options and exactly one recommended.
 
-### Open decisions after the round that filed them
+### Correcting open decisions and proposals
+
+The line is the trunk. A change record that isn't on the trunk yet is a draft nobody has reviewed, so correct it freely:
+- keep working in the open change for the next request rather than closing it just to start another; close it when its work is done;
+- `spec decide --replace D<n>` (the new decision on standard input) rewrites an open decision, and `spec decide --withdraw D<n>` removes it, with nothing kept;
+- `spec change discard` throws the whole open change away to redo it; its spec edits stay in the working tree, for version control to undo if they should go too.
+
+Once a record is on the trunk, people may have seen it, so a correction keeps the history: `--withdraw` needs `--reason "…"` and marks the decision withdrawn, and `--replace` files the new decision in the open change and withdraws the old one, naming its replacement. Both are logged in the open change; the earlier record keeps what it asked.
 
 Each change numbers its decisions from D1, so name one of another change as `<change>/D<n>`, with the change record's ID or a part naming only it (`round-63/D1`). A bare `D<n>` means the open change's, and is refused when another change has an open decision of that number. `spec status` lists the open decisions of earlier changes by those names.
 
-When one goes stale after its change closed (the facts settled it, a later round asks it again, or it names items since removed), correct it from the open change, which logs what you did:
-- `spec decide --withdraw <change>/D<n> --reason "…"` withdraws it;
-- `spec decide --replace <change>/D<n>` (the new decision on standard input) files the new one in the open change and withdraws the old one, naming its replacement.
-
-The earlier record keeps what it asked; it only gains the withdrawal and why. Withdrawing is yours and answers nothing: only the engineer resolves a decision (`spec resolve`, or a choice on the page), and a withdrawn one takes no choice.
+Withdrawing is yours and answers nothing: only the engineer resolves a decision (`spec resolve`, or a choice on the page), and a withdrawn one takes no choice.
 
 ## Handing over the review page
 
@@ -84,4 +87,4 @@ A lock is a person's own act, naming the items: a lock line in chat (`lock CHECK
 
 ## Proposing items to lock
 
-Propose the items whose consequences reach the engineer (what they see, lock or do), judged from what you know they care about: `spec propose <IDs> --why "…"`, most consequential first. To take a proposal back, because its reason was wrong or you proposed too much, `spec propose <IDs> --withdraw --reason "…"` withdraws it from whichever change made it; propose again with the right reason if the items still deserve it. One reason per group of items; don't repeat it for each. Your decision records about mechanics stay yours to revise. The review page also lists the items the most of the tree hangs from, but that list is mechanical and no substitute for your judgment.
+Propose the items whose consequences reach the engineer (what they see, lock or do), judged from what you know they care about: `spec propose <IDs> --why "…"`, most consequential first. To take a proposal back, because its reason was wrong or you proposed too much, `spec propose <IDs> --withdraw` removes it from whichever change made it; one already on the trunk needs `--reason "…"` and is kept as withdrawn. Propose again with the right reason if the items still deserve it. One reason per group of items; don't repeat it for each. Your decision records about mechanics stay yours to revise. The review page also lists the items the most of the tree hangs from, but that list is mechanical and no substitute for your judgment.

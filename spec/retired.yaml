@@ -150,3 +150,13 @@
   - CLI-32
   note: |-
     CLI-32, in 2026-10-31-round-41-pr4-review: the engineer found it too prescriptive; they approve the report's text themselves, so what's in it is up to them.
+- element: CHANGE
+  ids:
+  - CHANGE-24
+  note: |-
+    CHANGE-24, in 2026-11-03-round-65-migration-fixes: The engineer doesn't want withdrawals of work that never reached the trunk recorded (F1); CHANGE-30 and CHANGE-32 replace it.
+- element: CHANGE
+  ids:
+  - CHANGE-28
+  note: |-
+    CHANGE-28, in 2026-11-03-round-65-migration-fixes: Replaced by CHANGE-33, with a reason needed only on the trunk (CHANGE-32), per the engineer's review (F1).
