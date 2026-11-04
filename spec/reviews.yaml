@@ -3018,22 +3018,33 @@
     - VERIFY-36
     kept:
     - DR-77
+- review: '5027511589'
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-03T21:02-08:00
+  generated: 2026-11-03T17:43-08:00
+  revision: 6cc3b253cc3a0e01938463d2f8f3d754a409d214
+  dirty: false
+  did:
+    locked:
+    - NEED-33
+    - MODEL-44
+    - REVIEW-50
 - review: fb9e41a5f8
   by: Alex Thiele <alex.g.thiele@gmail.com>
-  at: 2026-11-03T18:52-08:00
+  at: 2026-11-03T21:04-08:00
   generated: 2026-11-03T18:12-08:00
   revision: 80b3c2fb87cadc894662b8048672cc022b50487d
   dirty: false
   did:
     locked:
-    - SYS-62
     - VCS-1
     - AGENT-80
     - AGENT-V29
     - CHECK-37
+    - SYS-62
 - review: 607eac5aa3
   by: Alex Thiele <alex.g.thiele@gmail.com>
-  at: 2026-11-03T20:14-08:00
+  at: 2026-11-03T21:05-08:00
   generated: 2026-11-03T20:06-08:00
   revision: 582294ad5621e46b450b1a464e26cd721b482e7e
   dirty: false
@@ -3046,7 +3057,7 @@
     - D1 → Keep the narrowed REVIEW-41
 - review: f61700c8ef
   by: Alex Thiele <alex.g.thiele@gmail.com>
-  at: 2026-11-03T20:58-08:00
+  at: 2026-11-03T21:05-08:00
   generated: 2026-11-03T20:23-08:00
   revision: d376e460e13a05346b5f5092662372c807d8ec00
   dirty: false
