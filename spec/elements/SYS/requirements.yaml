@@ -860,3 +860,15 @@
     said: Asked why there would be runners at all; the toolkit should not be in the business of running but of reading results, such as reading JUnit or writing a promptfoo JSON reader. Agreed to replacing the runner layer with a plain promptfoo config.
     basis: stated
     fingerprint: bbcbd522b97e
+- id: SYS-62
+  kind: system
+  text: The toolkit shall let a repository name paths that its spec leaves out.
+  serves:
+  - NEED-3
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 18:08
+    context: Preparing the sites repository for migration, where only the portal, the templates and the repository's conventions are to be specified and the other apps are throwaway.
+    said: Asked to add .specignore, so the apps that aren't specified stay out of the spec.
+    basis: stated
+    fingerprint: ebd15577ee66

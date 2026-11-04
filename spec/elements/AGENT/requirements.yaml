@@ -684,3 +684,8 @@
   traces_to: SYS-27
   basis: added
   why: a skill that fires on everything costs tokens and gets in the way.
+- id: AGENT-80
+  text: The instructions the toolkit writes into a repository shall tell agents that a change touching only paths in .specignore needs no spec work.
+  traces_to: SYS-62
+  basis: derived
+  why: agents working on apps outside the spec would otherwise follow the spec loop for them.

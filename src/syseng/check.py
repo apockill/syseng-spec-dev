@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import re
 from pathlib import Path
 
-from syseng import levels, records, render, review, schema, testlinks
+from syseng import levels, records, render, review, schema, scope, testlinks, vcs
 from syseng.model import Spec
 from syseng.rules import METHODS, RULES, TECHNIQUES, check_wording
 
@@ -265,7 +265,18 @@ def _attributes(spec: Spec) -> list[Finding]:
             if wrong:
                 out.append(Finding("A010", f"the lock on {a.get('id')}: {'; '.join(wrong)}", a.get("id"),
                                    spec.locks_path()))
-    return out + _schemas(spec)
+    return out + _schemas(spec) + _scope(spec)
+
+
+def _scope(spec: Spec) -> list[Finding]:
+    """CHECK-38: with a .specignore, each top-level path is either some element's related code or left out."""
+    repo = spec.repo_root()
+    try:
+        files = vcs.backend(repo).files(repo)
+    except vcs.VersionControlError:
+        return []
+    return [Finding("T006", f"{path} is neither related code of an element nor listed in {scope.FILE}")
+            for path in scope.uncovered(spec, files)]
 
 
 def _schemas(spec: Spec) -> list[Finding]:
@@ -401,7 +412,11 @@ def _test_links(spec: Spec) -> list[Finding]:
             continue
         links = [str(link) for vi in spec.of_kind("vi")
                  for link in ((vi.data.get("tests") or {}).get(i["name"]) or [])] if spec.of_kind("vi") else []
+        found = scope.patterns(spec.repo_root())
         for file, names in testlinks.unlinked(roots[i["name"]], links).items():
+            rel = (roots[i["name"]] / file).resolve().relative_to(spec.repo_root().resolve()).as_posix()
+            if found and scope.ignored(spec.repo_root(), rel, found):  # CHECK-37: outside the spec
+                continue
             shown = ", ".join(names[:8]) + (f" and {len(names) - 8} more" if len(names) > 8 else "")
             out.append(Finding("V003", f"{file} has {len(names)} test{'s' if len(names) != 1 else ''} no "
                                        f"verification item links: {shown}"))

@@ -243,3 +243,13 @@
   tests:
     python:
     - tests/test_edit.py::test_closing_a_change_reminds_the_agent_of_unlinked_tests
+- id: CHECK-V24
+  verifies:
+  - CHECK-37
+  - CHECK-38
+  method: test
+  technique: unit test
+  description: Patterns match folders, files and globs; without a .specignore nothing is listed; with one, paths neither related nor listed are reported, the spec's own files never are, and tests in listed paths aren't asked to be linked.
+  tests:
+    python:
+    - tests/test_scope.py

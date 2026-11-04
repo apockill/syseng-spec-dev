@@ -84,6 +84,9 @@ class Git(Backend):
     def setting(self, repo, key):
         return _quiet(repo, "config", key)
 
+    def files(self, repo):
+        return [f for f in _quiet(repo, "ls-files").splitlines() if f]
+
     def ignore(self, path):
         listing = path.parent / ".gitignore"
         entry = path.name + "/" if path.is_dir() else path.name

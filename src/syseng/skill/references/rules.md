@@ -11,7 +11,7 @@ The wording rules (W…) flag patterns that are usually wrong. When one doesn't 
 ## Contents
 
 - Structure: S001, S002, S003, S004, S005, S006, S007, S008, S009
-- Traceability: T001, T002, T003, T004, T005
+- Traceability: T001, T002, T003, T004, T005, T006
 - Attributes: A001, A002, A003, A004, A005, A006, A007, A008, A009, A010, F001
 - Conflicts: C001
 - Verification items: V001
@@ -89,6 +89,10 @@ Requirements flow down the system breakdown. A requirement on an element refines
 It's a to-do until `flow_down: enforced` is set in spec/toolkit.yaml, which new repositories start with. Then it's an error.
 
 ## Attributes
+
+<a id="t006"></a>
+### T006: path the spec doesn't account for (to-do)
+Only in a repository with a `.specignore`. Each top-level path is either some element's `related_code` or listed in `.specignore`, so nothing is in the spec by accident or left out by accident. Add the path to the element it belongs to, or to `.specignore`.
 
 <a id="a001"></a>
 ### A001: requirement without rationale

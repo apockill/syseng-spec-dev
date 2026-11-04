@@ -178,3 +178,9 @@
   tests:
     python:
     - tests/test_evals.py
+- id: SYS-V26
+  verifies:
+  - SYS-62
+  method: analysis
+  technique: roll-up
+  description: Verified through its children's verification.

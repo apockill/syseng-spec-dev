@@ -307,3 +307,13 @@
     said: Thinks the spec framework should request that the LLM link tests to verification items, creating them or fleshing out the tree where the relevant requirements and verification items don't exist.
     basis: guided
     fingerprint: eda0e3157021
+- id: CHECK-37
+  text: When a repository has a .specignore file, the checker shall leave the paths it lists out of its checks of code and tests.
+  traces_to: SYS-62
+  basis: derived
+  why: tests in apps outside the spec shouldn't be asked to be linked.
+- id: CHECK-38
+  text: When a repository has a .specignore file, the checker shall report as a to-do each top-level path that no element's related code covers and the file doesn't list.
+  traces_to: SYS-62
+  basis: derived
+  why: nothing should be in or out of the spec by accident.

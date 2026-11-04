@@ -88,6 +88,10 @@ _RULES = [
          "A link to an item that doesn't exist (or was retired) points readers nowhere.",
          "Fix the ID, or drop the reference."),
     Rule("T004", "requirement without verification", "", "", severity="todo"),
+    Rule("T006", "path the spec doesn't account for",
+         "With a .specignore, every part of the repository is either described by an element or deliberately left out.",
+         "Add the path to the related_code of the element it belongs to, or list it in .specignore.",
+         severity="todo"),
     Rule("T005", "requirement skips a level of the system breakdown",
          "Requirements flow down the system breakdown: a requirement on an element "
          "refines one of its parent element's requirements, so the requirement tree has the same shape as the "
