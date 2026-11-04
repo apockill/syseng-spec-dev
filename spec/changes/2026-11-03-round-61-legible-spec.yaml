@@ -1,0 +1,22 @@
+request: Make the spec's text legible on its own, to a reader with no context
+mode: spec-first
+target: python
+status: open
+opened: '2026-11-03'
+entries:
+- op: add
+  id: NEED-33
+  at: 2026-11-03T16:57-08:00
+  reason: the engineer stated this need.
+  requested: true
+  after:
+    text: The engineer needs every item the toolkit writes to read clearly on its own, to someone arriving with no context.
+    context: Reading the verification item for the problem-report eval, which said "Asked to do something the toolkit can't, an agent with the skill says so, offers a report, proposes no fix and leaves sending to the engineer."
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 16:57
+      context: Reviewing a verification item written for an eval.
+      said: Found text like this illegible; someone coming in blind would have no clue what it's trying to say, and even with context the wording is awkward. Wants specs from the toolkit to be well written and legible, so items can stand on their own.
+      basis: stated
+      fingerprint: c2be1e77f7df
+decisions: []
