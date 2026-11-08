@@ -13,10 +13,10 @@ Run the toolkit as `spec` from the repository root. `spec <command> --help` expl
 
 | Your task | Read | Size |
 |---|---|---|
-| Any change to a repository that has a spec | this file | 100 lines |
+| Any change to a repository that has a spec | this file | 125 lines |
 | Bringing an existing project in | [references/onboarding.md](references/onboarding.md) | 100 lines |
-| Writing or editing needs, requirements, verification items | [references/writing-requirements.md](references/writing-requirements.md) | 80 lines |
-| How deep to write a requirement: features, values, inferred requirements, documents, gaps (beyond the rules below) | [references/requirement-depth.md](references/requirement-depth.md) | 90 lines |
+| Writing or editing needs, requirements, verification items | [references/writing-requirements.md](references/writing-requirements.md) | 90 lines |
+| How deep to write a requirement: features, values by level, inferred requirements, documents, gaps, splitting (beyond the rules below) | [references/requirement-depth.md](references/requirement-depth.md) | 95 lines |
 | The types of node and the fields of each, with examples | [references/schema.md](references/schema.md) | 280 lines |
 | Handing over a review page, applying feedback, recording locks, raising conflicts, correcting earlier rounds' decisions and proposals, what to propose | [references/review-and-locks.md](references/review-and-locks.md) | 100 lines |
 | Running the auditors and reasoning checks | [references/auditing.md](references/auditing.md) | 40 lines |
@@ -68,13 +68,16 @@ What the engineer says becomes intent on the spec without an approval step; they
 
 1. **Depth follows intent.** Write what the engineer specified as deep as they went, in their terms, and never weaken it to match the code: a mismatch is an open decision. Write everything else at the level of behaviour someone relies on.
 2. **One requirement per feature** a user or another program would notice, even unasked (`basis: added`, or `derived` when a stated need implies it). Count features, not effects: polish serving a requirement you already have needs none of its own.
-3. **What's needed, not how it's built.** A requirement states the capability, or the risk it prevents, so a reader can agree with it without weighing an implementation. It never states an exact name, path, key, route, library, typeface or tool, interfaces included, and states a number only if the engineer stated it or it's a safety limit. For an interface other programs rely on, the interface requirement on the element that defines it says there is one standard name and which program relies on it; the verification item asserts the actual value; a decision record holds the standard values once, as does a shared constant in the code where one exists. Commands, flags, file names and formats go in the verification item, which may be as prescriptive as its test.
+3. **What's needed, at its level.** Needs and system requirements are solution-free: each states the capability, or the risk it prevents. A how belongs up there only as a constraint the engineer imposed, carrying their intent. Lower down, a choice made above is a fair "what" for the level below: a requirement may name an exact name or value (a file, key, route, exit code, typeface) when it sits at the level where that choice applies and a decision record at that level or above gives the reason; for an interface, that record can be the list of its standard names and values. Otherwise the value goes in the verification item, which may be as prescriptive as its test. Numbers the engineer stated, and safety limits, go in the requirement as given.
 4. **Environment-neutral.** Needs and requirements name no host, domain, operating system or deployment; a need's context may give example deployments.
-5. **Other values stay in the code.** A verification item names a value only when a test that exists, or that you're adding, checks it. Values you find in existing code get at most one decision record per design topic, and only when someone would ask why; decisions you make while building each get their own.
-6. **Subjective qualities** ("beautiful") are needs the engineer verifies by review, not requirements.
-7. **A requirement you infer is derived:** cite the statement and propose it. When two designs would both satisfy the statement, ask instead of picking.
-8. **A requirement belongs to the element whose code does it;** a system constraint is never restated in an element.
-9. For anything these don't settle, read references/requirement-depth.md.
+5. **Intent first, then parts.** Write a parent's intent before its children. Split a requirement that joins two behaviours with "and", "or" or ";". A parent with one child is suspect: merge the two, or find the missing sibling.
+6. **The engineer's test.** Before handing over, read each requirement you wrote or changed against it: "I should be able to look at any requirement, and with a little bit of context, agree 'yes this is a feature/something/an intent/etc that should exist/that I agree with' without also having to wonder if I also necessarily agree with the implementation details." Rewrite each that fails.
+7. **The strongest check that can work.** Verify by an automated test or static check first, then a reasoning check, then manual. An item that uses a weaker method says why the stronger one can't work.
+8. **Other values stay in the code.** A verification item names a value only when a test that exists, or that you're adding, checks it. Values you find in existing code get at most one decision record per design topic, and only when someone would ask why; decisions you make while building each get their own.
+9. **Subjective qualities** ("beautiful") are needs the engineer verifies by review, not requirements.
+10. **A requirement you infer is derived:** cite the statement and propose it. When two designs would both satisfy the statement, ask instead of picking.
+11. **A requirement belongs to the element whose code does it;** a system constraint is never restated in an element.
+12. For anything these don't settle, read references/requirement-depth.md.
 
 ## Editing the spec
 

@@ -1,0 +1,62 @@
+# Evals of how the skill has agents write requirements, on a project of their own (evals/lampboard.sh). Run them
+# with evals/run.sh. The baseline arm has no skill, or the skill at the git ref given to run.sh as SKILL_BASELINE.
+description: syseng skill evals - writing requirements
+prompts:
+  - '{{request}}'
+
+providers:
+  - id: anthropic:claude-agent-sdk
+    label: with-skill
+    config: &agent
+      model: claude-sonnet-5-5
+      apiKeyRequired: false
+      path_to_claude_code_executable: '{{env.CLAUDE_BIN}}'
+      working_dir: ./.work/lampboard/with-skill
+      copy_working_dir: copy
+      setting_sources: [project]
+      skills: [syseng]
+      permission_mode: acceptEdits
+      max_turns: 120      # bringing a whole project in takes many more turns than the other cases
+      tools: [Read, Grep, Glob, Edit, Write, Bash, Skill]
+      append_allowed_tools:
+        - Read
+        - Grep
+        - Glob
+        - Edit
+        - Write
+        - Bash(spec*)
+        - Bash(git status*)
+        - Bash(git diff*)
+        - Bash(git log*)
+        - Bash(git show*)
+        - Bash(python3 -m pytest*)
+        - Bash(python -m pytest*)
+        - Bash(cat*)
+        - Bash(head*)
+        - Bash(tail*)
+        - Bash(ls*)
+        - Bash(grep*)
+        - Bash(rg*)
+        - Bash(wc*)
+        - Bash(sed -n*)
+        - Bash(find . *)
+        - Bash(which*)
+        - Bash(echo*)
+  - id: anthropic:claude-agent-sdk
+    label: baseline   # the reader ignores this arm: it's here for reading the difference
+    config:
+      <<: *agent
+      working_dir: ./.work/lampboard/baseline
+
+# A verification item links a case by its description.
+tests:
+  - description: requirements-at-their-level
+    vars:
+      request: >-
+        I'm Ada. Please bring lampboard into the spec; the toolkit is set up. What it's for is in my README. Write
+        the needs, the system requirements, and the elements with their requirements and verification items, link
+        the tests, then hand it over for my review. I'm away today, so don't wait on me: record any questions as
+        decisions.
+    assert:
+      - type: python
+        value: file://checks.py:requirements_at_their_level

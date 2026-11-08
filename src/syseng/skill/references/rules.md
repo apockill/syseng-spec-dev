@@ -255,7 +255,7 @@ These are exempt: "how many" (a quantity, not a vague amount), and capitalized w
 
 <a id="w009"></a>
 ### W009: language-specific name (INCOSE R31)
-Requirements describe behavior in terms any implementation can meet, so a Rust rebuild can follow them. Code spans, file names, snake_case or camelCase identifiers and call syntax belong in test links and related-code lists. A name another program relies on (a JSON key, a socket's file name) stays out too: the requirement says there is one standard name, its verification item asserts the value, and a decision record holds it. The check reads text in double quotes as a quoted value, for the engineer's own words. Other specifics go in verification items.
+Requirements describe behavior in terms any implementation can meet, so a Rust rebuild can follow them. Code spans, file names, snake_case or camelCase identifiers and call syntax belong in test links and related-code lists. An exact name (a JSON key, a socket's file name) belongs only in a requirement at the lowest level where that choice applies, and only when a decision record at that level or above gives the reason: allow W009 on that item, citing the record. Otherwise the requirement states the capability, or that there is one standard name, and its verification item asserts the value. The check reads text in double quotes as a quoted value, for the engineer's own words. Other specifics go in verification items.
 
 <a id="w010"></a>
 ### W010: requirement states its own test (INCOSE R31)

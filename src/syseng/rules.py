@@ -201,8 +201,8 @@ _RULES = [
          "INCOSE R20"),
     Rule("W009", "language-specific name",
          "A requirement that names code can't guide a rebuild in another language.",
-         "Describe the behavior or concept. Put code names in test links or related-code lists; quote an exact value "
-         "another program depends on, such as \"node_id\".",
+         "Describe the behavior or concept. Put code names in test links or related-code lists. A name a decision "
+         "record justifies, at the lowest level where that choice applies, may stay: allow W009 on the item, citing the record.",
          "INCOSE R31"),
     Rule("W010", "requirement states its own test",
          "A requirement says what must hold. How it's checked belongs in a verification item, written separately.",

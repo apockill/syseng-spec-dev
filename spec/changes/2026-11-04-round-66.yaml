@@ -229,14 +229,272 @@ entries:
     description: SKILL.md says a requirement states what's needed or the risk it prevents, is environment-neutral, names an exact value another program parses only in an interface requirement on the defining element saying which program reads it, and leaves the rest to verification items as prescriptive as their tests; the depth reference's value rule 3 no longer lists command and flag names, says to state the capability, and its worked examples keep the operating system, proxy and domain out of requirements; neither says named consumer.
   after:
     description: SKILL.md says a requirement states what's needed or the risk it prevents, never states an exact name, path, key, route, library, typeface or tool, interfaces included, and that for an interface the requirement says there is one standard name and which program relies on it, the verification item asserts the actual value and a decision record holds the standard values once; it is environment-neutral and leaves the rest to verification items as prescriptive as their tests. The depth reference's section B says the same with a worked example asserting a file named app.sock, its value rule 3 no longer lists command and flag names, puts no interface value in double quotes and says to state the capability, and its worked examples keep the operating system, proxy and domain out of requirements; neither says named consumer.
+- op: modify
+  id: AGENT-82
+  at: 2026-11-08T13:16-08:00
+  reason: the engineer chose a level rule over the earlier never-name-a-value rule; this item keeps the top of the spec solution-free, and the rest of what it held moves to AGENT-83 (values below the top) and a new item for environment neutrality.
+  before:
+    text: The skill shall direct agents to write each need and requirement as the capability needed or the risk prevented, naming no host, domain, operating system or deployment and no exact name, path, key, route, library, typeface or tool, stating a number only where the engineer stated it or it is a safety limit, and leaving every other specific to verification items.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 18:00
+      context: Reviewing a spec migrated from a repository of web apps, whose requirements named the host's operating system, command flags and file names.
+      said: Wants nothing in the spec to mention that it runs on a machine running NixOS; thinks verification items may be very prescriptive since they test the implementation, while constraints should talk more about the risks involved and what is to be prevented; asked whether a command-line requirement should instead say the command can accept standard input, with the verification checking it does so through the flag; and suggested a manifest requirement might say each app shall have a file that is enforced to follow one schema, with a verification item or child requirements saying how.
+      basis: stated
+      source: human_conversation
+      fingerprint: 6dba055f0efa
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 10:02
+      context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+      said: Felt that naming the socket file in a requirement was implementation slipping into requirements again, and wanted the name left to the verification item. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+      basis: stated
+      source: human_conversation
+      fingerprint: 8be363c9112f
+  after:
+    text: The skill shall direct agents to write each need and system requirement as the capability needed or the risk prevented, stating a how there only as a constraint the engineer imposed.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 18:00
+      context: Reviewing a spec migrated from a repository of web apps, whose requirements named the host's operating system, command flags and file names.
+      said: Wants nothing in the spec to mention that it runs on a machine running NixOS; thinks verification items may be very prescriptive since they test the implementation, while constraints should talk more about the risks involved and what is to be prevented; asked whether a command-line requirement should instead say the command can accept standard input, with the verification checking it does so through the flag; and suggested a manifest requirement might say each app shall have a file that is enforced to follow one schema, with a verification item or child requirements saying how.
+      basis: stated
+      source: human_conversation
+      fingerprint: 6dba055f0efa
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 10:02
+      context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+      said: Felt that naming the socket file in a requirement was implementation slipping into requirements again, and wanted the name left to the verification item. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+      basis: stated
+      source: human_conversation
+      fingerprint: 8be363c9112f
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 12:00
+      context: After correcting about 25 requirements of a migrated spec of web apps for stating implementation detail, reading research the agent gathered from INCOSE's Guide to Writing Requirements - requirements free of implementation unless there is a reason to constrain the design, detail suited to each level, a how chosen at one level being a fair what for the level below, and a how a stakeholder imposes stated as a constraint.
+      said: Said the research aligned with their hunch.
+      basis: guided
+      source: human_conversation
+      fingerprint: b193d5083c6d
+  acks:
+    AGENT-V32: restated in this batch to verify AGENT-82 to AGENT-84 as now written.
+- op: modify
+  id: AGENT-83
+  at: 2026-11-08T13:16-08:00
+  reason: the engineer loosened the rule - names and values are allowed at the lowest level when a decision record justifies them.
+  requested: true
+  before:
+    text: Where other programs rely on an interface's exact names, the skill shall direct agents to state in the requirement only that one standard name exists and which program relies on it, to assert each actual value in a verification item, and to record the standard values once in a decision record.
+    why: the engineer's test for a requirement is that a reader agrees it should hold without weighing an implementation detail, and an interface's exact name is one; the verification item still pins the value, and the decision record keeps the standard values in one place.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 10:02
+      context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+      said: Felt that naming the socket file in a requirement was implementation slipping into requirements again; suggested the requirement avoid the name and say instead that each backend app has a Unix socket of a standard name at the top of the apps directory, with the verification item enforcing the implementation by asserting that a file named app.sock exists. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+      basis: stated
+      source: human_conversation
+      fingerprint: 12e4e7ba1982
+  after:
+    text: Below the system level, the skill shall direct agents to state an exact name or value in a requirement only where the engineer stated it, it is a safety limit, or the requirement sits at the level where that choice applies and a decision record at that level or above gives the reason.
+    why: a how chosen at one level is a fair what for the level below, so the lowest requirement may carry the choice, while the record keeps the reason in one place and every higher requirement stays agreeable by its intent; elsewhere the value belongs in the verification item.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 10:02
+      context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+      said: Felt that naming the socket file in a requirement was implementation slipping into requirements again; suggested the requirement avoid the name and say instead that each backend app has a Unix socket of a standard name at the top of the apps directory, with the verification item enforcing the implementation by asserting that a file named app.sock exists. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+      basis: stated
+      source: human_conversation
+      fingerprint: 12e4e7ba1982
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 12:00
+      context: Choosing how strict the skill's rule on names and values in requirements should be, after reading the INCOSE research; the rule then in the skill said never, interfaces included.
+      said: Chose to allow names and values in requirements at the lowest level when a decision record justifies the choice, and to have no glossary for now.
+      basis: stated
+      source: human_conversation
+      fingerprint: 3c445e5c5cd5
+  acks:
+    AGENT-V32: restated in this batch to verify AGENT-82 to AGENT-84 as now written.
+- op: add
+  id: AGENT-84
+  at: 2026-11-08T13:16-08:00
+  reason: split out of AGENT-82, which joined three rules; this one keeps the engineer's environment-neutral rule at every level.
+  requested: true
+  after:
+    text: The skill shall direct agents to name no host, domain, operating system or deployment in a need or requirement at every level.
+    traces_to: SYS-20
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 18:00
+      context: Reviewing a spec migrated from a repository of web apps, whose requirements named the host's operating system, command flags and file names.
+      said: Wants nothing in the spec to mention that it runs on a machine running NixOS.
+      basis: stated
+      source: human_conversation
+      fingerprint: 111e17bb918b
+- op: add
+  id: AGENT-85
+  at: 2026-11-08T13:16-08:00
+  reason: the engineer's test, given as the check for every requirement; the skill quotes it so agents run it before handing over.
+  requested: true
+  after:
+    text: Before handing over, the skill shall direct agents to check each requirement they wrote or changed against the engineer's test that a reader can agree with its intent without weighing its implementation details.
+    traces_to: SYS-20
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-07 12:00
+      context: Reviewing a spec migrated from a repository of web apps, giving their test for every requirement.
+      said: Said they should be able to look at any requirement and, with a little context, agree that it is a feature or intent that should exist, without also having to wonder whether they agree with its implementation details.
+      basis: stated
+      source: human_conversation
+      fingerprint: 7b9bd407fc13
+- op: add
+  id: AGENT-86
+  at: 2026-11-08T13:16-08:00
+  reason: the engineer asked three times for this split; the skill now does it unasked.
+  after:
+    text: The skill shall direct agents to split a requirement that joins two or more behaviours into a parent stating the intent and one child per behaviour.
+    traces_to: SYS-20
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 12:00
+      context: Reviewing a migrated spec of web apps from 2026-11-03 to 11-08, on three long items - a command's exit codes, a long reasoning check and a manifest's schema - and later reading research that a requirement states one thought and that a parent with a single child is a smell.
+      said: Asked each time for the long item to become a parent stating the intent, with children giving the specifics, each verified on its own; said the research aligned with their hunch.
+      basis: guided
+      source: human_conversation
+      fingerprint: 1d74e4aaaf2f
+- op: add
+  id: AGENT-87
+  at: 2026-11-08T13:16-08:00
+  reason: the engineer's agreed order of verification methods.
+  after:
+    text: The skill shall direct agents to verify each requirement by the strongest method that can work, preferring an automated test or static check to a reasoning check and a reasoning check to a manual one, and recording why when a weaker one is chosen.
+    traces_to: SYS-10
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 12:00
+      context: Reviewing a migrated spec of web apps whose verification of an agent's pre-hand-over checks was a manual item.
+      said: Did not see why that requirement could not be tested, thought a linter could be useful and that many verification items would then be testable, and agreed to preferring an automated check, then a model-judged one, then a manual one, with the reason recorded when a weaker one is chosen.
+      basis: guided
+      source: human_conversation
+      fingerprint: e95c4fc3e98b
+- op: add
+  id: DR-83
+  at: 2026-11-08T13:16-08:00
+  reason: records the engineer's choice and the alternatives it replaced.
+  requested: true
+  after:
+    title: Names and values in requirements follow the level
+    decided_by: engineer
+    elements:
+    - AGENT
+    requirements:
+    - AGENT-82
+    - AGENT-83
+    - AGENT-84
+    context: While reviewing a migrated spec of web apps, the engineer corrected about 25 requirements for stating implementation detail (file names, routes, keys, typefaces, the host, the domain). The skill's rule then became the strictest form - never name an exact value in a requirement, interfaces included. Research from INCOSE's Guide to Writing Requirements says requirements are solution-free unless there is a reason to constrain the design, appropriate to their level, and that a how chosen at one level is a legitimate what for the level below.
+    decision: Needs and system requirements are solution-free, with a how only as a constraint the engineer imposed. Below that, a requirement may name an exact name or value when it sits at the level where that choice applies and a decision record at that level or above gives the reason; for an interface the record lists its standard names and values. Otherwise the value goes in the verification item. No requirement names the host, domain, operating system or deployment. No glossary for now.
+    alternatives: Never naming a value in a requirement, interfaces included - kept every requirement agreeable by intent, but the element that defines an interface could not state it. A glossary of standard names, as INCOSE suggests - not for now.
+    consequences: A lower-level requirement that names a value lists its record, and allows the checker's code-name rule (W009) on itself citing that record; the record is where the engineer reviews the choice.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 12:00
+      context: Choosing how strict the skill's rule on names and values in requirements should be, after reading the INCOSE research.
+      said: Chose to allow names and values in requirements at the lowest level when a decision record justifies the choice, and to have no glossary for now.
+      basis: stated
+      source: human_conversation
+      fingerprint: b2de795d425d
+- op: modify
+  id: AGENT-V32
+  at: 2026-11-08T13:16-08:00
+  reason: verifies AGENT-82 to AGENT-84 as restated by the engineer's level rule.
+  before:
+    verifies:
+    - AGENT-82
+    - AGENT-83
+    description: SKILL.md says a requirement states what's needed or the risk it prevents, never states an exact name, path, key, route, library, typeface or tool, interfaces included, and that for an interface the requirement says there is one standard name and which program relies on it, the verification item asserts the actual value and a decision record holds the standard values once; it is environment-neutral and leaves the rest to verification items as prescriptive as their tests. The depth reference's section B says the same with a worked example asserting a file named app.sock, its value rule 3 no longer lists command and flag names, puts no interface value in double quotes and says to state the capability, and its worked examples keep the operating system, proxy and domain out of requirements; neither says named consumer.
+    tests:
+      python:
+      - tests/test_skill.py::test_requirements_say_what_is_needed_environment_neutral_and_leave_specifics_to_verification
+  after:
+    verifies:
+    - AGENT-82
+    - AGENT-83
+    - AGENT-84
+    description: SKILL.md's rule 3 says needs and system requirements are solution-free, with a how only as a constraint the engineer imposed, and that a lower requirement may name an exact name or value only where it sits at the level where that choice applies and a decision record at that level or above gives the reason, the value otherwise going in the verification item; rule 4 keeps needs and requirements environment-neutral. The depth reference's section B says the same by level, after INCOSE (your what is my how), allowing the code-name rule on such an item citing its record, and keeps every level environment-neutral; its value rule 3 puts an interface's value in a requirement only at the lowest level and says to state the capability for flags a person types; its worked examples name app.sock only where a decision record lists the app interface's standard names, and keep the operating system, proxy and domain out of needs and requirements. The code-name rule's explanation says the same. Neither file says interfaces included or named consumer.
+    tests:
+      python:
+      - tests/test_skill.py::test_requirements_name_values_only_at_their_level_with_a_decision_record
+- op: add
+  id: AGENT-V33
+  at: 2026-11-08T13:16-08:00
+  reason: checks the skill's text for AGENT-85.
+  after:
+    verifies:
+    - AGENT-85
+    method: inspection
+    technique: unit test
+    description: SKILL.md's rule 6 quotes the engineer's test word for word, says to read each requirement written or changed against it before handing over, and to rewrite each that fails; the depth reference quotes it too, and the onboarding checklist's last step starts with reading every requirement against it.
+    tests:
+      python:
+      - tests/test_skill.py::test_skill_gives_the_engineers_test_for_every_requirement
+- op: add
+  id: AGENT-V34
+  at: 2026-11-08T13:16-08:00
+  reason: checks the skill's text for AGENT-86.
+  after:
+    verifies:
+    - AGENT-86
+    method: inspection
+    technique: unit test
+    description: SKILL.md's rule 5 says to write a parent's intent before its children, to split a requirement joining two behaviours with and, or or a semicolon, and that a parent with one child is suspect; the depth reference's section F says a requirement is one thought, to write the parent first, and to merge a single child or find its missing sibling, and its exit-code example gives one child per outcome.
+    tests:
+      python:
+      - tests/test_skill.py::test_long_requirements_become_a_parent_and_children
+- op: add
+  id: AGENT-V35
+  at: 2026-11-08T13:16-08:00
+  reason: checks the skill's text for AGENT-87.
+  after:
+    verifies:
+    - AGENT-87
+    method: inspection
+    technique: unit test
+    description: SKILL.md's rule 7 orders verification as an automated test or static check first, then a reasoning check, then manual, and says an item using a weaker method says why the stronger one can't work; the writing reference says the same and names a linter over the code or the spec as a static check.
+    tests:
+      python:
+      - tests/test_skill.py::test_verification_prefers_the_strongest_check_that_can_work
+- op: add
+  id: AGENT-V36
+  at: 2026-11-08T13:16-08:00
+  reason: the main proof that the skill's guidance changes how agents write requirements, not just what it says.
+  after:
+    verifies:
+    - AGENT-82
+    - AGENT-83
+    - AGENT-84
+    - AGENT-85
+    - AGENT-86
+    method: demonstration
+    technique: integration test
+    description: Asked to bring a small working project into the spec - one whose code names its socket, routes, JSON keys, exit codes, a staleness limit, typefaces, the host's operating system, a proxy and a domain, and whose README is the engineer's - an agent with the skill writes needs and requirements of which at least 90% pass a model judge on all three of - solution-free at their level or justified by a decision record, singular, and passing the engineer's agree-by-intent test - with the rubric's examples taken from the engineer's corrections of a migrated spec.
+    tests:
+      python:
+      - requirements-at-their-level
+- op: modify
+  id: AGENT-V33
+  at: 2026-11-08T13:26-08:00
+  reason: the first eval batches showed no clear gain from quoting the test alone, so the review became an explicit pass at hand-over.
+  before:
+    description: SKILL.md's rule 6 quotes the engineer's test word for word, says to read each requirement written or changed against it before handing over, and to rewrite each that fails; the depth reference quotes it too, and the onboarding checklist's last step starts with reading every requirement against it.
+  after:
+    description: SKILL.md's rule 6 has agents list each need and requirement they wrote or changed before handing over and ask of each whether it joins two behaviours, whether it names a how its level doesn't justify, and whether it passes the engineer's test, quoted word for word, rewriting each that fails; the loop's hand-over step says to do this review first. The depth reference quotes the test too, and the onboarding checklist's last step starts with reading every requirement against it.
+- op: modify
+  id: AGENT-V33
+  at: 2026-11-08T13:34-08:00
+  reason: back to the shorter rule; an explicit three-question review pass at hand-over measured no better in the requirement eval (89% of items against the old skill's 92%), so it was removed.
+  before:
+    description: SKILL.md's rule 6 has agents list each need and requirement they wrote or changed before handing over and ask of each whether it joins two behaviours, whether it names a how its level doesn't justify, and whether it passes the engineer's test, quoted word for word, rewriting each that fails; the loop's hand-over step says to do this review first. The depth reference quotes the test too, and the onboarding checklist's last step starts with reading every requirement against it.
+  after:
+    description: SKILL.md's rule 6 quotes the engineer's test word for word, says to read each requirement written or changed against it before handing over, and to rewrite each that fails; the depth reference quotes it too, and the onboarding checklist's last step starts with reading every requirement against it.
 decisions: []
 proposals:
-- ids:
-  - AGENT-82
-  - AGENT-83
-  why: |-
-    I turned your 2026-11-03 remarks on the migrated spec into the skill's rule: needs and requirements say what's needed or prevented, name no host, OS or deployment, and name an exact value only in an interface requirement when another program parses it. Every future spec is written by this rule.
-  proposed: 2026-11-04T08:15-08:00
 - ids:
   - AGENT-81
   - CLI-38
@@ -251,6 +509,23 @@ proposals:
   proposed: 2026-11-04T08:16-08:00
 - ids:
   - AGENT-83
+  - DR-83
   why: |-
-    Restated to your stricter rule: even an interface's exact name stays out of the requirement, which says one standard name exists; the verification item asserts the value and a decision record holds it. It changes how every migrated spec writes interfaces, so worth your confirmation.
-  proposed: 2026-11-08T10:03-08:00
+    Your level rule as I wrote it: below the system level a requirement may name a value only at the level where that choice applies, with a decision record at that level or above giving the reason. This loosens the never-name rule this PR carried, and every future spec follows it.
+  proposed: 2026-11-08T13:18-08:00
+- ids:
+  - AGENT-82
+  - AGENT-84
+  why: |-
+    I split the old AGENT-82, which joined three rules: AGENT-82 keeps needs and system requirements solution-free, with a how only as a constraint you imposed, from the research you accepted; AGENT-84 keeps your no-NixOS rule at every level.
+  proposed: 2026-11-08T13:18-08:00
+- ids:
+  - AGENT-85
+  why: Your test for every requirement, quoted word for word in the skill as the check an agent runs before handing over.
+  proposed: 2026-11-08T13:18-08:00
+- ids:
+  - AGENT-86
+  - AGENT-87
+  why: |-
+    Guided by your review: split a requirement joining two behaviours into a parent and children, and verify by automated check, then reasoning check, then manual, saying why when a weaker one is chosen. Both change how agents write every spec.
+  proposed: 2026-11-08T13:18-08:00

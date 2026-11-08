@@ -281,3 +281,24 @@
   alternatives: Leaving it where it was. A reminder printed when a change closes, which isn't tried yet.
   consequences: In 120 side-by-side runs, when the skill loaded the offer rose from 23 of 30 to 33 of 34. With the instructions a real repository gets in its fixture, the skill loaded 26 of 30 times, against 3 of 30 without. With a real toolkit limit in the case, agents offered a report 13 of 15 times with the skill and 1 of 15 without.
   basis: derived
+- id: DR-83
+  title: Names and values in requirements follow the level
+  decided_by: engineer
+  elements:
+  - AGENT
+  requirements:
+  - AGENT-82
+  - AGENT-83
+  - AGENT-84
+  context: While reviewing a migrated spec of web apps, the engineer corrected about 25 requirements for stating implementation detail (file names, routes, keys, typefaces, the host, the domain). The skill's rule then became the strictest form - never name an exact value in a requirement, interfaces included. Research from INCOSE's Guide to Writing Requirements says requirements are solution-free unless there is a reason to constrain the design, appropriate to their level, and that a how chosen at one level is a legitimate what for the level below.
+  decision: Needs and system requirements are solution-free, with a how only as a constraint the engineer imposed. Below that, a requirement may name an exact name or value when it sits at the level where that choice applies and a decision record at that level or above gives the reason; for an interface the record lists its standard names and values. Otherwise the value goes in the verification item. No requirement names the host, domain, operating system or deployment. No glossary for now.
+  alternatives: Never naming a value in a requirement, interfaces included - kept every requirement agreeable by intent, but the element that defines an interface could not state it. A glossary of standard names, as INCOSE suggests - not for now.
+  consequences: A lower-level requirement that names a value lists its record, and allows the checker's code-name rule (W009) on itself citing that record; the record is where the engineer reviews the choice.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-08 12:00
+    context: Choosing how strict the skill's rule on names and values in requirements should be, after reading the INCOSE research.
+    said: Chose to allow names and values in requirements at the lowest level when a decision record justifies the choice, and to have no glossary for now.
+    basis: stated
+    source: human_conversation
+    fingerprint: b2de795d425d

@@ -23,7 +23,7 @@ Copy this into your notes and tick it off:
 - [ ] 4. The other elements, each dry-run and checked as it lands
 - [ ] 5. Every test linked; every partly-met requirement raised
 - [ ] 6. Every automated check run; options and costs for the model-judged checks; coverage reported honestly
-- [ ] 7. Questions merged and ranked; review page handed over
+- [ ] 7. Every requirement read against the engineer's test; questions merged and ranked; review page handed over
 ```
 
 ## 1. Preflight
@@ -44,13 +44,13 @@ Map the system elements from the code's structure first: one tree with the proje
 Then write the system layer yourself, before any element requirement:
 - needs, from what the engineer has said and written (see Capturing intent in SKILL.md; documents are guided at most);
 - system requirements, each serving needs;
-- constraints for rules every part follows (conventions, platforms, languages), so no element restates them.
+- constraints for rules every part follows that the engineer imposed (conventions, platforms, languages), so no element restates them.
 
 The system layer is what the engineer reads. Keep it to what they'd recognize; one owner writes it, and helpers never add to it.
 
 ## 3. How deep to write
 
-Follow the rules in SKILL.md and references/requirement-depth.md: one requirement per feature, not per function or test; each saying what's needed or prevented, not how it's built, and naming no host, domain or operating system; no exact names, paths or tools, interfaces included (the requirement says there is one standard name; the verification item and a decision record hold it), and numbers only where the engineer stated them or a safety limit, with other specifics in verification items; repository-wide conventions as system constraints, never restated per element. Where nothing can verify a part (no tests, hardware only), raise the missing verification once, as a decision.
+Follow the rules in SKILL.md and references/requirement-depth.md: one requirement per feature, not per function or test; each saying what's needed or prevented at its level, and naming no host, domain or operating system. The system layer is solution-free. Names and values found in the code (files, keys, routes, typefaces) go in a lower-level requirement only where that choice applies and a decision record gives the reason (one record per design topic, such as an interface's standard names); otherwise in verification items, or only in the code. Numbers only where the engineer stated them or a safety limit. Repository-wide conventions the engineer imposed are system constraints, never restated per element; a convention only the code shows is a decision record or a question. Write each parent's intent before its children, and split any requirement that joins two behaviours. Where nothing can verify a part (no tests, hardware only), raise the missing verification once, as a decision. Before handing over, read every requirement against the engineer's test (SKILL.md, rule 6).
 
 ## 4. Drafting, alone or with helpers
 

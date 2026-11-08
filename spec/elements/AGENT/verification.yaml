@@ -299,9 +299,50 @@
   verifies:
   - AGENT-82
   - AGENT-83
+  - AGENT-84
   method: inspection
   technique: unit test
-  description: SKILL.md says a requirement states what's needed or the risk it prevents, never states an exact name, path, key, route, library, typeface or tool, interfaces included, and that for an interface the requirement says there is one standard name and which program relies on it, the verification item asserts the actual value and a decision record holds the standard values once; it is environment-neutral and leaves the rest to verification items as prescriptive as their tests. The depth reference's section B says the same with a worked example asserting a file named app.sock, its value rule 3 no longer lists command and flag names, puts no interface value in double quotes and says to state the capability, and its worked examples keep the operating system, proxy and domain out of requirements; neither says named consumer.
+  description: SKILL.md's rule 3 says needs and system requirements are solution-free, with a how only as a constraint the engineer imposed, and that a lower requirement may name an exact name or value only where it sits at the level where that choice applies and a decision record at that level or above gives the reason, the value otherwise going in the verification item; rule 4 keeps needs and requirements environment-neutral. The depth reference's section B says the same by level, after INCOSE (your what is my how), allowing the code-name rule on such an item citing its record, and keeps every level environment-neutral; its value rule 3 puts an interface's value in a requirement only at the lowest level and says to state the capability for flags a person types; its worked examples name app.sock only where a decision record lists the app interface's standard names, and keep the operating system, proxy and domain out of needs and requirements. The code-name rule's explanation says the same. Neither file says interfaces included or named consumer.
   tests:
     python:
-    - tests/test_skill.py::test_requirements_say_what_is_needed_environment_neutral_and_leave_specifics_to_verification
+    - tests/test_skill.py::test_requirements_name_values_only_at_their_level_with_a_decision_record
+- id: AGENT-V33
+  verifies:
+  - AGENT-85
+  method: inspection
+  technique: unit test
+  description: SKILL.md's rule 6 quotes the engineer's test word for word, says to read each requirement written or changed against it before handing over, and to rewrite each that fails; the depth reference quotes it too, and the onboarding checklist's last step starts with reading every requirement against it.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_gives_the_engineers_test_for_every_requirement
+- id: AGENT-V34
+  verifies:
+  - AGENT-86
+  method: inspection
+  technique: unit test
+  description: SKILL.md's rule 5 says to write a parent's intent before its children, to split a requirement joining two behaviours with and, or or a semicolon, and that a parent with one child is suspect; the depth reference's section F says a requirement is one thought, to write the parent first, and to merge a single child or find its missing sibling, and its exit-code example gives one child per outcome.
+  tests:
+    python:
+    - tests/test_skill.py::test_long_requirements_become_a_parent_and_children
+- id: AGENT-V35
+  verifies:
+  - AGENT-87
+  method: inspection
+  technique: unit test
+  description: SKILL.md's rule 7 orders verification as an automated test or static check first, then a reasoning check, then manual, and says an item using a weaker method says why the stronger one can't work; the writing reference says the same and names a linter over the code or the spec as a static check.
+  tests:
+    python:
+    - tests/test_skill.py::test_verification_prefers_the_strongest_check_that_can_work
+- id: AGENT-V36
+  verifies:
+  - AGENT-82
+  - AGENT-83
+  - AGENT-84
+  - AGENT-85
+  - AGENT-86
+  method: demonstration
+  technique: integration test
+  description: Asked to bring a small working project into the spec - one whose code names its socket, routes, JSON keys, exit codes, a staleness limit, typefaces, the host's operating system, a proxy and a domain, and whose README is the engineer's - an agent with the skill writes needs and requirements of which at least 90% pass a model judge on all three of - solution-free at their level or justified by a decision record, singular, and passing the engineer's agree-by-intent test - with the rubric's examples taken from the engineer's corrections of a migrated spec.
+  tests:
+    python:
+    - requirements-at-their-level
