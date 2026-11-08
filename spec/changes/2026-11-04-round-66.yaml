@@ -170,6 +170,65 @@ entries:
     description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or named-consumer cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
   after:
     description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or parsed-by-another-program cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
+- op: modify
+  id: AGENT-83
+  at: 2026-11-08T10:02-08:00
+  reason: the engineer made the interface exception stricter - interfaces get one standard name in the requirement, the value in the verification item and a decision record.
+  requested: true
+  before:
+    text: Where another program parses an exact value, the skill shall direct agents to state the value in an interface requirement on the element that defines the interface, naming the program that reads it.
+    why: the textbook exception to keeping specifics out of requirements is a contract another program depends on; placing it on the defining element keeps it out of the consumer's requirements.
+  after:
+    text: Where other programs rely on an interface's exact names, the skill shall direct agents to state in the requirement only that one standard name exists and which program relies on it, to assert each actual value in a verification item, and to record the standard values once in a decision record.
+    why: the engineer's test for a requirement is that a reader agrees it should hold without weighing an implementation detail, and an interface's exact name is one; the verification item still pins the value, and the decision record keeps the standard values in one place.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 10:02
+      context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+      said: Felt that naming the socket file in a requirement was implementation slipping into requirements again; suggested the requirement avoid the name and say instead that each backend app has a Unix socket of a standard name at the top of the apps directory, with the verification item enforcing the implementation by asserting that a file named app.sock exists. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+      basis: stated
+      source: human_conversation
+      fingerprint: 12e4e7ba1982
+- op: modify
+  id: AGENT-82
+  at: 2026-11-08T10:02-08:00
+  reason: drops the parsed-value exception, which the engineer's stricter rule replaces (AGENT-83).
+  requested: true
+  before:
+    text: The skill shall direct agents to write each need and requirement as the capability needed or the risk prevented, naming no host, domain, operating system or deployment, and naming an exact value only where the engineer stated it, it is a safety limit, or another program parses it, leaving every other specific to verification items.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 18:00
+      context: Reviewing a spec migrated from a repository of web apps, whose requirements named the host's operating system, command flags and file names.
+      said: Wants nothing in the spec to mention that it runs on a machine running NixOS; thinks verification items may be very prescriptive since they test the implementation, while constraints should talk more about the risks involved and what is to be prevented; asked whether a command-line requirement should instead say the command can accept standard input, with the verification checking it does so through the flag; and suggested a manifest requirement might say each app shall have a file that is enforced to follow one schema, with a verification item or child requirements saying how.
+      basis: stated
+      source: human_conversation
+      fingerprint: 6dba055f0efa
+  after:
+    text: The skill shall direct agents to write each need and requirement as the capability needed or the risk prevented, naming no host, domain, operating system or deployment and no exact name, path, key, route, library, typeface or tool, stating a number only where the engineer stated it or it is a safety limit, and leaving every other specific to verification items.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-03 18:00
+      context: Reviewing a spec migrated from a repository of web apps, whose requirements named the host's operating system, command flags and file names.
+      said: Wants nothing in the spec to mention that it runs on a machine running NixOS; thinks verification items may be very prescriptive since they test the implementation, while constraints should talk more about the risks involved and what is to be prevented; asked whether a command-line requirement should instead say the command can accept standard input, with the verification checking it does so through the flag; and suggested a manifest requirement might say each app shall have a file that is enforced to follow one schema, with a verification item or child requirements saying how.
+      basis: stated
+      source: human_conversation
+      fingerprint: 6dba055f0efa
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-08 10:02
+      context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+      said: Felt that naming the socket file in a requirement was implementation slipping into requirements again, and wanted the name left to the verification item. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+      basis: stated
+      source: human_conversation
+      fingerprint: 8be363c9112f
+- op: modify
+  id: AGENT-V32
+  at: 2026-11-08T10:02-08:00
+  reason: verifies AGENT-82 and AGENT-83 as restated.
+  before:
+    description: SKILL.md says a requirement states what's needed or the risk it prevents, is environment-neutral, names an exact value another program parses only in an interface requirement on the defining element saying which program reads it, and leaves the rest to verification items as prescriptive as their tests; the depth reference's value rule 3 no longer lists command and flag names, says to state the capability, and its worked examples keep the operating system, proxy and domain out of requirements; neither says named consumer.
+  after:
+    description: SKILL.md says a requirement states what's needed or the risk it prevents, never states an exact name, path, key, route, library, typeface or tool, interfaces included, and that for an interface the requirement says there is one standard name and which program relies on it, the verification item asserts the actual value and a decision record holds the standard values once; it is environment-neutral and leaves the rest to verification items as prescriptive as their tests. The depth reference's section B says the same with a worked example asserting a file named app.sock, its value rule 3 no longer lists command and flag names, puts no interface value in double quotes and says to state the capability, and its worked examples keep the operating system, proxy and domain out of requirements; neither says named consumer.
 decisions: []
 proposals:
 - ids:
@@ -190,3 +249,8 @@ proposals:
   why: |-
     Two changes to what the review page shows you: every waiting recommendation, newest round first and named by round, instead of only this round's; and answers kept from an earlier page version on items changed since are set aside and named, not sent.
   proposed: 2026-11-04T08:16-08:00
+- ids:
+  - AGENT-83
+  why: |-
+    Restated to your stricter rule: even an interface's exact name stays out of the requirement, which says one standard name exists; the verification item asserts the value and a decision record holds it. It changes how every migrated spec writes interfaces, so worth your confirmation.
+  proposed: 2026-11-08T10:03-08:00

@@ -137,7 +137,7 @@ def test_skill_teaches_how_deep_to_write_requirements():                        
     skill = (init.SKILL / "SKILL.md").read_text()
     depth = (init.SKILL / "references" / "requirement-depth.md").read_text()
     assert "**Depth follows intent.**" in skill and "as deep as they went" in skill
-    assert "Count features, not effects" in skill and "another program parses that exact value" in skill
+    assert "Count features, not effects" in skill and "For an interface other programs rely on" in skill
     assert "ask instead of picking" in skill and "never restated in an element" in skill
     for part in ("## A. What counts as a noticeable feature", "## B. Where a value goes", "## C. Requirements you infer",
                  "## D. Code that falls short", "## E. Intent read from documents", "## F. Splitting a big element"):
@@ -148,12 +148,18 @@ def test_requirements_say_what_is_needed_environment_neutral_and_leave_specifics
     skill = (init.SKILL / "SKILL.md").read_text()
     depth = (init.SKILL / "references" / "requirement-depth.md").read_text()
     assert "**What's needed, not how it's built.**" in skill and "the risk it prevents" in skill
-    assert "interface requirement on the element that defines the interface, saying which program reads it" in skill
+    assert "never states an exact name, path, key, route, library, typeface or tool, interfaces included" in skill
+    assert "says there is one standard name and which program relies on it" in skill
+    assert "the verification item asserts the actual value" in skill and "a decision record holds the standard values once" in skill
     assert "**Environment-neutral.**" in skill and "a need's context may give example deployments" in skill
     assert "as prescriptive as its test" in skill
     rule3 = next(l for l in depth.splitlines() if l.startswith("3. "))
     assert "command and flag names" not in rule3.split("→")[0].lower()        # a flag a person types isn't an interface
-    assert "state the capability" in rule3 and "saying which program reads it" in rule3
+    assert "state the capability" in rule3 and "one standard value and which program relies on it" in rule3
+    assert "in double quotes" not in rule3                                       # an interface's value isn't quoted in
+    part_b = depth[depth.index("## B."):depth.index("## C.")]
+    assert "interfaces included" in part_b and "a file named `app.sock`" in part_b   # the socket worked example
+    assert "another program parses" not in part_b.lower() and "names the fields" not in depth
     assert "**Environment-neutral.**" in depth and "NixOS, the proxy, the domain" in depth   # worked example
     assert "named consumer" not in skill + depth
 

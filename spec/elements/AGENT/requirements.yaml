@@ -701,7 +701,7 @@
     source: human_conversation
     fingerprint: 946d17ca0c62
 - id: AGENT-82
-  text: The skill shall direct agents to write each need and requirement as the capability needed or the risk prevented, naming no host, domain, operating system or deployment, and naming an exact value only where the engineer stated it, it is a safety limit, or another program parses it, leaving every other specific to verification items.
+  text: The skill shall direct agents to write each need and requirement as the capability needed or the risk prevented, naming no host, domain, operating system or deployment and no exact name, path, key, route, library, typeface or tool, stating a number only where the engineer stated it or it is a safety limit, and leaving every other specific to verification items.
   traces_to: SYS-20
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -711,8 +711,23 @@
     basis: stated
     source: human_conversation
     fingerprint: 6dba055f0efa
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-08 10:02
+    context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+    said: Felt that naming the socket file in a requirement was implementation slipping into requirements again, and wanted the name left to the verification item. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+    basis: stated
+    source: human_conversation
+    fingerprint: 8be363c9112f
 - id: AGENT-83
-  text: Where another program parses an exact value, the skill shall direct agents to state the value in an interface requirement on the element that defines the interface, naming the program that reads it.
+  text: Where other programs rely on an interface's exact names, the skill shall direct agents to state in the requirement only that one standard name exists and which program relies on it, to assert each actual value in a verification item, and to record the standard values once in a decision record.
   traces_to: SYS-20
   basis: derived
-  why: the textbook exception to keeping specifics out of requirements is a contract another program depends on; placing it on the defining element keeps it out of the consumer's requirements.
+  why: the engineer's test for a requirement is that a reader agrees it should hold without weighing an implementation detail, and an interface's exact name is one; the verification item still pins the value, and the decision record keeps the standard values in one place.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-08 10:02
+    context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+    said: Felt that naming the socket file in a requirement was implementation slipping into requirements again; suggested the requirement avoid the name and say instead that each backend app has a Unix socket of a standard name at the top of the apps directory, with the verification item enforcing the implementation by asserting that a file named app.sock exists. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+    basis: stated
+    source: human_conversation
+    fingerprint: 12e4e7ba1982
