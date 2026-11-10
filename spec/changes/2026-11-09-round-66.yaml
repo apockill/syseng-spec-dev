@@ -1,0 +1,54 @@
+request: Show what the review page compares against as a badge in its header, with the full statement on hover or click
+mode: code-first
+target: python
+status: open
+opened: '2026-11-09'
+started_from: ba5615eea2ac5a04a267c16b9c997726c3ed7958
+entries:
+- op: modify
+  id: REVIEW-40
+  at: 2026-11-09T20:35-08:00
+  reason: The engineer asked for the comparison line to become a badge with its detail on hover or on expanding.
+  raised:
+  - a person stated or guided it
+  level: stated
+  fingerprint_before: d45886b2be03
+  fingerprint_after: b1b492616fd9
+  requested: true
+  before:
+    text: The review page shall state at its top the version it compares against, naming the version, its revision, how that was resolved, and the newer side.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Needs to know what a review page is diffing against; it isn't clear today and there's no way to know the tooling is respecting the expected base, so the page should state it.
+      basis: stated
+      fingerprint: d45886b2be03
+  after:
+    text: The review page shall show at its top a badge naming the version it compares against and its revision, which gives on request the full statement of the version, its revision, how it was resolved and the newer side.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-10-31 14:41
+      context: Asking how to tell what a given review page is comparing against.
+      said: Needs to know what a review page is diffing against; it isn't clear today and there's no way to know the tooling is respecting the expected base, so the page should state it.
+      basis: stated
+      fingerprint: d45886b2be03
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-09 20:35
+      context: Reviewing the sites migration's pages, where the comparison sat as a full-width line of text under the header.
+      said: Found the line saying what the page compares against, left-aligned under the header, odd-looking, and suggested putting it in a badge that explains more on hover or expands for more information.
+      basis: stated
+      source: human_conversation
+      fingerprint: b1b492616fd9
+  acks:
+    REVIEW-40: |-
+      The engineer asked for this change: the same facts, shown as a badge with the full statement on request.
+- op: modify
+  id: REVIEW-V20
+  at: 2026-11-09T20:35-08:00
+  reason: REVIEW-40 now shows the comparison as a badge with the full statement on request.
+  before:
+    description: The generated page has the comparison in its header and carries the version, revision, how it was resolved and, where the page chose it, why; a base named by its commit reads as that commit, and the command names the commit the working tree stands on beside it. With nothing to compare against, the data says so and the page's script has the message.
+  after:
+    description: The generated page has the comparison badge in its header, naming the version and its revision, and its detail carries the version, revision, how it was resolved and, where the page chose it, why; a base named by its commit reads as that commit, and the command names the commit the working tree stands on beside it. With nothing to compare against, the data says so and the page's script has the message.
+decisions: []

@@ -367,7 +367,7 @@
   basis: added
   why: in review 0a959844be two corrections on SYS-34 arrived with no text and a "(see comment)" placeholder pointing at no comment, so the agent couldn't act on them.
 - id: REVIEW-40
-  text: The review page shall state at its top the version it compares against, naming the version, its revision, how that was resolved, and the newer side.
+  text: The review page shall show at its top a badge naming the version it compares against and its revision, which gives on request the full statement of the version, its revision, how it was resolved and the newer side.
   traces_to: SYS-48
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -376,6 +376,13 @@
     said: Needs to know what a review page is diffing against; it isn't clear today and there's no way to know the tooling is respecting the expected base, so the page should state it.
     basis: stated
     fingerprint: d45886b2be03
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-09 20:35
+    context: Reviewing the sites migration's pages, where the comparison sat as a full-width line of text under the header.
+    said: Found the line saying what the page compares against, left-aligned under the header, odd-looking, and suggested putting it in a badge that explains more on hover or expands for more information.
+    basis: stated
+    source: human_conversation
+    fingerprint: b1b492616fd9
 - id: REVIEW-41
   text: When a person names no base and the trunk's base is not the current revision, the review page shall compare against the repository's trunk.
   traces_to: SYS-48

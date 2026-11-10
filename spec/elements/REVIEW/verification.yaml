@@ -205,7 +205,7 @@
   - REVIEW-43
   method: test
   technique: unit test
-  description: The generated page has the comparison in its header and carries the version, revision, how it was resolved and, where the page chose it, why; a base named by its commit reads as that commit, and the command names the commit the working tree stands on beside it. With nothing to compare against, the data says so and the page's script has the message.
+  description: The generated page has the comparison badge in its header, naming the version and its revision, and its detail carries the version, revision, how it was resolved and, where the page chose it, why; a base named by its commit reads as that commit, and the command names the commit the working tree stands on beside it. With nothing to compare against, the data says so and the page's script has the message.
   tests:
     python:
     - tests/test_review_base.py::test_the_page_states_its_base_at_the_top

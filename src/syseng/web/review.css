@@ -337,8 +337,13 @@ dialog pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--
 }
 @media (forced-colors: active) { .dot, .sw { forced-color-adjust: none; border: 1px solid CanvasText; } }
 
-.compared { padding: 6px 16px; font-size: 12.5px; border-top: 1px solid var(--border); overflow-wrap: anywhere; }
-.compared.none { color: var(--st-critical); }
+.cmp { display: inline-flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 999px; padding: 3px 10px; font-size: 12px; color: var(--text-secondary); cursor: pointer; max-width: 100%;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmp:hover, .cmp[aria-expanded="true"] { border-color: var(--border-strong); color: var(--text-primary); }
+.cmp.none { color: var(--st-critical); border-color: color-mix(in srgb, var(--st-critical) 45%, var(--border)); }
+.compared-detail { max-width: 1500px; margin: 0 auto; padding: 0 16px 10px; font-size: 12.5px; color: var(--text-secondary);
+  overflow-wrap: anywhere; }
 
 .round { padding: 10px 0; border-bottom: 1px solid var(--border); }
 .round .work { margin: 6px 0; }
