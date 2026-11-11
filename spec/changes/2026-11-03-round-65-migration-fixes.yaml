@@ -569,4 +569,4 @@ feedback:
   response: |-
     Agreed: what isn't on the trunk is now a draft, so withdrawing or replacing its decisions and proposals just removes or rewrites them, with no reason and no log, and spec change discard throws away an uncommitted change; logging is kept only for records already on the trunk (CHANGE-24 and CHANGE-28 removed, CHANGE-30 to CHANGE-34 added). Starting a change while a draft is open now says to keep working in it, which removes the reason agents closed round 1 early.
   responded: 2026-11-03T20:21-08:00
-closed: '2026-11-04'
+closed: '2026-11-09'
