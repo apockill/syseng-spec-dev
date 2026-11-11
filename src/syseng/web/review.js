@@ -145,6 +145,40 @@
     frag.append(String(text || "").slice(last));
     return frag;
   }
+  // ---------------------------------------------------------------- links into the page (REVIEW-56, REVIEW-57, DR-84)
+  // Pure, so the tests can run them on their own. A link names what it opens in the fragment alone: a page published
+  // where nothing else reaches it, such as a Claude artifact, still gets it. `#CORE-12` or `#<change>.D3` opens one
+  // thing where it is; `#focus~CORE-12~D3` shows only those. `?focus=A,B` and `#focus=A,B` work where they arrive.
+  // LINK-PURE-START
+  function parseLink(hash, search) {
+    const dec = (s) => { try { return decodeURIComponent(s); } catch (e) { return s; } };
+    const list = (s) => dec(s).split(/[~,+\s]+/).filter(Boolean);
+    const frag = dec(String(hash || "").replace(/^#/, ""));
+    const m = /^focus(?:[~=](.*))?$/i.exec(frag);
+    if (m) { const f = list(m[1] || ""); return f.length ? { focus: f } : null; }
+    if (/[~,]/.test(frag)) return { focus: list(frag) };
+    if (frag) return { anchor: frag };
+    const q = /(?:^\?|&)focus=([^&]*)/.exec(String(search || ""));
+    if (!q) return null;
+    const f = list(q[1].replace(/\+/g, " "));
+    return f.length ? { focus: f } : null;
+  }
+  // what one named thing is: {kind, key}, {ambiguous: [keys]} when a short form names several, or null
+  function resolveLink(token, items, links) {
+    const t = String(token || "").trim();
+    const tries = [t, t.toUpperCase(), t.replace(/^(.*\.)([a-z]\d+)$/i, (m, p, n) => p.toLowerCase() + n.toUpperCase())];
+    for (const x of tries) {
+      if (items[x]) return { kind: "item", key: x };
+      if (links.targets[x]) return { kind: links.targets[x].kind, key: x };
+      const a = links.aliases[x] || [];
+      if (a.length === 1) return { kind: links.targets[a[0]].kind, key: a[0] };
+      if (a.length > 1) return { ambiguous: a.slice() };
+    }
+    return null;
+  }
+  // LINK-PURE-END
+  const LINKS = META.links || { targets: {}, aliases: {} };
+
   const tip = h("div", { class: "tip", hidden: true });
   document.body.append(tip);
   function showTip(id, e) {
@@ -388,8 +422,8 @@
   const blocks = {};
   function block(id, title, iconName, lede) {
     const el = h("section", { class: "block", id }, h("h2", {}, icon(iconName), title), lede ? h("p", { class: "lede" }, lede) : null);
+    if (blocks[id]) { el.hidden = blocks[id].hidden; blocks[id].replaceWith(el); } else main.append(el);  // drawn again in place
     blocks[id] = el;
-    main.append(el);
     return el;
   }
 
@@ -397,6 +431,7 @@
   function renderForYou() {
     const el = block("awaiting", "For you", "sparkles",
       "What the agent recommends you look at, then the decisions waiting for you, then its answers to your feedback. Each one shows as answered once you act on it; what you leave stays.");
+    renderLook(el);
     renderOverview(el);
     if (setAside.length) el.append(h("div", { class: "card conflict" },
       h("div", { class: "item-head" }, h("span", { class: "status warning" }, icon("alert", "sm"), "answers set aside")),
@@ -454,52 +489,89 @@
 
     // decisions waiting: conflicts first; each involved item answerable on its own (REVIEW-30)
     const { decisions } = DATA.awaiting;
-    const altIds = new Set(DATA.awaiting.alterations.map((a) => a.id));
     el.append(h("h3", { class: "subhead" }, icon("scale", "sm"), "Decisions waiting"));
     if (!decisions.length) el.append(h("div", { class: "empty" }, "No decisions waiting."));
-    for (const d of decisions) {
-      const key = `${d.change} ${d.id}`;
-      const s = () => state.decisions[key] || (state.decisions[key] = { fingerprint: d.fingerprint });
-      const involved = (d.involves || []).filter((i) => ITEMS[i]);
-      const progress = h("span", { class: "small" });
-      const card = h("div", { class: "card" + (d.kind === "conflict" ? " conflict" : "") });
-      const mark = triage(card, () => !!(state.decisions[key] || {}).choose || (involved.length > 0 && involved.every(answered)));
-      const count = () => { const n = involved.filter(answered).length;
-        progress.replaceChildren(involved.length ? `${n} of ${involved.length} answered` : ""); mark(); };
-      card.append(h("div", { class: "item-head" }, d.kind === "conflict" ? h("span", { class: "status critical" }, icon("alert", "sm"), "conflict") : h("span", { class: "chip" }, "decision"),
-          h("span", { class: "mono small" }, `${d.id} · ${d.change}`), h("span", { class: "grow" }), progress),
-        h("div", { class: "item-text" }, h("b", {}, linkify(d.question))),
-        d.importance ? h("div", { class: "reason" }, h("b", {}, "Why it ranks here: "), linkify(d.importance)) : null);
-      if (involved.length) {
-        const list = h("div", { class: "subs" }, involved.map((id) => subItem(id, { alteration: altIds.has(id) }, count)));
-        card.append(h("details", { class: "involved", open: true }, h("summary", { class: "small" }, `Each item, on its own (${involved.length})`), list));
-      }
-      const opts = h("div", { class: "options", role: "radiogroup" });
-      const redraw = () => { opts.querySelectorAll(".option").forEach((o, n) => o.classList.toggle("on", (state.decisions[key] || {}).choose === n + 1)); mark(); };
-      (d.options || []).forEach((o, n) => {
-        opts.append(h("label", { class: "option" },
-          h("input", { type: "radio", name: key, checked: (state.decisions[key] || {}).choose === n + 1,
-            onclick: (e) => { const st = s(); if (st.choose === n + 1) { delete st.choose; e.target.checked = false; } else st.choose = n + 1; save(); redraw(); } }),
-          h("div", {}, h("div", {}, h("b", {}, o.label), o.recommended ? h("span", { class: "rec" }, "recommended") : null),
-            o.detail ? h("div", { class: "detail" }, linkify(o.detail)) : null)));
-      });
-      card.append(h("div", { class: "small", style: "margin-top:12px" }, involved.length ? "Or answer the whole decision at once:" : "Your answer:"),
-        opts, h("textarea", { class: "note", placeholder: "Anything to add (optional).",
-          oninput: (e) => { s().comment = e.target.value; save(); } }, (state.decisions[key] || {}).comment || ""));
-      redraw();
-      count();
-      el.append(card);
-    }
+    for (const d of decisions) el.append(decisionCard(d));
 
     // the agent's answers to your feedback (SYS-52)
     if (DATA.responses.length) {
       el.append(h("h3", { class: "subhead" }, icon("reply", "sm"), "Answers to your feedback"));
-      for (const r of DATA.responses.slice().reverse()) el.append(h("div", { class: "card" },
-        h("div", { class: "item-head" }, r.id ? idButton(r.id) : h("span", { class: "chip" }, r.decision || "general"), h("span", { class: "chip" }, r.kind),
-          h("span", { class: "small mono" }, `${r.n} · ${r.change}`)),
-        h("div", { class: "item-text muted" }, r.comment),
-        h("div", { class: "reason" }, h("b", {}, "Answer: "), r.response ? linkify(r.response) : h("span", { class: "status warning" }, icon("alert", "sm"), "not answered yet"))));
+      for (const r of DATA.responses.slice().reverse()) el.append(responseCard(r));
     }
+  }
+  // REVIEW-59, REVIEW-60: what the agent points you at, ranked, from the newest change only; apart from what it asks
+  // you to lock. Each target is a link, which opens it where it is; several open on their own together.
+  function renderLook(el) {
+    const look = DATA.look || { marks: [] };
+    if (!look.marks.length) return;
+    el.append(h("h3", { class: "subhead" }, icon("search", "sm"), "Look at this",
+      h("span", { class: "small muted" }, ` (${look.marks.length}, from ${look.change}, the newest change)`)));
+    look.marks.forEach((m, n) => el.append(h("div", { class: "card look" },
+      h("div", { class: "item-head" }, h("span", { class: "rank mono", title: "The agent's ranking: most important first" }, `${n + 1}`),
+        h("span", { class: "chip" }, "look at this"), h("span", { class: "grow" }),
+        m.targets.length > 1 ? h("a", { class: "act", href: "#" + m.focus }, `Only these ${m.targets.length}`) : null),
+      h("div", { class: "reason why-agent", style: "margin-top:0" }, icon("sparkles", "sm"), h("b", {}, " Why: "), linkify(m.why)),
+      h("ul", { class: "targets" }, m.targets.map((t) => h("li", {}, targetLink(t)))))));
+  }
+  function targetLink(t) {
+    const x = LINKS.targets[t.anchor] || {};
+    const words = t.kind === "item" ? (ITEMS[t.ref] ? ITEMS[t.ref].title || ITEMS[t.ref].text : "no longer in the spec")
+      : x.question || x.comment || "not on record";
+    const name = t.kind === "item" ? t.ref : `${x.id || t.ref} · ${x.change || ""}`;
+    return h("a", { class: "target", href: "#" + t.anchor }, h("span", { class: "mono" }, name), " ", h("span", { class: "small" }, brief(words, 14)));
+  }
+  let uid = 0;
+  // one decision waiting for the person: conflicts first; each involved item answerable on its own (REVIEW-30)
+  function decisionCard(d) {
+    const altIds = new Set(DATA.awaiting.alterations.map((a) => a.id));
+    const key = `${d.change} ${d.id}`, group = `${key} ${uid++}`;
+    const s = () => state.decisions[key] || (state.decisions[key] = { fingerprint: d.fingerprint });
+    const involved = (d.involves || []).filter((i) => ITEMS[i]);
+    const progress = h("span", { class: "small" });
+    const card = h("div", { class: "card" + (d.kind === "conflict" ? " conflict" : ""), "data-anchor": `${d.change}.${d.id}` });
+    const mark = triage(card, () => !!(state.decisions[key] || {}).choose || (involved.length > 0 && involved.every(answered)));
+    const count = () => { const n = involved.filter(answered).length;
+      progress.replaceChildren(involved.length ? `${n} of ${involved.length} answered` : ""); mark(); };
+    card.append(h("div", { class: "item-head" }, d.kind === "conflict" ? h("span", { class: "status critical" }, icon("alert", "sm"), "conflict") : h("span", { class: "chip" }, "decision"),
+        h("span", { class: "mono small" }, `${d.id} · ${d.change}`), h("span", { class: "grow" }), progress),
+      h("div", { class: "item-text" }, h("b", {}, linkify(d.question))),
+      d.importance ? h("div", { class: "reason" }, h("b", {}, "Why it ranks here: "), linkify(d.importance)) : null);
+    if (involved.length) {
+      const list = h("div", { class: "subs" }, involved.map((id) => subItem(id, { alteration: altIds.has(id) }, count)));
+      card.append(h("details", { class: "involved", open: true }, h("summary", { class: "small" }, `Each item, on its own (${involved.length})`), list));
+    }
+    const opts = h("div", { class: "options", role: "radiogroup" });
+    const redraw = () => { opts.querySelectorAll(".option").forEach((o, n) => o.classList.toggle("on", (state.decisions[key] || {}).choose === n + 1)); mark(); };
+    (d.options || []).forEach((o, n) => {
+      opts.append(h("label", { class: "option" },
+        h("input", { type: "radio", name: group, checked: (state.decisions[key] || {}).choose === n + 1,
+          onclick: (e) => { const st = s(); if (st.choose === n + 1) { delete st.choose; e.target.checked = false; } else st.choose = n + 1; save(); redraw(); } }),
+        h("div", {}, h("div", {}, h("b", {}, o.label), o.recommended ? h("span", { class: "rec" }, "recommended") : null),
+          o.detail ? h("div", { class: "detail" }, linkify(o.detail)) : null)));
+    });
+    card.append(h("div", { class: "small", style: "margin-top:12px" }, involved.length ? "Or answer the whole decision at once:" : "Your answer:"),
+      opts, h("textarea", { class: "note", placeholder: "Anything to add (optional).",
+        oninput: (e) => { s().comment = e.target.value; save(); } }, (state.decisions[key] || {}).comment || ""));
+    redraw();
+    count();
+    return card;
+  }
+  // a decision no longer waiting, which a link named: what was asked, and how it ended
+  function pastDecisionCard(key, t) {
+    return h("div", { class: "card", "data-anchor": key },
+      h("div", { class: "item-head" }, h("span", { class: "chip" }, "decision"), h("span", { class: "mono small" }, `${t.id} · ${t.change}`),
+        h("span", { class: "chip" }, t.status || "")),
+      h("div", { class: "item-text" }, h("b", {}, linkify(t.question || ""))),
+      t.chosen ? h("div", { class: "reason" }, h("b", {}, "Chosen: "), linkify(t.chosen)) : null,
+      t.withdrawn_because ? h("div", { class: "reason" }, h("b", {}, "Withdrawn: "), linkify(t.withdrawn_because)) : null);
+  }
+  // a comment from your feedback, with the agent's answer (SYS-52)
+  function responseCard(r) {
+    return h("div", { class: "card", "data-anchor": `${r.change}.${r.n}` },
+      h("div", { class: "item-head" }, r.id ? idButton(r.id) : h("span", { class: "chip" }, r.decision || "general"), h("span", { class: "chip" }, r.kind),
+        h("span", { class: "small mono" }, `${r.n} · ${r.change}`)),
+      h("div", { class: "item-text muted" }, r.comment),
+      h("div", { class: "reason" }, h("b", {}, "Answer: "), r.response ? linkify(r.response) : h("span", { class: "status warning" }, icon("alert", "sm"), "not answered yet")));
   }
   // the overview the page opens on: what changed, the health measures, the intent mix (REVIEW-32, DR-69)
   function renderOverview(el) {
@@ -837,6 +909,7 @@
     }
   }
 
+  let revealInSpec = () => null;
   function renderItems() {
     const el = block("items", "The full spec", "list", "Every item, grouped by system element. Verification items are hidden until you ask for them.");
     const q = h("input", { type: "search", placeholder: "Search IDs and text", "aria-label": "Search" });
@@ -853,6 +926,8 @@
       h("span", { class: `glyph shape-${k}`, "aria-hidden": "true" }), typeName(k)));
     el.append(h("div", { class: "filters" }, icon("search"), q), h("div", { class: "filters" }, kindChips), h("div", { class: "filters" }, chips, extras), list);
     q.addEventListener("input", () => draw());
+    let pinned = null;  // the item a link opened: shown whatever the filters say, opened, and marked (REVIEW-56)
+    revealInSpec = (id) => { pinned = id; draw(); return list.querySelector(`.card[data-item="${CSS.escape(id)}"]`); };
     function draw() {
       const needle = q.value.trim().toLowerCase();
       list.replaceChildren();
@@ -860,13 +935,14 @@
       for (const e of DATA.graph.elements) {
         const ids = [e.id, ...e.items].filter((id) => {
           const it = ITEMS[id];
+          if (it && id === pinned) return true;
           if (!it || (it.kind === "vi" ? !showVI : !kindOn.has(it.kind)) || !lvOn.has(it.level) || (changedOnly && !it.changed)) return false;
           return !needle || id.toLowerCase().includes(needle) || (it.text + " " + it.title).toLowerCase().includes(needle);
         });
         if (!ids.length) continue;
         list.append(h("h3", { class: "small mono", style: "margin:16px 0 6px;margin-left:" + e.depth * 14 + "px" }, `${e.id} · ${e.title}`));
         for (const id of ids) {
-          if (n++ > 600) break;
+          if (n++ > 600 && id !== pinned) continue;
           const it = ITEMS[id];
           const body = h("div", {});
           const card = h("div", { class: `card type-${it.kind}`, "data-item": id },
@@ -874,6 +950,7 @@
               h("span", { class: "grow" }), h("button", { class: "iconbtn", "aria-label": "Details", onclick: () => { body.childNodes.length ? body.replaceChildren() : body.append(details(id), itemActions(id)); } }, icon("list", "sm"))),
             it.title ? h("div", { class: "item-text" }, h("b", {}, it.title)) : null,
             it.text ? h("div", { class: "item-text" }, linkify(it.text)) : null, body);
+          if (id === pinned) { card.classList.add("linked"); body.append(details(id), itemActions(id)); }
           list.append(card);
         }
       }
@@ -919,7 +996,7 @@
     t.addEventListener("click", () => { const n = currentTheme() === "dark" ? "light" : "dark"; applyTheme(n); try { localStorage.setItem("syseng-theme", n); } catch (e) { /* fine */ } });
     applyTheme();
     const judged = DATA.proposals.filter((p) => p.from !== "computed" && ITEMS[p.id]).length;  // every waiting one (REVIEW-37)
-    const counts = { awaiting: judged + DATA.awaiting.decisions.length,
+    const counts = { awaiting: judged + DATA.awaiting.decisions.length + ((DATA.look || {}).marks || []).length,
       altered: DATA.awaiting.alterations.length, captured: DATA.captured.length,
       changes: DATA.changes.length ? DATA.changes[0].items.length : 0, history: DATA.history.rounds.length, items: Object.keys(ITEMS).length };
     // most signal on the left; the further right, the more mechanical (REVIEW-20)
@@ -930,10 +1007,19 @@
     nav.append(h("button", { type: "button", class: "side-toggle", onclick: () => side.classList.toggle("open") }, icon("graph", "sm"), "The system"));
     showTab.first = "awaiting";
   }
-  function showTab(name) {
+  let currentTab = null;
+  function showTab(name, byLink) {
+    if (!byLink && linkedFrom !== null) {  // the person moved on from a link: forget it, so tapping it again works
+      linkedFrom = null;
+      try { history.replaceState(null, "", location.pathname); } catch (e) { /* the link stays; harmless */ }
+      renderAll();
+    }
     for (const [k, el] of Object.entries(blocks)) el.hidden = k !== name;
     document.querySelectorAll("#nav [data-tab]").forEach((b) => b.classList.toggle("on", b.dataset.tab === name));
-    try { sessionStorage.setItem("syseng-tab", name); } catch (e) { /* fine */ }
+    if (name !== "linked") {
+      currentTab = name;
+      try { sessionStorage.setItem("syseng-tab", name); } catch (e) { /* fine */ }
+    }
     window.scrollTo({ top: 0 });
   }
   function headerHeight() {
@@ -1069,19 +1155,96 @@
   }
   function toast(msg) { const t = h("div", { class: "toast", role: "status" }, msg); document.body.append(t); setTimeout(() => t.remove(), 2600); }
 
+  // ---------------------------------------------------------------- following a link (REVIEW-56, REVIEW-57)
+  let linkedFrom = null;  // the tab the person was on before a link took them elsewhere
+  function scrollToCard(el) {
+    for (const x of document.querySelectorAll(".linked")) if (x !== el) x.classList.remove("linked");
+    el.classList.add("linked");
+    const top = el.getBoundingClientRect().top + window.scrollY - document.querySelector("header.top").offsetHeight - 12;
+    window.scrollTo({ top: Math.max(0, top) });
+  }
+  // one thing, opened where it is: an item in the full spec, a decision or a comment under For you; anything shown
+  // nowhere else, or a short form naming several, opens on its own instead
+  function jump(token) {
+    if (blocks[token] && token !== "linked") return showTab(token, true);  // a tab, by its name
+    const r = resolveLink(token, ITEMS, LINKS);
+    if (!r || r.ambiguous) return showFocus([token]);
+    if (r.kind === "item") {
+      showTab("items", true);
+      const card = revealInSpec(r.key);
+      if (!card) return showFocus([token]);
+      Graph.select(r.key);
+      return scrollToCard(card);
+    }
+    const card = blocks.awaiting.querySelector(`[data-anchor="${CSS.escape(r.key)}"]`);
+    if (!card) return showFocus([token]);
+    showTab("awaiting", true);
+    scrollToCard(card);
+  }
+  function targetCard(r) {
+    if (r.kind === "item") return itemCard(r.key, { details: true, alteration: DATA.awaiting.alterations.some((a) => a.id === r.key) });
+    const t = LINKS.targets[r.key];
+    if (t.kind === "decision") {
+      const d = DATA.awaiting.decisions.find((x) => `${x.change}.${x.id}` === r.key);
+      return d ? decisionCard(d) : pastDecisionCard(r.key, t);
+    }
+    return responseCard(DATA.responses.find((x) => `${x.change}.${x.n}` === r.key) ||
+      { change: t.change, n: t.id, id: t.item, kind: t.kind, decision: t.decision, comment: t.comment, response: t.response });
+  }
+  // only what the link names, in its order, with the way back to everything
+  function showFocus(tokens) {
+    const el = block("linked", "Only what the link names", "search", null);
+    el.append(h("div", { class: "focusbar" }, h("span", { class: "small" },
+      `Showing ${tokens.length === 1 ? "the one thing" : `the ${tokens.length} things`} this link names, and nothing else.`),
+    h("button", { class: "act primary", type: "button", onclick: showEverything }, icon("list", "sm"), "Show everything")));
+    for (const token of tokens) {
+      const r = resolveLink(token, ITEMS, LINKS);
+      if (!r) el.append(h("div", { class: "empty" }, h("span", { class: "mono" }, token), " isn't on this page: it may have been renamed or removed, or the page is older than the link."));
+      else if (r.ambiguous) {
+        el.append(h("div", { class: "small muted", style: "margin:12px 0 6px" }, h("span", { class: "mono" }, token), ` could mean any of these ${r.ambiguous.length}:`));
+        for (const k of r.ambiguous) el.append(targetCard({ kind: LINKS.targets[k].kind, key: k }));
+      } else el.append(targetCard(r));
+    }
+    showTab("linked", true);
+  }
+  function leaveLink() {
+    if (linkedFrom === null) return;
+    const back = linkedFrom;
+    linkedFrom = null;
+    for (const x of document.querySelectorAll(".linked")) x.classList.remove("linked");
+    renderAll();  // what was answered on the linked view shows everywhere
+    showTab(blocks[back] && back !== "linked" ? back : showTab.first, true);
+  }
+  function showEverything() {
+    try { history.replaceState(null, "", location.pathname); } catch (e) { location.hash = ""; return; }
+    leaveLink();
+  }
+  function route() {
+    const link = parseLink(location.hash, location.search);
+    if (!link) return leaveLink();
+    if (linkedFrom === null) linkedFrom = currentTab;
+    if (link.focus) showFocus(link.focus); else jump(link.anchor);
+  }
+
   // ---------------------------------------------------------------- go
+  function renderAll() {
+    renderForYou();
+    renderYourItems();
+    renderCaptured();
+    renderChanges();
+    renderHistory();
+    renderItems();
+    if (blocks.linked) { blocks.linked.remove(); delete blocks.linked; }
+  }
   renderHeader();
-  renderForYou();
-  renderYourItems();
-  renderCaptured();
-  renderChanges();
-  renderHistory();
-  renderItems();
+  renderAll();
   document.body.append(bar);
   renderBar();
   let tab = null;
   try { tab = sessionStorage.getItem("syseng-tab"); } catch (e) { /* fine */ }
-  showTab(blocks[tab] ? tab : showTab.first);
+  showTab(blocks[tab] ? tab : showTab.first, true);
+  route();
+  window.addEventListener("hashchange", route);  // a link tapped while the page is open (REVIEW-56)
   document.getElementById("side-close").addEventListener("click", () => side.classList.remove("open"));
   headerHeight();
   window.addEventListener("resize", headerHeight);

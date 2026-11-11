@@ -4,6 +4,7 @@ The review page embeds what `build` returns and renders it; `spec review --secti
 sections as text or YAML, so an agent can answer from exactly what the person is looking at.
 
 Sections, in the page's order (REVIEW-20):
+  look        the newest change's look-at-this list: what the agent points the person at, ranked (REVIEW-59)
   awaiting    open decisions (conflicts first) and alterations waiting for the person
   responses   the agent's responses to the person's last feedback
   changes     differences since the person's last review, and against each other version named
@@ -18,10 +19,10 @@ import hashlib
 import tempfile
 from pathlib import Path
 
-from syseng import changes, diff, health, levels, results, review, schema, vcs
+from syseng import changes, diff, health, levels, links, results, review, schema, vcs
 from syseng.model import Spec
 
-SECTIONS = ("overview", "awaiting", "responses", "changes", "captured", "proposals", "graph", "items", "history")
+SECTIONS = ("overview", "look", "awaiting", "responses", "changes", "captured", "proposals", "graph", "items", "history")
 
 
 def decision_fingerprint(d: dict) -> str:
@@ -371,8 +372,10 @@ def build(spec: Spec, person: str, against: list[str] | None = None) -> dict:
                  "types": {k: {"label": t.label, "about": schema.describe(k), "where": t.where,
                                "id": t.id_pattern.replace("ROOT", _root(spec))} for k, t in schema.TYPES.items()},
                  "change": _newest_change(spec),  # the round a recommendation marked "this round" was made in (REVIEW-37)
-                 "applied": [r.get("review") for r in levels.reviews(spec) if r.get("by") == person]},
+                 "applied": [r.get("review") for r in levels.reviews(spec) if r.get("by") == person],
+                 "links": links.index(spec)},  # REVIEW-56: what every link the page can be given opens
         "overview": overview(spec, person, sets),
+        "look": links.look(spec),
         "awaiting": awaiting(spec),
         "responses": responses(spec, person),
         "changes": sets,
@@ -391,6 +394,15 @@ def _label(data: dict, iid: str) -> str:
     text = it.get("title") or it.get("text") or ""
     words = text.split()
     return f"{iid} ({' '.join(words[:9])}{'…' if len(words) > 9 else ''})" if words else iid
+
+
+def target_label(data: dict, ref: str) -> str:
+    """An item, decision or comment with a few words of what it is, so nobody has to look it up (AGENT-44)."""
+    if ref in data["items"]:
+        return _label(data, ref)
+    t = data["meta"]["links"]["targets"].get(links.anchor(ref)) or {}
+    words = str(t.get("question") or t.get("comment") or "").split()
+    return f"{ref} ({' '.join(words[:9])}{'…' if len(words) > 9 else ''})" if words else ref
 
 
 def _work_lines(rows: list[dict], indent: str) -> list[str]:
@@ -419,6 +431,12 @@ def section_text(data: dict, name: str) -> str:
             mark = " WORSE" if m["worse"] else " better" if m["improved"] else ""
             lines.append(f"  {m['label']}: {m['now']}{'%' if m['percent'] else ''}{delta}{mark}")
         lines.append("  intent mix: " + ", ".join(f"{n} {k}" for k, n in o["now"]["mix"].items()))
+    elif name == "look":
+        lk = data["look"]
+        if lk["marks"]:
+            lines.append(f"look at this, from {lk['change']}:")
+        for n, m in enumerate(lk["marks"], 1):
+            lines.append(f"{n}. {'; '.join(target_label(data, t['ref']) for t in m['targets'])}: {m['why']}")
     elif name == "awaiting":
         for d in data["awaiting"]["decisions"]:
             lines.append(f"{'CONFLICT ' if d.get('kind') == 'conflict' else ''}{d['change']}/{d['id']}: {d['question']}")

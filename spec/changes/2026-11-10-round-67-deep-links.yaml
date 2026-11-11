@@ -1,0 +1,27 @@
+request: |-
+  Give agents better ways to point the engineer at what they're discussing: deep links into the review page, a focused view, and a look-at-this list kept apart from proposals to lock
+mode: code-first
+target: python
+status: open
+opened: '2026-11-10'
+started_from: 290f9b56514e369afedfdf628e15511876b4309a
+entries:
+- op: add
+  id: SYS-63
+  at: 2026-11-10T17:03-08:00
+  reason: the engineer asked for better ways for agents to point things out on the review page.
+  after:
+    kind: system
+    text: The toolkit shall let agents point the engineer at exactly the items, decisions and comments they are discussing, on the review page.
+    serves:
+    - NEED-24
+    - NEED-23
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-10 17:03
+      context: Discussing how agents in a chat refer the engineer to what they mean on the review page, which the engineer often reads on a phone. The specific mechanisms (links, a focused view, a look-at-this list) were proposed by agents, not by the engineer.
+      said: Wants better ways for agents to point the engineer at what they are discussing; did not specify how.
+      basis: guided
+      source: human_conversation
+      fingerprint: 14a47c8cc6b1
+decisions: []

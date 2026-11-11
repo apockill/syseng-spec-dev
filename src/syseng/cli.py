@@ -6,6 +6,8 @@
   spec lock ID... [--words TEXT] [--via]    record a person's lock, with who and how (SYS-33); alias: approve
   spec propose ID... --why TEXT             propose items for the engineer's explicit approval (SYS-38);
                                             --withdraw takes a proposal back
+  spec point TARGET... --why TEXT           ask the engineer to look at items or decisions, ranked (CLI-40);
+                                            --withdraw takes them off the list
   spec change start|close|show|discard      open and close the change record edits are logged in
   spec edit [--dry-run] < edits.yaml        change the spec (CLI-5 to CLI-8)
   spec decide < decision.yaml               add an open decision with options (CHANGE-10)
@@ -17,6 +19,7 @@
   spec migrate [--dry-run]                  move the spec to the current format, after agents convert words
   spec diff [OLDER] [NEWER] [--since-review] [--format text|yaml]   what changed in the spec (SYS-48)
   spec review [--against REV] [--section NAME --format text|yaml]  the review page, or one section of it
+  spec review --link TARGET... [--url ADDRESS]   links that open items or decisions on the page (CLI-39)
   spec feedback apply|respond|list          apply a review page's feedback block; answer its comments
 
 Run from anywhere inside a repository that has spec/toolkit.yaml, or pass --spec DIR.
@@ -29,7 +32,7 @@ import re
 import sys
 from pathlib import Path
 
-from syseng import (changes, diff, edit, feedback, fingerprint, init, issue, levels, migrate, model, page, pagedata,
+from syseng import (changes, diff, edit, feedback, fingerprint, init, issue, levels, links, migrate, model, page, pagedata,
                     people, readers, render, results, review, rules, schema, vcs, yamlio)
 from syseng import check as checker
 
@@ -75,6 +78,7 @@ def cmd_render(args) -> int:
     for p in render.write_views(spec):
         print(f"removed {p.relative_to(spec.root.parent)}, a Markdown view the review page replaced")
     args.against, args.person, args.out, args.section, args.format = None, None, None, None, "text"
+    args.link, args.url = None, None
     return cmd_review(args)
 
 
@@ -462,6 +466,75 @@ def cmd_propose(args) -> int:
     return 0
 
 
+def _targets(spec: model.Spec, tokens: list[str], command: str) -> list[str] | None:
+    """The stored references a command's targets name, or None after saying which can't be found."""
+    out, wrong = [], []
+    for token in _expand(tokens):
+        try:
+            out.append(links.resolve(spec, token))
+        except links.LinkError as e:
+            wrong.append(str(e))
+    if wrong:
+        print(f"spec {command}: nothing was done:\n" + "\n".join(f"  {w}" for w in wrong))
+        return None
+    return list(dict.fromkeys(out))
+
+
+def cmd_point(args) -> int:
+    """CLI-40: the agent's look-at-this list, kept apart from proposals to lock. The order recorded is the rank."""
+    spec = _load(args)
+    c = changes.current(spec)
+    if c is None:
+        print("spec point: no change is open")
+        return 1
+    refs = _targets(spec, args.targets, "point")
+    if refs is None:
+        return 1
+    try:
+        if args.withdraw:
+            missing = links.unpoint(c, refs)
+            gone = [r for r in refs if r not in missing]
+            if gone:
+                print(f"took {', '.join(gone)} off the look-at-this list of {c.id}")
+            if missing:
+                print(f"not on the look-at-this list of {c.id}: {', '.join(missing)}")
+            return 0
+        links.point(c, refs, args.why or "")
+    except links.LinkError as e:
+        print(f"spec point: {e}")
+        return 1
+    rank = len(c.data.get("look_at") or [])
+    print(f"asked the engineer to look at {', '.join(refs)}, number {rank} on the look-at-this list of {c.id}. "
+          f"Give them links: `spec review --link {' '.join(refs)}`")
+    return 0
+
+
+def _print_links(spec: model.Spec, args) -> int:
+    """CLI-39: one link per target, then one that focuses the page on all of them; each works from the fragment
+    alone (DR-84). Without the page's address, the fragments, and how to use them."""
+    refs = _targets(spec, args.link, "review --link")
+    if refs is None:
+        return 1
+    base = args.url.split("#")[0] if args.url else Path(args.out).resolve().as_uri() if args.out else None
+    targets = links.index(spec)["targets"]
+
+    def label(ref):
+        if ref in spec.items or ref in spec.elements:
+            return changes._label(spec, ref)
+        t = targets.get(links.anchor(ref)) or {}
+        words = str(t.get("question") or t.get("comment") or "").split()
+        return f"{ref} ({' '.join(words[:9])}{'…' if len(words) > 9 else ''})" if words else ref
+    rows = [(label(r), links.anchor(r)) for r in refs]
+    rows.append((f"all {len(refs)}, and nothing else" if len(refs) > 1 else "it alone", links.focus([a for _, a in rows])))
+    if base is None:
+        print("Append a fragment to the review page's address, such as its published link: <address>#<fragment>.")
+    for what, fragment in rows:
+        print(f"{what}: {base or ''}#{fragment}")
+    if base is None:
+        print("To print whole links, give the page's address: --url <address>, or --out <file> for the local page.")
+    return 0
+
+
 def cmd_issue(args) -> int:
     """CLI-29, CLI-33: a report goes out only with --send; without it, this shows what would go out."""
     if args.template:
@@ -623,6 +696,8 @@ def cmd_diff(args) -> int:
 def cmd_review(args) -> int:
     """CLI-25, CLI-24: the review page in one command, or any of its sections for an agent."""
     spec = _load(args)
+    if getattr(args, "link", None):
+        return _print_links(spec, args)
     if getattr(args, "results_dir", None):
         spec.results_dir = Path(args.results_dir)
     who = args.person or people.person(spec.repo_root())[0]
@@ -801,6 +876,15 @@ def build_parser() -> argparse.ArgumentParser:
                         "one on the trunk needs --reason")
     p.add_argument("--reason", help="why the proposal is withdrawn, for one on the trunk")
     p.set_defaults(fn=cmd_propose)
+    p = sub.add_parser("point", help="ask the engineer to look at items or decisions, without asking to lock them",
+                       description="Adds a mark to the open change's look-at-this list, which the review page shows "
+                                   "first under For you. Run it once per mark, most important first: the order "
+                                   "recorded is the rank. Only the newest change's list shows, so each change starts "
+                                   "clean. Targets are item IDs, decisions (D<n>, <change>/D<n>) or comments (F<n>).")
+    p.add_argument("targets", nargs="+", help="item IDs (or ranges like CORE-1..CORE-4), D<n>, <change>/D<n>, F<n>")
+    p.add_argument("--why", help="why the engineer should look")
+    p.add_argument("--withdraw", action="store_true", help="take these targets off the open change's list")
+    p.set_defaults(fn=cmd_point)
     p = sub.add_parser("change", help="open, close or show the change record edits are logged in")
     p.add_argument("action", choices=["start", "close", "show", "discard"],
                    help="discard throws away the open change when it isn't on the trunk yet")
@@ -886,6 +970,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--results-dir", help="where test results are kept; default .syseng/results")
     p.add_argument("--section", choices=list(pagedata.SECTIONS), help="print this section instead of writing the page")
     p.add_argument("--format", choices=["text", "yaml"], default="text")
+    p.add_argument("--link", nargs="+", metavar="TARGET",
+                   help="print links that open these items, decisions (D<n>, <change>/D<n>) or comments (F<n>) on the "
+                        "page, one each and one focused on all of them; writes nothing")
+    p.add_argument("--url", help="with --link: the page's address, such as its published link, to print whole links")
     p.set_defaults(fn=cmd_review)
     p = sub.add_parser("feedback", help="apply a review page's feedback block (stdin or --file), or answer it",
                        description=feedback.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
