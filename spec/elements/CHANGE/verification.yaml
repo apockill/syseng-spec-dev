@@ -176,3 +176,12 @@
   tests:
     python:
     - tests/test_review_base.py::test_on_the_trunk_without_a_review_it_compares_against_where_the_change_started
+- id: CHANGE-V17
+  verifies:
+  - CHANGE-35
+  method: test
+  technique: unit test
+  description: With two changes open, the toolkit refuses to pick one and names the option to close one by name; closing a name that matches no open change fails and says so; closing one by its ID leaves the other as the open change.
+  tests:
+    python:
+    - tests/test_decisions.py::test_one_of_two_open_changes_can_be_closed_by_name

@@ -1,7 +1,7 @@
 request: Show every waiting agent recommendation on the review page, make proposing part of every hand-over, keep requirements free of implementation and environment specifics, and investigate a lock refused by a fingerprint mismatch
 mode: code-first
 target: python
-status: open
+status: closed
 opened: '2026-11-04'
 started_from: ba5615eea2ac5a04a267c16b9c997726c3ed7958
 entries:
@@ -566,6 +566,29 @@ entries:
     tests:
       python:
       - tests/test_review_page.py::test_recommendations_keep_the_agents_ranking_and_number_it
+- op: add
+  id: CHANGE-35
+  at: 2026-11-10T16:45-08:00
+  reason: The toolkit's own refusal pointed at this option.
+  after:
+    text: When more than one change is open, the toolkit shall let an agent close a named one.
+    traces_to: SYS-16
+    basis: derived
+    why: |-
+      Merging two branches that each opened a change leaves both open, and every command then refuses until one is closed; the refusal named an option to close one by name that didn't exist. Seen on 2026-11-10 merging PRs #22 and #23.
+- op: add
+  id: CHANGE-V17
+  at: 2026-11-10T16:45-08:00
+  reason: Checks CHANGE-35.
+  after:
+    verifies:
+    - CHANGE-35
+    method: test
+    technique: unit test
+    description: With two changes open, the toolkit refuses to pick one and names the option to close one by name; closing a name that matches no open change fails and says so; closing one by its ID leaves the other as the open change.
+    tests:
+      python:
+      - tests/test_decisions.py::test_one_of_two_open_changes_can_be_closed_by_name
 decisions: []
 proposals:
 - ids:
@@ -612,6 +635,11 @@ proposals:
   why: |-
     New: the page numbers the agent's recommendations in its order, so the ranking is visible.
   proposed: 2026-11-10T16:37-08:00
+- ids:
+  - CHANGE-35
+  why: |-
+    A small fix found while merging this PR: closing one of two open changes by name, which the toolkit's own error message already told you to do.
+  proposed: 2026-11-10T16:45-08:00
 feedback:
 - n: F1
   by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -623,3 +651,4 @@ feedback:
   response: |-
     Done: AGENT-81 now asks for no fixed number; the agent ranks its proposals most important first (one spec propose per group, in order), and the skill says the order matters more than the count. The page numbers the recommendations in that order (new REVIEW-55), so you can work down from 1 and stop when your time runs out. Your words are recorded as stated intent on AGENT-81.
   responded: 2026-11-10T16:37-08:00
+closed: '2026-11-10'

@@ -290,3 +290,15 @@ def test_starting_a_change_while_a_draft_is_open_says_to_keep_working_in_it(spec
     with pytest.raises(changes.ChangeError, match="Keep working in it") as e:
         changes.start(spec.load(), "Round two", None, None, "two")
     assert "spec change discard" in str(e.value)
+
+
+def test_one_of_two_open_changes_can_be_closed_by_name(spec, change, capsys):            # CHANGE-35
+    # merging two branches that each opened a change leaves both open; the toolkit then names the way out
+    other = change.path.with_name("2026-01-01-round-99-other.yaml")
+    other.write_text(change.path.read_text())
+    with pytest.raises(changes.ChangeError, match=r"spec change close --id <id>"):
+        changes.current(spec.load())
+    assert _run(spec, "change", "close", "--id", "nosuch") == 1
+    assert "no open change matches 'nosuch'" in capsys.readouterr().out
+    assert _run(spec, "change", "close", "--id", other.stem) == 0
+    assert changes.current(spec.load()).id == change.id

@@ -226,7 +226,15 @@ def cmd_change(args) -> int:
             print(f"discarded {c.id}" + (f"; its edits to {', '.join(touched)} stay in the working tree: undo them "
                                          "with version control if they should go too" if touched else ""))
         elif args.action == "close":
-            c = changes.current(spec)
+            if args.id:  # CHANGE-35: after merging branches, more than one change can be open; close a named one
+                named = [x for x in changes.all_changes(spec) if x.is_open and (x.id == args.id or x.id.startswith(args.id))]
+                if len(named) != 1:
+                    print(f"spec change close: {'no open change' if not named else 'more than one open change'} "
+                          f"matches {args.id!r}")
+                    return 1
+                c = named[0]
+            else:
+                c = changes.current(spec)
             if c is None:
                 print("no change is open")
                 return 1
@@ -801,6 +809,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--target", help="implementation the change targets (default: the primary one)")
     p.add_argument("--slug", help="a few words for the file name")
     p.add_argument("--full", action="store_true", help="show: print the whole record as text")
+    p.add_argument("--id", help="close: the open change to close, by its ID or the start of it, when more than one is "
+                                "open (as after merging two branches that each opened one)")
     p.set_defaults(fn=cmd_change)
     p = sub.add_parser("edit", help="change the spec with a YAML batch on stdin (see `spec edit --help`)",
                        description=edit.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)

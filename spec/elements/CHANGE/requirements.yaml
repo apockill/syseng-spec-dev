@@ -244,3 +244,9 @@
   traces_to: SYS-16
   basis: derived
   why: in the onboarding of 2026-11-03 the agent closed round 1 only because starting round 2 was refused while it was open, which put round 1's open decisions out of reach; continuing in a change that never reached the trunk keeps them correctable without any record.
+- id: CHANGE-35
+  text: When more than one change is open, the toolkit shall let an agent close a named one.
+  traces_to: SYS-16
+  basis: derived
+  why: |-
+    Merging two branches that each opened a change leaves both open, and every command then refuses until one is closed; the refusal named an option to close one by name that didn't exist. Seen on 2026-11-10 merging PRs #22 and #23.
