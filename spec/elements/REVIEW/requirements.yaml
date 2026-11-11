@@ -507,3 +507,14 @@
   traces_to: SYS-46
   basis: derived
   why: in a sites review the page sent a lock on BOX-13 with the fingerprint of its wording before a wording pass; the answer had been kept from an earlier version of the page, the page showed it as given to the new text, and the agent refused it only after the engineer had sent the review.
+- id: REVIEW-55
+  text: The review page shall number the agent's recommendations in the order the agent made them, so the engineer can work down them by rank.
+  traces_to: SYS-38
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-10 16:37
+    context: Reviewing the rule that asked agents to propose up to eight items at each hand-over.
+    said: Wants the agent to rank its proposals by importance so they can go down the list in order and lock what they care about in the time available.
+    basis: guided
+    source: human_conversation
+    fingerprint: 18f66e995bfd

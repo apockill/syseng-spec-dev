@@ -325,3 +325,12 @@
   tests:
     python:
     - tests/test_review_page.py::test_an_answer_given_on_an_earlier_version_of_an_item_that_changed_is_set_aside
+- id: REVIEW-V32
+  verifies:
+  - REVIEW-55
+  method: test
+  technique: unit test
+  description: Two proposals made in one change in a given order come back in that order, and the page's script numbers each recommendation group from 1 in that order.
+  tests:
+    python:
+    - tests/test_review_page.py::test_recommendations_keep_the_agents_ranking_and_number_it

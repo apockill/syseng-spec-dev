@@ -690,7 +690,7 @@
   basis: derived
   why: agents working on apps outside the spec would otherwise follow the spec loop for them.
 - id: AGENT-81
-  text: Before handing over each change that adds or alters needs or requirements, the agent shall propose for locking up to eight of the items it judges most worth the engineer's attention, contentious ones first, with one reason for each group of items.
+  text: Before handing over each change that adds or alters needs or requirements, the agent shall propose for locking the items worth the engineer's attention, ranked from most to least important, with one reason for each group of items.
   traces_to: SYS-38
   intent:
   - by: Alex Thiele <alex.g.thiele@gmail.com>
@@ -700,6 +700,14 @@
     basis: stated
     source: human_conversation
     fingerprint: 946d17ca0c62
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-10 16:37
+    context: Reviewing the rule that asked agents to propose up to eight items at each hand-over.
+    said: |-
+      Did not state a limit of eight and finds a fixed number prescriptive, since changes range from small to large. Ranking matters more: the agent orders the items by importance, and the engineer works down the list, locking what they care about in the time they have; the number can vary.
+    basis: stated
+    source: human_conversation
+    fingerprint: bc4fd199ccb1
 - id: AGENT-82
   text: The skill shall direct agents to write each need and system requirement as the capability needed or the risk prevented, stating a how there only as a constraint the engineer imposed.
   traces_to: SYS-20

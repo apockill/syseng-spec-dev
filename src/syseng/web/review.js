@@ -418,7 +418,7 @@
       const g = groups.find((x) => x.why === p.why && x.change === p.change);
       if (g) g.ids.push(p.id); else groups.push({ why: p.why, change: p.change, ids: [p.id] });
     }
-    for (const g of groups) {
+    for (const [n, g] of groups.entries()) {  // in the agent's order: its ranking, most important first (AGENT-81)
       const card = h("div", { class: "card" });
       const lockAll = h("button", { class: "act" });
       const list = h("div", { class: "subs" });
@@ -436,7 +436,8 @@
         save(); rebuild();
       });
       rebuild();
-      card.append(h("div", { class: "item-head" }, h("span", { class: "chip" }, g.change === latest ? "this round" : "earlier round"),
+      card.append(h("div", { class: "item-head" }, h("span", { class: "rank mono", title: "The agent's ranking: work down from 1 and stop when your time runs out" }, `${n + 1}`),
+          h("span", { class: "chip" }, g.change === latest ? "this round" : "earlier round"),
           h("span", { class: "mono small" }, `recommended in ${g.change}`)),
         h("div", { class: "reason why-agent", style: "margin-top:0" }, icon("sparkles", "sm"),
           h("b", {}, " Why the agent recommends " + (g.ids.length > 1 ? "these: " : "it: ")), linkify(g.why)),

@@ -344,3 +344,5 @@ dialog pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--
 .round .work { margin: 6px 0; }
 .round .then { margin-top: 8px; }
 button.linkish { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+.rank { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px;
+  border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border-strong); font-size: 12px; font-weight: 650; }

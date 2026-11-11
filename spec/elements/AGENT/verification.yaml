@@ -282,7 +282,7 @@
   - AGENT-81
   method: inspection
   technique: unit test
-  description: The skill's hand-over step says to propose the items most worth the engineer's look, contentious ones first, and its proposing section says to do so in every change that alters the spec, lists inferred items, items stating an exact name or value, items others build on and items the engineer's words were reworded into, and asks for typically three to eight items grouped by an honest reason.
+  description: The skill's hand-over step says to propose the items worth the engineer's look ranked most important first, and its proposing section says to do so in every change that alters the spec, lists inferred items, items stating an exact name or value, items others build on and items the engineer's words were reworded into, asks for one spec propose per group in order of importance with the count left to the change, and sets no fixed number.
   tests:
     python:
     - tests/test_skill.py::test_every_change_that_alters_the_spec_ends_with_proposals

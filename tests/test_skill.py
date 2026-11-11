@@ -211,13 +211,14 @@ def test_verification_prefers_the_strongest_check_that_can_work():              
 
 def test_every_change_that_alters_the_spec_ends_with_proposals():
     step = next(l for l in (init.SKILL / "SKILL.md").read_text().splitlines() if l.startswith("8. **Hand over**"))
-    assert "propose the few items most worth the engineer's look" in step and "contentious ones first" in step
+    assert "ranked most important first" in step and "stop when their time runs out" in step
     locks = (init.SKILL / "references" / "review-and-locks.md").read_text()
     part = locks[locks.index("## Proposing items to lock"):]
     assert "in every change that alters the spec, not only onboarding" in part
     for kind in ("items you inferred", "exact name or value", "reworded the engineer's words into", "others build on"):
         assert kind in part
-    assert "grouped by an honest reason" in part and "typically three to eight" in part
+    assert "Group them by an honest reason" in part and "most important group first" in part
+    assert "the order matters more than the count" in part and "three to eight" not in part   # no fixed number
 
 
 def test_problem_reports_need_consent_general_terms_and_no_solution():

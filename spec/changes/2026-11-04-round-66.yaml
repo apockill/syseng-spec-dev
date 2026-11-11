@@ -493,6 +493,79 @@ entries:
     description: SKILL.md's rule 6 has agents list each need and requirement they wrote or changed before handing over and ask of each whether it joins two behaviours, whether it names a how its level doesn't justify, and whether it passes the engineer's test, quoted word for word, rewriting each that fails; the loop's hand-over step says to do this review first. The depth reference quotes the test too, and the onboarding checklist's last step starts with reading every requirement against it.
   after:
     description: SKILL.md's rule 6 quotes the engineer's test word for word, says to read each requirement written or changed against it before handing over, and to rewrite each that fails; the depth reference quotes it too, and the onboarding checklist's last step starts with reading every requirement against it.
+- op: modify
+  id: AGENT-81
+  at: 2026-11-10T16:37-08:00
+  reason: |-
+    The engineer's review: no fixed number; the agent ranks its proposals by importance.
+  requested: true
+  before:
+    text: Before handing over each change that adds or alters needs or requirements, the agent shall propose for locking up to eight of the items it judges most worth the engineer's attention, contentious ones first, with one reason for each group of items.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-04 08:14
+      context: Reviewing a large migration spec whose review page showed nothing recommended by the agent.
+      said: Noticed the agent had not recommended items in about the past twenty reviews, and suggested, perhaps as a to-do, improving the skill and its evals so the agent is reminded to surface useful, possibly contentious items in the requirement graph for them to review and possibly lock.
+      basis: stated
+      source: human_conversation
+      fingerprint: 946d17ca0c62
+  after:
+    text: Before handing over each change that adds or alters needs or requirements, the agent shall propose for locking the items worth the engineer's attention, ranked from most to least important, with one reason for each group of items.
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-04 08:14
+      context: Reviewing a large migration spec whose review page showed nothing recommended by the agent.
+      said: Noticed the agent had not recommended items in about the past twenty reviews, and suggested, perhaps as a to-do, improving the skill and its evals so the agent is reminded to surface useful, possibly contentious items in the requirement graph for them to review and possibly lock.
+      basis: stated
+      source: human_conversation
+      fingerprint: 946d17ca0c62
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-10 16:37
+      context: Reviewing the rule that asked agents to propose up to eight items at each hand-over.
+      said: |-
+        Did not state a limit of eight and finds a fixed number prescriptive, since changes range from small to large. Ranking matters more: the agent orders the items by importance, and the engineer works down the list, locking what they care about in the time they have; the number can vary.
+      basis: stated
+      source: human_conversation
+      fingerprint: bc4fd199ccb1
+  acks:
+    AGENT-V31: |-
+      Still verifies AGENT-81: the eval checks that the agent proposes with a reason, which the reworded rule still requires; it never checked a count.
+- op: add
+  id: REVIEW-55
+  at: 2026-11-10T16:37-08:00
+  reason: Makes the agent's ranking (AGENT-81) visible on the page.
+  after:
+    text: The review page shall number the agent's recommendations in the order the agent made them, so the engineer can work down them by rank.
+    traces_to: SYS-38
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-10 16:37
+      context: Reviewing the rule that asked agents to propose up to eight items at each hand-over.
+      said: Wants the agent to rank its proposals by importance so they can go down the list in order and lock what they care about in the time available.
+      basis: guided
+      source: human_conversation
+      fingerprint: 18f66e995bfd
+- op: modify
+  id: AGENT-V30
+  at: 2026-11-10T16:37-08:00
+  reason: AGENT-81 now asks for a ranking, not a number.
+  before:
+    description: The skill's hand-over step says to propose the items most worth the engineer's look, contentious ones first, and its proposing section says to do so in every change that alters the spec, lists inferred items, items stating an exact name or value, items others build on and items the engineer's words were reworded into, and asks for typically three to eight items grouped by an honest reason.
+  after:
+    description: The skill's hand-over step says to propose the items worth the engineer's look ranked most important first, and its proposing section says to do so in every change that alters the spec, lists inferred items, items stating an exact name or value, items others build on and items the engineer's words were reworded into, asks for one spec propose per group in order of importance with the count left to the change, and sets no fixed number.
+- op: add
+  id: REVIEW-V32
+  at: 2026-11-10T16:37-08:00
+  reason: Checks REVIEW-55.
+  after:
+    verifies:
+    - REVIEW-55
+    method: test
+    technique: unit test
+    description: Two proposals made in one change in a given order come back in that order, and the page's script numbers each recommendation group from 1 in that order.
+    tests:
+      python:
+      - tests/test_review_page.py::test_recommendations_keep_the_agents_ranking_and_number_it
 decisions: []
 proposals:
 - ids:
@@ -529,3 +602,24 @@ proposals:
   why: |-
     Guided by your review: split a requirement joining two behaviours into a parent and children, and verify by automated check, then reasoning check, then manual, saying why when a weaker one is chosen. Both change how agents write every spec.
   proposed: 2026-11-08T13:18-08:00
+- ids:
+  - AGENT-81
+  why: |-
+    Your comment reworded it: no fixed number, ranked by importance; check the wording says what you meant.
+  proposed: 2026-11-10T16:37-08:00
+- ids:
+  - REVIEW-55
+  why: |-
+    New: the page numbers the agent's recommendations in its order, so the ranking is visible.
+  proposed: 2026-11-10T16:37-08:00
+feedback:
+- n: F1
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-10T16:35-08:00
+  review: 25a34c5960
+  id: AGENT-81
+  kind: comment
+  comment: I didn't state 8, and its quite perscriptive... Some changes are large, some are small, not sure I like this. Sorting them by importance is more important, that way the human can look at the list and go down it in order of importance, lockikng only what they care about, with the time available. Yeah, I think sorting is a key part of this- agent can provide the importance ranking of things, but the N can be variable.
+  response: |-
+    Done: AGENT-81 now asks for no fixed number; the agent ranks its proposals most important first (one spec propose per group, in order), and the skill says the order matters more than the count. The page numbers the recommendations in that order (new REVIEW-55), so you can work down from 1 and stop when your time runs out. Your words are recorded as stated intent on AGENT-81.
+  responded: 2026-11-10T16:37-08:00

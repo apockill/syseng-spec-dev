@@ -330,6 +330,17 @@ def test_every_waiting_proposal_is_recommended_newest_round_first_naming_its_rou
     assert "Also: ${computed.length} items" in for_you                                          # counted, kept apart
 
 
+def test_recommendations_keep_the_agents_ranking_and_number_it(repo):     # AGENT-81, REVIEW-55
+    c = changes.start(model.load(repo), "ranked", None, None, None)
+    changes.add_proposal(c, ["SYS-1"], "most important")
+    changes.add_proposal(c, ["CORE-1"], "less important")
+    data = pagedata.build(model.load(repo), ADA)
+    judged = [p["id"] for p in data["proposals"] if p["from"] != "computed"]
+    assert judged == ["SYS-1", "CORE-1"]                                   # the order the agent proposed them in
+    for_you = JS[JS.index("function renderForYou()"):JS.index("function subItem(")]
+    assert "groups.entries()" in for_you and 'class: "rank mono"' in for_you and "${n + 1}" in for_you
+
+
 def test_the_overview_shows_requirements_with_linked_tests_beside_coverage(spec):     # REVIEW-38
     from syseng import health
     spec.files["elements/CORE/verification.yaml"][0].update({"technique": "reasoning check", "tests": {}})
