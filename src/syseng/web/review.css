@@ -358,9 +358,9 @@ button.linkish { background: none; border: 0; padding: 0; color: inherit; font: 
 .focusbar .small { flex: 1 1 180px; color: var(--text-secondary); }
 a.act { text-decoration: none; }
 .card.look ul.targets { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
-a.target { display: block; color: var(--text-secondary); text-decoration: none; overflow-wrap: anywhere; padding: 6px 8px;
+.target { display: block; width: 100%; text-align: left; font: inherit; cursor: pointer; color: var(--text-secondary); text-decoration: none; overflow-wrap: anywhere; padding: 6px 8px;
   border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
-a.target .mono { color: var(--accent-ink); text-decoration: underline dotted; text-underline-offset: 3px; }
-a.target:hover { border-color: var(--border-strong); }
+.target .mono { color: var(--accent-ink); text-decoration: underline dotted; text-underline-offset: 3px; }
+.target:hover { border-color: var(--border-strong); }
 .rank { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px;
   border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border-strong); font-size: 12px; font-weight: 650; }

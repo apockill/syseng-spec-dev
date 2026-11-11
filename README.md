@@ -35,6 +35,7 @@ spec check            # everything unfinished in the spec (--todo lists to-dos, 
 spec show MODEL-1     # one item: its level of intent, who gave it, its trace, verification and history
 spec lock SYS-7 --via chat   # record a person's lock, fingerprinted (`approve` is an alias)
 spec review          # write the review page (--against main on a branch; --section NAME for one section as text)
+spec review --link CORE-12 D3 --url <page address>   # links that open those on the page, and one showing only them
 spec diff main       # what changed in the spec since the branch left main (--format yaml for agents)
 spec feedback apply  # apply the block copied from the review page; `respond F<n> "…"` answers its comments
 spec change show --full      # the open change record, as text

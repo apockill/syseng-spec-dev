@@ -274,3 +274,13 @@
   traces_to: SYS-38
   basis: derived
   why: the engineer asked that agents be reminded to recommend items; writing the review page is the moment an agent hands over, so one line there reminds it without adding to the check's to-dos.
+- id: CLI-39
+  text: For the items, decisions and comments an agent names, the CLI shall print a link that opens each on the review page, and one link that shows only that set.
+  traces_to: SYS-63
+  basis: added
+  why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. Agents paste real links instead of bare IDs, and the toolkit, not the agent, knows how each link must be written (DR-84).
+- id: CLI-40
+  text: The CLI shall record in the open change an agent's look-at-this mark, naming items, decisions or comments and the agent's reason, ranked in the order the marks are recorded.
+  traces_to: SYS-63
+  basis: added
+  why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. Separate from proposing items to lock (DR-85).

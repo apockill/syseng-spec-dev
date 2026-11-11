@@ -214,3 +214,22 @@
   alternatives: Refusing every comment after a value, which breaks the skill's annotated examples; refusing only multi-word values, which still allows a person field and breaks examples such as a name with an email; warning instead of refusing, which agents miss.
   consequences: A new prose field has to be added to the list in yamlio. A single-word prose value followed by a spaced comment is still refused, because the field is prose.
   basis: derived
+- id: DR-85
+  title: The look-at-this list is its own command, spec point, and only the newest change's list shows
+  decided_by: agent
+  elements:
+  - CLI
+  - REVIEW
+  requirements:
+  - CLI-40
+  - REVIEW-59
+  - REVIEW-60
+  basis: added
+  context: Agents needed a way to ask the engineer to look at something without asking them to lock it, ranked, with a reason, and without marks from earlier changes piling up. `spec propose` asks to lock, takes only items, and keeps withdrawn proposals on the trunk as history.
+  decision: |-
+    - `spec point <targets> --why "…"` adds a mark to the open change's `look_at` list. Targets are item IDs, decisions (`D3`, `<change>/D3`, `<change>.D3`) and comments (`F1`, `<change>/F1`), stored as `<change>/D<n>`. The order recorded is the rank, as with proposals.
+    - Marking a target again moves it into the new mark, at the end; `--withdraw` takes targets off the open change's list without a trace, since only the newest change's list ever shows.
+    - The page shows the newest change's list only, first under For you, naming that change, each mark numbered with its reason, a link to each target and, for several, a link showing only them. Earlier lists stay in their change records.
+  alternatives: |-
+    A flag on `spec propose`: one command whose name says lock would carry two requests, and its items-only checks and its rules for withdrawing from the trunk would need exceptions. Marks that expire after a time: arbitrary, and invisible until they vanish. Marks that last until withdrawn: that is how they pile up.
+  consequences: A change that only applies feedback shows no list unless its agent marks things again. Marks are attention, not decisions, so nothing about them waits for the engineer or blocks a change.

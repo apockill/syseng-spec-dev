@@ -137,6 +137,7 @@ def test_a_focused_link_shows_only_what_it_names_with_a_way_back(history):
     assert "isn't on this page" in focus and "could mean any of these" in focus
     back = JS[JS.index("function leaveLink()"):JS.index("function route()")]
     assert "renderAll();" in back and "history.replaceState" in back
+    assert "showTab(blocks[back.tab]" in back and "window.scrollTo({ top: back.y })" in back   # back to their place
 
 
 # ---------------------------------------------------------------- spec review --link (CLI-39)
@@ -202,7 +203,9 @@ def test_only_the_newest_changes_look_at_this_list_shows(history, capsys):
     assert for_you.index("renderLook(el);") < for_you.index("renderOverview(el);") < for_you.index("Recommended by the agent")
     look = JS[JS.index("function renderLook(el)"):JS.index("function targetLink(t)")]
     assert "look.change" in look and 'class: "rank mono"' in look and "${n + 1}" in look and '"#" + m.focus' in look
-    assert 'href: "#" + t.anchor' in JS[JS.index("function targetLink(t)"):JS.index("function decisionCard(d)")]
+    target = JS[JS.index("function targetLink(t)"):JS.index("function decisionCard(d)")]
+    assert "onclick: () => openItem(t.ref)" in target                         # an item opens beside the reader (REVIEW-28)
+    assert 'href: "#" + t.anchor' in target                                   # a decision or comment, where it sits
 
 
 # ---------------------------------------------------------------- the skill (AGENT-88, AGENT-89)

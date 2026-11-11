@@ -346,3 +346,13 @@
   tests:
     python:
     - requirements-at-their-level
+- id: AGENT-V37
+  verifies:
+  - AGENT-88
+  - AGENT-89
+  method: inspection
+  technique: unit test
+  description: The skill's section on talking to the engineer tells agents to paste what spec review --link prints rather than bare IDs, and to ask for a look without asking to lock with spec point, most important first, each change's list starting empty.
+  tests:
+    python:
+    - tests/test_links.py::test_the_skill_says_to_paste_links_and_to_point_rather_than_propose

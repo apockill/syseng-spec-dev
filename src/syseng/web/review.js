@@ -518,7 +518,10 @@
     const words = t.kind === "item" ? (ITEMS[t.ref] ? ITEMS[t.ref].title || ITEMS[t.ref].text : "no longer in the spec")
       : x.question || x.comment || "not on record";
     const name = t.kind === "item" ? t.ref : `${x.id || t.ref} · ${x.change || ""}`;
-    return h("a", { class: "target", href: "#" + t.anchor }, h("span", { class: "mono" }, name), " ", h("span", { class: "small" }, brief(words, 14)));
+    const kids = [h("span", { class: "mono" }, name), " ", h("span", { class: "small" }, brief(words, 14))];
+    // an item opens beside the reader, who keeps their place (REVIEW-28); a decision or comment is shown where it sits
+    if (t.kind === "item" && ITEMS[t.ref]) return h("button", { class: "target", type: "button", "data-id": t.ref, onclick: () => openItem(t.ref) }, kids);
+    return h("a", { class: "target", href: "#" + t.anchor }, kids);
   }
   let uid = 0;
   // one decision waiting for the person: conflicts first; each involved item answerable on its own (REVIEW-30)
@@ -1156,7 +1159,7 @@
   function toast(msg) { const t = h("div", { class: "toast", role: "status" }, msg); document.body.append(t); setTimeout(() => t.remove(), 2600); }
 
   // ---------------------------------------------------------------- following a link (REVIEW-56, REVIEW-57)
-  let linkedFrom = null;  // the tab the person was on before a link took them elsewhere
+  let linkedFrom = null;  // where the person was before a link took them elsewhere: the tab, and how far down
   function scrollToCard(el) {
     for (const x of document.querySelectorAll(".linked")) if (x !== el) x.classList.remove("linked");
     el.classList.add("linked");
@@ -1213,7 +1216,8 @@
     linkedFrom = null;
     for (const x of document.querySelectorAll(".linked")) x.classList.remove("linked");
     renderAll();  // what was answered on the linked view shows everywhere
-    showTab(blocks[back] && back !== "linked" ? back : showTab.first, true);
+    showTab(blocks[back.tab] && back.tab !== "linked" ? back.tab : showTab.first, true);
+    window.scrollTo({ top: back.y });  // back where they were
   }
   function showEverything() {
     try { history.replaceState(null, "", location.pathname); } catch (e) { location.hash = ""; return; }
@@ -1222,7 +1226,7 @@
   function route() {
     const link = parseLink(location.hash, location.search);
     if (!link) return leaveLink();
-    if (linkedFrom === null) linkedFrom = currentTab;
+    if (linkedFrom === null) linkedFrom = { tab: currentTab, y: window.scrollY };
     if (link.focus) showFocus(link.focus); else jump(link.anchor);
   }
 

@@ -184,3 +184,9 @@
   method: analysis
   technique: roll-up
   description: Verified through its children's verification.
+- id: SYS-V27
+  verifies:
+  - SYS-63
+  method: analysis
+  technique: roll-up
+  description: Passes when every requirement refining SYS-63 passes its own verification (REVIEW-56 to REVIEW-60, CLI-39, CLI-40, AGENT-88, AGENT-89).
