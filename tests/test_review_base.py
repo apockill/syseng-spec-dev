@@ -83,10 +83,13 @@ def test_the_page_says_when_it_found_nothing_to_compare_against(tmp_path, repo):
 def test_the_page_states_its_base_at_the_top(repo):
     _git(repo, "switch", "-qc", "work")
     html = page.render(_build(repo))
-    assert 'id="compared"' in html.split("</header>")[0]
+    header = html.split("</header>")[0]
+    # a badge among the header's details, naming the base and its revision; the full statement on hover or click
+    assert 'class="cmp" id="compared"' in header.split('class="meta"')[1] and 'id="compared-detail" hidden' in header
     assert '"compared":{"label":"main"' in html
     script = (page.WEB / "review.js").read_text()
     assert "against ${cmp.text}" in script and "cmp.why" in script
+    assert "badge.title = full" in script and "detail.hidden = !open" in script and "cmp.short" in script
 
 
 def test_a_base_named_by_its_commit_reads_as_that_commit(repo, capsys, monkeypatch):

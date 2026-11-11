@@ -873,12 +873,23 @@
     document.getElementById("repo").textContent = META.repository;
     document.getElementById("when").textContent = `${META.generated} · ${META.revision.slice(0, 7)}${META.dirty ? " + uncommitted" : ""}`;
     // what everything on this page is measured against (REVIEW-40, REVIEW-43)
-    const cmp = META.compared, bar = document.getElementById("compared");
-    bar.classList.toggle("none", !cmp);
-    // in plain words, with the current commit, and why when the page chose the base itself (REVIEW-53)
-    bar.textContent = cmp ? `Comparing ${cmp.newer}${cmp.newer === "working tree" ? ` at ${META.revision.slice(0, 7)}` : ""} against ${cmp.text}`
+    // a badge naming the base and its revision; the full statement in plain words, with the current commit and why the
+    // page chose the base (REVIEW-53), on hover and below the header on click
+    const cmp = META.compared, badge = document.getElementById("compared"), detail = document.getElementById("compared-detail");
+    const full = cmp ? `Comparing ${cmp.newer}${cmp.newer === "working tree" ? ` at ${META.revision.slice(0, 7)}` : ""} against ${cmp.text}`
         + (cmp.note && !cmp.note.endsWith(cmp.short) ? ` (${cmp.note})` : "") + "." + (cmp.why ? ` ${cmp.why}` : "")
       : "Compared against nothing: no base was found, so nothing here is marked as changed.";
+    badge.classList.toggle("none", !cmp);
+    badge.title = full;
+    badge.replaceChildren(icon("compare", "sm"), cmp
+      ? h("span", {}, "vs ", h("b", {}, cmp.label), " ", h("span", { class: "mono" }, cmp.short))
+      : h("span", {}, "No base"));
+    detail.textContent = full;
+    badge.addEventListener("click", () => {
+      const open = detail.hidden;
+      detail.hidden = !open;
+      badge.setAttribute("aria-expanded", String(open));
+    });
     const t = document.getElementById("theme");
     const changed = Object.values(CHANGE).filter((c) => c.cls !== "added").length;
     t.before(h("button", { class: "act diffs" + (diffAll ? " on" : ""), id: "diffs", type: "button", "aria-pressed": diffAll,
