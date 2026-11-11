@@ -30,6 +30,22 @@
   batch: 5
   review: fb9e41a5f8
   text: The instructions the toolkit writes into a repository shall tell agents that a change touching only paths in .specignore needs no spec work.
+- id: AGENT-82
+  fingerprint: b193d5083c6d
+  locked_at: 2026-11-10T16:43-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 8f834d829d
+  text: The skill shall direct agents to write each need and system requirement as the capability needed or the risk prevented, stating a how there only as a constraint the engineer imposed.
+- id: AGENT-83
+  fingerprint: 3c445e5c5cd5
+  locked_at: 2026-11-10T16:43-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 8f834d829d
+  text: Below the system level, the skill shall direct agents to state an exact name or value in a requirement only where the engineer stated it, it is a safety limit, or the requirement sits at the level where that choice applies and a decision record at that level or above gives the reason.
 - id: AGENT-V20
   fingerprint: 8f52eaeb8434
   locked_at: 2026-10-31T15:07-07:00
