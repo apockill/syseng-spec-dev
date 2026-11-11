@@ -90,6 +90,32 @@ def test_the_review_command_writes_the_page_beside_the_hook_ignored_by_version_c
     assert "file://" in capsys.readouterr().out
 
 
+def test_the_review_command_reminds_a_change_that_altered_requirements_to_propose(repo, capsys):
+    from syseng import edit as _edit
+    changes.start(model.load(repo), "widgets", None, None, None)
+    assert cli.main(["--spec", str(repo), "review"]) == 0
+    assert "proposes none for locking" not in capsys.readouterr().out          # nothing altered: no reminder
+    assert _edit.run(repo, {"edits": [{"modify": "CORE-1", "set": {"text": "The core shall stamp each widget twice."},
+                                       "reason": "twice"}], "acks": {"CORE-1": "fine", "CORE-V1": "fine"}}).applied
+    assert cli.main(["--spec", str(repo), "review"]) == 0
+    assert "added or altered 1 needs or requirements and proposes none for locking" in capsys.readouterr().out
+    assert cli.main(["--spec", str(repo), "propose", "CORE-1", "--why", "it decides every widget"]) == 0
+    capsys.readouterr()
+    assert cli.main(["--spec", str(repo), "review"]) == 0
+    assert "proposes none for locking" not in capsys.readouterr().out
+
+
+def test_an_answer_given_on_an_earlier_version_of_an_item_that_changed_is_set_aside():
+    start = JS.index("const setAside = [];")
+    loop = JS[start:JS.index("const person = ", start)]
+    assert "s.fingerprint === ITEMS[id].fingerprint) continue" in loop           # unchanged items keep their answers
+    assert "delete s.lock; delete s.alteration; delete s.intent;" in loop        # never sent against the new text
+    assert "s.fingerprint = ITEMS[id].fingerprint" in loop                       # comments and wordings stay
+    assert JS.index("const setAside = [];") < JS.index("function feedbackBlock()")
+    for_you = JS[JS.index("function renderForYou()"):JS.index("Recommended by the agent")]
+    assert "if (setAside.length)" in for_you and "that changed since" in for_you and "idButton(a.id)" in for_you
+
+
 # ---------------------------------------------------------------- applying feedback
 def test_a_lock_is_recorded_in_the_reviewers_name_and_a_stale_one_is_refused(repo):
     text = _block(repo, items=[{"id": "CORE-1", "lock": True}, {"id": "SYS-1", "lock": True, "fingerprint": "stale0000000"}])
@@ -217,7 +243,7 @@ def test_the_first_tab_holds_what_awaits_the_person_then_the_agents_recommendati
     assert re.findall(r"(\w+): \"", names) == ["awaiting", "altered", "captured", "changes", "history", "items"]
     for_you = JS[JS.index("function renderForYou()"):JS.index("function subItem(")]
     assert for_you.index("Recommended by the agent") < for_you.index("Decisions waiting") < for_you.index("Answers to your feedback")
-    assert "Lock all" in JS and "Earlier recommendations, still unlocked" in JS
+    assert "Lock all" in JS and "recommended in ${g.change}" in JS
     assert "function triage(" in JS and '"answered"' in (page.WEB / "review.css").read_text()   # REVIEW-31
     changes.start(model.load(repo), "widgets", None, None, None)
     changes.add_proposal(changes.current(model.load(repo)), ["SYS-1", "NEED-1"], "the top of the tree")
@@ -286,14 +312,33 @@ def test_the_page_opens_on_the_overview_and_agents_can_read_it(repo, capsys):
     assert "Verification coverage: 50.0%" in capsys.readouterr().out
 
 
-def test_only_the_newest_changes_proposals_are_current(repo):
+def test_every_waiting_proposal_is_recommended_newest_round_first_naming_its_round(repo):    # REVIEW-37
     first = changes.start(model.load(repo), "first", None, None, None)
     changes.add_proposal(first, ["CORE-1"], "an old reason")
     changes.close(first)
     second = changes.start(model.load(repo), "second", None, None, None)
+    changes.add_proposal(second, ["SYS-1"], "a newer reason")
+    changes.close(second)
+    third = changes.start(model.load(repo), "applying feedback, proposing nothing", None, None, None)
     data = pagedata.build(model.load(repo), ADA)
-    assert data["meta"]["change"] == second.id                         # REVIEW-37
-    assert [p["change"] for p in data["proposals"] if p["from"] != "computed"] == [first.id]
+    assert data["meta"]["change"] == third.id
+    judged = [(p["id"], p["change"]) for p in data["proposals"] if p["from"] != "computed"]
+    assert judged == [("SYS-1", second.id), ("CORE-1", first.id)]
+    for_you = JS[JS.index("function renderForYou()"):JS.index("function subItem(")]
+    assert "p.change === latest" not in for_you and "Earlier recommendations" not in for_you   # none hidden
+    assert "x.change === p.change" in for_you and "recommended in ${g.change}" in for_you      # each names its round
+    assert "Also: ${computed.length} items" in for_you                                          # counted, kept apart
+
+
+def test_recommendations_keep_the_agents_ranking_and_number_it(repo):     # AGENT-81, REVIEW-55
+    c = changes.start(model.load(repo), "ranked", None, None, None)
+    changes.add_proposal(c, ["SYS-1"], "most important")
+    changes.add_proposal(c, ["CORE-1"], "less important")
+    data = pagedata.build(model.load(repo), ADA)
+    judged = [p["id"] for p in data["proposals"] if p["from"] != "computed"]
+    assert judged == ["SYS-1", "CORE-1"]                                   # the order the agent proposed them in
+    for_you = JS[JS.index("function renderForYou()"):JS.index("function subItem(")]
+    assert "groups.entries()" in for_you and 'class: "rank mono"' in for_you and "${n + 1}" in for_you
 
 
 def test_the_overview_shows_requirements_with_linked_tests_beside_coverage(spec):     # REVIEW-38

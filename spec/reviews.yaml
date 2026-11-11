@@ -3066,3 +3066,23 @@
     - CHANGE-30
     - CHANGE-31
     - REVIEW-41
+- review: 25a34c5960
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-10T16:35-08:00
+  generated: 2026-11-08T13:40-08:00
+  revision: aca8a5f22a9809cdc91a775472314141bea91aaf
+  dirty: false
+  did:
+    locked:
+    - REVIEW-37
+    - CLI-38
+- review: 8f834d829d
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  at: 2026-11-10T16:43-08:00
+  generated: 2026-11-10T16:38-08:00
+  revision: 3cdef488342dbb423a2d7a8197d63ba553b4f2a7
+  dirty: false
+  did:
+    locked:
+    - AGENT-82
+    - AGENT-83

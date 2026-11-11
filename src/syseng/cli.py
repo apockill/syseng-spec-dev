@@ -226,7 +226,15 @@ def cmd_change(args) -> int:
             print(f"discarded {c.id}" + (f"; its edits to {', '.join(touched)} stay in the working tree: undo them "
                                          "with version control if they should go too" if touched else ""))
         elif args.action == "close":
-            c = changes.current(spec)
+            if args.id:  # CHANGE-35: after merging branches, more than one change can be open; close a named one
+                named = [x for x in changes.all_changes(spec) if x.is_open and (x.id == args.id or x.id.startswith(args.id))]
+                if len(named) != 1:
+                    print(f"spec change close: {'no open change' if not named else 'more than one open change'} "
+                          f"matches {args.id!r}")
+                    return 1
+                c = named[0]
+            else:
+                c = changes.current(spec)
             if c is None:
                 print("no change is open")
                 return 1
@@ -642,7 +650,21 @@ def cmd_review(args) -> int:
         print("  compared against nothing: no base was found. Name one with --against")
     print(f"  {awaiting} awaiting a decision, {len(data['changes'][0]['items']) if data['changes'] else 0} items changed, "
           f"{len(data['captured'])} intent records captured, {len(data['proposals'])} proposed for locking")
+    unproposed = _altered_without_proposals(spec)
+    if unproposed:  # the hand-over reminder (CLI-38): one line, and only when it applies
+        print(f"  this change added or altered {unproposed} needs or requirements and proposes none for locking: propose the "
+              "few most worth the engineer's look with `spec propose <IDs> --why \"…\"`, or say in your report why none")
     return 0
+
+
+def _altered_without_proposals(spec) -> int:
+    """How many needs and requirements the open change added or modified, when it proposes nothing to lock."""
+    c = changes.current(spec)
+    if c is None or c.data.get("proposals"):
+        return 0
+    kinds = ("need", "system", "constraint", "requirement")
+    return len({e["id"] for e in c.data.get("entries") or [] if e.get("op") in ("add", "modify")
+                and e.get("id") in spec.items and spec.items[e["id"]].kind in kinds})
 
 
 def cmd_feedback(args) -> int:
@@ -787,6 +809,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--target", help="implementation the change targets (default: the primary one)")
     p.add_argument("--slug", help="a few words for the file name")
     p.add_argument("--full", action="store_true", help="show: print the whole record as text")
+    p.add_argument("--id", help="close: the open change to close, by its ID or the start of it, when more than one is "
+                                "open (as after merging two branches that each opened one)")
     p.set_defaults(fn=cmd_change)
     p = sub.add_parser("edit", help="change the spec with a YAML batch on stdin (see `spec edit --help`)",
                        description=edit.__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)

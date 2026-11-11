@@ -160,7 +160,7 @@
   - AGENT-71
   method: inspection
   technique: unit test
-  description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or named-consumer cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
+  description: The skill states depth follows intent, counts features not effects, keeps exact values only for stated, safety or parsed-by-another-program cases, asks instead of picking between designs, never restates constraints per element, and has a reference covering features, values, inferred requirements, gaps, documents and splitting.
   tests:
     python:
     - tests/test_skill.py::test_skill_teaches_how_deep_to_write_requirements
@@ -277,3 +277,72 @@
   tests:
     python:
     - tests/test_scope.py::test_the_instructions_say_ignored_paths_need_no_spec
+- id: AGENT-V30
+  verifies:
+  - AGENT-81
+  method: inspection
+  technique: unit test
+  description: The skill's hand-over step says to propose the items worth the engineer's look ranked most important first, and its proposing section says to do so in every change that alters the spec, lists inferred items, items stating an exact name or value, items others build on and items the engineer's words were reworded into, asks for one spec propose per group in order of importance with the count left to the change, and sets no fixed number.
+  tests:
+    python:
+    - tests/test_skill.py::test_every_change_that_alters_the_spec_ends_with_proposals
+- id: AGENT-V31
+  verifies:
+  - AGENT-81
+  method: demonstration
+  technique: integration test
+  description: Asked to add two requirements and rework a third, then hand over, an agent with the skill runs spec propose with a reason.
+  tests:
+    python:
+    - propose-at-hand-over
+- id: AGENT-V32
+  verifies:
+  - AGENT-82
+  - AGENT-83
+  - AGENT-84
+  method: inspection
+  technique: unit test
+  description: SKILL.md's rule 3 says needs and system requirements are solution-free, with a how only as a constraint the engineer imposed, and that a lower requirement may name an exact name or value only where it sits at the level where that choice applies and a decision record at that level or above gives the reason, the value otherwise going in the verification item; rule 4 keeps needs and requirements environment-neutral. The depth reference's section B says the same by level, after INCOSE (your what is my how), allowing the code-name rule on such an item citing its record, and keeps every level environment-neutral; its value rule 3 puts an interface's value in a requirement only at the lowest level and says to state the capability for flags a person types; its worked examples name app.sock only where a decision record lists the app interface's standard names, and keep the operating system, proxy and domain out of needs and requirements. The code-name rule's explanation says the same. Neither file says interfaces included or named consumer.
+  tests:
+    python:
+    - tests/test_skill.py::test_requirements_name_values_only_at_their_level_with_a_decision_record
+- id: AGENT-V33
+  verifies:
+  - AGENT-85
+  method: inspection
+  technique: unit test
+  description: SKILL.md's rule 6 quotes the engineer's test word for word, says to read each requirement written or changed against it before handing over, and to rewrite each that fails; the depth reference quotes it too, and the onboarding checklist's last step starts with reading every requirement against it.
+  tests:
+    python:
+    - tests/test_skill.py::test_skill_gives_the_engineers_test_for_every_requirement
+- id: AGENT-V34
+  verifies:
+  - AGENT-86
+  method: inspection
+  technique: unit test
+  description: SKILL.md's rule 5 says to write a parent's intent before its children, to split a requirement joining two behaviours with and, or or a semicolon, and that a parent with one child is suspect; the depth reference's section F says a requirement is one thought, to write the parent first, and to merge a single child or find its missing sibling, and its exit-code example gives one child per outcome.
+  tests:
+    python:
+    - tests/test_skill.py::test_long_requirements_become_a_parent_and_children
+- id: AGENT-V35
+  verifies:
+  - AGENT-87
+  method: inspection
+  technique: unit test
+  description: SKILL.md's rule 7 orders verification as an automated test or static check first, then a reasoning check, then manual, and says an item using a weaker method says why the stronger one can't work; the writing reference says the same and names a linter over the code or the spec as a static check.
+  tests:
+    python:
+    - tests/test_skill.py::test_verification_prefers_the_strongest_check_that_can_work
+- id: AGENT-V36
+  verifies:
+  - AGENT-82
+  - AGENT-83
+  - AGENT-84
+  - AGENT-85
+  - AGENT-86
+  method: demonstration
+  technique: integration test
+  description: Asked to bring a small working project into the spec - one whose code names its socket, routes, JSON keys, exit codes, a staleness limit, typefaces, the host's operating system, a proxy and a domain, and whose README is the engineer's - an agent with the skill writes needs and requirements of which at least 90% pass a model judge on all three of - solution-free at their level or justified by a decision record, singular, and passing the engineer's agree-by-intent test - with the rubric's examples taken from the engineer's corrections of a migrated spec.
+  tests:
+    python:
+    - requirements-at-their-level

@@ -66,7 +66,7 @@ Beside the page, report in a few lines:
 - each measure the overview marks worse (`spec review --section overview`), with why and what you'd do about it;
 - each conflict, with its options, the recommended one first;
 - each alteration to an item a person locked, stated or guided, which they keep on the page (or with `lock <ID>`) or ask you to roll back;
-- the items you propose for locking;
+- the items you proposed for locking, and why, in a line;
 - anything in the toolkit that got in your way, with an offer to report it (references/reporting-problems.md).
 
 ## Feedback from the review page
@@ -87,4 +87,14 @@ A lock is a person's own act, naming the items: a lock line in chat (`lock CHECK
 
 ## Proposing items to lock
 
-Propose the items whose consequences reach the engineer (what they see, lock or do), judged from what you know they care about: `spec propose <IDs> --why "…"`, most consequential first. To take a proposal back, because its reason was wrong or you proposed too much, `spec propose <IDs> --withdraw` removes it from whichever change made it; one already on the trunk needs `--reason "…"` and is kept as withdrawn. Propose again with the right reason if the items still deserve it. One reason per group of items; don't repeat it for each. Your decision records about mechanics stay yours to revise. The review page also lists the items the most of the tree hangs from, but that list is mechanical and no substitute for your judgment.
+Propose the items whose consequences reach the engineer (what they see, lock or do), judged from what you know they care about: `spec propose <IDs> --why "…"`, most consequential first.
+
+Do it in every change that alters the spec, not only onboarding: before handing over, ask which of the items you touched the engineer would most regret finding out about later. The likely ones:
+- items you inferred (`derived`, `added`) that others build on;
+- items that state an exact name or value;
+- items you reworded the engineer's words into, or that lean on a choice they didn't make;
+- items where you picked between designs, or narrowed what they said.
+
+Rank them: run `spec propose` once per group, most important group first, because the page lists them in that order and numbers them. The engineer works down the list and stops when their time runs out, so the order matters more than the count: propose as many as earn a look, few for a small change and more for a large one. Group them by an honest reason ("I inferred these from your remark about X; they decide Y"). Earlier proposals still waiting stay on the page, so don't repeat them. A change that only applied the engineer's feedback may need none; say so in your report.
+
+To take a proposal back, because its reason was wrong or you proposed too much, `spec propose <IDs> --withdraw` removes it from whichever change made it; one already on the trunk needs `--reason "…"` and is kept as withdrawn. Propose again with the right reason if the items still deserve it. One reason per group of items; don't repeat it for each. Your decision records about mechanics stay yours to revise. The review page also lists the items the most of the tree hangs from, but that list is mechanical and no substitute for your judgment.

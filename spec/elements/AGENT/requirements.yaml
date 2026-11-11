@@ -689,3 +689,111 @@
   traces_to: SYS-62
   basis: derived
   why: agents working on apps outside the spec would otherwise follow the spec loop for them.
+- id: AGENT-81
+  text: Before handing over each change that adds or alters needs or requirements, the agent shall propose for locking the items worth the engineer's attention, ranked from most to least important, with one reason for each group of items.
+  traces_to: SYS-38
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-04 08:14
+    context: Reviewing a large migration spec whose review page showed nothing recommended by the agent.
+    said: Noticed the agent had not recommended items in about the past twenty reviews, and suggested, perhaps as a to-do, improving the skill and its evals so the agent is reminded to surface useful, possibly contentious items in the requirement graph for them to review and possibly lock.
+    basis: stated
+    source: human_conversation
+    fingerprint: 946d17ca0c62
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-10 16:37
+    context: Reviewing the rule that asked agents to propose up to eight items at each hand-over.
+    said: |-
+      Did not state a limit of eight and finds a fixed number prescriptive, since changes range from small to large. Ranking matters more: the agent orders the items by importance, and the engineer works down the list, locking what they care about in the time they have; the number can vary.
+    basis: stated
+    source: human_conversation
+    fingerprint: bc4fd199ccb1
+- id: AGENT-82
+  text: The skill shall direct agents to write each need and system requirement as the capability needed or the risk prevented, stating a how there only as a constraint the engineer imposed.
+  traces_to: SYS-20
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 18:00
+    context: Reviewing a spec migrated from a repository of web apps, whose requirements named the host's operating system, command flags and file names.
+    said: Wants nothing in the spec to mention that it runs on a machine running NixOS; thinks verification items may be very prescriptive since they test the implementation, while constraints should talk more about the risks involved and what is to be prevented; asked whether a command-line requirement should instead say the command can accept standard input, with the verification checking it does so through the flag; and suggested a manifest requirement might say each app shall have a file that is enforced to follow one schema, with a verification item or child requirements saying how.
+    basis: stated
+    source: human_conversation
+    fingerprint: 6dba055f0efa
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-08 10:02
+    context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+    said: Felt that naming the socket file in a requirement was implementation slipping into requirements again, and wanted the name left to the verification item. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+    basis: stated
+    source: human_conversation
+    fingerprint: 8be363c9112f
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-08 12:00
+    context: After correcting about 25 requirements of a migrated spec of web apps for stating implementation detail, reading research the agent gathered from INCOSE's Guide to Writing Requirements - requirements free of implementation unless there is a reason to constrain the design, detail suited to each level, a how chosen at one level being a fair what for the level below, and a how a stakeholder imposes stated as a constraint.
+    said: Said the research aligned with their hunch.
+    basis: guided
+    source: human_conversation
+    fingerprint: b193d5083c6d
+- id: AGENT-83
+  text: Below the system level, the skill shall direct agents to state an exact name or value in a requirement only where the engineer stated it, it is a safety limit, or the requirement sits at the level where that choice applies and a decision record at that level or above gives the reason.
+  traces_to: SYS-20
+  basis: derived
+  why: a how chosen at one level is a fair what for the level below, so the lowest requirement may carry the choice, while the record keeps the reason in one place and every higher requirement stays agreeable by its intent; elsewhere the value belongs in the verification item.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-08 10:02
+    context: Reviewing on 2026-11-08 a spec migrated from a repository of web apps, whose requirement named the socket file each backend app serves on; the second part is the test they had given earlier for every requirement.
+    said: Felt that naming the socket file in a requirement was implementation slipping into requirements again; suggested the requirement avoid the name and say instead that each backend app has a Unix socket of a standard name at the top of the apps directory, with the verification item enforcing the implementation by asserting that a file named app.sock exists. Earlier gave their test for any requirement - with a little context, they should be able to agree it is a feature or intent that should exist without also having to wonder whether they agree with its implementation details.
+    basis: stated
+    source: human_conversation
+    fingerprint: 12e4e7ba1982
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-08 12:00
+    context: Choosing how strict the skill's rule on names and values in requirements should be, after reading the INCOSE research; the rule then in the skill said never, interfaces included.
+    said: Chose to allow names and values in requirements at the lowest level when a decision record justifies the choice, and to have no glossary for now.
+    basis: stated
+    source: human_conversation
+    fingerprint: 3c445e5c5cd5
+- id: AGENT-84
+  text: The skill shall direct agents to name no host, domain, operating system or deployment in a need or requirement at every level.
+  traces_to: SYS-20
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-03 18:00
+    context: Reviewing a spec migrated from a repository of web apps, whose requirements named the host's operating system, command flags and file names.
+    said: Wants nothing in the spec to mention that it runs on a machine running NixOS.
+    basis: stated
+    source: human_conversation
+    fingerprint: 111e17bb918b
+- id: AGENT-85
+  text: Before handing over, the skill shall direct agents to check each requirement they wrote or changed against the engineer's test that a reader can agree with its intent without weighing its implementation details.
+  traces_to: SYS-20
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-07 12:00
+    context: Reviewing a spec migrated from a repository of web apps, giving their test for every requirement.
+    said: Said they should be able to look at any requirement and, with a little context, agree that it is a feature or intent that should exist, without also having to wonder whether they agree with its implementation details.
+    basis: stated
+    source: human_conversation
+    fingerprint: 7b9bd407fc13
+- id: AGENT-86
+  text: The skill shall direct agents to split a requirement that joins two or more behaviours into a parent stating the intent and one child per behaviour.
+  traces_to: SYS-20
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-08 12:00
+    context: Reviewing a migrated spec of web apps from 2026-11-03 to 11-08, on three long items - a command's exit codes, a long reasoning check and a manifest's schema - and later reading research that a requirement states one thought and that a parent with a single child is a smell.
+    said: Asked each time for the long item to become a parent stating the intent, with children giving the specifics, each verified on its own; said the research aligned with their hunch.
+    basis: guided
+    source: human_conversation
+    fingerprint: 1d74e4aaaf2f
+- id: AGENT-87
+  text: The skill shall direct agents to verify each requirement by the strongest method that can work, preferring an automated test or static check to a reasoning check and a reasoning check to a manual one, and recording why when a weaker one is chosen.
+  traces_to: SYS-10
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-08 12:00
+    context: Reviewing a migrated spec of web apps whose verification of an agent's pre-hand-over checks was a manual item.
+    said: Did not see why that requirement could not be tested, thought a linter could be useful and that many verification items would then be testable, and agreed to preferring an automated check, then a model-judged one, then a manual one, with the reason recorded when a weaker one is chosen.
+    basis: guided
+    source: human_conversation
+    fingerprint: e95c4fc3e98b

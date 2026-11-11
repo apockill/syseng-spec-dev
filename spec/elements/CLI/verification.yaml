@@ -263,3 +263,12 @@
   tests:
     python:
     - tests/test_batches.py
+- id: CLI-V25
+  verifies:
+  - CLI-38
+  method: test
+  technique: unit test
+  description: Writing the review page prints no reminder while the open change has altered nothing, prints that it added or altered 1 needs or requirements and proposes none once it modifies a requirement, and prints none again after spec propose.
+  tests:
+    python:
+    - tests/test_review_page.py::test_the_review_command_reminds_a_change_that_altered_requirements_to_propose

@@ -347,10 +347,18 @@
   basis: derived
   why: the page groups the newest change's proposals at the top; an item proposed again under an older reason dropped out of that group, so the engineer saw five of the six items they were asked to look at.
 - id: REVIEW-37
-  text: The review page shall present as the agent's current recommendations only those made in the newest change, listing older ones as earlier recommendations.
+  text: The review page shall list as the agent's recommendations each agent proposal that is neither withdrawn nor locked, the newest change's first, each naming the change that made it.
   traces_to: SYS-38
   basis: derived
-  why: a change with decisions but no proposals showed proposals from months-old changes as the agent's current advice, above the decisions it was handing over.
+  why: REVIEW-37 first showed only the newest change's proposals, so a newer change with decisions but no proposals wouldn't present months-old advice as current; but a round that proposes nothing, such as one applying review feedback, then showed nothing recommended with ten proposals waiting, folded away. Naming each proposal's change keeps old advice from reading as current without hiding it.
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-04 08:14
+    context: Reviewing a large migration spec on the review page, which showed nothing under the agent's recommendations although earlier rounds had proposed items.
+    said: Asked why nothing was marked as recommended by the agent in so large a review they had barely begun, noting that an earlier review had recommended many items and that knowing what to focus on makes their work much easier.
+    basis: guided
+    source: human_conversation
+    fingerprint: 9c3810dc456b
 - id: REVIEW-38
   text: The review page overview shall show the share of requirements whose verification links tests, beside the verification coverage.
   traces_to: SYS-45
@@ -501,3 +509,19 @@
   traces_to: SYS-48
   basis: derived
   why: a base the page chose itself would otherwise look like a mistake; one onboarding agent's page said it compared against a commit at that same commit, which read as wrong while the current commit was another.
+- id: REVIEW-54
+  text: When the review page holds an answer a person gave on an earlier version of the page to an item that has changed since, the review page shall set the answer aside and name the item, instead of sending the answer with the feedback.
+  traces_to: SYS-46
+  basis: derived
+  why: in a sites review the page sent a lock on BOX-13 with the fingerprint of its wording before a wording pass; the answer had been kept from an earlier version of the page, the page showed it as given to the new text, and the agent refused it only after the engineer had sent the review.
+- id: REVIEW-55
+  text: The review page shall number the agent's recommendations in the order the agent made them, so the engineer can work down them by rank.
+  traces_to: SYS-38
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-10 16:37
+    context: Reviewing the rule that asked agents to propose up to eight items at each hand-over.
+    said: Wants the agent to rank its proposals by importance so they can go down the list in order and lock what they care about in the time available.
+    basis: guided
+    source: human_conversation
+    fingerprint: 18f66e995bfd

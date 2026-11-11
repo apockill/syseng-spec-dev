@@ -18,7 +18,9 @@ Place each requirement where the system's structure puts it, not where the engin
 
 ## How deep
 
-SKILL.md's rules, and references/requirement-depth.md for the rest: depth follows the engineer's intent, one requirement per noticeable feature, exact values only where stated, safety-critical or read by a named consumer.
+SKILL.md's rules, and references/requirement-depth.md for the rest: depth follows the engineer's intent, one requirement per noticeable feature, each saying what's needed or prevented at its level. Needs and system requirements are solution-free and environment-neutral, with a how only as a constraint the engineer imposed. A lower-level requirement names an exact name or value only at the level where that choice applies, with a decision record at that level or above giving the reason; otherwise the value goes in the verification item. Numbers only where stated or safety-critical.
+
+Write a parent's intent first, then its children: one thought per requirement, so a requirement joining two behaviours with "and", "or" or ";" splits, and a parent with one child either merges with it or is missing a sibling. Before handing over, read each requirement against the engineer's test (SKILL.md, rule 6).
 
 ## Wording
 
@@ -65,6 +67,8 @@ A verification item says how one or more requirements are checked:
 - `tests`: links per implementation, for example `{python: [tests/test_x.py::test_y]}`.
 
 System requirements also get system-level verification, such as an end-to-end run, not only their children's tests.
+
+Choose the strongest check that can work: an automated test or a static check (a linter over the code or the spec) first, then a reasoning check, then manual. Many checks that look manual can be automated. When you choose a weaker one, the description says why the stronger one can't work ("no test can see the hardware's light; a person watches it").
 
 ## Linking tests
 

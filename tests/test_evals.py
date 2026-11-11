@@ -10,7 +10,7 @@ import yaml
 from syseng import readers
 
 REPO = Path(__file__).resolve().parent.parent
-SUITE = yaml.safe_load((REPO / "evals" / "promptfooconfig.yaml").read_text())
+SUITES = {name: yaml.safe_load((REPO / "evals" / f"{name}.yaml").read_text()) for name in ("promptfooconfig", "requirements")}
 _spec = importlib.util.spec_from_file_location("eval_checks", REPO / "evals" / "checks.py")
 checks = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(checks)
@@ -25,8 +25,10 @@ def _passed(result):
     return result["pass"]
 
 
-def test_every_case_is_named_graded_and_calls_a_real_check():
-    for case in SUITE["tests"]:
+@pytest.mark.parametrize("suite", SUITES)
+def test_every_case_is_named_graded_and_calls_a_real_check(suite):
+    assert "with-skill" in [p["label"] for p in SUITES[suite]["providers"]]      # the arm the reader reads
+    for case in SUITES[suite]["tests"]:
         assert case["description"] and case["vars"]["request"] and case["assert"], case
         for grader in case["assert"]:
             if grader["type"] == "python":
@@ -114,3 +116,41 @@ def test_only_the_reader_in_the_toolkit_names_the_eval_tool():
     source = REPO / "src" / "syseng"
     named = {p.relative_to(source).as_posix() for p in source.rglob("*.py") if "promptfoo" in p.read_text()}
     assert named == {"readers/promptfoo.py"}
+
+
+def test_a_proposal_counts_only_with_a_reason():
+    def run(*commands):
+        return _passed(checks.proposed_with_a_reason("", _context(tool_calls=[
+            {"name": "Bash", "input": {"command": c}} for c in commands])))
+    assert run('spec propose ARM-3 ARM-4 --why "I inferred both from your words; ARM-2 builds on them"')
+    assert not run("spec check", "spec review")
+    assert not run('spec propose ARM-3 --why ""')
+    assert not run("spec propose ARM-3 --withdraw")
+
+
+def test_the_requirement_judge_sees_every_need_and_requirement_and_scores_them(tmp_path, monkeypatch):
+    sys_, cli = tmp_path / "spec" / "elements" / "SYS", tmp_path / "spec" / "elements" / "CLI"
+    cli.mkdir(parents=True)
+    sys_.mkdir()
+    (sys_ / "element.yaml").write_text("id: SYS\nparent: null\n")
+    (cli / "element.yaml").write_text("id: CLI\nparent: SYS\n")
+    (sys_ / "needs.yaml").write_text("- id: NEED-1\n  text: See which lamps are out.\n")
+    (sys_ / "requirements.yaml").write_text("- id: SYS-1\n  kind: system\n  text: The board shall show it.\n")
+    (cli / "requirements.yaml").write_text("- id: CLI-1\n  text: Ping shall exit 2.\n  traces_to: SYS-1\n")
+    (cli / "decisions.yaml").write_text("- id: DR-1\n  title: Exit codes\n  requirements: [CLI-1]\n")
+    prompts = []
+
+    def judge(prompt):
+        prompts.append(prompt)
+        return [{"id": i, "solution_free": True, "singular": i != "CLI-1", "agreeable": True, "why": "-"}
+                for i in ("NEED-1", "SYS-1", "CLI-1")]
+    monkeypatch.setattr(checks, "_judge", judge)
+    result = checks.requirements_at_their_level("", _context(tmp_path))
+    assert "DR-1" in prompts[0] and '"has_children": true' in prompts[0]      # the judge sees the records and levels
+    assert "I should be able to look at any requirement" in prompts[0]           # the engineer's test, verbatim
+    assert not result["pass"] and round(result["score"], 2) == 0.67 and "CLI-1: singular" in result["reason"]
+    assert result["namedScores"]["singular"] == result["score"]
+
+
+def test_a_run_that_wrote_no_requirements_fails(tmp_path):
+    assert not _passed(checks.requirements_at_their_level("", _context(tmp_path)))

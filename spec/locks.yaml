@@ -30,6 +30,22 @@
   batch: 5
   review: fb9e41a5f8
   text: The instructions the toolkit writes into a repository shall tell agents that a change touching only paths in .specignore needs no spec work.
+- id: AGENT-82
+  fingerprint: b193d5083c6d
+  locked_at: 2026-11-10T16:43-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 8f834d829d
+  text: The skill shall direct agents to write each need and system requirement as the capability needed or the risk prevented, stating a how there only as a constraint the engineer imposed.
+- id: AGENT-83
+  fingerprint: 3c445e5c5cd5
+  locked_at: 2026-11-10T16:43-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 8f834d829d
+  text: Below the system level, the skill shall direct agents to state an exact name or value in a requirement only where the engineer stated it, it is a safety limit, or the requirement sits at the level where that choice applies and a decision record at that level or above gives the reason.
 - id: AGENT-V20
   fingerprint: 8f52eaeb8434
   locked_at: 2026-10-31T15:07-07:00
@@ -145,6 +161,14 @@
   batch: 4
   review: 8b5e84e04f
   text: A requirement on an element with sub-elements that nothing refines or verifies is reported as neither decomposed nor verified; a refined one and a leaf element's one get the plain to-do.
+- id: CLI-38
+  fingerprint: 1b909a089376
+  locked_at: 2026-11-10T16:35-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 25a34c5960
+  text: When the open change has added or altered needs or requirements and proposes no item for locking, the CLI shall say so when it writes the review page, naming the command that proposes items.
 - id: DR-1
   fingerprint: 0b72ae3a99ed
   locked_at: '2026-10-11'
@@ -928,6 +952,14 @@
   batch: 3
   review: 6fab0daf3a
   text: Wherever the review page shows an item that changed since its base, it shall mark the item as new or as edited, naming the kind of edit.
+- id: REVIEW-37
+  fingerprint: 9c3810dc456b
+  locked_at: 2026-11-10T16:35-08:00
+  by: Alex Thiele <alex.g.thiele@gmail.com>
+  via: page
+  batch: 2
+  review: 25a34c5960
+  text: The review page shall list as the agent's recommendations each agent proposal that is neither withdrawn nor locked, the newest change's first, each naming the change that made it.
 - id: REVIEW-38
   fingerprint: e30bb2497a97
   locked_at: 2026-10-26T08:09-07:00
