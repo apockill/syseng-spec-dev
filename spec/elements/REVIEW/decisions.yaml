@@ -118,3 +118,28 @@
   alternatives: A version-control operation finding the commit that added the change record, which would change the locked version-control interface (VCS-1); preferring the change's start over the last review, which hides what changed between the review and the change.
   consequences: Change records written before this have no started_from, so with no review either the page falls back to the trunk and its empty comparison, as before.
   basis: derived
+- id: DR-84
+  title: Links name what they open in the URL's fragment alone, with the change record's ID and a dot for decisions and comments
+  decided_by: agent
+  elements:
+  - REVIEW
+  - CLI
+  requirements:
+  - REVIEW-56
+  - REVIEW-57
+  - REVIEW-58
+  - CLI-39
+  basis: added
+  context: |-
+    The engineer usually opens the review page published as a Claude artifact. There, only a plain fragment made of letters, digits, '.', '_', '~' and '-' reaches the page's location.hash; a query string and a fragment such as #key=value never arrive. Decisions are numbered from D1 in each change and comments from F1, and are named `<change>/D<n>` elsewhere, but '/' isn't allowed. Round numbers don't name one change: this repository has two changes numbered round 66.
+  decision: |-
+    - An item or element: its ID, `#CORE-12`.
+    - A decision or comment: the change record's ID, a dot, and its number, `#2026-11-10-round-67-deep-links.D3`, `#…round-66.F1`. The page also takes `round-N.D3` while only one change has that round, and a bare `D3` or `F1` by the rule the CLI follows (the newest change's, unless another change has an open decision of that number); a short form that names more than one thing lists every candidate.
+    - A focus link: `#focus~CORE-12~2026-11-10-round-67-deep-links.D3`, the targets in order, joined by '~'. Where they arrive, as in a file opened locally, `#focus=A,B` and `?focus=A,B` work too. A tab's name, such as `#items`, opens that tab.
+    - One target opens where it sits: an item in the full spec, shown whatever the filters say, its details open, highlighted and scrolled to below the header; a decision or comment under For you. A target shown nowhere else (a resolved decision, an older comment) or a short form naming several opens on its own, as in a focus link.
+    - The page follows the link when it loads and on every hashchange. Leaving a link redraws the page, so answers given on the linked view show everywhere, and clears the fragment, so tapping the same link again works. Show everything, or going back to no fragment, returns the person to the tab and place they left; choosing a tab goes to that tab.
+    - Inside the page, an item on the look-at-this list opens beside the reader, as any item does (REVIEW-28); only a decision, a comment or a focus link moves the view.
+    - The toolkit computes the table of forms once (`links.index`) and embeds it in the page, so the page and `spec review --link` can't disagree. `spec review --link` prints the full form, which no later change can make ambiguous, and, without `--url` or `--out`, the fragments with a line on how to use them: the toolkit can't know where a page was published.
+  alternatives: |-
+    '/' as in `<change>/D3`, `#focus=…` and `?focus=` as the printed forms: they don't reach a page published as an artifact. `round-N.D3` as the printed form: shorter, but round numbers repeat after branches merge. Resolving forms in the page's script alone: two implementations of one rule, free to drift apart.
+  consequences: Links to decisions and comments are long. An agent that published the page passes its address with `--url` to print whole links. The page's parsing is tested by running its own functions under Node where Node is installed (the evals shell); the default development shell has none, so there that test is skipped, and the resolution rules are tested in Python.

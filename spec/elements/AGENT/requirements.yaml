@@ -797,3 +797,13 @@
     basis: guided
     source: human_conversation
     fingerprint: e95c4fc3e98b
+- id: AGENT-88
+  text: When the agent points the engineer at items, decisions or comments in a conversation, it shall give links that open them on the review page, not bare IDs.
+  traces_to: SYS-63
+  basis: added
+  why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. A bare ID sends the engineer searching the page.
+- id: AGENT-89
+  text: The agent shall put on the look-at-this list, most important first, what it wants the engineer to look at without asking to lock it.
+  traces_to: SYS-63
+  basis: added
+  why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer.

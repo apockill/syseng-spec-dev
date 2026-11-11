@@ -113,6 +113,7 @@ YAML
 ## Talking to the engineer
 
 - Give every ID a short title: "SYS-7 (done gate)".
+- **Point with links, not bare IDs.** When you point the engineer at items, decisions or comments, paste what `spec review --link <IDs, D<n>, F<n>> --url <the page's address>` prints: a link to each, and one showing only them. To ask them to look at something without asking to lock it, `spec point <targets> --why "…"`, once per mark, most important first; each change's list starts empty.
 - Order questions by how much each answer would change, each with options and one recommended, plus a one-line way to accept everything. Use your harness's question menu if it has one. Record open decisions with `spec decide`, so they survive the conversation.
 - **Anything you want the engineer to answer goes on a rendered page,** not in chat: record it with `spec decide`, hand over the review page, and give the link. Write each decision for a reader with none of your context: what is being decided, why it matters now, what each option does and what follows from it, with examples. If you'd only be informing them, a chat line is enough. Until they answer, `spec decide --replace D<n>` rewrites an open decision, and `spec decide --withdraw D<n>` withdraws one the conversation has overtaken (with `--reason "…"` once it's on the trunk); name one of an earlier change as `<change>/D<n>`.
 - **Locks belong to the engineer.** Record one only when they named the items; never lock your own work. Details in references/review-and-locks.md.

@@ -1,0 +1,361 @@
+request: |-
+  Give agents better ways to point the engineer at what they're discussing: deep links into the review page, a focused view, and a look-at-this list kept apart from proposals to lock
+mode: code-first
+target: python
+status: closed
+opened: '2026-11-10'
+started_from: 290f9b56514e369afedfdf628e15511876b4309a
+entries:
+- op: add
+  id: SYS-63
+  at: 2026-11-10T17:03-08:00
+  reason: the engineer asked for better ways for agents to point things out on the review page.
+  after:
+    kind: system
+    text: The toolkit shall let agents point the engineer at exactly the items, decisions and comments they are discussing, on the review page.
+    serves:
+    - NEED-24
+    - NEED-23
+    intent:
+    - by: Alex Thiele <alex.g.thiele@gmail.com>
+      when: 2026-11-10 17:03
+      context: Discussing how agents in a chat refer the engineer to what they mean on the review page, which the engineer often reads on a phone. The specific mechanisms (links, a focused view, a look-at-this list) were proposed by agents, not by the engineer.
+      said: Wants better ways for agents to point the engineer at what they are discussing; did not specify how.
+      basis: guided
+      source: human_conversation
+      fingerprint: 14a47c8cc6b1
+- op: add
+  id: REVIEW-56
+  at: 2026-11-10T17:07-08:00
+  reason: one of the ways agents point the engineer at what they discuss (SYS-63).
+  after:
+    text: When the review page's link names one item, decision or comment, the page shall show it opened where it sits on the page, on loading and whenever the link changes while the page is open.
+    traces_to: SYS-63
+    basis: added
+    why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. An agent in a chat can send a link that opens exactly what it names, so the engineer, often on a phone, doesn't search hundreds of items for it.
+- op: add
+  id: REVIEW-57
+  at: 2026-11-10T17:07-08:00
+  reason: one of the ways agents point the engineer at what they discuss (SYS-63).
+  after:
+    text: When the review page's link names a set of items, decisions or comments to focus on, the page shall show only that set, in the order named, with a control that shows the whole page again.
+    traces_to: SYS-63
+    basis: added
+    why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. When an agent discusses a few things at once, the engineer sees just those, in the agent's order, without the rest of the page around them.
+- op: add
+  id: REVIEW-58
+  at: 2026-11-10T17:07-08:00
+  reason: links must work where the engineer actually opens the page.
+  after:
+    text: The review page shall read every form of link from the URL's fragment alone, written only in letters, digits, '.', '_', '~' and '-'.
+    traces_to: SYS-63
+    basis: added
+    why: The engineer usually opens the page published as a Claude artifact, where nothing else of the URL reaches the page (DR-84). Proposed by agents, not by the engineer.
+- op: add
+  id: REVIEW-59
+  at: 2026-11-10T17:07-08:00
+  reason: the agent's curated list, kept apart from proposals to lock (SYS-63).
+  after:
+    text: Under For you, the review page shall show the agent's look-at-this list first, apart from its recommendations to lock, numbered in the order the agent recorded it, each mark with its reason and links that open what it names.
+    traces_to: SYS-63
+    basis: added
+    why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. Lets an agent ask for the engineer's attention without asking for a lock, ranked so the engineer can work down it.
+- op: add
+  id: REVIEW-60
+  at: 2026-11-10T17:07-08:00
+  reason: stale marks shouldn't accumulate on the page.
+  after:
+    text: The review page shall show only the newest change's look-at-this list, naming that change.
+    traces_to: SYS-63
+    basis: added
+    why: Proposed by an agent in another conversation, and by this agent, so marks from earlier changes don't pile up; each change starts clean (DR-85). Not asked for in these terms by the engineer.
+- op: add
+  id: CLI-39
+  at: 2026-11-10T17:07-08:00
+  reason: agents need the links in a form they can paste (SYS-63).
+  after:
+    text: For the items, decisions and comments an agent names, the CLI shall print a link that opens each on the review page, and one link that shows only that set.
+    traces_to: SYS-63
+    basis: added
+    why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. Agents paste real links instead of bare IDs, and the toolkit, not the agent, knows how each link must be written (DR-84).
+- op: add
+  id: CLI-40
+  at: 2026-11-10T17:07-08:00
+  reason: how an agent builds the look-at-this list (SYS-63).
+  after:
+    text: The CLI shall record in the open change an agent's look-at-this mark, naming items, decisions or comments and the agent's reason, ranked in the order the marks are recorded.
+    traces_to: SYS-63
+    basis: added
+    why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. Separate from proposing items to lock (DR-85).
+- op: add
+  id: AGENT-88
+  at: 2026-11-10T17:07-08:00
+  reason: the skill's part in pointing the engineer at things (SYS-63).
+  after:
+    text: When the agent points the engineer at items, decisions or comments in a conversation, it shall give links that open them on the review page, not bare IDs.
+    traces_to: SYS-63
+    basis: added
+    why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. A bare ID sends the engineer searching the page.
+- op: add
+  id: AGENT-89
+  at: 2026-11-10T17:07-08:00
+  reason: the skill's part in the look-at-this list (SYS-63).
+  after:
+    text: The agent shall put on the look-at-this list, most important first, what it wants the engineer to look at without asking to lock it.
+    traces_to: SYS-63
+    basis: added
+    why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer.
+- op: add
+  id: DR-84
+  at: 2026-11-10T17:08-08:00
+  reason: the link formats and why they fit the artifact's constraint.
+  after:
+    title: Links name what they open in the URL's fragment alone, with the change record's ID and a dot for decisions and comments
+    decided_by: agent
+    elements:
+    - REVIEW
+    - CLI
+    requirements:
+    - REVIEW-56
+    - REVIEW-57
+    - REVIEW-58
+    - CLI-39
+    basis: added
+    context: |-
+      The engineer usually opens the review page published as a Claude artifact. There, only a plain fragment made of letters, digits, '.', '_', '~' and '-' reaches the page's location.hash; a query string and a fragment such as #key=value never arrive. Decisions are numbered from D1 in each change and comments from F1, and are named `<change>/D<n>` elsewhere, but '/' isn't allowed. Round numbers don't name one change: this repository has two changes numbered round 66.
+    decision: |-
+      - An item or element: its ID, `#CORE-12`.
+      - A decision or comment: the change record's ID, a dot, and its number, `#2026-11-10-round-67-deep-links.D3`, `#…round-66.F1`. The page also takes `round-N.D3` while only one change has that round, and a bare `D3` or `F1` by the rule the CLI follows (the newest change's, unless another change has an open decision of that number); a short form that names more than one thing lists every candidate.
+      - A focus link: `#focus~CORE-12~2026-11-10-round-67-deep-links.D3`, the targets in order, joined by '~'. Where they arrive, as in a file opened locally, `#focus=A,B` and `?focus=A,B` work too. A tab's name, such as `#items`, opens that tab.
+      - One target opens where it sits: an item in the full spec, shown whatever the filters say, its details open, highlighted and scrolled to below the header; a decision or comment under For you. A target shown nowhere else (a resolved decision, an older comment) or a short form naming several opens on its own, as in a focus link.
+      - The page follows the link when it loads and on every hashchange. Leaving a link (Show everything, another tab, or back to no fragment) redraws the page, so answers given on the linked view show everywhere, and clears the fragment, so tapping the same link again works.
+      - The toolkit computes the table of forms once (`links.index`) and embeds it in the page, so the page and `spec review --link` can't disagree. `spec review --link` prints the full form, which no later change can make ambiguous, and, without `--url` or `--out`, the fragments with a line on how to use them: the toolkit can't know where a page was published.
+    alternatives: |-
+      '/' as in `<change>/D3`, `#focus=…` and `?focus=` as the printed forms: they don't reach a page published as an artifact. `round-N.D3` as the printed form: shorter, but round numbers repeat after branches merge. Resolving forms in the page's script alone: two implementations of one rule, free to drift apart.
+    consequences: Links to decisions and comments are long. An agent that published the page passes its address with `--url` to print whole links. The page's parsing is tested by running its own functions under Node where Node is installed (the evals shell); the default development shell has none, so there that test is skipped, and the resolution rules are tested in Python.
+- op: add
+  id: DR-85
+  at: 2026-11-10T17:08-08:00
+  reason: the look-at-this command and its staleness rule.
+  after:
+    title: The look-at-this list is its own command, spec point, and only the newest change's list shows
+    decided_by: agent
+    elements:
+    - CLI
+    - REVIEW
+    requirements:
+    - CLI-40
+    - REVIEW-59
+    - REVIEW-60
+    basis: added
+    context: Agents needed a way to ask the engineer to look at something without asking them to lock it, ranked, with a reason, and without marks from earlier changes piling up. `spec propose` asks to lock, takes only items, and keeps withdrawn proposals on the trunk as history.
+    decision: |-
+      - `spec point <targets> --why "…"` adds a mark to the open change's `look_at` list. Targets are item IDs, decisions (`D3`, `<change>/D3`, `<change>.D3`) and comments (`F1`, `<change>/F1`), stored as `<change>/D<n>`. The order recorded is the rank, as with proposals.
+      - Marking a target again moves it into the new mark, at the end; `--withdraw` takes targets off the open change's list without a trace, since only the newest change's list ever shows.
+      - The page shows the newest change's list only, first under For you, naming that change, each mark numbered with its reason, a link to each target and, for several, a link showing only them. Earlier lists stay in their change records.
+    alternatives: |-
+      A flag on `spec propose`: one command whose name says lock would carry two requests, and its items-only checks and its rules for withdrawing from the trunk would need exceptions. Marks that expire after a time: arbitrary, and invisible until they vanish. Marks that last until withdrawn: that is how they pile up.
+    consequences: A change that only applies feedback shows no list unless its agent marks things again. Marks are attention, not decisions, so nothing about them waits for the engineer or blocks a change.
+- op: add
+  id: REVIEW-V33
+  at: 2026-11-10T17:08-08:00
+  reason: verifies the anchor and focus behaviour.
+  after:
+    verifies:
+    - REVIEW-56
+    - REVIEW-57
+    method: test
+    technique: unit test
+    description: The page script follows a link when the page loads and on every hashchange. One item opens in the full spec, shown whatever the filters say with its details open, and is scrolled to; a decision or comment opens under For you; anything shown nowhere else, or a short form naming more than one thing, opens on its own. A focus link shows only what it names, in its order, says which names aren't on the page, lists every candidate of an ambiguous short form, and offers Show everything, which redraws the page and clears the link. Demonstrated in round 67 in headless Chromium at 390 pixels wide, where an item link opened SYS-45 highlighted with its details below the header, and a focus link showed an item, a resolved decision, a comment and an unknown ID.
+    tests:
+      python:
+      - tests/test_links.py::test_the_page_opens_what_a_link_names_on_load_and_when_it_changes
+      - tests/test_links.py::test_a_focused_link_shows_only_what_it_names_with_a_way_back
+- op: add
+  id: REVIEW-V34
+  at: 2026-11-10T17:08-08:00
+  reason: verifies the link forms.
+  after:
+    verifies:
+    - REVIEW-58
+    method: test
+    technique: unit test
+    description: Every decision's and comment's anchor, and every shorter form the page takes, is made only of letters, digits, '.', '_', '~' and '-', and a focus link joins anchors with '~'. A round only one change has gives a short form, a round two changes share gives none, and a bare D<n> lists every candidate until no other change has that decision open, when it is the newest change's. Run under Node where Node is installed, the page's own functions read '#ID', '#focus~A~B', '#focus=A,B', '?focus=A,B' and '#A~B', the fragment winning over the query, and resolve an item ID in either case, a decision by its full or round form, a bare D<n> or F<n> naming one thing, both candidates of an ambiguous D1, and nothing for a shared round or an unknown ID.
+    tests:
+      python:
+      - tests/test_links.py::test_every_link_form_is_made_of_characters_that_reach_the_fragment
+      - tests/test_links.py::test_short_forms_name_one_thing_or_list_every_candidate
+      - tests/test_links.py::test_the_page_reads_every_link_form_and_resolves_it
+- op: add
+  id: REVIEW-V35
+  at: 2026-11-10T17:08-08:00
+  reason: verifies the look-at-this list on the page.
+  after:
+    verifies:
+    - REVIEW-59
+    - REVIEW-60
+    method: test
+    technique: unit test
+    description: A mark recorded in the open change shows in the page data under that change; once that change closes and a newer one opens, the list is empty until the newer change records a mark, which shows with each target's anchor and a focus link for its targets. The text section names the change, numbers the mark and gives each decision's question. The page script draws the list before the overview and the recommendations to lock, numbering each mark, naming the change, linking each target by its anchor and offering the focus link.
+    tests:
+      python:
+      - tests/test_links.py::test_only_the_newest_changes_look_at_this_list_shows
+- op: add
+  id: CLI-V26
+  at: 2026-11-10T17:08-08:00
+  reason: verifies spec review --link.
+  after:
+    verifies:
+    - CLI-39
+    method: test
+    technique: unit test
+    description: spec review --link prints one line for each target, naming it with a few words and giving its link, then one focus link for them; with --url, whole links on that address with any fragment dropped; with --out, file links; with neither, the fragments, how to use them and how to get whole links. It writes nothing, and with an unknown target it prints no link and fails. Targets resolve as the CLI names decisions elsewhere (<change>/D<n>, <change>.D<n>, a round naming one change, a bare D<n> in the open change), and unknown, ambiguous and missing ones are refused.
+    tests:
+      python:
+      - tests/test_links.py::test_review_link_prints_a_link_per_target_and_one_focused_on_all
+      - tests/test_links.py::test_targets_resolve_as_the_cli_names_them
+- op: add
+  id: CLI-V27
+  at: 2026-11-10T17:08-08:00
+  reason: verifies spec point.
+  after:
+    verifies:
+    - CLI-40
+    method: test
+    technique: unit test
+    description: spec point records marks in the open change in the order run, each with its targets, items and decisions stored as <change>/D<n>, and its reason, and proposes nothing to lock. It refuses a mark with no reason or an unknown target. Marking a target again moves it to a new mark at the end, and --withdraw takes a target off the list.
+    tests:
+      python:
+      - tests/test_links.py::test_point_records_a_ranked_look_at_this_list_apart_from_proposals
+- op: add
+  id: AGENT-V37
+  at: 2026-11-10T17:08-08:00
+  reason: verifies the skill text.
+  after:
+    verifies:
+    - AGENT-88
+    - AGENT-89
+    method: inspection
+    technique: unit test
+    description: The skill's section on talking to the engineer tells agents to paste what spec review --link prints rather than bare IDs, and to ask for a look without asking to lock with spec point, most important first, each change's list starting empty.
+    tests:
+      python:
+      - tests/test_links.py::test_the_skill_says_to_paste_links_and_to_point_rather_than_propose
+- op: modify
+  id: REVIEW-V35
+  at: 2026-11-10T17:09-08:00
+  reason: item targets open beside the reader, who keeps their place (REVIEW-28).
+  before:
+    description: A mark recorded in the open change shows in the page data under that change; once that change closes and a newer one opens, the list is empty until the newer change records a mark, which shows with each target's anchor and a focus link for its targets. The text section names the change, numbers the mark and gives each decision's question. The page script draws the list before the overview and the recommendations to lock, numbering each mark, naming the change, linking each target by its anchor and offering the focus link.
+  after:
+    description: A mark recorded in the open change shows in the page data under that change; once that change closes and a newer one opens, the list is empty until the newer change records a mark, which shows with each target's anchor and a focus link for its targets. The text section names the change, numbers the mark and gives each decision's question. The page script draws the list before the overview and the recommendations to lock, numbering each mark, naming the change and offering the focus link; an item target opens beside the reader, and a decision or comment target links to it by its anchor.
+- op: modify
+  id: REVIEW-V33
+  at: 2026-11-10T17:09-08:00
+  reason: leaving a link returns the person to where they were.
+  before:
+    description: The page script follows a link when the page loads and on every hashchange. One item opens in the full spec, shown whatever the filters say with its details open, and is scrolled to; a decision or comment opens under For you; anything shown nowhere else, or a short form naming more than one thing, opens on its own. A focus link shows only what it names, in its order, says which names aren't on the page, lists every candidate of an ambiguous short form, and offers Show everything, which redraws the page and clears the link. Demonstrated in round 67 in headless Chromium at 390 pixels wide, where an item link opened SYS-45 highlighted with its details below the header, and a focus link showed an item, a resolved decision, a comment and an unknown ID.
+  after:
+    description: The page script follows a link when the page loads and on every hashchange. One item opens in the full spec, shown whatever the filters say with its details open, and is scrolled to; a decision or comment opens under For you; anything shown nowhere else, or a short form naming more than one thing, opens on its own. A focus link shows only what it names, in its order, says which names aren't on the page, lists every candidate of an ambiguous short form, and offers Show everything, which redraws the page, clears the link and returns the person to the tab and place they left. Demonstrated in round 67 in headless Chromium at 390 pixels wide, where an item link opened SYS-45 highlighted with its details below the header, and a focus link showed an item, a resolved decision, a comment and an unknown ID.
+- op: modify
+  id: DR-84
+  at: 2026-11-10T17:09-08:00
+  reason: item targets inside the page keep the reader's place (REVIEW-28), and leaving a link returns them to it.
+  before:
+    decision: |-
+      - An item or element: its ID, `#CORE-12`.
+      - A decision or comment: the change record's ID, a dot, and its number, `#2026-11-10-round-67-deep-links.D3`, `#…round-66.F1`. The page also takes `round-N.D3` while only one change has that round, and a bare `D3` or `F1` by the rule the CLI follows (the newest change's, unless another change has an open decision of that number); a short form that names more than one thing lists every candidate.
+      - A focus link: `#focus~CORE-12~2026-11-10-round-67-deep-links.D3`, the targets in order, joined by '~'. Where they arrive, as in a file opened locally, `#focus=A,B` and `?focus=A,B` work too. A tab's name, such as `#items`, opens that tab.
+      - One target opens where it sits: an item in the full spec, shown whatever the filters say, its details open, highlighted and scrolled to below the header; a decision or comment under For you. A target shown nowhere else (a resolved decision, an older comment) or a short form naming several opens on its own, as in a focus link.
+      - The page follows the link when it loads and on every hashchange. Leaving a link (Show everything, another tab, or back to no fragment) redraws the page, so answers given on the linked view show everywhere, and clears the fragment, so tapping the same link again works.
+      - The toolkit computes the table of forms once (`links.index`) and embeds it in the page, so the page and `spec review --link` can't disagree. `spec review --link` prints the full form, which no later change can make ambiguous, and, without `--url` or `--out`, the fragments with a line on how to use them: the toolkit can't know where a page was published.
+  after:
+    decision: |-
+      - An item or element: its ID, `#CORE-12`.
+      - A decision or comment: the change record's ID, a dot, and its number, `#2026-11-10-round-67-deep-links.D3`, `#…round-66.F1`. The page also takes `round-N.D3` while only one change has that round, and a bare `D3` or `F1` by the rule the CLI follows (the newest change's, unless another change has an open decision of that number); a short form that names more than one thing lists every candidate.
+      - A focus link: `#focus~CORE-12~2026-11-10-round-67-deep-links.D3`, the targets in order, joined by '~'. Where they arrive, as in a file opened locally, `#focus=A,B` and `?focus=A,B` work too. A tab's name, such as `#items`, opens that tab.
+      - One target opens where it sits: an item in the full spec, shown whatever the filters say, its details open, highlighted and scrolled to below the header; a decision or comment under For you. A target shown nowhere else (a resolved decision, an older comment) or a short form naming several opens on its own, as in a focus link.
+      - The page follows the link when it loads and on every hashchange. Leaving a link (Show everything, another tab, or back to no fragment) redraws the page, so answers given on the linked view show everywhere, returns the person to the tab and place they left, and clears the fragment, so tapping the same link again works.
+      - Inside the page, an item on the look-at-this list opens beside the reader, as any item does (REVIEW-28); only a decision, a comment or a focus link moves the view.
+      - The toolkit computes the table of forms once (`links.index`) and embeds it in the page, so the page and `spec review --link` can't disagree. `spec review --link` prints the full form, which no later change can make ambiguous, and, without `--url` or `--out`, the fragments with a line on how to use them: the toolkit can't know where a page was published.
+- op: add
+  id: SYS-V27
+  at: 2026-11-10T17:09-08:00
+  reason: SYS-63 is covered by its children.
+  after:
+    verifies:
+    - SYS-63
+    method: analysis
+    technique: roll-up
+    description: Passes when every requirement refining SYS-63 passes its own verification (REVIEW-56 to REVIEW-60, CLI-39, CLI-40, AGENT-88, AGENT-89).
+- op: modify
+  id: DR-84
+  at: 2026-11-10T17:10-08:00
+  reason: says exactly where leaving a link takes the person.
+  before:
+    decision: |-
+      - An item or element: its ID, `#CORE-12`.
+      - A decision or comment: the change record's ID, a dot, and its number, `#2026-11-10-round-67-deep-links.D3`, `#…round-66.F1`. The page also takes `round-N.D3` while only one change has that round, and a bare `D3` or `F1` by the rule the CLI follows (the newest change's, unless another change has an open decision of that number); a short form that names more than one thing lists every candidate.
+      - A focus link: `#focus~CORE-12~2026-11-10-round-67-deep-links.D3`, the targets in order, joined by '~'. Where they arrive, as in a file opened locally, `#focus=A,B` and `?focus=A,B` work too. A tab's name, such as `#items`, opens that tab.
+      - One target opens where it sits: an item in the full spec, shown whatever the filters say, its details open, highlighted and scrolled to below the header; a decision or comment under For you. A target shown nowhere else (a resolved decision, an older comment) or a short form naming several opens on its own, as in a focus link.
+      - The page follows the link when it loads and on every hashchange. Leaving a link (Show everything, another tab, or back to no fragment) redraws the page, so answers given on the linked view show everywhere, returns the person to the tab and place they left, and clears the fragment, so tapping the same link again works.
+      - Inside the page, an item on the look-at-this list opens beside the reader, as any item does (REVIEW-28); only a decision, a comment or a focus link moves the view.
+      - The toolkit computes the table of forms once (`links.index`) and embeds it in the page, so the page and `spec review --link` can't disagree. `spec review --link` prints the full form, which no later change can make ambiguous, and, without `--url` or `--out`, the fragments with a line on how to use them: the toolkit can't know where a page was published.
+  after:
+    decision: |-
+      - An item or element: its ID, `#CORE-12`.
+      - A decision or comment: the change record's ID, a dot, and its number, `#2026-11-10-round-67-deep-links.D3`, `#…round-66.F1`. The page also takes `round-N.D3` while only one change has that round, and a bare `D3` or `F1` by the rule the CLI follows (the newest change's, unless another change has an open decision of that number); a short form that names more than one thing lists every candidate.
+      - A focus link: `#focus~CORE-12~2026-11-10-round-67-deep-links.D3`, the targets in order, joined by '~'. Where they arrive, as in a file opened locally, `#focus=A,B` and `?focus=A,B` work too. A tab's name, such as `#items`, opens that tab.
+      - One target opens where it sits: an item in the full spec, shown whatever the filters say, its details open, highlighted and scrolled to below the header; a decision or comment under For you. A target shown nowhere else (a resolved decision, an older comment) or a short form naming several opens on its own, as in a focus link.
+      - The page follows the link when it loads and on every hashchange. Leaving a link redraws the page, so answers given on the linked view show everywhere, and clears the fragment, so tapping the same link again works. Show everything, or going back to no fragment, returns the person to the tab and place they left; choosing a tab goes to that tab.
+      - Inside the page, an item on the look-at-this list opens beside the reader, as any item does (REVIEW-28); only a decision, a comment or a focus link moves the view.
+      - The toolkit computes the table of forms once (`links.index`) and embeds it in the page, so the page and `spec review --link` can't disagree. `spec review --link` prints the full form, which no later change can make ambiguous, and, without `--url` or `--out`, the fragments with a line on how to use them: the toolkit can't know where a page was published.
+decisions: []
+proposals:
+- ids:
+  - REVIEW-56
+  - REVIEW-57
+  why: |-
+    What a link does on the page: one target opens where it sits (an item in the full spec, a decision under For you), several show alone with a way back. Agents proposed this; you asked only for better ways to point things out. Every link an agent sends you behaves this way.
+  proposed: 2026-11-10T17:12-08:00
+- ids:
+  - REVIEW-59
+  - REVIEW-60
+  - DR-85
+  why: |-
+    The look-at-this list: first under For you, apart from lock recommendations, and only the newest change's list shows (each change starts clean, rather than marks expiring). I picked this staleness rule and a separate command, spec point, over a flag on spec propose.
+  proposed: 2026-11-10T17:12-08:00
+- ids:
+  - REVIEW-58
+  - DR-84
+  why: |-
+    The exact link forms, fitted to what reaches a page published as a Claude artifact: #CORE-12, #<change-id>.D3, #focus~A~B. Decision links carry the full change ID because round numbers repeat (two changes are round 66), so they're long.
+  proposed: 2026-11-10T17:12-08:00
+- ids:
+  - AGENT-88
+  - AGENT-89
+  why: |-
+    What the skill now tells agents: paste spec review --link output instead of bare IDs, and use the look-at-this list to ask for attention without asking to lock.
+  proposed: 2026-11-10T17:12-08:00
+- ids:
+  - SYS-63
+  why: My summary of what you said, that you want better ways for agents to point you at what they're discussing, recorded as guided intent. Everything above refines it.
+  proposed: 2026-11-10T17:12-08:00
+- ids:
+  - CLI-39
+  - CLI-40
+  why: |-
+    The two commands, spec review --link and spec point: the shape agents use, which you'll see in their reports.
+  proposed: 2026-11-10T17:12-08:00
+look_at:
+- targets:
+  - DR-84
+  why: |-
+    How the links are written, and why: only a plain fragment reaches a page published as an artifact. Decision links are long because round numbers repeat.
+  at: 2026-11-10T17:12-08:00
+- targets:
+  - REVIEW-28
+  - REVIEW-59
+  why: Inside the page, an item on this list opens beside you, as REVIEW-28 asks of every item, rather than jumping to the full spec; decisions and comments do jump. Say if you'd rather items jump too.
+  at: 2026-11-10T17:12-08:00
+closed: '2026-11-10'

@@ -334,3 +334,35 @@
   tests:
     python:
     - tests/test_review_page.py::test_recommendations_keep_the_agents_ranking_and_number_it
+- id: REVIEW-V33
+  verifies:
+  - REVIEW-56
+  - REVIEW-57
+  method: test
+  technique: unit test
+  description: The page script follows a link when the page loads and on every hashchange. One item opens in the full spec, shown whatever the filters say with its details open, and is scrolled to; a decision or comment opens under For you; anything shown nowhere else, or a short form naming more than one thing, opens on its own. A focus link shows only what it names, in its order, says which names aren't on the page, lists every candidate of an ambiguous short form, and offers Show everything, which redraws the page, clears the link and returns the person to the tab and place they left. Demonstrated in round 67 in headless Chromium at 390 pixels wide, where an item link opened SYS-45 highlighted with its details below the header, and a focus link showed an item, a resolved decision, a comment and an unknown ID.
+  tests:
+    python:
+    - tests/test_links.py::test_the_page_opens_what_a_link_names_on_load_and_when_it_changes
+    - tests/test_links.py::test_a_focused_link_shows_only_what_it_names_with_a_way_back
+- id: REVIEW-V34
+  verifies:
+  - REVIEW-58
+  method: test
+  technique: unit test
+  description: Every decision's and comment's anchor, and every shorter form the page takes, is made only of letters, digits, '.', '_', '~' and '-', and a focus link joins anchors with '~'. A round only one change has gives a short form, a round two changes share gives none, and a bare D<n> lists every candidate until no other change has that decision open, when it is the newest change's. Run under Node where Node is installed, the page's own functions read '#ID', '#focus~A~B', '#focus=A,B', '?focus=A,B' and '#A~B', the fragment winning over the query, and resolve an item ID in either case, a decision by its full or round form, a bare D<n> or F<n> naming one thing, both candidates of an ambiguous D1, and nothing for a shared round or an unknown ID.
+  tests:
+    python:
+    - tests/test_links.py::test_every_link_form_is_made_of_characters_that_reach_the_fragment
+    - tests/test_links.py::test_short_forms_name_one_thing_or_list_every_candidate
+    - tests/test_links.py::test_the_page_reads_every_link_form_and_resolves_it
+- id: REVIEW-V35
+  verifies:
+  - REVIEW-59
+  - REVIEW-60
+  method: test
+  technique: unit test
+  description: A mark recorded in the open change shows in the page data under that change; once that change closes and a newer one opens, the list is empty until the newer change records a mark, which shows with each target's anchor and a focus link for its targets. The text section names the change, numbers the mark and gives each decision's question. The page script draws the list before the overview and the recommendations to lock, numbering each mark, naming the change and offering the focus link; an item target opens beside the reader, and a decision or comment target links to it by its anchor.
+  tests:
+    python:
+    - tests/test_links.py::test_only_the_newest_changes_look_at_this_list_shows

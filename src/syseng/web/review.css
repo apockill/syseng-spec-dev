@@ -349,5 +349,18 @@ dialog pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--
 .round .work { margin: 6px 0; }
 .round .then { margin-top: 8px; }
 button.linkish { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+
+/* links into the page (REVIEW-56, REVIEW-57, REVIEW-59) */
+.card.linked { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent), var(--shadow); }
+.focusbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; margin-bottom: 12px;
+  border: 1px solid var(--accent); border-radius: 12px; background: color-mix(in srgb, var(--accent) 10%, var(--surface-2));
+  position: sticky; top: calc(var(--head-h, 96px) + 6px); z-index: 5; }
+.focusbar .small { flex: 1 1 180px; color: var(--text-secondary); }
+a.act { text-decoration: none; }
+.card.look ul.targets { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.target { display: block; width: 100%; text-align: left; font: inherit; cursor: pointer; color: var(--text-secondary); text-decoration: none; overflow-wrap: anywhere; padding: 6px 8px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+.target .mono { color: var(--accent-ink); text-decoration: underline dotted; text-underline-offset: 3px; }
+.target:hover { border-color: var(--border-strong); }
 .rank { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px;
   border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border-strong); font-size: 12px; font-weight: 650; }

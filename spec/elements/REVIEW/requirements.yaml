@@ -525,3 +525,28 @@
     basis: guided
     source: human_conversation
     fingerprint: 18f66e995bfd
+- id: REVIEW-56
+  text: When the review page's link names one item, decision or comment, the page shall show it opened where it sits on the page, on loading and whenever the link changes while the page is open.
+  traces_to: SYS-63
+  basis: added
+  why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. An agent in a chat can send a link that opens exactly what it names, so the engineer, often on a phone, doesn't search hundreds of items for it.
+- id: REVIEW-57
+  text: When the review page's link names a set of items, decisions or comments to focus on, the page shall show only that set, in the order named, with a control that shows the whole page again.
+  traces_to: SYS-63
+  basis: added
+  why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. When an agent discusses a few things at once, the engineer sees just those, in the agent's order, without the rest of the page around them.
+- id: REVIEW-58
+  text: The review page shall read every form of link from the URL's fragment alone, written only in letters, digits, '.', '_', '~' and '-'.
+  traces_to: SYS-63
+  basis: added
+  why: The engineer usually opens the page published as a Claude artifact, where nothing else of the URL reaches the page (DR-84). Proposed by agents, not by the engineer.
+- id: REVIEW-59
+  text: Under For you, the review page shall show the agent's look-at-this list first, apart from its recommendations to lock, numbered in the order the agent recorded it, each mark with its reason and links that open what it names.
+  traces_to: SYS-63
+  basis: added
+  why: Proposed by an agent in another conversation, and by this agent, to serve SYS-63, not asked for in these terms by the engineer. Lets an agent ask for the engineer's attention without asking for a lock, ranked so the engineer can work down it.
+- id: REVIEW-60
+  text: The review page shall show only the newest change's look-at-this list, naming that change.
+  traces_to: SYS-63
+  basis: added
+  why: Proposed by an agent in another conversation, and by this agent, so marks from earlier changes don't pile up; each change starts clean (DR-85). Not asked for in these terms by the engineer.

@@ -272,3 +272,22 @@
   tests:
     python:
     - tests/test_review_page.py::test_the_review_command_reminds_a_change_that_altered_requirements_to_propose
+- id: CLI-V26
+  verifies:
+  - CLI-39
+  method: test
+  technique: unit test
+  description: spec review --link prints one line for each target, naming it with a few words and giving its link, then one focus link for them; with --url, whole links on that address with any fragment dropped; with --out, file links; with neither, the fragments, how to use them and how to get whole links. It writes nothing, and with an unknown target it prints no link and fails. Targets resolve as the CLI names decisions elsewhere (<change>/D<n>, <change>.D<n>, a round naming one change, a bare D<n> in the open change), and unknown, ambiguous and missing ones are refused.
+  tests:
+    python:
+    - tests/test_links.py::test_review_link_prints_a_link_per_target_and_one_focused_on_all
+    - tests/test_links.py::test_targets_resolve_as_the_cli_names_them
+- id: CLI-V27
+  verifies:
+  - CLI-40
+  method: test
+  technique: unit test
+  description: spec point records marks in the open change in the order run, each with its targets, items and decisions stored as <change>/D<n>, and its reason, and proposes nothing to lock. It refuses a mark with no reason or an unknown target. Marking a target again moves it to a new mark at the end, and --withdraw takes a target off the list.
+  tests:
+    python:
+    - tests/test_links.py::test_point_records_a_ranked_look_at_this_list_apart_from_proposals

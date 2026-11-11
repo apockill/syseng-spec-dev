@@ -872,3 +872,17 @@
     said: Asked to add .specignore, so the apps that aren't specified stay out of the spec.
     basis: stated
     fingerprint: ebd15577ee66
+- id: SYS-63
+  kind: system
+  text: The toolkit shall let agents point the engineer at exactly the items, decisions and comments they are discussing, on the review page.
+  serves:
+  - NEED-24
+  - NEED-23
+  intent:
+  - by: Alex Thiele <alex.g.thiele@gmail.com>
+    when: 2026-11-10 17:03
+    context: Discussing how agents in a chat refer the engineer to what they mean on the review page, which the engineer often reads on a phone. The specific mechanisms (links, a focused view, a look-at-this list) were proposed by agents, not by the engineer.
+    said: Wants better ways for agents to point the engineer at what they are discussing; did not specify how.
+    basis: guided
+    source: human_conversation
+    fingerprint: 14a47c8cc6b1
